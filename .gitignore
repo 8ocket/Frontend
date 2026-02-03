@@ -1,0 +1,4 @@
+# Backend (별도 리포 관리)
+backend/
+# macOS
+.DS_Store
