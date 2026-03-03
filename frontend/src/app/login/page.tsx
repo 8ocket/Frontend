@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { LoginContent, ModeSelect } from '@/components/login';
+import WaveBackground from '@/components/login/WaveBackground';
 import type { LoginProvider } from '@/components/login';
 
 export default function LoginPage() {
@@ -23,6 +24,7 @@ export default function LoginPage() {
 
   return (
     <main className="relative h-screen w-full overflow-hidden bg-white">
+      <WaveBackground />
       <LoginContent onLogin={handleLogin} />
       <ModeSelect onClick={handleModeSelect} className="fixed top-10 right-10 z-20" />
     </main>

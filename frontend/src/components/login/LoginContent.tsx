@@ -22,16 +22,16 @@ export function LoginContent({ onLogin }: LoginContentProps) {
   };
 
   return (
-    <div className="absolute top-1/2 left-1/2 w-[90%] sm:w-[420px] md:w-[450px] -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white/10 px-4 sm:px-8 py-8 sm:py-16 backdrop-blur-[30px]">
-      <div className="mb-8 sm:mb-16 flex justify-center">
+    <div className="absolute top-1/2 left-1/2 w-[90%] -translate-x-1/2 -translate-y-1/2 rounded-lg px-4 py-8 sm:w-[420px] sm:px-8 sm:py-16 md:w-[450px]">
+      <div className="mb-8 flex justify-center sm:mb-16">
         <LogoSmall className="h-[180px] w-[180px] sm:h-[240px] sm:w-[240px] md:h-[295px] md:w-[295px]" />
       </div>
 
-      <div className="mb-4 sm:mb-6 space-y-3 sm:space-y-4 text-center">
-        <p className="text-[13px] sm:text-[14px] md:text-[16px] leading-[1.3] font-semibold tracking-tight text-[#1a222e]">
+      <div className="mb-4 space-y-3 text-center sm:mb-6 sm:space-y-4">
+        <p className="text-[13px] leading-[1.3] font-semibold tracking-tight text-[#1a222e] sm:text-[14px] md:text-[16px]">
           {loginTexts.greeting}
         </p>
-        <h1 className="text-[16px] sm:text-[18px] md:text-[20px] leading-[1.3] font-semibold tracking-tight text-[#1a222e]">
+        <h1 className="text-[16px] leading-[1.3] font-semibold tracking-tight text-[#1a222e] sm:text-[18px] md:text-[20px]">
           {loginTexts.loginPrompt}
         </h1>
       </div>
