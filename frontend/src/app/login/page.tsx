@@ -1,44 +1,30 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
-// TODO: 백엔드에서 소셜 로그인 URL 받으면 수정
-const KAKAO_LOGIN_URL = process.env.NEXT_PUBLIC_API_URL + '/auth/kakao';
-const GOOGLE_LOGIN_URL = process.env.NEXT_PUBLIC_API_URL + '/auth/google';
+import { useRouter } from 'next/navigation';
+import { LoginContent, ModeSelect } from '@/components/login';
+import type { LoginProvider } from '@/components/login';
 
 export default function LoginPage() {
-  const handleKakaoLogin = () => {
-    window.location.href = KAKAO_LOGIN_URL;
+  const router = useRouter();
+
+  const handleLogin = async (provider: LoginProvider) => {
+    try {
+      // TODO: 실제 로그인 로직 구현
+      console.log(`Login with ${provider}`);
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = GOOGLE_LOGIN_URL;
+  const handleModeSelect = () => {
+    // TODO: 다크 모드 토글 로직 구현
+    console.log('Toggle dark mode');
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">MindLog</CardTitle>
-          <CardDescription>소셜 계정으로 간편하게 시작하세요</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Button
-            onClick={handleKakaoLogin}
-            className="w-full bg-[#FEE500] text-black hover:bg-[#FDD800]"
-          >
-            카카오로 시작하기
-          </Button>
-          <Button
-            onClick={handleGoogleLogin}
-            variant="outline"
-            className="w-full"
-          >
-            Google로 시작하기
-          </Button>
-        </CardContent>
-      </Card>
-    </div>
+    <main className="relative h-screen w-full overflow-hidden bg-white">
+      <LoginContent onLogin={handleLogin} />
+      <ModeSelect onClick={handleModeSelect} className="fixed top-10 right-10 z-20" />
+    </main>
   );
 }
