@@ -5,3 +5,4 @@ export { LoginContent } from './LoginContent';
 export { TermsAgreement } from './TermsAgreement';
 export { TermsItem } from './TermsItem';
 export { TermsCheckbox } from './TermsCheckbox';
+export { Conditions, type ConditionsProps } from './Conditions';
