@@ -33,17 +33,17 @@ interface SliderProps {
   onChange: (value: number) => void;
 }
 
-// ── Plutchik 감정 바퀴 8가지 색상 ──────────────────────────────
+// ── Plutchik 감정 바퀴 8가지 색상 (globals.css --color-emotion-* 토큰 기준) ──
 // cSpell: disable-next-line
 const EMOTIONS: Emotion[] = [
-  { name: 'Rage', rgb: [196, 10, 10] },
-  { name: 'Vigilance', rgb: [218, 85, 0] },
-  { name: 'Ecstasy', rgb: [255, 185, 0] },
-  { name: 'Admiration', rgb: [22, 120, 30] },
-  { name: 'Terror', rgb: [0, 115, 95] },
-  { name: 'Amazement', rgb: [28, 90, 195] },
-  { name: 'Grief', rgb: [65, 30, 155] },
-  { name: 'Loathing', rgb: [115, 20, 170] },
+  { name: 'Rage', rgb: [196, 10, 10] },       // --color-emotion-rage:       #c40a0a
+  { name: 'Vigilance', rgb: [218, 85, 0] },    // --color-emotion-vigilance:  #da5500
+  { name: 'Ecstasy', rgb: [255, 185, 0] },     // --color-emotion-ecstasy:    #ffb900
+  { name: 'Admiration', rgb: [22, 120, 30] },  // --color-emotion-admiration: #16781e
+  { name: 'Terror', rgb: [0, 115, 95] },       // --color-emotion-terror:     #00735f
+  { name: 'Amazement', rgb: [28, 90, 195] },   // --color-emotion-amazement:  #1c5ac3
+  { name: 'Grief', rgb: [65, 30, 155] },       // --color-emotion-grief:      #411e9b
+  { name: 'Loathing', rgb: [115, 20, 170] },   // --color-emotion-loathing:   #7314aa
 ];
 
 // ── 유틸 ──────────────────────────────────────────────────────
@@ -149,7 +149,6 @@ export default function EmotionCardGenerator() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         input[type=range] { -webkit-appearance: none; background: #333; border-radius: 2px; }
         input[type=range]::-webkit-slider-thumb {
@@ -173,9 +172,9 @@ export default function EmotionCardGenerator() {
       >
         {/* 상단 타이틀 */}
         <p
+          className="card-03"
           style={{
             color: '#333',
-            fontSize: 11,
             letterSpacing: '0.4em',
             textTransform: 'uppercase',
           }}
@@ -231,12 +230,11 @@ export default function EmotionCardGenerator() {
 
           {/* 좌상단 텍스트 */}
           <span
+            className="card-01"
             style={{
               position: 'absolute',
               top: 22,
               left: 22,
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: 20,
               letterSpacing: '0.14em',
               color: 'rgba(0,0,0,0.75)',
               zIndex: 3,
@@ -249,12 +247,11 @@ export default function EmotionCardGenerator() {
 
           {/* 우하단 텍스트 (180도 회전) */}
           <span
+            className="card-01"
             style={{
               position: 'absolute',
               bottom: 22,
               right: 22,
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: 20,
               letterSpacing: '0.14em',
               color: 'rgba(0,0,0,0.75)',
               zIndex: 3,
@@ -269,8 +266,8 @@ export default function EmotionCardGenerator() {
 
         {/* 현재 감정 이름 */}
         <p
+          className="card-03"
           style={{
-            fontSize: 11,
             letterSpacing: '0.35em',
             color: dominantColor,
             textTransform: 'uppercase',
@@ -327,12 +324,11 @@ export default function EmotionCardGenerator() {
                     }}
                   />
                   <span
+                    className="card-03"
                     style={{
-                      fontSize: 9,
                       letterSpacing: '0.1em',
                       textTransform: 'uppercase',
                       color: isActive ? '#aaa' : '#333',
-                      fontFamily: 'inherit',
                       transition: 'color 0.2s',
                     }}
                   >
@@ -346,14 +342,12 @@ export default function EmotionCardGenerator() {
           {/* 생성 버튼 */}
           <div style={{ display: 'flex', gap: 12 }}>
             <button
-              className="generate-btn"
+              className="generate-btn card-02"
               onClick={generate}
               style={{
                 background: 'none',
                 border: '1px solid #333',
                 color: '#777',
-                fontFamily: "'Cormorant Garamond', serif",
-                fontSize: 14,
                 letterSpacing: '0.3em',
                 padding: '10px 30px',
                 cursor: 'pointer',
@@ -364,13 +358,12 @@ export default function EmotionCardGenerator() {
               ↻ GENERATE
             </button>
             <button
+              className="card-02"
               onClick={() => setActiveIndices([])}
               style={{
                 background: 'none',
                 border: '1px solid #999',
                 color: '#999',
-                fontFamily: "'Cormorant Garamond', serif",
-                fontSize: 14,
                 letterSpacing: '0.3em',
                 padding: '10px 30px',
                 cursor: 'pointer',

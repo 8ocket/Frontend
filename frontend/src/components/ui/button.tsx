@@ -1,54 +1,63 @@
-import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from 'react';
+import { Slot } from '@radix-ui/react-slot';
+import { cva, type VariantProps } from 'class-variance-authority';
 
-import { cn } from "@/lib/utils"
+import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-all disabled:pointer-events-none disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
-        outline:
-          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
+        // ── MindLog 디자인 시스템 ──────────────────────────────
+        // Light: bg cta-300, text secondary-100
+        // Dark:  bg cta-400, text prime-950 (밝은 배경에서 대비 확보)
+        primary:
+          'bg-cta-300 text-secondary-100 hover:bg-[#4ba1f0] active:bg-[#257cc0] disabled:bg-[#cacaca] disabled:text-neutral-400' +
+          ' dark:bg-cta-400 dark:text-prime-950 dark:hover:bg-cta-300 dark:active:bg-cta-500 dark:disabled:bg-tertiary-700 dark:disabled:text-tertiary-500',
+        // Light: bg secondary-100, border+text cta-300
+        // Dark:  bg prime-800, border+text cta-300
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          'bg-secondary-100 text-cta-300 border border-cta-300 hover:bg-neutral-300 hover:text-[#4ba1f0] hover:border-[#4ba1f0] active:bg-neutral-300 active:text-[#257cc0] active:border-[#257cc0] disabled:text-[#cacaca] disabled:border-[#cacaca]' +
+          ' dark:bg-prime-800 dark:text-cta-300 dark:border-cta-300 dark:hover:bg-prime-700 dark:hover:text-cta-400 dark:hover:border-cta-400 dark:disabled:text-tertiary-500 dark:disabled:border-tertiary-700',
+        // Light: transparent, text cta-300
+        // Dark:  transparent, text cta-300 (hover는 prime-800)
         ghost:
-          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-primary underline-offset-4 hover:underline",
+          'bg-transparent text-cta-300 hover:bg-neutral-300 hover:text-[#4ba1f0] active:bg-neutral-300 active:text-[#257cc0] disabled:text-neutral-400' +
+          ' dark:text-cta-300 dark:hover:bg-prime-800 dark:hover:text-cta-400 dark:disabled:text-tertiary-500',
+        // ── shadcn 호환 (내부 컴포넌트용) ──────────────────────
+        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        destructive:
+          'bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20',
+        outline: 'border bg-background hover:bg-accent hover:text-accent-foreground',
+        link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {
-        default: "h-9 px-4 py-2 has-[>svg]:px-3",
-        xs: "h-6 gap-1 rounded-md px-2 text-xs has-[>svg]:px-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
-        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
-        icon: "size-9",
-        "icon-xs": "size-6 rounded-md [&_svg:not([class*='size-'])]:size-3",
-        "icon-sm": "size-8",
-        "icon-lg": "size-10",
+        default: 'h-11 px-4 rounded-lg text-sm',
+        cta: 'h-11 w-full rounded-full px-8 text-base',
+        sm: 'h-8 px-3 rounded-md text-xs',
+        lg: 'h-12 px-6 rounded-lg text-base',
+        icon: 'size-11 rounded-lg',
       },
     },
     defaultVariants: {
-      variant: "default",
-      size: "default",
+      variant: 'primary',
+      size: 'default',
     },
   }
-)
+);
 
 function Button({
   className,
-  variant = "default",
-  size = "default",
+  variant = 'primary',
+  size = 'default',
   asChild = false,
   ...props
-}: React.ComponentProps<"button"> &
+}: React.ComponentProps<'button'> &
   VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
+    asChild?: boolean;
   }) {
-  const Comp = asChild ? Slot : "button"
+  const Comp = asChild ? Slot : 'button';
 
   return (
     <Comp
@@ -58,7 +67,7 @@ function Button({
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />
-  )
+  );
 }
 
-export { Button, buttonVariants }
+export { Button, buttonVariants };
