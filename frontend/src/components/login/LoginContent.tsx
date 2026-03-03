@@ -7,9 +7,17 @@ import { loginTexts, oauthConfig } from '@/constants/login';
 
 interface LoginContentProps {
   onLogin?: (provider: LoginProvider) => Promise<void>;
+  isLoading?: boolean;
+  error?: string | null;
 }
 
-export function LoginContent({ onLogin }: LoginContentProps) {
+const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
+
+export function LoginContent({
+  onLogin,
+  isLoading: externalLoading,
+  error: externalError,
+}: LoginContentProps) {
   const [loadingProvider, setLoadingProvider] = useState<LoginProvider | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,8 +26,8 @@ export function LoginContent({ onLogin }: LoginContentProps) {
       setLoadingProvider(provider);
       setError(null);
 
-      if (provider === 'kakao') {
-        // Kakao 인가 요청 URL 생성
+      if (provider === 'kakao' && !USE_MOCK) {
+        // 실제 카카오 인증 (Mock 모드가 아닐 때만)
         const params = new URLSearchParams({
           client_id: oauthConfig.kakao.clientId,
           redirect_uri: oauthConfig.kakao.redirectUri,
@@ -29,7 +37,7 @@ export function LoginContent({ onLogin }: LoginContentProps) {
         const kakaoAuthUrl = `${oauthConfig.kakao.authUrl}?${params.toString()}`;
         window.location.href = kakaoAuthUrl;
       } else {
-        // 다른 프로바이더 처리 (향후 구현)
+        // Mock 모드 또는 다른 프로바이더 처리
         await onLogin?.(provider);
       }
     } catch (err) {
@@ -40,6 +48,9 @@ export function LoginContent({ onLogin }: LoginContentProps) {
       setLoadingProvider(null);
     }
   };
+
+  const displayError = externalError || error;
+  const isLoading = externalLoading || loadingProvider !== null;
 
   return (
     <div className="absolute top-1/2 left-1/2 w-[90%] -translate-x-1/2 -translate-y-1/2 px-4 py-8 sm:w-[420px] sm:px-8 sm:py-16 md:w-[450px]">
@@ -56,26 +67,28 @@ export function LoginContent({ onLogin }: LoginContentProps) {
         </h1>
       </div>
 
-      {error && <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>}
+      {displayError && (
+        <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">{displayError}</div>
+      )}
 
       <div className="space-y-3 sm:space-y-4">
         <LoginButton
           provider="kakao"
           onClick={() => handleLogin('kakao')}
           isLoading={loadingProvider === 'kakao'}
-          disabled={loadingProvider !== null}
+          disabled={isLoading}
         />
         <LoginButton
           provider="naver"
           onClick={() => handleLogin('naver')}
           isLoading={loadingProvider === 'naver'}
-          disabled={loadingProvider !== null}
+          disabled={isLoading}
         />
         <LoginButton
           provider="google"
           onClick={() => handleLogin('google')}
           isLoading={loadingProvider === 'google'}
-          disabled={loadingProvider !== null}
+          disabled={isLoading}
         />
 
         <p className="text-center text-[10px] leading-[1.2] font-medium tracking-tight text-[#6983aa] sm:text-[11px] md:text-[12px]">
