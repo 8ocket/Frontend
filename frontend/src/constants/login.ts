@@ -31,3 +31,16 @@ export const loginColors = {
   naver: '#03c75a',
   google: 'white',
 } as const;
+
+/**
+ * OAuth 설정
+ */
+export const oauthConfig = {
+  kakao: {
+    clientId: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID || '',
+    authUrl: 'https://kauth.kakao.com/oauth/authorize',
+    redirectUri: process.env.NEXT_PUBLIC_APP_URL
+      ? `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`
+      : 'http://localhost:3000/auth/callback',
+  },
+} as const;

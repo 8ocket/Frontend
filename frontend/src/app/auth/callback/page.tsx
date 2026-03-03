@@ -1,47 +1,73 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth';
+import { api } from '@/lib/axios';
+import type { LoginResponse } from '@/types/login';
 
 function CallbackHandler() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useAuthStore();
+  const [error, setError] = useState<string | null>(null);
+  const hasProcessed = useRef(false);
 
   useEffect(() => {
-    const handleCallback = async () => {
-      // TODO: 백엔드에서 토큰 전달 방식에 맞게 수정
-      // 예시 1: 쿼리 파라미터로 받는 경우
-      const accessToken = searchParams.get('accessToken') || searchParams.get('token');
-      const refreshToken = searchParams.get('refreshToken');
+    if (hasProcessed.current) return;
+    hasProcessed.current = true;
 
-      if (accessToken) {
-        // TODO: 토큰으로 유저 정보 조회 API 호출
-        // const { data } = await api.get('/auth/me');
-        
-        // 임시: 토큰만 저장하고 메인으로
-        const mockUser = {
-          id: 1,
-          email: 'user@example.com',
-          name: '사용자',
-        };
-        
-        login(mockUser, accessToken, refreshToken || undefined);
+    const handleCallback = async () => {
+      try {
+        const code = searchParams.get('code');
+        const errorParam = searchParams.get('error');
+        const errorDescription = searchParams.get('error_description');
+
+        if (errorParam) {
+          const message = errorDescription || '로그인이 취소되었습니다.';
+          setError(message);
+          setTimeout(() => router.push('/login'), 3000);
+          return;
+        }
+
+        if (!code) {
+          setError('인가 코드를 받지 못했습니다.');
+          setTimeout(() => router.push('/login'), 3000);
+          return;
+        }
+
+        const response = await api.post<LoginResponse>('/v1/auth/login/kakao', { code });
+        const { accessToken, refreshToken, user } = response.data;
+
+        login({ ...user, id: Number(user.id) }, accessToken, refreshToken);
         router.push('/');
-      } else {
-        // 토큰 없으면 로그인 페이지로
-        router.push('/login');
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '로그인 처리 중 오류가 발생했습니다.';
+        setError(message);
+        console.error('Callback error:', err);
+        setTimeout(() => router.push('/login'), 3000);
       }
     };
 
     handleCallback();
   }, [searchParams, login, router]);
 
+  if (error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-red-50">
+        <div className="text-center">
+          <h1 className="mb-4 text-2xl font-bold text-red-600">로그인 오류</h1>
+          <p className="mb-6 text-red-500">{error}</p>
+          <p className="text-sm text-gray-600">3초 후 로그인 페이지로 이동합니다...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="flex min-h-screen items-center justify-center">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900"></div>
         <p className="mt-4 text-gray-600">로그인 처리 중...</p>
       </div>
     </div>
@@ -52,9 +78,9 @@ export default function AuthCallbackPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="flex min-h-screen items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900"></div>
             <p className="mt-4 text-gray-600">로그인 처리 중...</p>
           </div>
         </div>

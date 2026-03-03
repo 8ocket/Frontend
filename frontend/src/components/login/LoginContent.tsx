@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { LoginButton, type LoginProvider } from './LoginButton';
 import { LogoSmall } from './LogoSmall';
-import { loginTexts } from '@/constants/login';
+import { loginTexts, oauthConfig } from '@/constants/login';
 
 interface LoginContentProps {
   onLogin?: (provider: LoginProvider) => Promise<void>;
@@ -11,18 +11,38 @@ interface LoginContentProps {
 
 export function LoginContent({ onLogin }: LoginContentProps) {
   const [loadingProvider, setLoadingProvider] = useState<LoginProvider | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (provider: LoginProvider) => {
     try {
       setLoadingProvider(provider);
-      await onLogin?.(provider);
+      setError(null);
+
+      if (provider === 'kakao') {
+        // Kakao 인가 요청 URL 생성
+        const params = new URLSearchParams({
+          client_id: oauthConfig.kakao.clientId,
+          redirect_uri: oauthConfig.kakao.redirectUri,
+          response_type: 'code',
+        });
+
+        const kakaoAuthUrl = `${oauthConfig.kakao.authUrl}?${params.toString()}`;
+        window.location.href = kakaoAuthUrl;
+      } else {
+        // 다른 프로바이더 처리 (향후 구현)
+        await onLogin?.(provider);
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '로그인 중 오류가 발생했습니다.';
+      setError(message);
+      console.error('Login error:', err);
     } finally {
       setLoadingProvider(null);
     }
   };
 
   return (
-    <div className="absolute top-1/2 left-1/2 w-[90%] -translate-x-1/2 -translate-y-1/2 rounded-lg px-4 py-8 sm:w-[420px] sm:px-8 sm:py-16 md:w-[450px]">
+    <div className="absolute top-1/2 left-1/2 w-[90%] -translate-x-1/2 -translate-y-1/2 px-4 py-8 sm:w-[420px] sm:px-8 sm:py-16 md:w-[450px]">
       <div className="mb-8 flex justify-center sm:mb-16">
         <LogoSmall className="h-[180px] w-[180px] sm:h-[240px] sm:w-[240px] md:h-[295px] md:w-[295px]" />
       </div>
@@ -36,21 +56,26 @@ export function LoginContent({ onLogin }: LoginContentProps) {
         </h1>
       </div>
 
+      {error && <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>}
+
       <div className="space-y-3 sm:space-y-4">
         <LoginButton
           provider="kakao"
           onClick={() => handleLogin('kakao')}
           isLoading={loadingProvider === 'kakao'}
+          disabled={loadingProvider !== null}
         />
         <LoginButton
           provider="naver"
           onClick={() => handleLogin('naver')}
           isLoading={loadingProvider === 'naver'}
+          disabled={loadingProvider !== null}
         />
         <LoginButton
           provider="google"
           onClick={() => handleLogin('google')}
           isLoading={loadingProvider === 'google'}
+          disabled={loadingProvider !== null}
         />
 
         <p className="text-center text-[10px] leading-[1.2] font-medium tracking-tight text-[#6983aa] sm:text-[11px] md:text-[12px]">
