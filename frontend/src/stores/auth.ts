@@ -12,7 +12,7 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  
+
   // Actions
   setUser: (user: User | null) => void;
   login: (user: User, accessToken: string, refreshToken?: string) => void;
@@ -41,11 +41,11 @@ export const useAuthStore = create<AuthState>()(
         // localStorage 삭제
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
-        
+
         // 쿠키 삭제
         document.cookie = 'accessToken=; path=/; max-age=0';
         document.cookie = 'refreshToken=; path=/; max-age=0';
-        
+
         set({ user: null, isAuthenticated: false });
       },
 
