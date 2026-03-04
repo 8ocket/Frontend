@@ -146,23 +146,6 @@ export default function SignupPage() {
                 onChange={() => handleToggleAgreement('multimodal')}
                 onViewClick={() => setSelectedCondition('multimodal')}
               />
-                  <input
-                    type="checkbox"
-                    checked={agreements.multimodal}
-                    onChange={() => handleToggleAgreement('multimodal')}
-                    className="accent-cta-300 mt-0.5 h-5 w-5 rounded"
-                  />
-                  <span className="text-prime-800 text-base leading-[1.4] font-medium">
-                    AI 멀티모달 데이터 처리 동의 (<span className="text-cta-300">필수</span>)
-                  </span>
-                </label>
-                <button
-                  onClick={() => setSelectedCondition('multimodal')}
-                  className="text-cta-300 hover:text-cta-500 mt-0.5 text-xs font-medium whitespace-nowrap"
-                >
-                  약관보기
-                </button>
-              </div>
 
               {/* 마케팅 정보 수신 동의 */}
               <CheckboxItem
