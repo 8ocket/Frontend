@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   // React Strict Mode (개발 시 잠재적 문제 감지)
@@ -8,12 +8,16 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "**.googleusercontent.com", // Google 프로필 이미지
+        protocol: 'https',
+        hostname: '**.googleusercontent.com', // Google 프로필 이미지
       },
       {
-        protocol: "https",
-        hostname: "**.kakaocdn.net", // 카카오 프로필 이미지
+        protocol: 'https',
+        hostname: '**.kakaocdn.net', // 카카오 프로필 이미지
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.figma.com', // Figma 디자인 asset
       },
       // 필요시 백엔드 이미지 서버 추가
       // {
@@ -27,19 +31,19 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/(.*)",
+        source: '/(.*)',
         headers: [
           {
-            key: "X-Frame-Options",
-            value: "DENY",
+            key: 'X-Frame-Options',
+            value: 'DENY',
           },
           {
-            key: "X-Content-Type-Options",
-            value: "nosniff",
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
           },
           {
-            key: "Referrer-Policy",
-            value: "origin-when-cross-origin",
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin',
           },
         ],
       },
