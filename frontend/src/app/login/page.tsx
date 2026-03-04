@@ -30,6 +30,12 @@ export default function LoginPage() {
         throw new Error('로그인 응답 데이터가 불완전합니다.');
       }
 
+      // midleware에서 인증 상태를 확인하기 위해 쿠키와 localStorage에 토큰 저장
+      document.cookie = `accessToken=${response.accessToken}; path=/; max-age=3600`;
+      if (response.refreshToken) {
+        document.cookie = `refreshToken=${response.refreshToken}; path=/; max-age=86400`;
+      }
+
       // 로그인 성공 - 인증 상태 업데이트
       login(response.user, response.accessToken, response.refreshToken || '');
 

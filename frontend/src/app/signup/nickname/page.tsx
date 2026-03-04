@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import WaveBackground from '@/components/common/WaveBackground';
 import { Button, Input, RadioGroup, SectionHeader, SuccessModal } from '@/components/ui';
+import { useAuthStore } from '@/stores/auth';
 
 const imgVector = 'https://www.figma.com/api/mcp/asset/1d130480-0444-4c0b-926c-7cc10c5433d9';
 
@@ -42,9 +43,22 @@ export default function NicknamePage() {
   };
 
   const handleSuccessModalClick = () => {
-    // 성공 모달 확인 → 가입완료 페이지로 이동
+    // 성공 모달 확인 → 메인 페이지로 이동
     setShowSuccessModal(false);
-    router.push('/signup/complete');
+
+    // 임시: 회원가입 완료 후 인증 상태 저장
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      const { login } = useAuthStore.getState();
+      const mockUser = {
+        id: Date.now(),
+        email: 'user@example.com',
+        name: nickname,
+      };
+      login(mockUser, token, localStorage.getItem('refreshToken') || '');
+    }
+
+    router.push('/');
   };
 
   const generateRandomNickname = () => {

@@ -1,57 +1,56 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useAuthStore } from '@/stores/auth';
 
 export default function KakaoCallback() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  let code = searchParams.get('code');
+  const initialCode = searchParams.get('code');
+  const [code, setCode] = useState<string | null>(null);
 
   useEffect(() => {
-    // Mock 모드: code가 없으면 mock code 생성
-    if (!code) {
-      const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
-      if (USE_MOCK) {
-        code = `mock_code_${Date.now()}`;
-        console.log('🎭 Mock mode: Generated mock code:', code);
-      } else {
-        // 실제 모드인데 code가 없으면 리다이렉트
-        router.push('/login');
-        return;
-      }
-    }
-
     const handleLogin = async () => {
+      // code 결정
+      let resolvedCode: string | null = initialCode;
+
+      if (!initialCode) {
+        const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
+        if (USE_MOCK) {
+          resolvedCode = `mock_code_${Date.now()}`;
+          console.log('🎭 Mock mode: Generated mock code:', resolvedCode);
+        } else {
+          router.push('/login');
+          return;
+        }
+      }
+
+      // 로그인 처리
       try {
-        console.log('📡 Calling API: /api/v1/auth/login/kakao with code:', code?.substring(0, 20) + '...');
-        
         const res = await fetch('/api/v1/auth/login/kakao', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code }),
+          body: JSON.stringify({ code: resolvedCode }),
         });
 
-        console.log('📥 API Response status:', res.status);
         const result = await res.json();
-        console.log('📥 API Response data:', result);
 
         if (res.ok) {
-          // 1. 토큰 저장
+          document.cookie = `accessToken=${result.access_token}; path=/; max-age=3600`;
+          document.cookie = `refreshToken=${result.refresh_token}; path=/; max-age=86400`;
           localStorage.setItem('accessToken', result.access_token);
           localStorage.setItem('refreshToken', result.refresh_token);
-          console.log('✅ Tokens saved');
 
-          // 2. 신규 유저 여부에 따른 분기 처리
-          if (result.is_new_user) {
-            console.log('🆕 New user → redirect to /signup/terms');
-            router.push('/signup/terms');
-          } else {
-            console.log('👤 Existing user → redirect to /');
-            router.push('/');
-          }
+          const login = useAuthStore.getState().login;
+          login(
+            { id: Date.now(), email: 'user@example.com', name: 'User' },
+            result.access_token,
+            result.refresh_token
+          );
+
+          router.push('/signup');
         } else {
-          console.error('❌ API Error:', result.error);
           alert('로그인에 실패했습니다.');
           router.push('/login');
         }
@@ -63,7 +62,7 @@ export default function KakaoCallback() {
     };
 
     handleLogin();
-  }, [code, router]);
+  }, [initialCode, router]); // ← 의존성도 깔끔해짐
 
   return (
     <div className="flex min-h-screen items-center justify-center">

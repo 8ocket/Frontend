@@ -4,7 +4,7 @@ export async function POST(req: NextRequest) {
   try {
     console.log('📝 Kakao login API called');
     console.log('💡 USE_MOCK env:', process.env.NEXT_PUBLIC_USE_MOCK);
-    
+
     const { code } = await req.json();
     console.log('🔐 Code received:', code?.substring(0, 10) + '...');
 
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     if (USE_MOCK) {
       // Mock 응답 (백엔드 준비 전)
       console.log('✅ Mock mode activated - returning mock data');
-      await new Promise(resolve => setTimeout(resolve, 500)); // 네트워크 지연 시뮬레이션
+      await new Promise((resolve) => setTimeout(resolve, 500)); // 네트워크 지연 시뮬레이션
 
       const mockResponse = {
         access_token: `mock_access_token_${Date.now()}`,
