@@ -37,10 +37,9 @@ export const loginColors = {
  */
 export const oauthConfig = {
   kakao: {
-    clientId: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID || '',
+    clientId: process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY || '',
     authUrl: 'https://kauth.kakao.com/oauth/authorize',
-    redirectUri: process.env.NEXT_PUBLIC_APP_URL
-      ? `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`
-      : 'http://localhost:3000/auth/callback',
+    redirectUri:
+      process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI || 'http://localhost:3000/auth/callback',
   },
 } as const;
