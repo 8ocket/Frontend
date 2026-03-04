@@ -5,3 +5,4 @@ export { Label } from './label';
 export { CheckboxItem } from './checkbox-item';
 export { RadioGroup, type RadioOption } from './radio-group';
 export { SectionHeader } from './section-header';
+export { SuccessModal, type SuccessModalProps } from './success-modal';

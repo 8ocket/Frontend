@@ -217,11 +217,7 @@ export default function SignupPage() {
               </div>
 
               {/* 동의하기 버튼 */}
-              <Button
-                onClick={handleConditionAgree}
-                variant="primary"
-                size="cta"
-              >
+              <Button onClick={handleConditionAgree} variant="primary" size="cta">
                 동의하기
               </Button>
             </div>

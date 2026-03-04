@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import WaveBackground from '@/components/common/WaveBackground';
-import { Button, Input, RadioGroup, SectionHeader } from '@/components/ui';
+import { Button, Input, RadioGroup, SectionHeader, SuccessModal } from '@/components/ui';
 
 const imgVector = 'https://www.figma.com/api/mcp/asset/1d130480-0444-4c0b-926c-7cc10c5433d9';
 
@@ -19,6 +19,7 @@ export default function NicknamePage() {
   const [ageGroup, setAgeGroup] = useState<AgeGroup>('20대');
   const [gender, setGender] = useState<Gender>('남성');
   const [isLoading, setIsLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleNext = async () => {
     if (!nickname.trim()) return;
@@ -33,11 +34,17 @@ export default function NicknamePage() {
       //   gender,
       // });
 
-      // 가입완료 페이지로 이동
-      router.push('/signup/complete');
+      // 성공 모달 표시
+      setShowSuccessModal(true);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSuccessModalClick = () => {
+    // 성공 모달 확인 → 가입완료 페이지로 이동
+    setShowSuccessModal(false);
+    router.push('/signup/complete');
   };
 
   const generateRandomNickname = () => {
@@ -161,6 +168,15 @@ export default function NicknamePage() {
           {isLoading ? '처리 중...' : '다음 단계로 진행'}
         </Button>
       </div>
+
+      {/* 성공 모달 */}
+      <SuccessModal
+        isOpen={showSuccessModal}
+        title="가입해 주셔서 감사드립니다."
+        subtitle="감사의 의미로 300 크레딧을 선물로 드립니다."
+        buttonLabel="300 크레딧 받기"
+        onButtonClick={handleSuccessModalClick}
+      />
     </main>
   );
 }
