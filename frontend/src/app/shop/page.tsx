@@ -55,14 +55,15 @@ export default function ShopPage() {
       case 'credit':
         return (
           <div className="flex flex-col items-center gap-10">
+            {/* 제목 */}
             <div className="flex flex-col items-start gap-2.5 px-2.5 py-2.5">
-              <h2 className="text-prime-900 dark:text-secondary-100 text-4xl font-semibold">
+              <h2 className="text-4xl font-semibold text-prime-900 dark:text-secondary-100">
                 크레딧 구매하기
               </h2>
             </div>
 
-            {/* 상품 카드 그리드 */}
-            <div className="flex flex-wrap justify-center gap-10">
+            {/* 상품 카드 그리드 - 3개 상품을 가로로 배치 */}
+            <div className="flex justify-center gap-10">
               {PRODUCTS.map((product) => (
                 <ProductCard
                   key={product.id}
@@ -82,10 +83,10 @@ export default function ShopPage() {
       case 'persona':
         return (
           <div className="flex flex-col items-center gap-10 py-12">
-            <h2 className="text-prime-900 dark:text-secondary-100 text-4xl font-semibold">
+            <h2 className="text-4xl font-semibold text-prime-900 dark:text-secondary-100">
               페르소나 해금하기
             </h2>
-            <p className="text-prime-600 dark:text-prime-400 text-center text-lg">
+            <p className="text-center text-lg text-prime-600 dark:text-prime-400">
               페르소나 해금 기능은 준비 중입니다.
             </p>
           </div>
@@ -94,10 +95,10 @@ export default function ShopPage() {
       case 'event':
         return (
           <div className="flex flex-col items-center gap-10 py-12">
-            <h2 className="text-prime-900 dark:text-secondary-100 text-4xl font-semibold">
+            <h2 className="text-4xl font-semibold text-prime-900 dark:text-secondary-100">
               이벤트
             </h2>
-            <p className="text-prime-600 dark:text-prime-400 text-center text-lg">
+            <p className="text-center text-lg text-prime-600 dark:text-prime-400">
               진행 중인 이벤트가 없습니다.
             </p>
           </div>
@@ -109,20 +110,20 @@ export default function ShopPage() {
   };
 
   return (
-    <div className="dark:bg-prime-900 min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-prime-900">
       <GNB />
 
-      <main className="flex flex-col items-center gap-10 px-4 py-12">
+      <main className="flex flex-col items-center px-4 py-12">
         {/* 탭 네비게이션 */}
-        <div className="pt-6">
+        <div className="mt-6 mb-10">
           <ShopTabs activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
 
         {/* 콘텐츠 */}
-        <div className="w-full max-w-6xl">{renderContent()}</div>
+        <div className="w-full">{renderContent()}</div>
 
-        {/* 하단 버튼 (임시) */}
-        <div className="pb-12">
+        {/* 하단 버튼 */}
+        <div className="mt-16 pb-12">
           <Button variant="primary">확인</Button>
         </div>
       </main>

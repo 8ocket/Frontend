@@ -19,19 +19,19 @@ export function ShopTabs({ activeTab, onTabChange }: ShopTabsProps) {
   ];
 
   return (
-    <div className="border-cta-300 dark:border-cta-400 flex items-start justify-center rounded-lg border">
+    <div className="flex items-start justify-center rounded-lg border border-cta-300 dark:border-cta-400">
       <div className="flex gap-4">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
-            className={`flex flex-col items-center justify-center px-2.5 py-2.5 transition-all ${
+            className={`flex items-center justify-center px-2.5 py-2.5 transition-all ${
               activeTab === tab.id
-                ? 'bg-cta-300 bg-opacity-50 text-prime-900 dark:bg-cta-300 dark:bg-opacity-50 dark:text-prime-900 rounded-lg'
+                ? 'rounded-lg bg-cta-300 bg-opacity-50 text-prime-900 dark:bg-cta-300 dark:bg-opacity-50 dark:text-prime-900'
                 : 'text-prime-500 hover:text-prime-600 dark:text-prime-400 dark:hover:text-prime-300'
             }`}
           >
-            <span className="text-sm font-medium whitespace-nowrap">{tab.label}</span>
+            <span className="whitespace-nowrap text-sm font-medium">{tab.label}</span>
           </button>
         ))}
       </div>

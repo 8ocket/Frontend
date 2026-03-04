@@ -27,18 +27,18 @@ export function ProductCard({
   return (
     <div
       className={cn(
-        'bg-secondary-100 dark:bg-prime-800 relative flex h-[401px] w-[268px] flex-col overflow-hidden rounded-lg'
+        'relative flex h-[401px] w-[268px] flex-col overflow-hidden rounded-lg bg-secondary-100 dark:bg-prime-800'
       )}
     >
-      {/* 상품 번호 배지 */}
-      <div className="bg-prime-900 dark:bg-secondary-100 absolute top-0 right-0 flex items-center justify-center rounded-lg px-2 py-1">
-        <span className="text-secondary-100 dark:text-prime-900 text-xs font-medium">
+      {/* 상품 번호 배지 - 16px 높이 */}
+      <div className="absolute right-2 top-2 flex h-4 items-center justify-center rounded-lg bg-prime-900 px-2 dark:bg-secondary-100">
+        <span className="text-xs font-medium leading-none text-secondary-100 dark:text-prime-900">
           {productNumber}
         </span>
       </div>
 
-      {/* 카드 내용 */}
-      <div className="flex flex-col gap-6 p-2 pt-4">
+      {/* 카드 내용 - 8px padding */}
+      <div className="flex flex-col gap-6 px-2 py-2">
         {/* 헤더: 아이콘 + 상품명 */}
         <div className="flex flex-col gap-4">
           <div className="flex items-end gap-3">
@@ -60,22 +60,22 @@ export function ProductCard({
             </div>
 
             {/* 가격 정보 */}
-            <div className="flex flex-col gap-1.5">
-              <div className="flex flex-wrap items-end gap-2">
-                <span className="text-prime-900 dark:text-secondary-100 text-xl font-semibold whitespace-nowrap">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-baseline gap-2">
+                <span className="text-xl font-semibold text-prime-900 dark:text-secondary-100">
                   {price}₩
                 </span>
-                <span className="text-prime-900 dark:text-secondary-100 text-lg whitespace-nowrap">
+                <span className="text-base text-prime-900 dark:text-secondary-100">
                   (부가세 포함)
                 </span>
-                <span className="text-prime-500 dark:text-prime-400 text-xs font-normal whitespace-nowrap">
-                  건당 결제
-                </span>
               </div>
+              <span className="text-xs font-normal text-prime-500 dark:text-prime-400">
+                건당 결제
+              </span>
 
               {/* 할인 정보 */}
               {discount && (
-                <p className="text-success-700 dark:text-success-500 text-xs font-medium">
+                <p className="text-xs font-medium text-success-700 dark:text-success-500">
                   {discount}
                 </p>
               )}
@@ -93,17 +93,17 @@ export function ProductCard({
 
         {/* 혜택 섹션 */}
         <div className="flex flex-col gap-2">
-          <h4 className="text-prime-700 dark:text-prime-300 text-sm font-semibold">
+          <h4 className="text-sm font-semibold text-prime-700 dark:text-prime-300">
             1회 구매시 경험하시는 혜택
           </h4>
           <ul className="flex flex-col gap-2">
             {benefits.map((benefit, index) => (
               <li
                 key={index}
-                className="text-prime-500 dark:text-prime-400 flex items-start gap-2 text-xs font-medium"
+                className="flex items-start gap-2 text-xs font-medium text-prime-500 dark:text-prime-400"
               >
                 <span className="mt-0.5 shrink-0">•</span>
-                <span className="flex-1 break-keep">{benefit}</span>
+                <span className="break-keep">{benefit}</span>
               </li>
             ))}
           </ul>
@@ -111,8 +111,8 @@ export function ProductCard({
       </div>
 
       {/* 하단 안내 텍스트 */}
-      <div className="absolute right-2 bottom-2 left-2">
-        <p className="text-warning-500 dark:text-warning-500 text-xs font-normal">
+      <div className="absolute bottom-2 left-2 right-2">
+        <p className="text-xs font-normal text-warning-500 dark:text-warning-500">
           혜택의 수치는 평균 사용패턴 기준이며, 개인 이용 방식에 따라 달라질 수 있습니다.
         </p>
       </div>
