@@ -2,71 +2,70 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { LoginContent, Conditions } from '@/components/login';
 import WaveBackground from '@/components/common/WaveBackground';
 import { useAuthStore } from '@/stores/auth';
 import { socialLoginApi } from '@/lib/api';
-import type { LoginProvider } from '@/components/login';
+import { LoginContent, type LoginProvider } from '@/components/login';
 
 export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showConditions, setShowConditions] = useState(false);
-  const [pendingProvider, setPendingProvider] = useState<LoginProvider | null>(null);
   const { login } = useAuthStore();
 
-  const handleLoginClick = (provider: LoginProvider) => {
-    // 약관에 동의하지 않았으면 모달 표시
-    setShowConditions(true);
-    setPendingProvider(provider);
-  };
-
-  const handleConditionsAgree = async () => {
-    if (!pendingProvider) return;
+  const handleLoginClick = async (provider: LoginProvider) => {
+    console.log('Login attempt with provider:', provider);
+    // 카카오만 처리
+    if (provider !== 'kakao') return;
 
     try {
       setIsLoading(true);
       setError(null);
 
       // 소셜 로그인 API 호출
-      const response = await socialLoginApi(pendingProvider);
+      const response = await socialLoginApi(provider);
+
+      // 응답 데이터 검증
+      if (!response || !response.user || !response.accessToken) {
+        throw new Error('로그인 응답 데이터가 불완전합니다.');
+      }
 
       // 로그인 성공 - 인증 상태 업데이트
-      login(response.user, response.accessToken, response.refreshToken);
+      login(response.user, response.accessToken, response.refreshToken || '');
 
-      // 메인 페이지로 이동
-      router.push('/');
-    } catch (err: any) {
-      const errorMessage =
-        err.response?.data?.error?.message ||
-        err.message ||
-        `${pendingProvider} 로그인에 실패했습니다.`;
+      // 로그인 완료 → signup 페이지로 이동
+      router.push('/signup');
+    } catch (err: unknown) {
+      console.error('Login error:', err);
+
+      let errorMessage = '로그인에 실패했습니다.';
+
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === 'object' && err !== null) {
+        // Axios 에러 처리
+        if ('response' in err) {
+          const apiError = err as { response?: { data?: { error?: { message?: string } } } };
+          errorMessage = apiError.response?.data?.error?.message || errorMessage;
+        }
+        // 기타 객체 에러
+        if ('message' in err) {
+          errorMessage = (err as { message: string }).message;
+        }
+      }
+
       setError(errorMessage);
-      console.error('Login failed:', err);
-      setShowConditions(false);
-      setPendingProvider(null);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleConditionsClose = () => {
-    setShowConditions(false);
-    setPendingProvider(null);
-  };
-
   return (
     <main className="relative h-screen w-full overflow-hidden bg-white">
       <WaveBackground />
-      <LoginContent onLogin={handleLoginClick} isLoading={isLoading} error={error} />
-
-      {/* 약관 동의 모달 */}
-      <Conditions
-        isOpen={showConditions}
-        onClose={handleConditionsClose}
-        onAgree={handleConditionsAgree}
-      />
+      <div className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center">
+        <LoginContent onLogin={handleLoginClick} isLoading={isLoading} error={error} />
+      </div>
     </main>
   );
 }

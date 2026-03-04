@@ -53,25 +53,21 @@ export function LoginContent({
   const isLoading = externalLoading || loadingProvider !== null;
 
   return (
-    <div className="absolute top-1/2 left-1/2 w-[90%] -translate-x-1/2 -translate-y-1/2 px-4 py-8 sm:w-[420px] sm:px-8 sm:py-16 md:w-[450px]">
-      <div className="mb-8 flex justify-center sm:mb-16">
-        <LogoSmall className="h-[180px] w-[180px] sm:h-[240px] sm:w-[240px] md:h-[295px] md:w-[295px]" />
-      </div>
-
-      <div className="mb-4 space-y-3 text-center sm:mb-6 sm:space-y-4">
-        <p className="text-[13px] leading-[1.3] font-semibold tracking-tight text-[#1a222e] sm:text-[14px] md:text-[16px]">
+    <div className="flex w-96 flex-col items-center justify-center">
+      {/* 로고 */}
+      <LogoSmall className="h-73.75 w-73.75" />
+      {/* 텍스트 섹션 */}
+      <div className="mt-16 flex w-full flex-col items-center gap-4">
+        <p className="text-center text-sm leading-[1.3] font-semibold text-[#1a222e]">
           {loginTexts.greeting}
         </p>
-        <h1 className="text-[16px] leading-[1.3] font-semibold tracking-tight text-[#1a222e] sm:text-[18px] md:text-[20px]">
+        <h1 className="text-center text-xl leading-[1.3] font-semibold text-[#1a222e]">
           {loginTexts.loginPrompt}
         </h1>
       </div>
 
-      {displayError && (
-        <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">{displayError}</div>
-      )}
-
-      <div className="space-y-3 sm:space-y-4">
+      {/* 로그인 버튼 섹션 */}
+      <div className="mt-6 flex w-full flex-col items-stretch gap-4">
         <LoginButton
           provider="kakao"
           onClick={() => handleLogin('kakao')}
@@ -91,10 +87,16 @@ export function LoginContent({
           disabled={isLoading}
         />
 
-        <p className="text-center text-[10px] leading-[1.2] font-medium tracking-tight text-[#6983aa] sm:text-[11px] md:text-[12px]">
+        {/* 디스클레이머 텍스트 */}
+        <p className="text-prime-500 text-center text-xs leading-[1.2] font-medium whitespace-pre-wrap">
           {loginTexts.disclaimer}
         </p>
       </div>
+
+      {/* 에러 메시지 */}
+      {displayError && (
+        <div className="w-full rounded-lg bg-red-50 p-3 text-sm text-red-600">{displayError}</div>
+      )}
     </div>
   );
 }
