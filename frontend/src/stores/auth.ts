@@ -38,8 +38,14 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
+        // localStorage 삭제
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
+        
+        // 쿠키 삭제
+        document.cookie = 'accessToken=; path=/; max-age=0';
+        document.cookie = 'refreshToken=; path=/; max-age=0';
+        
         set({ user: null, isAuthenticated: false });
       },
 

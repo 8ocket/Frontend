@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 const imgFrame = 'https://www.figma.com/api/mcp/asset/7bc19b81-69ee-4b0f-af98-b6f5a776d983';
 const imgWave = 'https://www.figma.com/api/mcp/asset/e2d936b1-30e5-4dfd-8b0c-89e46c1fd873';
 
-interface ConditionsProps {
+export interface ConditionsProps {
   isOpen?: boolean;
   onClose?: () => void;
   onAgree?: () => void;

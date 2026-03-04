@@ -7,7 +7,7 @@ import { useAuthStore } from '@/stores/auth';
 
 export default function Home() {
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading, user } = useAuthStore();
+  const { isAuthenticated, isLoading: authLoading, user, setLoading } = useAuthStore();
 
   useEffect(() => {
     // 인증 상태 확인
@@ -15,6 +15,7 @@ export default function Home() {
 
     // 토큰이 없으면 로그인 페이지로
     if (!token) {
+      setLoading(false);
       router.push('/login');
       return;
     }
@@ -28,6 +29,9 @@ export default function Home() {
         name: 'User',
       };
       login(mockUser, token, localStorage.getItem('refreshToken') || '');
+    } else {
+      // 토큰이 있고 user가 있으면 로딩 완료
+      setLoading(false);
     }
   }, []); // 의존성 배열을 비움 - 한 번만 실행
 

@@ -1,10 +1,11 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth';
 
-export default function KakaoCallback() {
+function CallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialCode = searchParams.get('code');
@@ -71,5 +72,22 @@ export default function KakaoCallback() {
         <p className="mt-4 text-gray-600">로그인 처리 중입니다...</p>
       </div>
     </div>
+  );
+}
+
+export default function KakaoCallback() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="text-center">
+            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900"></div>
+            <p className="mt-4 text-gray-600">로드 중...</p>
+          </div>
+        </div>
+      }
+    >
+      <CallbackContent />
+    </Suspense>
   );
 }
