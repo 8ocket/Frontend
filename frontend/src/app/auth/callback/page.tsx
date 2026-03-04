@@ -1,92 +1,59 @@
 'use client';
 
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuthStore } from '@/stores/auth';
-import { api } from '@/lib/axios';
-import type { LoginResponse } from '@/types/login';
 
-function CallbackHandler() {
+export default function KakaoCallback() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login } = useAuthStore();
-  const [error, setError] = useState<string | null>(null);
-  const hasProcessed = useRef(false);
+  const code = searchParams.get('code');
 
   useEffect(() => {
-    if (hasProcessed.current) return;
-    hasProcessed.current = true;
+    if (!code) return;
 
-    const handleCallback = async () => {
+    const handleLogin = async () => {
       try {
-        const code = searchParams.get('code');
-        const errorParam = searchParams.get('error');
-        const errorDescription = searchParams.get('error_description');
+        const res = await fetch('/api/v1/auth/login/kakao', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code }),
+        });
 
-        if (errorParam) {
-          const message = errorDescription || '로그인이 취소되었습니다.';
-          setError(message);
-          setTimeout(() => router.push('/login'), 3000);
-          return;
+        const result = await res.json();
+
+        if (res.ok) {
+          // 1. 토큰 저장
+          localStorage.setItem('accessToken', result.access_token);
+          localStorage.setItem('refreshToken', result.refresh_token);
+
+          // 2. 신규 유저 여부에 따른 분기 처리
+          if (result.is_new_user) {
+            // 신규 사용자 -> 가입 정보 입력 페이지로 이동
+            router.push('/signup/terms');
+          } else {
+            // 기존 사용자 -> 홈으로 이동
+            router.push('/');
+          }
+        } else {
+          alert('로그인에 실패했습니다.');
+          router.push('/login');
         }
-
-        if (!code) {
-          setError('인가 코드를 받지 못했습니다.');
-          setTimeout(() => router.push('/login'), 3000);
-          return;
-        }
-
-        const response = await api.post<LoginResponse>('/v1/auth/login/kakao', { code });
-        const { accessToken, refreshToken, user } = response.data;
-
-        login({ ...user, id: Number(user.id) }, accessToken, refreshToken);
-        router.push('/');
-      } catch (err) {
-        const message = err instanceof Error ? err.message : '로그인 처리 중 오류가 발생했습니다.';
-        setError(message);
-        console.error('Callback error:', err);
-        setTimeout(() => router.push('/login'), 3000);
+      } catch (error) {
+        console.error('Kakao login error:', error);
+        alert('로그인 처리 중 오류가 발생했습니다.');
+        router.push('/login');
       }
     };
 
-    handleCallback();
-  }, [searchParams, login, router]);
-
-  if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-red-50">
-        <div className="text-center">
-          <h1 className="mb-4 text-2xl font-bold text-red-600">로그인 오류</h1>
-          <p className="mb-6 text-red-500">{error}</p>
-          <p className="text-sm text-gray-600">3초 후 로그인 페이지로 이동합니다...</p>
-        </div>
-      </div>
-    );
-  }
+    handleLogin();
+  }, [code, router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="text-center">
         <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900"></div>
-        <p className="mt-4 text-gray-600">로그인 처리 중...</p>
+        <p className="mt-4 text-gray-600">로그인 처리 중입니다...</p>
       </div>
     </div>
-  );
-}
-
-export default function AuthCallbackPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="text-center">
-            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900"></div>
-            <p className="mt-4 text-gray-600">로그인 처리 중...</p>
-          </div>
-        </div>
-      }
-    >
-      <CallbackHandler />
-    </Suspense>
   );
 }

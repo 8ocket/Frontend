@@ -20,17 +20,10 @@ export async function POST(req: NextRequest) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('Backend auth error:', data);
-      return NextResponse.json(
-        { error: data.message || '로그인 실패' },
-        { status: response.status }
-      );
+      return NextResponse.json({ error: data.message || '인증 실패' }, { status: response.status });
     }
 
-    return NextResponse.json({
-      success: true,
-      ...data,
-    });
+    return NextResponse.json(data);
   } catch (error) {
     console.error('Kakao login error:', error);
     return NextResponse.json({ error: '로그인 실패' }, { status: 500 });

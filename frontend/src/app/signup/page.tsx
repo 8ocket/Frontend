@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import WaveBackground from '@/components/common/WaveBackground';
-import { Button, CheckboxItem, SectionHeader } from '@/components/ui';
+import { Button, CheckboxItem, SectionHeader, Dialog } from '@/components/ui';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -185,50 +185,32 @@ export default function SignupPage() {
         </div>
 
         {/* 우측: 약관 모달 */}
-        <div className="h-[646px] w-[602px]">
-          {selectedCondition && (
-            <div className="border-secondary-200 relative flex h-full flex-col rounded-3xl border bg-white p-6 shadow-lg backdrop-blur-[20px]">
-              {/* 헤더 */}
-              <div className="border-secondary-200 mb-6 flex items-center justify-between border-b pb-4">
-                <h2 className="text-prime-900 text-lg leading-[1.3] font-semibold">
-                  {conditionTexts[selectedCondition]?.title}
-                </h2>
-                <button
-                  onClick={() => setSelectedCondition(null)}
-                  className="text-tertiary-400 hover:text-tertiary-500 text-2xl transition-colors"
-                >
-                  ✕
-                </button>
-              </div>
+        <Dialog
+          isOpen={!!selectedCondition}
+          onClose={() => setSelectedCondition(null)}
+          title={selectedCondition ? conditionTexts[selectedCondition]?.title : ''}
+          maxWidth="max-w-[602px]"
+        >
+          <div className="mb-6 flex-1 overflow-y-auto pr-4">
+            <p className="text-prime-500 text-sm leading-relaxed font-normal">
+              Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum
+              has been the industry&apos;s standard dummy text ever since the 1500s, when an unknown
+              printer took a galley of type and scrambled it to make a type specimen book. It has
+              survived not only five centuries, but also the leap into electronic typesetting,
+              remaining essentially unchanged. It was popularised in the 1960s with the release of
+              Letraset sheets containing Lorem Ipsum passages, and more recently with desktop
+              publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem
+              Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
+              been the industry&apos;s standard dummy text ever since the 1500s.
+            </p>
+          </div>
 
-              {/* 약관 텍스트 */}
-              <div className="mb-6 flex-1 overflow-y-auto pr-4">
-                <p className="text-prime-500 text-sm leading-relaxed font-normal">
-                  Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
-                  Ipsum has been the industry&apos;s standard dummy text ever since the 1500s, when
-                  an unknown printer took a galley of type and scrambled it to make a type specimen
-                  book. It has survived not only five centuries, but also the leap into electronic
-                  typesetting, remaining essentially unchanged. It was popularised in the 1960s with
-                  the release of Letraset sheets containing Lorem Ipsum passages, and more recently
-                  with desktop publishing software like Aldus PageMaker including versions of Lorem
-                  Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                  Lorem Ipsum has been the industry&apos;s standard dummy text ever since the 1500s.
-                </p>
-              </div>
-
-              {/* 동의하기 버튼 */}
-              <Button onClick={handleConditionAgree} variant="primary" size="cta">
-                동의하기
-              </Button>
-            </div>
-          )}
-        </div>
+          {/* 동의하기 버튼 */}
+          <Button onClick={handleConditionAgree} variant="primary" size="cta">
+            동의하기
+          </Button>
+        </Dialog>
       </div>
-
-      {/* 모달이 없을 때 우측 빈 공간 */}
-      {!selectedCondition && (
-        <div className="absolute top-1/2 left-1/2 ml-[413px] h-[646px] w-[602px] -translate-x-1/2 -translate-y-1/2"></div>
-      )}
     </main>
   );
 }

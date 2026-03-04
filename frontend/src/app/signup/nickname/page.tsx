@@ -93,12 +93,7 @@ export default function NicknamePage() {
                 placeholder="닉네임을 입력해 주세요"
               />
               <div className="flex gap-6">
-                <Button
-                  onClick={() => {}}
-                  variant="primary"
-                  size="default"
-                  className="flex-1"
-                >
+                <Button onClick={() => {}} variant="primary" size="default" className="flex-1">
                   닉네임 사용하기
                 </Button>
                 <Button
@@ -172,6 +167,7 @@ export default function NicknamePage() {
       {/* 성공 모달 */}
       <SuccessModal
         isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
         title="가입해 주셔서 감사드립니다."
         subtitle="감사의 의미로 300 크레딧을 선물로 드립니다."
         buttonLabel="300 크레딧 받기"
