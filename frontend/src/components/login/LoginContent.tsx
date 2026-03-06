@@ -6,7 +6,7 @@ import { LogoSmall } from './LogoSmall';
 import { loginTexts, oauthConfig } from '@/constants/login';
 
 interface LoginContentProps {
-  onLogin?: (provider: LoginProvider) => Promise<void>;
+  onLogin?: (provider: LoginProvider | 'temp') => Promise<void>;
   isLoading?: boolean;
   error?: string | null;
 }
@@ -86,6 +86,26 @@ export function LoginContent({
           isLoading={loadingProvider === 'google'}
           disabled={isLoading}
         />
+
+        {/* 임시 로그인 버튼 */}
+        <button
+          onClick={async () => {
+            setLoadingProvider('kakao');
+            try {
+              await onLogin?.('temp');
+            } catch (err) {
+              const message = err instanceof Error ? err.message : '임시 로그인 중 오류가 발생했습니다.';
+              setError(message);
+              console.error('Temp login error:', err);
+            } finally {
+              setLoadingProvider(null);
+            }
+          }}
+          disabled={isLoading}
+          className="rounded-lg bg-gray-400 px-4 py-3 font-semibold text-white transition-colors hover:bg-gray-500 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {loadingProvider === 'kakao' ? '로그인 중...' : '임시 로그인 (개발용)'}
+        </button>
 
         {/* 디스클레이머 텍스트 */}
         <p className="text-prime-500 text-center text-xs leading-[1.2] font-medium whitespace-pre-wrap">

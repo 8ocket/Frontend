@@ -13,34 +13,56 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const { login } = useAuthStore();
 
-  const handleLoginClick = async (provider: LoginProvider) => {
+  const handleLoginClick = async (provider: LoginProvider | 'temp') => {
     console.log('Login attempt with provider:', provider);
-    // 카카오만 처리
-    if (provider !== 'kakao') return;
 
     try {
       setIsLoading(true);
       setError(null);
 
-      // 소셜 로그인 API 호출
-      const response = await socialLoginApi(provider);
+      // 임시 로그인 처리
+      if (provider === 'temp') {
+        // 임시 사용자 데이터 생성
+        const tempUser = {
+          id: Math.floor(Math.random() * 10000),
+          email: `temp_user_${Date.now()}@mindlog.local`,
+          name: `Temp User ${Math.floor(Math.random() * 1000)}`,
+        };
 
-      // 응답 데이터 검증
-      if (!response || !response.user || !response.accessToken) {
-        throw new Error('로그인 응답 데이터가 불완전합니다.');
+        const tempToken = `temp_token_${Date.now()}`;
+
+        // 쿠키와 localStorage에 토큰 저장
+        document.cookie = `accessToken=${tempToken}; path=/; max-age=3600`;
+        document.cookie = `refreshToken=${tempToken}; path=/; max-age=86400`;
+
+        // 인증 상태 업데이트
+        login(tempUser, tempToken, tempToken);
+
+        console.log('Temp login successful:', tempUser);
+
+        // 로그인 완료 → signup 페이지로 이동
+        router.push('/signup');
+      } else {
+        // 다른 프로바이더는 소셜 로그인 API 호출
+        const response = await socialLoginApi(provider);
+
+        // 응답 데이터 검증
+        if (!response || !response.user || !response.accessToken) {
+          throw new Error('로그인 응답 데이터가 불완전합니다.');
+        }
+
+        // midleware에서 인증 상태를 확인하기 위해 쿠키와 localStorage에 토큰 저장
+        document.cookie = `accessToken=${response.accessToken}; path=/; max-age=3600`;
+        if (response.refreshToken) {
+          document.cookie = `refreshToken=${response.refreshToken}; path=/; max-age=86400`;
+        }
+
+        // 로그인 성공 - 인증 상태 업데이트
+        login(response.user, response.accessToken, response.refreshToken || '');
+
+        // 로그인 완료 → signup 페이지로 이동
+        router.push('/signup');
       }
-
-      // midleware에서 인증 상태를 확인하기 위해 쿠키와 localStorage에 토큰 저장
-      document.cookie = `accessToken=${response.accessToken}; path=/; max-age=3600`;
-      if (response.refreshToken) {
-        document.cookie = `refreshToken=${response.refreshToken}; path=/; max-age=86400`;
-      }
-
-      // 로그인 성공 - 인증 상태 업데이트
-      login(response.user, response.accessToken, response.refreshToken || '');
-
-      // 로그인 완료 → signup 페이지로 이동
-      router.push('/signup');
     } catch (err: unknown) {
       console.error('Login error:', err);
 
