@@ -1,5 +1,4 @@
 import React from 'react';
-import Image from 'next/image';
 
 interface ProductCard1Props {
   onPurchase: () => void;
@@ -27,11 +26,9 @@ export function ProductCard({ onPurchase }: ProductCard1Props) {
             <div className="flex w-full flex-col gap-[16px]">
               {/* Icon & Title Row */}
               <div className="flex items-end gap-0">
-                <Image
+                <img
                   src="/images/icons/credit.svg"
                   alt="credit icon"
-                  width={48}
-                  height={48}
                   className="h-12 w-12 flex-shrink-0"
                 />
                 <h3 className="text-prime-500 text-xl leading-[1.3] font-semibold tracking-[-0.3px] whitespace-nowrap">
@@ -120,11 +117,9 @@ export function ProductCard2({ onPurchase }: ProductCard1Props) {
               <div className="flex items-end gap-0">
                 <Image
                   src="/images/icons/credit.svg"
+                 img
+                  src="/images/icons/credit.svg"
                   alt="credit icon"
-                  width={48}
-                  height={48}
-                  className="h-12 w-12 flex-shrink-0"
-                />
                 <h3 className="text-prime-500 text-xl leading-[1.3] font-semibold tracking-[-0.3px] whitespace-nowrap">
                   중형 상품
                 </h3>
