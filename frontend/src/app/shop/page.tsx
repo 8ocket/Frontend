@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { GNB } from '@/components/layout/gnb';
-import { ProductCard, ShopTabs, type ShopTabType } from '@/components/shop';
+import { ProductCard, ProductCard2, ShopTabs, type ShopTabType } from '@/components/shop';
 import { Button } from '@/components/ui/button';
 
 // 상품 데이터 (Figma 디자인 기반)
@@ -57,25 +57,15 @@ export default function ShopPage() {
           <div className="flex flex-col items-center gap-10">
             {/* 제목 */}
             <div className="flex flex-col items-start gap-2.5 px-2.5 py-2.5">
-              <h2 className="text-4xl font-semibold text-prime-900 dark:text-secondary-100">
+              <h2 className="text-prime-900 dark:text-secondary-100 text-4xl font-semibold">
                 크레딧 구매하기
               </h2>
             </div>
 
             {/* 상품 카드 그리드 - 3개 상품을 가로로 배치 */}
-            <div className="flex justify-center gap-10">
-              {PRODUCTS.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  productNumber={`상품 ${product.id}`}
-                  productName={product.name}
-                  credits={product.credits}
-                  price={product.price}
-                  discount={product.discount}
-                  benefits={product.benefits}
-                  onPurchase={() => handlePurchase(product.id)}
-                />
-              ))}
+            <div className="flex justify-center gap-40">
+              <ProductCard onPurchase={() => handlePurchase('01')} />
+              <ProductCard2 onPurchase={() => handlePurchase('02')} />
             </div>
           </div>
         );
@@ -83,10 +73,10 @@ export default function ShopPage() {
       case 'persona':
         return (
           <div className="flex flex-col items-center gap-10 py-12">
-            <h2 className="text-4xl font-semibold text-prime-900 dark:text-secondary-100">
+            <h2 className="text-prime-900 dark:text-secondary-100 text-4xl font-semibold">
               페르소나 해금하기
             </h2>
-            <p className="text-center text-lg text-prime-600 dark:text-prime-400">
+            <p className="text-prime-600 dark:text-prime-400 text-center text-lg">
               페르소나 해금 기능은 준비 중입니다.
             </p>
           </div>
@@ -95,10 +85,10 @@ export default function ShopPage() {
       case 'event':
         return (
           <div className="flex flex-col items-center gap-10 py-12">
-            <h2 className="text-4xl font-semibold text-prime-900 dark:text-secondary-100">
+            <h2 className="text-prime-900 dark:text-secondary-100 text-4xl font-semibold">
               이벤트
             </h2>
-            <p className="text-center text-lg text-prime-600 dark:text-prime-400">
+            <p className="text-prime-600 dark:text-prime-400 text-center text-lg">
               진행 중인 이벤트가 없습니다.
             </p>
           </div>
@@ -110,7 +100,7 @@ export default function ShopPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-prime-900">
+    <div className="dark:bg-prime-900 min-h-screen bg-white">
       <GNB />
 
       <main className="flex flex-col items-center px-4 py-12">

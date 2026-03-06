@@ -55,6 +55,12 @@
   --color-cta-200: #b5dfff;
   --color-cta-100: #e8f5ff;
 
+  /* Text - 텍스트 색상 */
+  --color-inverse: #f8fafc;
+
+  /* Interactive - 상호작용 */
+  --color-interactive-glass-blue-50: rgba(130, 201, 255, 0.5);
+
   /* Semantic - Success (그린) */
   --color-success-950: #06442f;
   --color-success-900: #085b40;

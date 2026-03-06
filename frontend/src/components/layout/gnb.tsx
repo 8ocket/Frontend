@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth';
 import { cn } from '@/lib/utils';
+import { LogoSmall } from '../login';
 
 // Figma: GNB (1738:4600)
 // 1440x80
@@ -29,7 +30,7 @@ export function GNB() {
     <header className="bg-secondary-100 dark:bg-prime-900 dark:border-prime-800 w-full border-b border-neutral-200">
       <nav className="layout-container flex h-20 items-center justify-between px-6">
         {/* 로고 영역 - 추후 작업 */}
-        <div className="w-60" />
+        <div className="w-60">마인드로그</div>
 
         {/* 메뉴 */}
         <div className="flex items-center gap-1">
