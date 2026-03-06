@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth';
 import { cn } from '@/lib/utils';
 import { LogoSmall } from '../login';
@@ -24,7 +24,13 @@ const AUTH_NAV = { label: '고객지원', href: '/credit' } as const;
 
 export function GNB() {
   const pathname = usePathname();
+  const router = useRouter();
   const { isAuthenticated, logout } = useAuthStore();
+
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
 
   return (
     <header className="bg-secondary-100 dark:bg-prime-900 dark:border-prime-800 w-full border-b border-neutral-200">
@@ -50,7 +56,7 @@ export function GNB() {
             <>
               <NavItem label="마이페이지" href="/my" active={pathname === '/my'} />
               <button
-                onClick={logout}
+                onClick={handleLogout}
                 className={cn(
                   'h-11 rounded-full px-4 text-sm font-medium transition-all',
                   'text-prime-700 hover:text-prime-900 hover:bg-neutral-200',
