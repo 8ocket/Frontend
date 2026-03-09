@@ -1,44 +1,104 @@
-import React, { InputHTMLAttributes } from 'react';
+import React from 'react';
 
-interface CheckboxItemProps extends InputHTMLAttributes<HTMLInputElement> {
+import { cn } from '@/lib/utils';
+
+// ── Figma 디자인 시스템: Checkbox (node 1306:3235) ──────────────
+// 20×20, rounded-sm (4px), border-1 neutral-300 (#e2e8f0)
+// States:
+//   Checked:  bg cta-300 (#82c9ff), border neutral-300, ✓ inverse (#f8fafc)
+//   Default:  bg secondary-100 (#f8fafc), border neutral-300
+//   Disabled: bg transparent, border neutral-300, ✓ neutral-400 (#cbd5e1)
+//   Error:    bg transparent, border error-700 (#8e0c0c), ✓ neutral-400
+// Label: Pretendard 16px Medium, lineHeight: 1
+// ─────────────────────────────────────────────────────────────────
+
+interface CheckboxItemProps {
   label: string;
   required?: boolean;
-  onViewClick?: () => void;
-  viewButtonLabel?: string;
+  checked?: boolean;
+  disabled?: boolean;
+  error?: boolean;
+  onChange?: () => void;
+  /** 라벨 텍스트 클릭 시 (약관 상세 열기 등) */
+  onLabelClick?: () => void;
+  /** (필수)/(선택) 태그 표시 여부 — false면 라벨만 표시 */
+  showTag?: boolean;
 }
 
 export function CheckboxItem({
   label,
   required = false,
-  onViewClick,
-  viewButtonLabel = '약관보기',
-  checked,
+  checked = false,
+  disabled = false,
+  error = false,
   onChange,
-  ...props
+  onLabelClick,
+  showTag = true,
 }: CheckboxItemProps) {
+  // 체크박스 박스 스타일 결정
+  const boxClass = cn(
+    'flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border transition-colors',
+    error
+      ? 'border-error-700'
+      : 'border-neutral-300',
+    checked && !disabled && !error && 'bg-cta-300',
+    !checked && !disabled && 'bg-secondary-100',
+    disabled && 'bg-transparent cursor-not-allowed',
+  );
+
+  // ✓ 아이콘 색상
+  const checkColor = disabled || error
+    ? 'text-neutral-400'
+    : 'text-secondary-100';
+
   return (
-    <div className="flex items-center justify-between gap-3">
-      <label className="flex flex-1 cursor-pointer items-center gap-3">
-        <input
-          type="checkbox"
-          checked={checked}
-          onChange={onChange}
-          className="accent-cta-300 h-5 w-5 rounded"
-          {...props}
-        />
-        <span className="text-prime-800 text-base leading-[1.4] font-medium">
-          {label}
-          {required && <span className="text-cta-300"> (필수)</span>}
-        </span>
-      </label>
-      {onViewClick && (
-        <button
-          onClick={onViewClick}
-          className="text-cta-300 hover:text-cta-500 text-xs font-medium whitespace-nowrap"
+    <div className={cn('flex items-center gap-2', disabled && 'opacity-60')}>
+      {/* 체크박스 */}
+      <button
+        type="button"
+        onClick={onChange}
+        disabled={disabled}
+        className="flex shrink-0 cursor-pointer disabled:cursor-not-allowed"
+      >
+        <div className={boxClass}>
+          {checked && (
+            <span className={cn(checkColor, 'text-[12px] leading-none font-semibold')}>✓</span>
+          )}
+        </div>
+      </button>
+      {/* 라벨 텍스트 */}
+      <button
+        type="button"
+        onClick={onLabelClick ?? onChange}
+        disabled={disabled}
+        className="cursor-pointer text-left disabled:cursor-not-allowed"
+      >
+        <p
+          className={cn(
+            'text-base leading-none font-medium',
+            error ? 'text-error-700' : disabled ? 'text-neutral-400' : 'text-prime-800'
+          )}
         >
-          {viewButtonLabel}
-        </button>
-      )}
+          <span>{label}</span>
+          {showTag && (
+            <>
+              <span> (</span>
+              <span
+                className={
+                  error
+                    ? 'text-error-700'
+                    : required
+                      ? 'text-[rgba(130,201,255,0.8)]'
+                      : 'text-warning-500'
+                }
+              >
+                {required ? '필수' : '선택'}
+              </span>
+              <span>)</span>
+            </>
+          )}
+        </p>
+      </button>
     </div>
   );
 }
