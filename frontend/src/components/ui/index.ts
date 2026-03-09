@@ -1,4 +1,4 @@
-export { Button } from './button';
+export { Button, type ButtonVariant, type ButtonSemantic } from './button';
 export { Input } from './input';
 export { Card } from './card';
 export { Label } from './label';
@@ -7,3 +7,4 @@ export { RadioGroup, type RadioOption } from './radio-group';
 export { SectionHeader } from './section-header';
 export { Dialog, type DialogProps } from './dialog';
 export { SuccessModal, type SuccessModalProps } from './success-modal';
+export { TermsDetailPanel, type TermsDetailPanelProps } from './terms-detail-panel';
