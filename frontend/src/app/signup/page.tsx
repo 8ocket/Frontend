@@ -3,28 +3,45 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import WaveBackground from '@/components/common/WaveBackground';
-import { Button, CheckboxItem, SectionHeader, Dialog } from '@/components/ui';
+import { Button, CheckboxItem, TermsDetailPanel } from '@/components/ui';
+import { cn } from '@/lib/utils';
+
+type AgreementKey = 'age14' | 'personalInfo' | 'sensitiveInfo' | 'multimodal' | 'marketing';
+
+const TERMS_LIST: { key: AgreementKey; label: string; required: boolean }[] = [
+  { key: 'age14', label: '만 14세 이상 이용 확인', required: true },
+  { key: 'personalInfo', label: '개인정보 수집 및 이용 동의', required: true },
+  { key: 'sensitiveInfo', label: '민감정보(상담 관련 정보) 수집 및 이용 동의', required: true },
+  { key: 'multimodal', label: 'AI 멀티모달 데이터 처리 동의', required: true },
+  { key: 'marketing', label: '마케팅 정보 수신 동의', required: false },
+];
+
+// TODO: 실제 약관 내용으로 교체
+const TERMS_CONTENT: Record<AgreementKey, string> = {
+  age14:
+    '만 14세 이상의 이용자만 본 서비스를 이용할 수 있습니다. 본 서비스는 만 14세 미만 아동의 개인정보를 수집하지 않으며, 만 14세 미만임이 확인된 경우 즉시 해당 정보를 삭제합니다.',
+  personalInfo:
+    '개인정보 수집 및 이용에 관한 안내입니다. 수집 항목: 이메일, 닉네임, 프로필 이미지. 수집 목적: 회원 식별 및 서비스 제공. 보유 기간: 회원 탈퇴 시까지.',
+  sensitiveInfo:
+    '민감정보(상담 관련 정보) 수집 및 이용에 관한 안내입니다. 수집 항목: 상담 내용, 감정 분석 데이터. 수집 목적: 맞춤형 심리 상담 서비스 제공. 보유 기간: 회원 탈퇴 시까지.',
+  multimodal:
+    'AI 멀티모달 데이터 처리에 관한 안내입니다. 처리 항목: 텍스트, 음성, 이미지 데이터. 처리 목적: AI 기반 감정 분석 및 상담 서비스 향상. 처리 방식: 익명화 후 모델 학습에 활용.',
+  marketing:
+    '마케팅 정보 수신에 관한 안내입니다. 수신 항목: 이벤트, 프로모션, 서비스 업데이트 알림. 수신 방법: 앱 푸시, 이메일. 동의를 거부하셔도 서비스 이용에 제한은 없습니다.',
+};
 
 export default function SignupPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [allAgree, setAllAgree] = useState(false);
-  const [selectedCondition, setSelectedCondition] = useState<string | null>(null);
-  const [agreements, setAgreements] = useState({
+  const [selectedTerm, setSelectedTerm] = useState<AgreementKey | null>(null);
+  const [agreements, setAgreements] = useState<Record<AgreementKey, boolean>>({
     age14: false,
     personalInfo: false,
     sensitiveInfo: false,
     multimodal: false,
     marketing: false,
   });
-
-  const conditionTexts: Record<string, { title: string; required: boolean }> = {
-    age14: { title: '만 14세 이상 이용 확인', required: true },
-    personalInfo: { title: '개인정보 수집 및 이용 동의', required: true },
-    sensitiveInfo: { title: '민감정보(상담 관련 정보) 수집 및 이용 동의', required: true },
-    multimodal: { title: 'AI 멀티모달 데이터 처리 동의', required: true },
-    marketing: { title: '마케팅 정보 수신 동의', required: false },
-  };
 
   const handleToggleAll = () => {
     const newState = !allAgree;
@@ -38,17 +55,23 @@ export default function SignupPage() {
     });
   };
 
-  const handleToggleAgreement = (key: keyof typeof agreements) => {
+  const handleToggleAgreement = (key: AgreementKey) => {
     const newAgreements = { ...agreements, [key]: !agreements[key] };
     setAgreements(newAgreements);
+    const allChecked = Object.values(newAgreements).every(Boolean);
+    setAllAgree(allChecked);
+  };
 
-    // 모든 필수 항목이 체크되었는지 확인
-    const allRequired =
-      newAgreements.age14 &&
-      newAgreements.personalInfo &&
-      newAgreements.sensitiveInfo &&
-      newAgreements.multimodal;
-    setAllAgree(allRequired);
+  const handleAgree = (key: AgreementKey) => {
+    const newAgreements = { ...agreements, [key]: true };
+    setAgreements(newAgreements);
+    const allChecked = Object.values(newAgreements).every(Boolean);
+    setAllAgree(allChecked);
+    setSelectedTerm(null);
+  };
+
+  const handleTermClick = (key: AgreementKey) => {
+    setSelectedTerm((prev) => (prev === key ? null : key));
   };
 
   const isAllRequiredAgree =
@@ -59,158 +82,117 @@ export default function SignupPage() {
 
   const handleNext = () => {
     if (!isAllRequiredAgree) return;
-
     try {
       setIsLoading(true);
-      // 약관 동의 완료 → 닉네임 설정 페이지로 이동
       router.push('/signup/nickname');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleConditionAgree = () => {
-    if (!selectedCondition) return;
-
-    const newAgreements = { ...agreements, [selectedCondition]: true };
-    setAgreements(newAgreements);
-
-    // 모든 필수 항목이 체크되었는지 확인
-    const allRequired =
-      newAgreements.age14 &&
-      newAgreements.personalInfo &&
-      newAgreements.sensitiveInfo &&
-      newAgreements.multimodal;
-    setAllAgree(allRequired);
-
-    setSelectedCondition(null);
-  };
-
   return (
-    <main className="relative h-screen w-full overflow-hidden bg-white">
+    <main className="bg-secondary-100 relative h-screen w-full overflow-hidden">
       <WaveBackground />
-      <div className="absolute top-1/2 left-1/2 flex w-[1200px] -translate-x-1/2 -translate-y-1/2 justify-between">
-        {/* 좌측: 회원가입 폼 */}
-        <div className="flex w-[358px] flex-col">
-          {/* 헤더 */}
-          <div className="mb-8 flex flex-col gap-[19px]">
-            <h2 className="text-prime-900 text-lg leading-[1.3] font-semibold tracking-[-0.3px]">
+
+      {/* 좌측: 회원가입 폼 — Figma: x=240/1920=12.5%, 세로 중앙, w=358 고정 */}
+      <div className="absolute top-1/2 left-[12.5%] flex w-89.5 -translate-y-1/2 flex-col gap-12">
+        {/* 헤더 */}
+        <div className="flex flex-col gap-4.75">
+          <div className="flex items-center justify-between">
+            <p className="text-prime-900 text-[20px] leading-[1.3] font-semibold tracking-[-0.3px]">
               회원가입
-            </h2>
-            <div className="flex flex-col gap-2">
-              <h1 className="text-prime-900 text-2xl leading-[1.3] font-semibold tracking-[-0.36px]">
-                이용약관 및 정책 동의
-              </h1>
-              <p className="text-prime-500 text-xs leading-[1.2] font-medium tracking-[-0.18px]">
-                서비스 이용을 위해 약관에 동의해 주세요.
-              </p>
-            </div>
-          </div>
-
-          {/* 약관 동의 목록 */}
-          <div className="mb-8 flex flex-col gap-8">
-            {/* 약관 체크박스들 */}
-            <div className="flex flex-col gap-6">
-              {/* 만 14세 이상 이용 확인 */}
-              <CheckboxItem
-                label="만 14세 이상 이용 확인"
-                required
-                checked={agreements.age14}
-                onChange={() => handleToggleAgreement('age14')}
-                onViewClick={() => setSelectedCondition('age14')}
-              />
-
-              {/* 개인정보 수집 및 이용 동의 */}
-              <CheckboxItem
-                label="개인정보 수집 및 이용 동의"
-                required
-                checked={agreements.personalInfo}
-                onChange={() => handleToggleAgreement('personalInfo')}
-                onViewClick={() => setSelectedCondition('personalInfo')}
-              />
-
-              {/* 민감정보 수집 및 이용 동의 */}
-              <CheckboxItem
-                label="민감정보(상담 관련 정보) 수집 및 이용 동의"
-                required
-                checked={agreements.sensitiveInfo}
-                onChange={() => handleToggleAgreement('sensitiveInfo')}
-                onViewClick={() => setSelectedCondition('sensitiveInfo')}
-              />
-
-              {/* AI 멀티모달 데이터 처리 동의 */}
-              <CheckboxItem
-                label="AI 멀티모달 데이터 처리 동의"
-                required
-                checked={agreements.multimodal}
-                onChange={() => handleToggleAgreement('multimodal')}
-                onViewClick={() => setSelectedCondition('multimodal')}
-              />
-
-              {/* 마케팅 정보 수신 동의 */}
-              <CheckboxItem
-                label="마케팅 정보 수신 동의"
-                checked={agreements.marketing}
-                onChange={() => handleToggleAgreement('marketing')}
-                onViewClick={() => setSelectedCondition('marketing')}
-              />
-            </div>
-
-            {/* 전체 동의 */}
+            </p>
             <button
-              onClick={handleToggleAll}
-              className="border-cta-300 hover:bg-cta-100 flex h-11 items-center gap-3 rounded-lg border-2 bg-white px-4 py-3 transition-colors"
+              type="button"
+              onClick={() => router.back()}
+              className="bg-cta-300 flex h-6 w-6 items-center justify-center overflow-hidden rounded-3xl"
             >
-              <input
-                type="checkbox"
-                checked={allAgree}
-                readOnly
-                className="accent-cta-300 h-5 w-5 rounded"
-              />
-              <span className="text-prime-800 text-base leading-none font-medium">
-                전체 동의하기
-              </span>
+              <svg
+                width="15"
+                height="14"
+                viewBox="0 0 15 14"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M10 2L5 7L10 12"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </button>
           </div>
-
-          {/* 다음 버튼 */}
-          <Button
-            onClick={handleNext}
-            disabled={!isAllRequiredAgree || isLoading}
-            variant="primary"
-            size="cta"
-          >
-            {isLoading ? '처리 중...' : '가입하기'}
-          </Button>
-        </div>
-
-        {/* 우측: 약관 모달 */}
-        <Dialog
-          isOpen={!!selectedCondition}
-          onClose={() => setSelectedCondition(null)}
-          title={selectedCondition ? conditionTexts[selectedCondition]?.title : ''}
-          maxWidth="max-w-[602px]"
-        >
-          <div className="mb-6 flex-1 overflow-y-auto pr-4">
-            <p className="text-prime-500 text-sm leading-relaxed font-normal">
-              Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum
-              has been the industry&apos;s standard dummy text ever since the 1500s, when an unknown
-              printer took a galley of type and scrambled it to make a type specimen book. It has
-              survived not only five centuries, but also the leap into electronic typesetting,
-              remaining essentially unchanged. It was popularised in the 1960s with the release of
-              Letraset sheets containing Lorem Ipsum passages, and more recently with desktop
-              publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem
-              Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
-              been the industry&apos;s standard dummy text ever since the 1500s.
+          <div className="flex flex-col gap-2.5">
+            <p className="text-prime-900 text-[24px] leading-[1.3] font-semibold tracking-[-0.36px]">
+              이용약관 및 정책 동의
+            </p>
+            <p className="text-prime-900 text-[12px] leading-[1.2] font-medium tracking-[-0.18px]">
+              서비스 이용을 위해 약관에 동의해 주세요.
             </p>
           </div>
+        </div>
 
-          {/* 동의하기 버튼 */}
-          <Button onClick={handleConditionAgree} variant="primary" size="cta">
-            동의하기
-          </Button>
-        </Dialog>
+        {/* 약관 동의 목록 */}
+        <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-6">
+            {TERMS_LIST.map((term) => (
+              <CheckboxItem
+                key={term.key}
+                label={term.label}
+                required={term.required}
+                checked={agreements[term.key]}
+                onChange={() => handleToggleAgreement(term.key)}
+                onLabelClick={() => handleTermClick(term.key)}
+              />
+            ))}
+          </div>
+
+          {/* 전체 동의 */}
+          <button
+            type="button"
+            onClick={handleToggleAll}
+            className="border-cta-300 bg-interactive-glass-blue-50 flex h-11 items-center gap-2 rounded-xl border px-3.75"
+          >
+            <div
+              className={cn(
+                'flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border border-neutral-300 transition-colors',
+                allAgree ? 'bg-cta-300' : 'bg-white'
+              )}
+            >
+              {allAgree && <span className="text-secondary-100 text-[12px] leading-[1.6]">✓</span>}
+            </div>
+            <span className="text-secondary-100 text-[16px] leading-none font-medium">
+              전체 동의하기
+            </span>
+          </button>
+        </div>
+
+        {/* 가입하기 버튼 */}
+        <Button
+          onClick={handleNext}
+          disabled={!isAllRequiredAgree || isLoading}
+          variant="primary"
+          size="cta"
+        >
+          {isLoading ? '처리 중...' : '가입하기'}
+        </Button>
       </div>
+
+      {/* 우측: 약관 세부내용 패널 — Figma: x=678/1920≈35.3%, y=217/1080≈20.1%, w=967/1920≈50.4%, h=646/1080≈59.8% */}
+      {selectedTerm && (
+        <div className="absolute top-[20.1%] left-[35.3%] h-[59.8vh] w-[50.4%]">
+          <TermsDetailPanel
+            title={TERMS_LIST.find((t) => t.key === selectedTerm)!.label}
+            onClose={() => setSelectedTerm(null)}
+            onAgree={() => handleAgree(selectedTerm)}
+            isAgreed={agreements[selectedTerm]}
+          >
+            <p>{TERMS_CONTENT[selectedTerm]}</p>
+          </TermsDetailPanel>
+        </div>
+      )}
     </main>
   );
 }
