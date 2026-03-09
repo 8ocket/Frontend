@@ -72,107 +72,135 @@ export default function NicknamePage() {
   return (
     <main className="bg-secondary-100 relative h-screen w-full overflow-hidden">
       <WaveBackground />
-      <div className="bg-cta-100 absolute top-1/2 left-1/2 flex w-full max-w-[420px] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-lg px-2 py-8">
-        {/* 제목 */}
-        <div className="text-center">
-          <h1 className="text-prime-900 text-3xl leading-[1.3] font-semibold tracking-[-0.48px]">
+
+      {/* Figma: 340×707, 중앙 정렬, bg-cta-100, rounded-md(8px), px-2(8px) */}
+      <div className="bg-cta-100 absolute top-1/2 left-1/2 h-176.75 w-85 -translate-x-1/2 -translate-y-1/2 rounded-md px-2">
+        {/* ── 헤더: 제목 + 뒤로가기 ── */}
+        <div className="flex h-10.5 items-center justify-between">
+          <h1 className="text-prime-900 text-[32px] leading-[1.3] font-semibold">
             개인정보 설정하기
           </h1>
-        </div>
-
-        {/* 프로필 영역 */}
-        <div className="flex items-start gap-4 px-4">
-          <div className="border-cta-300 bg-secondary-100 relative flex size-[60px] shrink-0 items-center justify-center overflow-hidden rounded-full border-2">
-            <div className="relative inset-[20%] h-8 w-8">
-              <Image src={imgVector} alt="profile" fill className="object-contain" />
-            </div>
-          </div>
-          <div className="text-prime-500 flex-1 pt-1 text-xs leading-[1.2] font-normal tracking-[-0.18px]">
-            <p>프로필을 바꾸고 싶으시다면</p>
-            <p>아이콘을 눌러 사진을 추가하세요.</p>
-            <p>설정하지 않으시면 기본 프로필로 접속합니다.</p>
-          </div>
-        </div>
-
-        {/* 섹션들 */}
-        <div className="flex flex-col gap-8 px-4">
-          {/* 닉네임 설정 */}
-          <div className="flex flex-col gap-2">
-            <SectionHeader>닉네임 설정하기</SectionHeader>
-            <div className="flex flex-col gap-4">
-              <Input
-                type="text"
-                value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
-                placeholder="닉네임을 입력해 주세요"
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="bg-cta-300 flex h-6 w-6 items-center justify-center rounded-full"
+          >
+            <svg
+              width="15"
+              height="14"
+              viewBox="0 0 15 14"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10 2L5 7L10 12"
+                stroke="white"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
-              <div className="flex gap-6">
-                <Button onClick={() => {}} variant="primary" size="default" className="flex-1">
-                  닉네임 사용하기
-                </Button>
-                <Button
-                  onClick={generateRandomNickname}
-                  variant="secondary"
-                  size="default"
-                  className="flex-1"
-                >
-                  닉네임 랜덤 생성
-                </Button>
+            </svg>
+          </button>
+        </div>
+
+        {/* ── 콘텐츠 ── Figma: gap 16px(mt-4) from header */}
+        <div className="mt-4 flex flex-col gap-4">
+          {/* 프로필 영역 — Figma: 60×60 circle + helper text */}
+          <div className="flex items-start gap-4">
+            <div className="border-cta-300 bg-secondary-100 relative flex size-15 shrink-0 items-center justify-center overflow-hidden rounded-full border-2">
+              <div className="relative h-8 w-8">
+                <Image src={imgVector} alt="profile" fill className="object-contain" />
               </div>
             </div>
+            <p className="text-prime-500 flex-1 pt-2.25 text-xs leading-[1.2] font-normal tracking-[-0.18px]">
+              프로필을 바꾸고 싶으시다면 아이콘을 눌러 사진을 추가하세요. 설정하지 않으시면 기본
+              프로필로 접속합니다.
+            </p>
           </div>
 
-          {/* 직업 선택 */}
-          <RadioGroup
-            legend="직업 선택하기"
-            name="userType"
-            options={[
-              { label: '대학생 / 대학원생', value: '대학생 / 대학원생' },
-              { label: '취업 준비생', value: '취업 준비생' },
-              { label: '직장인', value: '직장인' },
-              { label: '이직 준비', value: '이직 준비' },
-            ]}
-            value={userType}
-            onChange={(value) => setUserType(value as UserType)}
-            columns={2}
-            orientation="horizontal"
-          />
+          {/* ── 폼 섹션들 — Figma: 각 섹션간 gap-8(32px) ── */}
+          <div className="flex flex-col gap-8">
+            {/* 닉네임 설정 — legend gap 8px, input↔buttons gap 16px, buttons gap 24px */}
+            <div className="flex flex-col gap-2">
+              <SectionHeader>닉네임 설정하기</SectionHeader>
+              <div className="flex flex-col gap-4">
+                <Input
+                  type="text"
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                  placeholder="닉네임을 입력해 주세요"
+                />
+                <div className="flex gap-6">
+                  <Button onClick={() => {}} variant="primary" size="default" className="flex-1">
+                    닉네임 사용하기
+                  </Button>
+                  <Button
+                    onClick={generateRandomNickname}
+                    variant="secondary"
+                    size="default"
+                    className="flex-1"
+                  >
+                    닉네임 랜덤 생성
+                  </Button>
+                </div>
+              </div>
+            </div>
 
-          {/* 나이 선택 */}
-          <RadioGroup
-            legend="나이"
-            name="ageGroup"
-            options={[
-              { label: '20대', value: '20대' },
-              { label: '30대', value: '30대' },
-              { label: '40대', value: '40대' },
-            ]}
-            value={ageGroup}
-            onChange={(value) => setAgeGroup(value as AgeGroup)}
-            orientation="horizontal"
-          />
+            {/* 직업 선택 — Figma: 2-col column-first flow, gap-x 35px, gap-y 8px */}
+            <RadioGroup
+              legend="직업 선택하기"
+              name="userType"
+              options={[
+                { label: '대학생 / 대학원생', value: '대학생 / 대학원생' },
+                { label: '취업 준비생', value: '취업 준비생' },
+                { label: '직장인', value: '직장인' },
+                { label: '이직 준비', value: '이직 준비' },
+              ]}
+              value={userType}
+              onChange={(value) => setUserType(value as UserType)}
+              legendGap="gap-2"
+              contentClassName="grid grid-rows-2 grid-flow-col gap-x-[35px] gap-y-2"
+            />
 
-          {/* 성별 선택 */}
-          <RadioGroup
-            legend="성별"
-            name="gender"
-            options={[
-              { label: '남성', value: '남성' },
-              { label: '여성', value: '여성' },
-            ]}
-            value={gender}
-            onChange={(value) => setGender(value as Gender)}
-            orientation="horizontal"
-          />
+            {/* 나이 — Figma: 3-col flex, gap 16px, legend gap 16px */}
+            <RadioGroup
+              legend="나이"
+              name="ageGroup"
+              options={[
+                { label: '20대', value: '20대' },
+                { label: '30대', value: '30대' },
+                { label: '40대', value: '40대' },
+              ]}
+              value={ageGroup}
+              onChange={(value) => setAgeGroup(value as AgeGroup)}
+              legendGap="gap-4"
+              contentClassName="flex gap-4"
+              itemClassName="flex-1"
+            />
+
+            {/* 성별 — Figma: horizontal, gap 16px, legend gap 16px */}
+            <RadioGroup
+              legend="성별"
+              name="gender"
+              options={[
+                { label: '남성', value: '남성' },
+                { label: '여성', value: '여성' },
+              ]}
+              value={gender}
+              onChange={(value) => setGender(value as Gender)}
+              legendGap="gap-4"
+              contentClassName="flex gap-4"
+            />
+          </div>
         </div>
 
-        {/* 다음 버튼 */}
+        {/* CTA 버튼 — Figma: absolute bottom-4, w-324, h-41, rounded-[22px] */}
         <Button
           onClick={handleNext}
           disabled={!nickname.trim() || isLoading}
           variant="primary"
           size="cta"
-          className="mx-4"
+          className="absolute bottom-4 left-2 h-10.25 w-81"
         >
           {isLoading ? '처리 중...' : '다음 단계로 진행'}
         </Button>
