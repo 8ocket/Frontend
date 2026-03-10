@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import WaveBackground from '@/components/common/WaveBackground';
-import { Button, Input, RadioGroup, SectionHeader, SuccessModal } from '@/components/ui';
+import { Button, Input, RadioGroup, SectionHeader, StatusModal } from '@/components/ui';
 import { useAuthStore } from '@/stores/auth';
 
 const imgVector = 'https://www.figma.com/api/mcp/asset/1d130480-0444-4c0b-926c-7cc10c5433d9';
@@ -207,13 +207,20 @@ export default function NicknamePage() {
       </div>
 
       {/* 성공 모달 */}
-      <SuccessModal
+      <StatusModal
         isOpen={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
+        semantic="safe"
         title="가입해 주셔서 감사드립니다."
-        subtitle="감사의 의미로 300 크레딧을 선물로 드립니다."
-        buttonLabel="300 크레딧 받기"
-        onButtonClick={handleSuccessModalClick}
+        description="감사의 의미로 300 크레딧을 선물로 드립니다."
+        creditAmount={300}
+        actions={[
+          {
+            label: '300 크레딧 받기',
+            variant: 'primary',
+            onClick: handleSuccessModalClick,
+          },
+        ]}
       />
     </main>
   );
