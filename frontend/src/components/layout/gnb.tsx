@@ -22,10 +22,14 @@ const NAV_ITEMS = [
 
 const AUTH_NAV = { label: '고객지원', href: '/credit' } as const;
 
+const NO_GNB_PATHS = ['/login', '/signup', '/signup/nickname', '/auth/callback'];
+
 export function GNB() {
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, logout } = useAuthStore();
+
+  if (NO_GNB_PATHS.includes(pathname)) return null;
 
   const handleLogout = () => {
     logout();

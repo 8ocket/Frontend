@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { GNB } from '@/components/layout/gnb';
 import { CreditProductCard } from '@/components/shop/CreditProductCard';
 import { PurchaseConfirmDialog } from '@/components/shop/PurchaseConfirmDialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -64,7 +63,6 @@ export default function ShopPage() {
 
   return (
     <div className="dark:bg-prime-900 min-h-screen bg-white">
-      <GNB />
 
       <main className="flex flex-col items-center px-4 py-12">
         {/* Radix Tabs — Figma: 탭 네비게이션 */}
