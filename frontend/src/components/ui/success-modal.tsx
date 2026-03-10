@@ -1,6 +1,5 @@
 import React from 'react';
-import { Dialog } from './dialog';
-import { Button } from './button';
+import { StatusModal } from './status-modal';
 
 export interface SuccessModalProps {
   isOpen: boolean;
@@ -12,6 +11,10 @@ export interface SuccessModalProps {
   onButtonClick?: () => void;
 }
 
+/**
+ * StatusModal semantic="safe" 기반 성공 모달 래퍼.
+ * 기존 SuccessModal API를 유지하면서 내부적으로 공통 컴포넌트를 활용합니다.
+ */
 export function SuccessModal({
   isOpen,
   onClose,
@@ -26,27 +29,32 @@ export function SuccessModal({
     onClose();
   };
 
-  return (
-    <Dialog isOpen={isOpen} onClose={onClose} maxWidth="max-w-[400px]" closeButton={false}>
-      {/* 텍스트 */}
-      <div className="flex flex-col items-center gap-2 text-center">
-        <h2 className="text-prime-900 text-xl leading-[1.3] font-semibold tracking-[-0.3px]">
-          {title}
-        </h2>
-        {subtitle && (
-          <p className="text-prime-600 text-base leading-[1.4] font-medium">{subtitle}</p>
-        )}
+  // subtitle과 description을 하나의 description 노드로 합침
+  const descriptionNode =
+    subtitle || description ? (
+      <>
+        {subtitle && <span>{subtitle}</span>}
+        {subtitle && description && <br />}
         {description && (
-          <p className="text-prime-500 text-sm leading-[1.4] font-normal">{description}</p>
+          <span className="text-prime-500 text-sm">{description}</span>
         )}
-      </div>
+      </>
+    ) : undefined;
 
-      {/* 버튼 */}
-      <div className="mt-8 flex flex-col gap-3">
-        <Button onClick={handleButtonClick} variant="primary" size="default" className="w-full">
-          {buttonLabel}
-        </Button>
-      </div>
-    </Dialog>
+  return (
+    <StatusModal
+      isOpen={isOpen}
+      onClose={onClose}
+      semantic="safe"
+      title={title}
+      description={descriptionNode}
+      actions={[
+        {
+          label: buttonLabel,
+          variant: 'primary',
+          onClick: handleButtonClick,
+        },
+      ]}
+    />
   );
 }
