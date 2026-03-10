@@ -8,3 +8,4 @@ export { SectionHeader } from './section-header';
 export { Dialog, type DialogProps } from './dialog';
 export { SuccessModal, type SuccessModalProps } from './success-modal';
 export { TermsDetailPanel, type TermsDetailPanelProps } from './terms-detail-panel';
+export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
