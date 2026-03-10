@@ -1,16 +1,15 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 
 import { Search } from 'lucide-react';
 
 import { ChatFilterPanel } from './ChatFilterPanel';
-import { ChatLoadMoreButton } from './ChatLoadMoreButton';
 import { ChatScrollbar } from './ChatScrollbar';
 import { ChatSessionGroup, ChatSessionList } from './ChatSessionList';
 
 // Figma 1379:2840 샘플 데이터
-const MOCK_SESSION_GROUPS: ChatSessionGroup[] = [
+const ALL_SESSION_GROUPS: ChatSessionGroup[] = [
   {
     date: '2026년 2월 17일',
     sessions: [
@@ -43,13 +42,32 @@ const MOCK_SESSION_GROUPS: ChatSessionGroup[] = [
       { id: '9', title: '삼성전자 직군별 갖춰야 할 스펙' },
     ],
   },
+  {
+    date: '2026년 2월 12일',
+    sessions: [
+      { id: '10', title: '직장 동료와의 갈등 해소 방법' },
+      { id: '11', title: '번아웃 극복하기' },
+    ],
+  },
+  {
+    date: '2026년 2월 11일',
+    sessions: [
+      { id: '12', title: '대인관계 스트레스 줄이기' },
+    ],
+  },
 ];
 
-export function ChatSidebar() {
+const PAGE_SIZE = 5;
+
+export function ChatSidebar({ onNewChat }: { onNewChat?: () => void }) {
   const [filterOpen, setFilterOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollRatio, setScrollRatio] = useState(0);
   const [thumbRatio, setThumbRatio] = useState(0.2);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  const visibleGroups = ALL_SESSION_GROUPS.slice(0, visibleCount);
+  const hasMore = visibleCount < ALL_SESSION_GROUPS.length;
 
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
@@ -57,7 +75,12 @@ export function ChatSidebar() {
     const maxScroll = el.scrollHeight - el.clientHeight;
     setScrollRatio(maxScroll > 0 ? el.scrollTop / maxScroll : 0);
     setThumbRatio(el.clientHeight / el.scrollHeight);
-  }, []);
+
+    // 스크롤이 하단에 가까워지면 추가 로드
+    if (hasMore && el.scrollTop + el.clientHeight >= el.scrollHeight - 40) {
+      setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, ALL_SESSION_GROUPS.length));
+    }
+  }, [hasMore]);
 
   const handleScrollTo = useCallback((ratio: number) => {
     const el = scrollRef.current;
@@ -65,8 +88,15 @@ export function ChatSidebar() {
     el.scrollTop = ratio * (el.scrollHeight - el.clientHeight);
   }, []);
 
+  // thumbRatio 재계산 (데이터 추가 시)
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setThumbRatio(el.clientHeight / el.scrollHeight);
+  }, [visibleCount]);
+
   return (
-    <aside className="flex w-80.75 shrink-0 flex-col gap-4 bg-transparent">
+    <aside className="relative flex w-80.75 shrink-0 flex-col gap-4 bg-transparent">
       {/* Logo — Figma 1361:2679 */}
       <div className="flex h-10.5 w-36 items-center justify-center">
         <span
@@ -82,6 +112,24 @@ export function ChatSidebar() {
           마인드 로그
         </span>
       </div>
+
+      {/* 새로운 상담 버튼 — Figma 340:19 */}
+      <button
+        type="button"
+        onClick={onNewChat}
+        className="flex w-full items-center justify-center gap-2.5 rounded-lg transition-colors hover:bg-[#4BA1F0] active:bg-[#257CC0]"
+        style={{
+          padding: '14px 24px',
+          background: '#82C9FF',
+          fontFamily: 'var(--font-pretendard)',
+          fontSize: '16px',
+          fontWeight: 500,
+          color: '#1A222E',
+          lineHeight: '100%',
+        }}
+      >
+        새로운 상담
+      </button>
 
       {/* Search Input — Figma 1361:2666 */}
       <div
@@ -121,7 +169,7 @@ export function ChatSidebar() {
         <button
           type="button"
           onClick={() => setFilterOpen((prev) => !prev)}
-          className="bg-success-700 flex items-center justify-center rounded-lg px-2"
+          className="flex items-center justify-center rounded-lg px-2 transition-colors bg-success-700 hover:bg-[#0C8A60] active:bg-[#085B40]"
           style={{ height: '18px' }}
         >
           <span
@@ -139,18 +187,20 @@ export function ChatSidebar() {
         </button>
       </div>
 
-      {/* Filter Panel — Figma 1512:3168 (토글) */}
+      {/* Filter Panel — absolute 오버레이, 목록 위에 떠있음 */}
       {filterOpen && (
-        <ChatFilterPanel
-          onClose={() => setFilterOpen(false)}
-          onApply={() => setFilterOpen(false)}
-        />
+        <div className="absolute top-53 left-0 z-10 w-full">
+          <ChatFilterPanel
+            onClose={() => setFilterOpen(false)}
+            onApply={() => setFilterOpen(false)}
+          />
+        </div>
       )}
 
       {/* Chat Session List + 커스텀 스크롤바 — Figma 1379:2840, 1457:2423 */}
       <div className="relative flex flex-1 flex-row overflow-hidden">
         <ChatSessionList
-          groups={MOCK_SESSION_GROUPS}
+          groups={visibleGroups}
           scrollRef={scrollRef}
           onScroll={handleScroll}
         />
@@ -159,11 +209,6 @@ export function ChatSidebar() {
           thumbRatio={thumbRatio}
           onScrollTo={handleScrollTo}
         />
-      </div>
-
-      {/* 더 보기 버튼 — Figma 1363:2961, 세션 리스트(315px) 중앙 정렬 */}
-      <div className="flex w-78.75 justify-center">
-        <ChatLoadMoreButton />
       </div>
     </aside>
   );
