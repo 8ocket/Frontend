@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { GNB } from '@/components/layout/gnb';
 import { useAuthStore } from '@/stores/auth';
 
 export default function Home() {
@@ -48,9 +47,6 @@ export default function Home() {
 
   return (
     <div className="dark:bg-prime-900 min-h-screen bg-white">
-      {/* GNB 헤더 */}
-      <GNB />
-
       {/* 메인 콘텐츠 */}
       <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         {/* 환영 섹션 */}

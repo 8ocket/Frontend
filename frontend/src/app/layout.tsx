@@ -45,6 +45,7 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <QueryProvider>
+            <GNB />
             <main>{children}</main>
           </QueryProvider>
         </ThemeProvider>

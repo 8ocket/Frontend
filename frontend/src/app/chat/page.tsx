@@ -1,14 +1,14 @@
 'use client';
 
-import { GNB } from '@/components/layout/gnb';
+import { ChatMainArea, ChatSidebar } from '@/components/chat';
 
 export default function ChatPage() {
   return (
-    <div className="dark:bg-prime-900 min-h-screen bg-white">
-      <GNB />
-      <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <h1 className="text-prime-900 text-4xl font-bold dark:text-white">AI 상담</h1>
-      </main>
+    // GNB는 layout.tsx에서 전역 렌더링 — 여기서는 콘텐츠 영역만
+    // 1920px 기준: 좌우 240px 패딩, gap 43px, 하단 116px
+    <div className="flex h-[calc(100vh-80px)] gap-10.75 overflow-hidden px-60 pb-29">
+      <ChatSidebar />
+      <ChatMainArea />
     </div>
   );
 }

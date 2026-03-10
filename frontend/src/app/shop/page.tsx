@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { GNB } from '@/components/layout/gnb';
 import { ProductCard, ProductCard2, ShopTabs, type ShopTabType } from '@/components/shop';
 import { Button } from '@/components/ui/button';
 
@@ -101,7 +100,6 @@ export default function ShopPage() {
 
   return (
     <div className="dark:bg-prime-900 min-h-screen bg-white">
-      <GNB />
 
       <main className="flex flex-col items-center px-4 py-12">
         {/* 탭 네비게이션 */}
