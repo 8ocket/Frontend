@@ -91,7 +91,7 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="bg-secondary-100 relative h-screen w-full overflow-hidden">
+    <main className="relative h-screen w-full overflow-hidden bg-white">
       <WaveBackground />
 
       {/* 좌측: 회원가입 폼 — Figma: x=240/1920=12.5%, 세로 중앙, w=358 고정 */}

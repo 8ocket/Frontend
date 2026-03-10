@@ -70,7 +70,7 @@ export default function NicknamePage() {
   };
 
   return (
-    <main className="bg-secondary-100 relative h-screen w-full overflow-hidden">
+    <main className="relative h-screen w-full overflow-hidden bg-white">
       <WaveBackground />
 
       {/* Figma: 340×707, 중앙 정렬, bg-cta-100, rounded-md(8px), px-2(8px) */}
