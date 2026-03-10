@@ -5,11 +5,12 @@ import Image from 'next/image';
 
 import { Dialog } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { StatusModal } from '@/components/ui/status-modal';
 import type { CreditProduct } from '@/types/credit';
 
 // ── 구매 확인 다이얼로그 ────────────────────────────────────────
-// Dialog 공통 컴포넌트를 활용한 크레딧 구매 확인 플로우
-// 단계: 확인 → 처리 중 → 완료/실패
+// confirm 단계 → 고유 레이아웃 (Dialog 래퍼)
+// processing / success / error → StatusModal 공통 컴포넌트 활용
 // ─────────────────────────────────────────────────────────────────
 
 type PurchaseStep = 'confirm' | 'processing' | 'success' | 'error';
@@ -54,9 +55,10 @@ export function PurchaseConfirmDialog({
     }
   };
 
-  return (
-    <Dialog isOpen={isOpen} onClose={handleClose} maxWidth="max-w-[440px]">
-      {step === 'confirm' && (
+  /* ── 확인 단계: 고유 레이아웃 ──────────────────────────────── */
+  if (step === 'confirm') {
+    return (
+      <Dialog isOpen={isOpen} onClose={handleClose} maxWidth="max-w-[440px]" accessibleTitle={`${product.name} 구매 확인`}>
         <div className="flex flex-col items-center gap-6">
           {/* 상품 요약 */}
           <div className="flex flex-col items-center gap-3 text-center">
@@ -116,103 +118,54 @@ export function PurchaseConfirmDialog({
             </Button>
           </div>
         </div>
-      )}
+      </Dialog>
+    );
+  }
 
-      {step === 'processing' && (
-        <div className="flex flex-col items-center gap-4 py-8">
-          {/* 로딩 스피너 */}
-          <div className="border-cta-300 h-12 w-12 animate-spin rounded-full border-4 border-t-transparent" />
-          <p className="text-prime-700 text-base font-medium">결제 처리 중...</p>
-          <p className="text-prime-500 text-sm">잠시만 기다려 주세요.</p>
-        </div>
-      )}
+  /* ── 결제 진행 중 ──────────────────────────────────────────── */
+  if (step === 'processing') {
+    return (
+      <StatusModal
+        isOpen={isOpen}
+        onClose={handleClose}
+        semantic="progress"
+        title="결제가 진행중입니다"
+        description="결제 정보를 안전하게 확인 중에 있습니다. 잠시만 기다려주시면 됩니다."
+        creditAmount={product.credits}
+      />
+    );
+  }
 
-      {step === 'success' && (
-        <div className="flex flex-col items-center gap-6">
-          <div className="flex flex-col items-center gap-3 text-center">
-            <div className="bg-success-100 flex h-16 w-16 items-center justify-center rounded-full">
-              <svg
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M20 6L9 17L4 12"
-                  stroke="#0c8a60"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-            <h2 className="text-prime-900 text-xl leading-[1.3] font-semibold">
-              구매가 완료되었습니다!
-            </h2>
-            <p className="text-prime-600 text-base font-medium">
-              {product.credits.toLocaleString()} 크레딧이 충전되었습니다.
-            </p>
-          </div>
-          <Button
-            variant="primary"
-            size="default"
-            onClick={handleClose}
-            className="w-full"
-          >
-            확인
-          </Button>
-        </div>
-      )}
+  /* ── 결제 완료 ─────────────────────────────────────────────── */
+  if (step === 'success') {
+    return (
+      <StatusModal
+        isOpen={isOpen}
+        onClose={handleClose}
+        semantic="safe"
+        title="결제가 완료되었습니다"
+        description="제품을 구매가 되었는지 확인해 주시고, 문제가 있을 시 고객센터로 연락을 부탁드립니다."
+        creditAmount={product.credits}
+        actions={[
+          { label: '결제 내역 보기', variant: 'secondary', onClick: handleClose },
+          { label: '홈 화면에 가기', variant: 'primary', onClick: handleClose },
+        ]}
+      />
+    );
+  }
 
-      {step === 'error' && (
-        <div className="flex flex-col items-center gap-6">
-          <div className="flex flex-col items-center gap-3 text-center">
-            <div className="bg-error-100 flex h-16 w-16 items-center justify-center rounded-full">
-              <svg
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M18 6L6 18M6 6L18 18"
-                  stroke="#bd1010"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-            <h2 className="text-prime-900 text-xl leading-[1.3] font-semibold">
-              결제에 실패했습니다
-            </h2>
-            <p className="text-prime-500 text-sm font-medium">
-              다시 시도해 주세요. 문제가 지속되면 고객지원에 문의해 주세요.
-            </p>
-          </div>
-          <div className="flex w-full gap-3">
-            <Button
-              variant="secondary"
-              size="default"
-              onClick={handleClose}
-              className="flex-1"
-            >
-              닫기
-            </Button>
-            <Button
-              variant="primary"
-              semantic="red"
-              size="default"
-              onClick={handleConfirm}
-              className="flex-1"
-            >
-              다시 시도
-            </Button>
-          </div>
-        </div>
-      )}
-    </Dialog>
+  /* ── 결제 중단 ─────────────────────────────────────────────── */
+  return (
+    <StatusModal
+      isOpen={isOpen}
+      onClose={handleClose}
+      semantic="warning"
+      title="결제가 중단되었습니다"
+      description="알 수 없는 원인으로 인한 거래가 중단되었습니다. 인터넷 연결을 다시 확인해볼수 있습니다. 지속적 문제가 발생 시, 고객지원에 문의 해주세요."
+      actions={[
+        { label: '고객지원 확인하기', variant: 'secondary', onClick: handleClose },
+        { label: '돌아가기', variant: 'primary', onClick: handleConfirm },
+      ]}
+    />
   );
 }
