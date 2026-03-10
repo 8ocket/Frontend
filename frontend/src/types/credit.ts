@@ -7,3 +7,15 @@ export interface CreditTransactions {
   description: string | null; // 거래_설명 / TEXT
   created_at: Date | null; // 거래_일시 / TIMESTAMP
 }
+
+/** 크레딧 상품 정보 */
+export interface CreditProduct {
+  id: string;
+  name: string;
+  credits: number;
+  price: number;
+  priceFormatted: string;
+  paymentType: string;
+  discount?: string;
+  benefits: string[];
+}
