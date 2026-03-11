@@ -59,6 +59,8 @@ const MOCK_PERSONAS: PersonaCardData[] = [
   },
 ];
 
+type ModalState = 'resume' | 'end' | 'credit' | 'newChat' | null;
+
 export default function ChatPage() {
   const [activeModal, setActiveModal] = useState<ChatModalType>(null);
   const [remainingCredits] = useState(0); // TODO: 실제 크레딧 조회 연동

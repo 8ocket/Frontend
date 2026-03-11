@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { ChatBubble, ChatBubbleProps } from './ChatBubble';
 import { ChatInputBar } from './ChatInputBar';
 import { ChatLogo } from './ChatLogo';
-import { ChatSelectOptions, PersonaOption } from './ChatSelectOptions';
 
 // Figma 1357:3355 — Frame 1597881480
 // 1074×884, fill cta-300, radius 24
@@ -53,15 +52,6 @@ export function ChatMainArea({ onEndChat, onCreditShortage, onUnfinishedSession 
       { variant: 'user', senderName: 'User Name', content: inputValue.trim() },
     ]);
     setInputValue('');
-    setShowSelectOptions(false);
-  }
-
-  function handlePersonaSelect(option: PersonaOption) {
-    setMessages((prev) => [
-      ...prev,
-      { variant: 'ai', senderName: option.label, content: '안녕하세요! 무엇을 도와드릴까요?' },
-    ]);
-    setShowSelectOptions(false);
   }
 
   return (
@@ -88,23 +78,14 @@ export function ChatMainArea({ onEndChat, onCreditShortage, onUnfinishedSession 
         ))}
       </div>
 
-      {/* Input bar — Figma 1508:2473 */}
-      <div className="relative">
+      {/* Input bar — Figma 1512:3708 */}
+      <div className="relative px-3 pb-3">
         {/* Select Options popover — AI 교체 버튼 클릭 시 표시, 입력바 좌측 상단에 위치 */}
-        {showSelectOptions && (
-          <div className="absolute bottom-full left-6 mb-2">
-            <ChatSelectOptions
-              title="원하시는 상담사를 고르세요"
-              options={PERSONA_OPTIONS}
-              onSelect={handlePersonaSelect}
-            />
-          </div>
-        )}
         <ChatInputBar
           value={inputValue}
           onChange={setInputValue}
           onSend={handleSend}
-          onAiChange={() => setShowSelectOptions((prev) => !prev)}
+          onEndChat={() => setModal('end')}
         />
       </div>
 
