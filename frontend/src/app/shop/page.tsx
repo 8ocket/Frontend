@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { CreditProductCard } from '@/components/shop/CreditProductCard';
 import { PurchaseConfirmDialog } from '@/components/shop/PurchaseConfirmDialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -53,6 +54,7 @@ const CREDIT_PRODUCTS: CreditProduct[] = [
 ];
 
 export default function ShopPage() {
+  const router = useRouter();
   const [selectedProduct, setSelectedProduct] = useState<CreditProduct | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -125,6 +127,18 @@ export default function ShopPage() {
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         product={selectedProduct}
+        onViewHistory={() => {
+          setIsDialogOpen(false);
+          router.push('/credit');
+        }}
+        onGoHome={() => {
+          setIsDialogOpen(false);
+          router.push('/');
+        }}
+        onContactSupport={() => {
+          setIsDialogOpen(false);
+          // TODO: 고객지원 페이지 라우팅
+        }}
       />
     </div>
   );
