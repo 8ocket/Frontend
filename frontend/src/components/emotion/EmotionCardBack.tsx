@@ -50,7 +50,7 @@ export function EmotionCardBack({
 
   return (
     <div
-      className={cn('relative overflow-hidden rounded-3xl bg-secondary-100', className)}
+      className={cn('bg-secondary-100 relative overflow-hidden rounded-3xl', className)}
       style={{ width, height }}
     >
       {/* 브러시 레이어 (앞면과 동일) */}
@@ -78,13 +78,13 @@ export function EmotionCardBack({
 
       {/* ─── 글래스모피즘 정보 패널 ─── */}
       <div
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col gap-6 rounded-2xl p-2 backdrop-blur-md"
+        className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col gap-6 rounded-2xl p-2 backdrop-blur-md"
         style={{
           width: panelWidth,
           backgroundColor: 'rgba(248, 250, 252, 0.3)',
         }}
       >
-        <div className="flex flex-col gap-4 w-full">
+        <div className="flex w-full flex-col gap-4">
           {/* 상담 요약 헤더 */}
           <SummaryHeader
             title={data.summary.title}
@@ -130,8 +130,8 @@ export function EmotionCardBack({
 
         {/* 보안 고지문 */}
         <p className="caption-1 text-warning-500 leading-[1.2]">
-          본 기록은 비공개 보안 저장소에 암호화되어 저장되었으며 본인 외에는 관리자도
-          열람하지 못합니다.
+          본 기록은 비공개 보안 저장소에 암호화되어 저장되었으며 본인 외에는 관리자도 열람하지
+          못합니다.
         </p>
       </div>
     </div>
@@ -173,13 +173,7 @@ function SummaryHeader({
 }
 
 /** 정보 섹션 (제목 + 내용) */
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-2">
       <h4 className="subtitle-1 text-prime-900">{title}</h4>
