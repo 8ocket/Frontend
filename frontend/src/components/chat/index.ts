@@ -26,5 +26,4 @@ export { ChatFilterPanel } from './ChatFilterPanel';
 export type { PersonaFilter } from './ChatFilterPanel';
 export { ChatWelcomeHeader } from './ChatWelcomeHeader';
 export { ChatLogo } from './ChatLogo';
-export { ChatLoadMoreButton } from './ChatLoadMoreButton';
 export { ChatScrollbar } from './ChatScrollbar';
