@@ -6,6 +6,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { X } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -152,6 +153,7 @@ export function ChatPersonaSelectModal({
   onStart,
   onPurchase,
 }: ChatPersonaSelectModalProps) {
+  const router = useRouter();
   const [selectedId, setSelectedId] = useState<string | null>(
     defaultSelectedId ?? null
   );
@@ -162,12 +164,16 @@ export function ChatPersonaSelectModal({
     }
   };
 
-  // 모달 닫힐 때 선택 상태 초기화
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       setSelectedId(defaultSelectedId ?? null);
       onClose();
     }
+  };
+
+  const handlePurchase = () => {
+    onPurchase?.();
+    router.push('/shop');
   };
 
   return (
@@ -189,15 +195,15 @@ export function ChatPersonaSelectModal({
             </DialogClose>
           </div>
 
-          {/* ── 페르소나 카드 목록 ── */}
-          <div className="flex w-full items-start gap-10 overflow-x-auto">
+          {/* ── 페르소나 카드 목록 (가로 스크롤, 구매버튼 절반 노출로 스크롤 유도) ── */}
+          <div className="no-scrollbar flex w-full items-start gap-10 overflow-x-auto">
             {personas.map((persona) => (
               <PersonaCard
                 key={persona.id}
                 persona={persona}
                 isSelected={selectedId === persona.id}
                 onSelect={() => setSelectedId(persona.id)}
-                onPurchase={onPurchase}
+                onPurchase={handlePurchase}
               />
             ))}
           </div>

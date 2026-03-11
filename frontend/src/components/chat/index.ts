@@ -18,10 +18,7 @@ export type { ChatUnfinishedSessionModalProps } from './ChatUnfinishedSessionMod
 export { ChatRecordLoadingModal } from './ChatRecordLoadingModal';
 export type { ChatRecordLoadingModalProps } from './ChatRecordLoadingModal';
 export { ChatPersonaSelectModal } from './ChatPersonaSelectModal';
-export type {
-  ChatPersonaSelectModalProps,
-  PersonaCardData,
-} from './ChatPersonaSelectModal';
+export type { ChatPersonaSelectModalProps, PersonaCardData } from './ChatPersonaSelectModal';
 export { ChatFilterPanel } from './ChatFilterPanel';
 export type { PersonaFilter } from './ChatFilterPanel';
 export { ChatWelcomeHeader } from './ChatWelcomeHeader';
