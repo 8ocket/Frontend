@@ -16,10 +16,7 @@ const CREDIT_PRODUCTS: CreditProduct[] = [
     price: 3300,
     priceFormatted: '3,300',
     paymentType: '건당 결제',
-    benefits: [
-      '추가 상담권 4번 구매 가능(280크레딧)',
-      '디자인 1종 해금(200크레딧)',
-    ],
+    benefits: ['추가 상담권 4번 구매 가능(280크레딧)', '디자인 1종 해금(200크레딧)'],
   },
   {
     id: '02',
@@ -65,7 +62,6 @@ export default function ShopPage() {
 
   return (
     <div className="dark:bg-prime-900 min-h-screen bg-white">
-
       <main className="flex flex-col items-center px-4 py-12">
         {/* Radix Tabs — Figma: 탭 네비게이션 */}
         <Tabs defaultValue="credit" className="flex w-full flex-col items-center">

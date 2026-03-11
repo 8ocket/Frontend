@@ -47,12 +47,8 @@ export default function ShopModalDemoPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-12">
-      <h1 className="mb-2 text-3xl font-bold text-prime-900">
-        🛒 Shop Modal 데모
-      </h1>
-      <p className="mb-8 text-prime-600">
-        버튼을 눌러 각 구매 모달 단계를 테스트해 보세요.
-      </p>
+      <h1 className="text-prime-900 mb-2 text-3xl font-bold">🛒 Shop Modal 데모</h1>
+      <p className="text-prime-600 mb-8">버튼을 눌러 각 구매 모달 단계를 테스트해 보세요.</p>
 
       <div className="grid grid-cols-2 gap-4">
         {MODAL_LIST.map(({ key, label, semantic }) => (
@@ -60,10 +56,10 @@ export default function ShopModalDemoPage() {
             key={key}
             type="button"
             onClick={() => setActive(key)}
-            className="flex flex-col gap-1 rounded-xl border-2 border-neutral-300 bg-secondary-100 p-4 text-left transition-colors hover:border-cta-300 hover:bg-cta-100"
+            className="bg-secondary-100 hover:border-cta-300 hover:bg-cta-100 flex flex-col gap-1 rounded-xl border-2 border-neutral-300 p-4 text-left transition-colors"
           >
-            <span className="text-base font-semibold text-prime-900">{label}</span>
-            <span className="text-sm text-tertiary-400">{semantic}</span>
+            <span className="text-prime-900 text-base font-semibold">{label}</span>
+            <span className="text-tertiary-400 text-sm">{semantic}</span>
           </button>
         ))}
       </div>
@@ -73,9 +69,18 @@ export default function ShopModalDemoPage() {
         isOpen={active === 'full-flow'}
         onClose={close}
         product={MOCK_PRODUCT}
-        onViewHistory={() => { close(); alert('결제내역 보기 → /credit 라우팅'); }}
-        onGoHome={() => { close(); alert('홈 화면에 가기 → / 라우팅'); }}
-        onContactSupport={() => { close(); alert('고객지원 확인하기 클릭'); }}
+        onViewHistory={() => {
+          close();
+          alert('결제내역 보기 → /credit 라우팅');
+        }}
+        onGoHome={() => {
+          close();
+          alert('홈 화면에 가기 → / 라우팅');
+        }}
+        onContactSupport={() => {
+          close();
+          alert('고객지원 확인하기 클릭');
+        }}
       />
 
       {/* ── 개별 단계 테스트 모달들 ── */}
@@ -96,8 +101,23 @@ export default function ShopModalDemoPage() {
         showAgreement
         agreementLabel="위 내용을 확인 했습니다."
         actions={[
-          { label: '취소하기', variant: 'secondary', semantic: 'red', onClick: () => { close(); alert('취소하기 클릭'); } },
-          { label: '구매하기', variant: 'primary', onClick: () => { close(); alert('구매하기 클릭'); } },
+          {
+            label: '취소하기',
+            variant: 'secondary',
+            semantic: 'red',
+            onClick: () => {
+              close();
+              alert('취소하기 클릭');
+            },
+          },
+          {
+            label: '구매하기',
+            variant: 'primary',
+            onClick: () => {
+              close();
+              alert('구매하기 클릭');
+            },
+          },
         ]}
       />
 
@@ -120,8 +140,22 @@ export default function ShopModalDemoPage() {
         description="제대로 구매가 되었는지 확인해 주시고, 문제가 있을 시 고객센터로 문의를 부탁드리겠습니다."
         creditAmount={MOCK_PRODUCT.credits}
         actions={[
-          { label: '결제내역 보기', variant: 'secondary', onClick: () => { close(); alert('결제내역 보기 클릭'); } },
-          { label: '홈 화면에 가기', variant: 'primary', onClick: () => { close(); alert('홈 화면에 가기 클릭'); } },
+          {
+            label: '결제내역 보기',
+            variant: 'secondary',
+            onClick: () => {
+              close();
+              alert('결제내역 보기 클릭');
+            },
+          },
+          {
+            label: '홈 화면에 가기',
+            variant: 'primary',
+            onClick: () => {
+              close();
+              alert('홈 화면에 가기 클릭');
+            },
+          },
         ]}
       />
 
@@ -133,16 +167,31 @@ export default function ShopModalDemoPage() {
         title="결제가 중단되었습니다"
         description={
           <>
-            알 수 없는 원인으로 인하여 거래가 중단되었습니다.
-            인터넷 연결을 먼저 확인해 보시겠습니까?
+            알 수 없는 원인으로 인하여 거래가 중단되었습니다. 인터넷 연결을 먼저 확인해
+            보시겠습니까?
             <br />
             지속적 문제 발생 시, 고객지원에 문의 바랍니다.
           </>
         }
         creditAmount={MOCK_PRODUCT.credits}
         actions={[
-          { label: '고객지원 확인하기', variant: 'secondary', semantic: 'red', onClick: () => { close(); alert('고객지원 확인하기 클릭'); } },
-          { label: '돌아가기', variant: 'primary', onClick: () => { close(); alert('돌아가기 클릭'); } },
+          {
+            label: '고객지원 확인하기',
+            variant: 'secondary',
+            semantic: 'red',
+            onClick: () => {
+              close();
+              alert('고객지원 확인하기 클릭');
+            },
+          },
+          {
+            label: '돌아가기',
+            variant: 'primary',
+            onClick: () => {
+              close();
+              alert('돌아가기 클릭');
+            },
+          },
         ]}
       />
 
@@ -160,7 +209,15 @@ export default function ShopModalDemoPage() {
           </>
         }
         actions={[
-          { label: '다시 시작하기', variant: 'secondary', semantic: 'yellow', onClick: () => { close(); alert('다시 시작하기 클릭'); } },
+          {
+            label: '다시 시작하기',
+            variant: 'secondary',
+            semantic: 'yellow',
+            onClick: () => {
+              close();
+              alert('다시 시작하기 클릭');
+            },
+          },
         ]}
       />
     </div>

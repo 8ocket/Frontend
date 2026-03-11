@@ -112,6 +112,7 @@ const cuteAnimals: string[] = [
   '카피바라',
   '라마',
   '기러기',
+  '시베리안 허스키',
 ];
 
 const nicknameConfig: Config = {
