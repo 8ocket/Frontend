@@ -13,6 +13,8 @@ export interface ChatSidebarProps {
   onNewCounsel?: () => void;
 }
 
+const PAGE_SIZE = 5;
+
 // Figma 1379:2840 샘플 데이터
 const ALL_SESSION_GROUPS: ChatSessionGroup[] = [
   {
@@ -119,7 +121,7 @@ export function ChatSidebar({ onNewCounsel }: ChatSidebarProps = {}) {
       {/* 새로운 상담 버튼 — Figma 340:19 */}
       <button
         type="button"
-        onClick={onNewChat}
+        onClick={onNewCounsel}
         className="flex w-full items-center justify-center gap-2.5 rounded-lg transition-colors hover:bg-[#4BA1F0] active:bg-[#257CC0]"
         style={{
           padding: '14px 24px',
@@ -154,15 +156,6 @@ export function ChatSidebar({ onNewCounsel }: ChatSidebarProps = {}) {
           <Search className="text-prime-900" size={22} strokeWidth={1.5} />
         </div>
       </div>
-
-      {/* 새 상담 버튼 — Figma 사이드바 상단 */}
-      <button
-        type="button"
-        onClick={onNewCounsel}
-        className="flex h-11 w-full items-center justify-center rounded-lg bg-cta-300 text-base font-medium leading-none text-prime-900 transition-colors hover:bg-[#4ba1f0] active:bg-[#257cc0]"
-      >
-        상담
-      </button>
 
       {/* 최근 항목 + 필터 옵션 — Figma 1457:2758 */}
       <div className="flex w-full items-center justify-between">

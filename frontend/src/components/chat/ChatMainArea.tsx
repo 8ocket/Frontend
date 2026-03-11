@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { ChatBubble, ChatBubbleProps } from './ChatBubble';
 import { ChatInputBar } from './ChatInputBar';
 import { ChatLogo } from './ChatLogo';
+import { type PersonaOption } from './ChatSelectOptions';
 
 // Figma 1357:3355 — Frame 1597881480
 // 1074×884, fill cta-300, radius 24
@@ -85,7 +86,7 @@ export function ChatMainArea({ onEndChat, onCreditShortage, onUnfinishedSession 
           value={inputValue}
           onChange={setInputValue}
           onSend={handleSend}
-          onEndChat={() => setModal('end')}
+          onEndChat={onEndChat}
         />
       </div>
 

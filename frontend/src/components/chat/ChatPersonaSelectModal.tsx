@@ -7,14 +7,13 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { X } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import {
   DialogRoot,
   DialogContent,
   DialogTitle,
-  DialogClose,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 
@@ -54,54 +53,11 @@ function PersonaCard({
   persona,
   isSelected,
   onSelect,
-  onPurchase,
 }: {
   persona: PersonaCardData;
   isSelected: boolean;
   onSelect: () => void;
-  onPurchase?: () => void;
 }) {
-  // ── 잠긴 페르소나 (미구매) ──
-  if (persona.isLocked) {
-    return (
-      <div className="flex w-55 shrink-0 flex-col gap-4 opacity-50">
-        {/* 잠금 플레이스홀더 */}
-        <div className="flex aspect-220/333 w-full flex-col items-center justify-center gap-5 rounded-full bg-[rgba(130,201,255,0.2)]">
-          <div className="flex h-12 w-12 items-center justify-center">
-            <span className="text-3xl text-prime-400">?</span>
-          </div>
-          <div className="flex flex-col items-center gap-2 px-6">
-            <p className="whitespace-pre-wrap text-center text-sm leading-[1.6] text-prime-900">
-              {'새로운 페르소나를\n구매하시겠어요?'}
-            </p>
-            <Button
-              variant="secondary"
-              size="default"
-              className="w-full"
-              onClick={(e) => {
-                e.stopPropagation();
-                onPurchase?.();
-              }}
-            >
-              구매하러 가기
-            </Button>
-          </div>
-        </div>
-
-        {/* 이름 + 설명 */}
-        <div className="flex flex-col items-center gap-1 text-center">
-          <h4 className="text-2xl leading-[1.3] font-semibold tracking-[-0.36px] text-prime-500">
-            {persona.name}
-          </h4>
-          <p className="text-sm leading-[1.6] text-prime-500">
-            {persona.description}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // ── 활성 페르소나 ──
   return (
     <button
       type="button"
@@ -143,6 +99,47 @@ function PersonaCard({
   );
 }
 
+/* ── 구매 유도 카드 ───────────────────────────────────────────── */
+
+function BuyCard({ onPurchase }: { onPurchase?: () => void }) {
+  return (
+    <div className="flex w-55 shrink-0 flex-col gap-4">
+      {/* 구매 플레이스홀더 */}
+      <div className="flex aspect-220/333 w-full flex-col items-center justify-center gap-5 rounded-full bg-[rgba(130,201,255,0.2)]">
+        <div className="flex h-12 w-12 items-center justify-center">
+          <span className="text-3xl text-prime-400">?</span>
+        </div>
+        <div className="flex flex-col items-center gap-2 px-6">
+          <p className="whitespace-pre-wrap text-center text-sm leading-[1.6] text-prime-900">
+            {'새로운 페르소나를\n구매하시겠어요?'}
+          </p>
+          <Button
+            variant="secondary"
+            size="default"
+            className="w-full"
+            onClick={(e) => {
+              e.stopPropagation();
+              onPurchase?.();
+            }}
+          >
+            구매하러 가기
+          </Button>
+        </div>
+      </div>
+
+      {/* 이름 + 설명 */}
+      <div className="flex flex-col items-center gap-1 text-center">
+        <h4 className="text-2xl leading-[1.3] font-semibold tracking-[-0.36px] text-prime-500">
+          새로운 페르소나
+        </h4>
+        <p className="text-sm leading-[1.6] text-prime-500">
+          페르소나를 해금하여 더 많은 방식의 상담을 진행해 보세요.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 /* ── 페르소나 선택 모달 ──────────────────────────────────────── */
 
 export function ChatPersonaSelectModal({
@@ -158,10 +155,16 @@ export function ChatPersonaSelectModal({
     defaultSelectedId ?? null
   );
 
+  // 보유 페르소나 / 구매 가능 여부 분리
+  const ownedPersonas = personas.filter((p) => !p.isLocked);
+  const hasBuySlot = personas.some((p) => p.isLocked);
+  const totalItems = ownedPersonas.length + (hasBuySlot ? 1 : 0);
+
+  // 4개 초과 시 스크롤 활성화
+  const needsScroll = totalItems > 4;
+
   const handleStart = () => {
-    if (selectedId) {
-      onStart(selectedId);
-    }
+    if (selectedId) onStart(selectedId);
   };
 
   const handleOpenChange = (open: boolean) => {
@@ -180,39 +183,51 @@ export function ChatPersonaSelectModal({
     <DialogRoot open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent
         showClose={false}
-        maxWidth="max-w-[1200px]"
+        maxWidth={needsScroll ? 'max-w-[1200px]' : 'max-w-[1060px]'}
         className="rounded-2xl border-0 bg-[rgba(130,201,255,0.1)] backdrop-blur-[15px]"
       >
         <div className="flex flex-col items-center gap-6">
-          {/* ── 헤더: 제목 + 닫기 버튼 ── */}
-          <div className="relative flex w-full items-center justify-center">
-            <DialogTitle className="text-center text-[32px] leading-[1.3] font-semibold tracking-[-0.48px] text-prime-800">
-              원하시는 상담사를 선택해 주세요.
-            </DialogTitle>
-            <DialogClose className="absolute right-0 top-0 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:outline-none">
-              <X size={32} className="text-prime-800" />
-              <span className="sr-only">닫기</span>
-            </DialogClose>
-          </div>
+          {/* ── 헤더: 제목 ── */}
+          <DialogTitle className="text-center text-[32px] leading-[1.3] font-semibold tracking-[-0.48px] text-prime-800">
+            원하시는 상담사를 선택해 주세요.
+          </DialogTitle>
 
-          {/* ── 페르소나 카드 목록 (가로 스크롤, 구매버튼 절반 노출로 스크롤 유도) ── */}
-          <div className="no-scrollbar flex w-full items-start gap-10 overflow-x-auto">
-            {personas.map((persona) => (
-              <PersonaCard
-                key={persona.id}
-                persona={persona}
-                isSelected={selectedId === persona.id}
-                onSelect={() => setSelectedId(persona.id)}
-                onPurchase={handlePurchase}
-              />
-            ))}
+          {/* ── 페르소나 카드 목록 ── */}
+          <div className="relative w-full">
+            <div
+              className={cn(
+                'flex w-full items-start gap-10',
+                needsScroll ? 'no-scrollbar overflow-x-auto' : 'justify-center'
+              )}
+            >
+              {ownedPersonas.map((persona) => (
+                <PersonaCard
+                  key={persona.id}
+                  persona={persona}
+                  isSelected={selectedId === persona.id}
+                  onSelect={() => setSelectedId(persona.id)}
+                />
+              ))}
+              {hasBuySlot && <BuyCard onPurchase={handlePurchase} />}
+            </div>
+
+            {/* 스크롤 유도 화살표 (5개 이상일 때) */}
+            {needsScroll && (
+              <div className="pointer-events-none absolute right-0 top-0 flex h-full items-center">
+                <div className="absolute inset-y-0 right-0 w-20 bg-linear-to-r from-transparent to-[rgba(130,201,255,0.25)]" />
+                <ChevronRight
+                  size={28}
+                  className="relative z-10 text-prime-400 drop-shadow-sm"
+                />
+              </div>
+            )}
           </div>
 
           {/* ── CTA 버튼 ── */}
           <Button
             variant="primary"
             size="default"
-            className="w-full max-w-89.5"
+            className="w-full max-w-89.5 px-6"
             onClick={handleStart}
             disabled={!selectedId}
           >
