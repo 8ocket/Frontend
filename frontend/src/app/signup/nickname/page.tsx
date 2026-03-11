@@ -6,6 +6,7 @@ import Image from 'next/image';
 import WaveBackground from '@/components/common/WaveBackground';
 import { Button, Input, RadioGroup, SectionHeader, StatusModal } from '@/components/ui';
 import { useAuthStore } from '@/stores/auth';
+import { generatePositiveNickname } from '@/lib/utils/nickname';
 
 const imgVector = 'https://www.figma.com/api/mcp/asset/1d130480-0444-4c0b-926c-7cc10c5433d9';
 
@@ -15,7 +16,7 @@ type Gender = '남성' | '여성';
 
 export default function NicknamePage() {
   const router = useRouter();
-  const [nickname, setNickname] = useState('');
+  const [nickname, setNickname] = useState(generatePositiveNickname);
   const [userType, setUserType] = useState<UserType>('대학생 / 대학원생');
   const [ageGroup, setAgeGroup] = useState<AgeGroup>('20대');
   const [gender, setGender] = useState<Gender>('남성');
@@ -62,11 +63,7 @@ export default function NicknamePage() {
   };
 
   const generateRandomNickname = () => {
-    const adjectives = ['행복한', '신나는', '멋진', '친절한', '똑똑한'];
-    const nouns = ['사자', '호랑이', '독수리', '늑대', '여우'];
-    const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
-    const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
-    setNickname(`${randomAdj}${randomNoun}`);
+    setNickname(generatePositiveNickname());
   };
 
   return (
@@ -212,11 +209,11 @@ export default function NicknamePage() {
         onClose={() => setShowSuccessModal(false)}
         semantic="safe"
         title="가입해 주셔서 감사드립니다."
-        description="감사의 의미로 300 크레딧을 선물로 드립니다."
+        description="감사의 의미로 150 크레딧을 선물로 드립니다."
         creditAmount={300}
         actions={[
           {
-            label: '300 크레딧 받기',
+            label: '150 크레딧 받기',
             variant: 'primary',
             onClick: handleSuccessModalClick,
           },
