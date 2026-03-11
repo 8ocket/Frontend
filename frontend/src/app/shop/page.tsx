@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { CreditProductCard } from '@/components/shop/CreditProductCard';
 import { PurchaseConfirmDialog } from '@/components/shop/PurchaseConfirmDialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -15,10 +16,7 @@ const CREDIT_PRODUCTS: CreditProduct[] = [
     price: 3300,
     priceFormatted: '3,300',
     paymentType: '건당 결제',
-    benefits: [
-      '추가 상담권 4번 구매 가능(280크레딧)',
-      '디자인 1종 해금(200크레딧)',
-    ],
+    benefits: ['추가 상담권 4번 구매 가능(280크레딧)', '디자인 1종 해금(200크레딧)'],
   },
   {
     id: '02',
@@ -53,6 +51,7 @@ const CREDIT_PRODUCTS: CreditProduct[] = [
 ];
 
 export default function ShopPage() {
+  const router = useRouter();
   const [selectedProduct, setSelectedProduct] = useState<CreditProduct | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -63,7 +62,6 @@ export default function ShopPage() {
 
   return (
     <div className="dark:bg-prime-900 min-h-screen bg-white">
-
       <main className="flex flex-col items-center px-4 py-12">
         {/* Radix Tabs — Figma: 탭 네비게이션 */}
         <Tabs defaultValue="credit" className="flex w-full flex-col items-center">
@@ -125,6 +123,18 @@ export default function ShopPage() {
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         product={selectedProduct}
+        onViewHistory={() => {
+          setIsDialogOpen(false);
+          router.push('/credit');
+        }}
+        onGoHome={() => {
+          setIsDialogOpen(false);
+          router.push('/');
+        }}
+        onContactSupport={() => {
+          setIsDialogOpen(false);
+          // TODO: 고객지원 페이지 라우팅
+        }}
       />
     </div>
   );

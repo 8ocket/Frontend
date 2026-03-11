@@ -2,13 +2,27 @@
 
 import { useState } from 'react';
 
-import { ChatAlertModal } from './ChatAlertModal';
 import { ChatBubble, ChatBubbleProps } from './ChatBubble';
 import { ChatInputBar } from './ChatInputBar';
 import { ChatLogo } from './ChatLogo';
 
 // Figma 1357:3355 — Frame 1597881480
 // 1074×884, fill cta-300, radius 24
+
+export interface ChatMainAreaProps {
+  /** 상담 종료 확인 시 호출 (종료 확인 모달 표시) */
+  onEndChat?: () => void;
+  /** 크레딧 부족 시 호출 */
+  onCreditShortage?: () => void;
+  /** 미완결 상담 발견 시 호출 */
+  onUnfinishedSession?: () => void;
+}
+
+const PERSONA_OPTIONS: PersonaOption[] = [
+  { id: 'mental', label: '정신건강 상담사' },
+  { id: 'career', label: '직업 및 진로 상담사' },
+  { id: 'coaching', label: '코칭 심리 상담사' },
+];
 
 // Figma 샘플 메시지
 const INITIAL_MESSAGES: ChatBubbleProps[] = [
@@ -26,17 +40,10 @@ const INITIAL_MESSAGES: ChatBubbleProps[] = [
   },
 ];
 
-type ModalState = 'resume' | 'end' | 'credit' | 'newChat' | null;
-
-export function ChatMainArea({
-  modal,
-  onModalChange: setModal,
-}: {
-  modal: ModalState;
-  onModalChange: (m: ModalState) => void;
-}) {
+export function ChatMainArea({ onEndChat, onCreditShortage, onUnfinishedSession }: ChatMainAreaProps = {}) {
   const [messages, setMessages] = useState<ChatBubbleProps[]>(INITIAL_MESSAGES);
   const [inputValue, setInputValue] = useState('');
+  const [showSelectOptions, setShowSelectOptions] = useState(false);
 
   function handleSend() {
     if (!inputValue.trim()) return;
@@ -82,37 +89,6 @@ export function ChatMainArea({
         />
       </div>
 
-      {/* Alert Modals — overlay */}
-      {modal === 'resume' && (
-        <ChatAlertModal
-          variant="resume"
-          date="2026. 02. 17"
-          sessionTitle="설날 기간 친척들과의 불편한 이야기"
-          onResume={() => setModal(null)}
-          onNewChat={() => setModal(null)}
-        />
-      )}
-      {modal === 'end' && (
-        <ChatAlertModal
-          variant="end"
-          onEnd={() => setModal(null)}
-          onViewHistory={() => setModal(null)}
-        />
-      )}
-      {modal === 'credit' && (
-        <ChatAlertModal
-          variant="credit"
-          remainingCredits={0}
-          onEnd={() => setModal(null)}
-          onBuy={() => setModal(null)}
-        />
-      )}
-      {modal === 'newChat' && (
-        <ChatAlertModal
-          variant="newChat"
-          onConfirm={() => setModal(null)}
-        />
-      )}
     </div>
   );
 }

@@ -96,10 +96,7 @@ function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
   );
 }
 
-function DialogTitle({
-  className,
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Title>) {
+function DialogTitle({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Title>) {
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
@@ -117,6 +114,16 @@ function DialogDescription({
     <DialogPrimitive.Description
       data-slot="dialog-description"
       className={cn('text-prime-700 text-base leading-[1.6]', className)}
+      {...props}
+    />
+  );
+}
+
+function DialogFooter({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot="dialog-footer"
+      className={cn('flex w-full items-center justify-between', className)}
       {...props}
     />
   );
@@ -176,6 +183,7 @@ export {
   DialogContent,
   DialogClose,
   DialogHeader,
+  DialogFooter,
   DialogTitle,
   DialogDescription,
 };

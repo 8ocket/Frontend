@@ -8,6 +8,11 @@ import { ChatFilterPanel } from './ChatFilterPanel';
 import { ChatScrollbar } from './ChatScrollbar';
 import { ChatSessionGroup, ChatSessionList } from './ChatSessionList';
 
+export interface ChatSidebarProps {
+  /** 새 상담 시작 버튼 클릭 시 호출 (페르소나 선택 모달 열기) */
+  onNewCounsel?: () => void;
+}
+
 // Figma 1379:2840 샘플 데이터
 const ALL_SESSION_GROUPS: ChatSessionGroup[] = [
   {
@@ -57,9 +62,7 @@ const ALL_SESSION_GROUPS: ChatSessionGroup[] = [
   },
 ];
 
-const PAGE_SIZE = 5;
-
-export function ChatSidebar({ onNewChat }: { onNewChat?: () => void }) {
+export function ChatSidebar({ onNewCounsel }: ChatSidebarProps = {}) {
   const [filterOpen, setFilterOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollRatio, setScrollRatio] = useState(0);
@@ -151,6 +154,15 @@ export function ChatSidebar({ onNewChat }: { onNewChat?: () => void }) {
           <Search className="text-prime-900" size={22} strokeWidth={1.5} />
         </div>
       </div>
+
+      {/* 새 상담 버튼 — Figma 사이드바 상단 */}
+      <button
+        type="button"
+        onClick={onNewCounsel}
+        className="flex h-11 w-full items-center justify-center rounded-lg bg-cta-300 text-base font-medium leading-none text-prime-900 transition-colors hover:bg-[#4ba1f0] active:bg-[#257cc0]"
+      >
+        상담
+      </button>
 
       {/* 최근 항목 + 필터 옵션 — Figma 1457:2758 */}
       <div className="flex w-full items-center justify-between">
