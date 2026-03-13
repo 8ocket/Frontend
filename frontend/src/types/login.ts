@@ -45,3 +45,16 @@ export interface KakaoLoginError {
   code: 'INVALID_CREDENTIALS';
   message: string;
 }
+
+// ─── /v1/auth/google/callback ───
+
+export interface GoogleLoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  isNewUser: boolean;
+}
+
+export interface GoogleLoginError {
+  code: 'INVALID_CREDENTIALS';
+  message: string;
+}

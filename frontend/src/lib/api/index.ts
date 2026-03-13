@@ -3,9 +3,9 @@
 
 import { api } from '@/lib/axios';
 import { AuthResponse, ApiResponse } from '@/types/auth';
-import { RefreshTokenResponse, KakaoLoginResponse } from '@/types/login';
+import { RefreshTokenResponse, KakaoLoginResponse, GoogleLoginResponse } from '@/types/login';
 import { SessionListQuery, SessionListResponse } from '@/types/session';
-import { mockLogin, mockRefreshToken, mockGetSessions, mockKakaoLogin } from '@/mocks';
+import { mockLogin, mockRefreshToken, mockGetSessions, mockKakaoLogin, mockGoogleLogin } from '@/mocks';
 
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
 
@@ -43,6 +43,21 @@ export const kakaoLoginApi = async (code: string): Promise<KakaoLoginResponse> =
   }
 
   const response = await api.get<KakaoLoginResponse>(`/auth/kakao/callback?code=${code}`);
+  return response.data;
+};
+
+/**
+ * 구글 소셜 로그인 API
+ * GET /v1/auth/google/callback
+ */
+export const googleLoginApi = async (code: string): Promise<GoogleLoginResponse> => {
+  if (USE_MOCK) {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(mockGoogleLogin()), 500);
+    });
+  }
+
+  const response = await api.get<GoogleLoginResponse>(`/auth/google/callback?code=${code}`);
   return response.data;
 };
 
