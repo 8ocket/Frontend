@@ -64,17 +64,14 @@ export function EmotionCard({
       aria-label={`감정 카드 — ${emotionLabel}. ${isFlipped ? '뒷면' : '앞면'} 표시 중. 클릭하여 뒤집기`}
     >
       <div
-        className="relative w-full h-full transition-transform duration-700 ease-in-out"
+        className="relative h-full w-full transition-transform duration-700 ease-in-out"
         style={{
           transformStyle: 'preserve-3d',
           transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
         }}
       >
         {/* 앞면 */}
-        <div
-          className="absolute inset-0"
-          style={{ backfaceVisibility: 'hidden' }}
-        >
+        <div className="absolute inset-0" style={{ backfaceVisibility: 'hidden' }}>
           <EmotionCardFront
             layers={data.layers}
             emotionLabel={emotionLabel}
