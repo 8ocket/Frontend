@@ -86,12 +86,13 @@ export function LoginContent({
           isLoading={loadingProvider === 'kakao'}
           disabled={isLoading}
         />
+        {/* 네이버 로그인 — 미연동, 추후 활성화
         <LoginButton
           provider="naver"
           onClick={() => handleLogin('naver')}
           isLoading={loadingProvider === 'naver'}
           disabled={isLoading}
-        />
+        /> */}
         <LoginButton
           provider="google"
           onClick={() => handleLogin('google')}
@@ -118,7 +119,7 @@ export function LoginContent({
         </button>
 
         {/* 디스클레이머 텍스트 */}
-        <p className="text-prime-500 text-center text-xs leading-[1.2] font-medium whitespace-pre-wrap">
+        <p className="text-prime-500 text-center text-xs leading-[1.2] font-medium whitespace-nowrap">
           {loginTexts.disclaimer}
         </p>
       </div>
