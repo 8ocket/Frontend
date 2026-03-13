@@ -1,3 +1,47 @@
+// ─── /v1/sessions (GET) - 세션 목록 조회 ───
+
+export type SessionStatus = 'active' | 'saved' | 'abandoned';
+
+export interface SessionListQuery {
+  status?: SessionStatus;
+  page?: number;
+  size?: number;
+}
+
+export interface SessionListItem {
+  session_id: string;
+  persona_image_url: string;
+  title: string;
+  status: SessionStatus;
+  started_at: string;
+}
+
+export interface Pagination {
+  page: number;
+  size: number;
+  total_count: number;
+  total_pages: number;
+}
+
+export interface SessionListResponse {
+  sessions: SessionListItem[];
+  pagination: Pagination;
+}
+
+// ─── /v1/sessions/{session_id} (POST) - 상담 메시지 전송 ───
+
+// Request
+export interface SendMessageRequest {
+  content: string;
+}
+
+// SSE 이벤트 타입
+export type SSEEventType = 'ai_chunk' | 'ai_complete' | 'crisis_check' | 'done';
+
+export interface SSEChunkEvent {
+  content: string;
+}
+
 export interface CounselingSessions {
   session_id: string; // PK / UUID
   user_id: string; // FK / 사용자_ID / UUID
