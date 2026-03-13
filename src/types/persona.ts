@@ -9,3 +9,19 @@ export interface AiPersonas {
   is_active: boolean | null; // 활성화_여부 / BOOLEAN
   created_at: Date | null; // 생성일시 / TIMESTAMP
 }
+
+/** 상점 표시용 페르소나 상품 */
+export type PersonaCategory = 'animal' | 'job' | 'limited';
+
+export interface PersonaProduct {
+  id: string;
+  name: string;
+  quote: string;
+  description: string;
+  image: string;
+  unlockCredits: number;
+  category: PersonaCategory;
+  isUnlocked?: boolean;
+  isLimited?: boolean;
+  limitedStock?: number;
+}

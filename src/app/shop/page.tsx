@@ -4,8 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CreditProductCard } from '@/components/shop/CreditProductCard';
 import { PurchaseConfirmDialog } from '@/components/shop/PurchaseConfirmDialog';
+import { PersonaCard } from '@/components/persona/PersonaCard';
+import { UnlockConfirmDialog } from '@/components/persona/UnlockConfirmDialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import type { CreditProduct } from '@/types/credit';
+import type { PersonaProduct } from '@/types/persona';
+import { ANIMAL_PERSONAS } from '@/mocks/persona';
 
 // ── Figma: 크레딧 상품 데이터 (node 1738:3773) ─────────────────
 const CREDIT_PRODUCTS: CreditProduct[] = [
@@ -54,10 +58,17 @@ export default function ShopPage() {
   const router = useRouter();
   const [selectedProduct, setSelectedProduct] = useState<CreditProduct | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedPersona, setSelectedPersona] = useState<PersonaProduct | null>(null);
+  const [isUnlockDialogOpen, setIsUnlockDialogOpen] = useState(false);
 
   const handlePurchase = (product: CreditProduct) => {
     setSelectedProduct(product);
     setIsDialogOpen(true);
+  };
+
+  const handleUnlock = (persona: PersonaProduct) => {
+    setSelectedPersona(persona);
+    setIsUnlockDialogOpen(true);
   };
 
   return (
@@ -94,13 +105,26 @@ export default function ShopPage() {
 
           {/* ── 페르소나 해금 탭 ───────────────────────────────── */}
           <TabsContent value="persona" className="w-full">
-            <div className="flex flex-col items-center gap-10 py-12">
-              <h2 className="text-prime-900 dark:text-secondary-100 text-[32px] leading-[1.3] font-semibold tracking-[-1.5px]">
-                페르소나 해금하기
-              </h2>
-              <p className="text-prime-600 dark:text-prime-400 text-center text-lg">
-                페르소나 해금 기능은 준비 중입니다.
-              </p>
+            <div className="flex flex-col gap-12">
+
+              {/* 동물 친구들 */}
+              <section className="flex flex-col gap-6">
+                <div className="flex flex-col gap-1">
+                  <h3 className="text-prime-900 dark:text-secondary-100 text-2xl leading-[1.3] font-semibold tracking-[-0.36px]">
+                    동물 친구들
+                  </h3>
+                  <p className="text-prime-500 dark:text-prime-400 text-sm leading-[1.6]">
+                    귀여운 동물 친구들과 함께 즐거운 소통을 합니다.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-6">
+                  {ANIMAL_PERSONAS.map((persona) => (
+                    <PersonaCard key={persona.id} persona={persona} onUnlock={handleUnlock} />
+                  ))}
+                </div>
+              </section>
+
+
             </div>
           </TabsContent>
 
@@ -118,7 +142,18 @@ export default function ShopPage() {
         </Tabs>
       </main>
 
-      {/* 구매 확인 다이얼로그 */}
+      {/* 페르소나 해금 다이얼로그 */}
+      <UnlockConfirmDialog
+        isOpen={isUnlockDialogOpen}
+        onClose={() => setIsUnlockDialogOpen(false)}
+        persona={selectedPersona}
+        onGoHome={() => {
+          setIsUnlockDialogOpen(false);
+          router.push('/');
+        }}
+      />
+
+      {/* 크레딧 구매 확인 다이얼로그 */}
       <PurchaseConfirmDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
