@@ -30,10 +30,6 @@ function CallbackContent() {
       try {
         const result = await kakaoLoginApi(resolvedCode!);
 
-        document.cookie = `accessToken=${result.accessToken}; path=/; max-age=3600`;
-        document.cookie = `refreshToken=${result.refreshToken}; path=/; max-age=86400`;
-        localStorage.setItem('accessToken', result.accessToken);
-        localStorage.setItem('refreshToken', result.refreshToken);
 
         const login = useAuthStore.getState().login;
         login(
@@ -46,7 +42,6 @@ function CallbackContent() {
         router.push(result.isNewUser ? '/signup' : '/');
       } catch (error) {
         console.error('❌ Kakao login error:', error);
-        alert('로그인 처리 중 오류가 발생했습니다.');
         router.push('/login');
       }
     };

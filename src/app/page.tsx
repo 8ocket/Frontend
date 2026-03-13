@@ -3,37 +3,27 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAuthStore } from '@/stores/auth';
-import { getSessionsApi } from '@/lib/api';
+import { getCookie } from '@/lib/utils/cookie';
 
 export default function Home() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading, user, setLoading } = useAuthStore();
 
   useEffect(() => {
-    // 인증 상태 확인
-    const token = localStorage.getItem('accessToken');
+    const token = getCookie('accessToken');
 
-    // 토큰이 없으면 로그인 페이지로
     if (!token) {
       setLoading(false);
       router.push('/login');
       return;
     }
 
-    // 토큰이 있는데 store에 사용자 정보가 없으면 동기화
     if (token && !user) {
-      const login = useAuthStore.getState().login;
-      const mockUser = {
-        id: Date.now(),
-        email: 'user@example.com',
-        name: 'User',
-      };
-      login(mockUser, token, localStorage.getItem('refreshToken') || '');
+      setLoading(false);
     } else {
-      // 토큰이 있고 user가 있으면 로딩 완료
       setLoading(false);
     }
-  }, []); // 의존성 배열을 비움 - 한 번만 실행
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (authLoading || !isAuthenticated) {
     return (
@@ -159,25 +149,6 @@ export default function Home() {
             ))}
           </div>
         </section>
-
-        {/* 정보 배너 */}
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-900/20">
-          <p className="text-sm text-blue-900 dark:text-blue-200">
-            💡 <strong>Mock 모드 실행 중:</strong> 백엔드 API가 준비되면 .env.local에서
-            NEXT_PUBLIC_USE_MOCK=false로 변경하세요.
-          </p>
-          {/* TODO: 테스트 완료 후 삭제 */}
-          <button
-            onClick={async () => {
-              const result = await getSessionsApi({ status: 'saved' });
-              console.log('[getSessionsApi 테스트]', result);
-              alert(JSON.stringify(result, null, 2));
-            }}
-            className="mt-2 rounded bg-blue-200 px-3 py-1 text-xs text-blue-900 hover:bg-blue-300"
-          >
-            getSessionsApi 테스트
-          </button>
-        </div>
       </main>
     </div>
   );

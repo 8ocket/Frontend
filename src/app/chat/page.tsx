@@ -68,7 +68,6 @@ export default function ChatPage() {
     closeModal();
     // TODO: 크레딧 확인 → 부족하면 openModal('credit-shortage')
     // TODO: 세션 생성 API 호출 (personaId)
-    console.log('상담 시작:', personaId);
   };
 
   const handleEndChat = () => openModal('end-confirm');

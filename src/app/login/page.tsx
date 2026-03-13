@@ -14,8 +14,6 @@ export default function LoginPage() {
   const { login } = useAuthStore();
 
   const handleLoginClick = async (provider: LoginProvider | 'temp') => {
-    console.log('Login attempt with provider:', provider);
-
     try {
       setIsLoading(true);
       setError(null);
@@ -31,14 +29,7 @@ export default function LoginPage() {
 
         const tempToken = `temp_token_${Date.now()}`;
 
-        // 쿠키와 localStorage에 토큰 저장
-        document.cookie = `accessToken=${tempToken}; path=/; max-age=3600`;
-        document.cookie = `refreshToken=${tempToken}; path=/; max-age=86400`;
-
-        // 인증 상태 업데이트
         login(tempUser, tempToken, tempToken);
-
-        console.log('Temp login successful:', tempUser);
 
         // 로그인 완료 → signup 페이지로 이동
         router.push('/signup');
@@ -51,13 +42,6 @@ export default function LoginPage() {
           throw new Error('로그인 응답 데이터가 불완전합니다.');
         }
 
-        // midleware에서 인증 상태를 확인하기 위해 쿠키와 localStorage에 토큰 저장
-        document.cookie = `accessToken=${response.accessToken}; path=/; max-age=3600`;
-        if (response.refreshToken) {
-          document.cookie = `refreshToken=${response.refreshToken}; path=/; max-age=86400`;
-        }
-
-        // 로그인 성공 - 인증 상태 업데이트
         login(response.user, response.accessToken, response.refreshToken || '');
 
         // 로그인 완료 → signup 페이지로 이동
