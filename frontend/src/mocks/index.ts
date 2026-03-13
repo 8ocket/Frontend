@@ -3,6 +3,9 @@
 
 import { User, AuthResponse } from '@/types/auth';
 
+// 감정카드 mock
+export * from './emotion';
+
 /**
  * Mock 사용자 데이터
  */
