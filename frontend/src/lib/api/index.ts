@@ -3,9 +3,73 @@
 
 import { api } from '@/lib/axios';
 import { AuthResponse, ApiResponse } from '@/types/auth';
-import { mockLogin } from '@/mocks';
+import { RefreshTokenResponse, KakaoLoginResponse } from '@/types/login';
+import { SessionListQuery, SessionListResponse } from '@/types/session';
+import { mockLogin, mockRefreshToken, mockGetSessions, mockKakaoLogin } from '@/mocks';
 
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
+
+/**
+ * 토큰 갱신 API
+ * GET /v1/auth/refresh
+ */
+export const refreshTokenApi = async (refreshToken: string): Promise<RefreshTokenResponse> => {
+  if (USE_MOCK) {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(mockRefreshToken()), 500);
+    });
+  }
+
+  const response = await api.get<ApiResponse<RefreshTokenResponse>>('/auth/refresh', {
+    headers: { Authorization: `Bearer ${refreshToken}` },
+  });
+
+  if (response.data.success && response.data.data) {
+    return response.data.data;
+  }
+
+  throw new Error(response.data.error?.message || '토큰 갱신 실패');
+};
+
+/**
+ * 카카오 소셜 로그인 API
+ * GET /v1/auth/kakao/callback
+ */
+export const kakaoLoginApi = async (code: string): Promise<KakaoLoginResponse> => {
+  if (USE_MOCK) {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(mockKakaoLogin()), 500);
+    });
+  }
+
+  const response = await api.get<KakaoLoginResponse>(`/auth/kakao/callback?code=${code}`);
+  return response.data;
+};
+
+/**
+ * 세션 목록 조회 API
+ * GET /v1/sessions
+ */
+export const getSessionsApi = async (query: SessionListQuery = {}): Promise<SessionListResponse> => {
+  if (USE_MOCK) {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(mockGetSessions(query)), 500);
+    });
+  }
+
+  const params = new URLSearchParams();
+  if (query.status) params.set('status', query.status);
+  if (query.page) params.set('page', String(query.page));
+  if (query.size) params.set('size', String(query.size));
+
+  const response = await api.get<ApiResponse<SessionListResponse>>(`/sessions?${params.toString()}`);
+
+  if (response.data.success && response.data.data) {
+    return response.data.data;
+  }
+
+  throw new Error(response.data.error?.message || '세션 목록 조회 실패');
+};
 
 /**
  * 로그인 API

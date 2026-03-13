@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAuthStore } from '@/stores/auth';
+import { getSessionsApi } from '@/lib/api';
 
 export default function Home() {
   const router = useRouter();
@@ -165,6 +166,17 @@ export default function Home() {
             💡 <strong>Mock 모드 실행 중:</strong> 백엔드 API가 준비되면 .env.local에서
             NEXT_PUBLIC_USE_MOCK=false로 변경하세요.
           </p>
+          {/* TODO: 테스트 완료 후 삭제 */}
+          <button
+            onClick={async () => {
+              const result = await getSessionsApi({ status: 'saved' });
+              console.log('[getSessionsApi 테스트]', result);
+              alert(JSON.stringify(result, null, 2));
+            }}
+            className="mt-2 rounded bg-blue-200 px-3 py-1 text-xs text-blue-900 hover:bg-blue-300"
+          >
+            getSessionsApi 테스트
+          </button>
         </div>
       </main>
     </div>

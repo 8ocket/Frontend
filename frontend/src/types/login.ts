@@ -1,5 +1,17 @@
 export type LoginProvider = 'kakao' | 'naver' | 'google';
 
+// ─── /v1/auth/refresh ───
+
+export interface RefreshTokenRequest {
+  refresh_token: string;
+}
+
+export interface RefreshTokenResponse {
+  access_token: string;
+  refresh_token: string;
+  is_new_user: boolean | null;
+}
+
 export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
@@ -17,12 +29,19 @@ export interface LoginError {
   details?: Record<string, unknown>;
 }
 
-/**
- * Kakao OAuth 로그인 응답
- * POST /v1/auth/login/kakao 에서 반환
- */
-export interface KakaoLoginResponse extends LoginResponse {
-  user: LoginResponse['user'] & {
-    provider: 'kakao';
-  };
+// ─── /v1/auth/kakao/callback ───
+
+export interface KakaoLoginRequest {
+  code: string;
+}
+
+export interface KakaoLoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  isNewUser: boolean;
+}
+
+export interface KakaoLoginError {
+  code: 'INVALID_CREDENTIALS';
+  message: string;
 }

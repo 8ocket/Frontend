@@ -26,18 +26,21 @@ export function LoginContent({
       setLoadingProvider(provider);
       setError(null);
 
-      if (provider === 'kakao' && !USE_MOCK) {
-        // 실제 카카오 인증 (Mock 모드가 아닐 때만)
-        const params = new URLSearchParams({
-          client_id: oauthConfig.kakao.clientId,
-          redirect_uri: oauthConfig.kakao.redirectUri,
-          response_type: 'code',
-        });
-
-        const kakaoAuthUrl = `${oauthConfig.kakao.authUrl}?${params.toString()}`;
-        window.location.href = kakaoAuthUrl;
+      if (provider === 'kakao') {
+        if (USE_MOCK) {
+          // Mock 모드: callback 페이지로 이동 (code 없이 → callback에서 mock code 생성)
+          window.location.href = '/auth/callback';
+        } else {
+          // 실제 카카오 인증
+          const params = new URLSearchParams({
+            client_id: oauthConfig.kakao.clientId,
+            redirect_uri: oauthConfig.kakao.redirectUri,
+            response_type: 'code',
+          });
+          window.location.href = `${oauthConfig.kakao.authUrl}?${params.toString()}`;
+        }
       } else {
-        // Mock 모드 또는 다른 프로바이더 처리
+        // 다른 프로바이더 처리
         await onLogin?.(provider);
       }
     } catch (err) {
