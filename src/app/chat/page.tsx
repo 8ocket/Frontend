@@ -102,17 +102,13 @@ export default function ChatPage() {
 
       {/* 사이드바 — 모바일: 슬라이드 오버레이, 데스크톱: 고정 */}
       <div
-        className={`
-          fixed inset-y-0 left-0 z-40 w-[min(320px,85vw)] transform bg-white pt-16 transition-transform duration-300 ease-in-out dark:bg-prime-900
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-          lg:relative lg:z-auto lg:w-80.75 lg:translate-x-0 lg:bg-transparent lg:pt-0 lg:transition-none dark:lg:bg-transparent
-        `}
+        className={`dark:bg-prime-900 fixed inset-y-0 left-0 z-40 w-[min(320px,85vw)] transform bg-white pt-16 transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:z-auto lg:w-80.75 lg:translate-x-0 lg:bg-transparent lg:pt-0 lg:transition-none dark:lg:bg-transparent`}
       >
         <ChatSidebar onNewCounsel={handleNewCounsel} />
       </div>
 
       {/* 메인 채팅 영역 */}
-      <div className="flex-1 overflow-hidden pt-14 lg:pt-0">
+      <div className="flex flex-1 flex-col overflow-hidden pt-14 lg:pt-0">
         <ChatMainArea
           onEndChat={handleEndChat}
           onCreditShortage={() => openModal('credit-shortage')}
@@ -151,7 +147,10 @@ export default function ChatPage() {
         onClose={closeModal}
         sessionTitle="설날 기간 친척들과의 불편한 이야기"
         sessionDate="2026. 02. 17"
-        onIgnore={() => { closeModal(); openModal('persona-select'); }}
+        onIgnore={() => {
+          closeModal();
+          openModal('persona-select');
+        }}
         onResume={closeModal}
       />
 
