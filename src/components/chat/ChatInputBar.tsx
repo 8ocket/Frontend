@@ -41,9 +41,9 @@ export function ChatInputBar({
 
   return (
     <div className="bg-secondary-100 flex h-13 w-full flex-row items-center justify-between gap-2 rounded-2xl">
-      {/* Left tools — 136×52, gap:16 */}
-      <div className="flex h-13 w-34 shrink-0 flex-row items-center">
-        <div className="flex flex-row items-center gap-4">
+      {/* Left tools — 모바일에서 축소 */}
+      <div className="flex shrink-0 flex-row items-center md:h-13 md:w-34">
+        <div className="flex flex-row items-center gap-2 md:gap-4">
 
           {/* 상담 종료 — Figma 1845:6269 (Size=44)
               Default: frame white, icon #EF4444, text #3F526F

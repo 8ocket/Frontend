@@ -13,6 +13,7 @@ import {
   type PersonaCardData,
 } from '@/components/chat';
 import { StatusModal } from '@/components/ui/status-modal';
+import { Menu } from 'lucide-react';
 
 // ── 모달 상태 타입 ──────────────────────────────────────────────
 export type ChatModalType =
@@ -55,11 +56,13 @@ const MOCK_PERSONAS: PersonaCardData[] = [
 export default function ChatPage() {
   const [activeModal, setActiveModal] = useState<ChatModalType>(null);
   const [remainingCredits] = useState(0); // TODO: 실제 크레딧 조회 연동
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const openModal = (type: ChatModalType) => setActiveModal(type);
   const closeModal = () => setActiveModal(null);
 
   const handleNewCounsel = () => {
+    setSidebarOpen(false);
     // TODO: 미완결 상담 체크 API → 있으면 'unfinished-session', 없으면 'persona-select'
     openModal('persona-select');
   };
@@ -78,15 +81,44 @@ export default function ChatPage() {
   };
 
   return (
-    // GNB는 layout.tsx에서 전역 렌더링 — 여기서는 콘텐츠 영역만
-    // 1920px 기준: 좌우 240px 패딩, gap 43px, 하단 116px
-    <div className="flex h-[calc(100vh-80px)] gap-10.75 overflow-hidden px-60">
-      <ChatSidebar onNewCounsel={handleNewCounsel} />
-      <ChatMainArea
-        onEndChat={handleEndChat}
-        onCreditShortage={() => openModal('credit-shortage')}
-        onUnfinishedSession={() => openModal('unfinished-session')}
-      />
+    <div className="relative flex h-[calc(100dvh-4rem)] overflow-hidden md:h-[calc(100dvh-5rem)] lg:gap-10.75 lg:px-60">
+      {/* 모바일 사이드바 토글 버튼 */}
+      <button
+        type="button"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="bg-secondary-100/80 dark:bg-prime-900/80 absolute top-3 left-3 z-30 flex h-10 w-10 items-center justify-center rounded-lg shadow-md backdrop-blur-sm lg:hidden"
+        aria-label="상담 목록 열기"
+      >
+        <Menu size={20} />
+      </button>
+
+      {/* 모바일 사이드바 오버레이 */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/30 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* 사이드바 — 모바일: 슬라이드 오버레이, 데스크톱: 고정 */}
+      <div
+        className={`
+          fixed inset-y-0 left-0 z-40 w-[min(320px,85vw)] transform bg-white pt-16 transition-transform duration-300 ease-in-out dark:bg-prime-900
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+          lg:relative lg:z-auto lg:w-80.75 lg:translate-x-0 lg:bg-transparent lg:pt-0 lg:transition-none dark:lg:bg-transparent
+        `}
+      >
+        <ChatSidebar onNewCounsel={handleNewCounsel} />
+      </div>
+
+      {/* 메인 채팅 영역 */}
+      <div className="flex-1 overflow-hidden pt-14 lg:pt-0">
+        <ChatMainArea
+          onEndChat={handleEndChat}
+          onCreditShortage={() => openModal('credit-shortage')}
+          onUnfinishedSession={() => openModal('unfinished-session')}
+        />
+      </div>
 
       {/* 페르소나 선택 모달 */}
       <ChatPersonaSelectModal

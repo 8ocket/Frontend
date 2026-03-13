@@ -1,7 +1,9 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { Menu, X } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
 import { cn } from '@/lib/utils';
 import { LogoSmall } from '../login';
@@ -28,6 +30,22 @@ export function GNB() {
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, logout } = useAuthStore();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // 경로 변경 시 모바일 메뉴 닫기
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  // 모바일 메뉴 열림 시 스크롤 방지
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileMenuOpen]);
 
   if (NO_GNB_PATHS.includes(pathname)) return null;
 
@@ -38,12 +56,14 @@ export function GNB() {
 
   return (
     <header className="bg-secondary-100 dark:bg-prime-900 dark:border-prime-800 w-full border-b border-neutral-200">
-      <nav className="layout-container flex h-20 items-center justify-between px-6">
-        {/* 로고 영역 - 추후 작업 */}
-        <div className="w-60">마인드로그</div>
+      <nav className="layout-container flex h-16 items-center justify-between px-4 md:h-20 md:px-6">
+        {/* 로고 영역 */}
+        <Link href="/" className="shrink-0 text-lg font-semibold md:w-60 md:text-base">
+          마인드로그
+        </Link>
 
-        {/* 메뉴 */}
-        <div className="flex items-center gap-1">
+        {/* 데스크톱 메뉴 */}
+        <div className="hidden items-center gap-1 lg:flex">
           {NAV_ITEMS.map(({ label, href }) => (
             <NavItem key={href} label={label} href={href} active={pathname === href} />
           ))}
@@ -82,7 +102,64 @@ export function GNB() {
             </Link>
           )}
         </div>
+
+        {/* 모바일 햄버거 버튼 */}
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="flex h-10 w-10 items-center justify-center rounded-lg transition-colors hover:bg-neutral-200 dark:hover:bg-prime-800 lg:hidden"
+          aria-label={mobileMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
+        >
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </nav>
+
+      {/* 모바일 메뉴 오버레이 */}
+      {mobileMenuOpen && (
+        <div
+          className="bg-secondary-100 dark:bg-prime-900 fixed inset-0 top-16 z-50 flex flex-col overflow-y-auto lg:hidden"
+        >
+          <div className="flex flex-col gap-1 px-4 py-4">
+            {NAV_ITEMS.map(({ label, href }) => (
+              <MobileNavItem key={href} label={label} href={href} active={pathname === href} />
+            ))}
+
+            {isAuthenticated && (
+              <MobileNavItem
+                label={AUTH_NAV.label}
+                href={AUTH_NAV.href}
+                active={pathname === AUTH_NAV.href}
+              />
+            )}
+
+            {isAuthenticated ? (
+              <>
+                <MobileNavItem label="마이페이지" href="/my" active={pathname === '/my'} />
+                <div className="border-neutral-200 dark:border-prime-700 my-2 border-t" />
+                <button
+                  onClick={handleLogout}
+                  className={cn(
+                    'w-full rounded-xl px-4 py-3 text-left text-base font-medium transition-all',
+                    'text-error-500 hover:bg-error-100 dark:hover:bg-prime-800'
+                  )}
+                >
+                  로그아웃
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="border-neutral-200 dark:border-prime-700 my-2 border-t" />
+                <Link
+                  href="/login"
+                  className="bg-cta-300 text-secondary-100 hover:bg-[#4ba1f0] active:bg-[#257cc0] rounded-xl px-4 py-3 text-center text-base font-medium transition-all"
+                >
+                  로그인
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 }
@@ -96,6 +173,22 @@ function NavItem({ label, href, active }: { label: string; href: string; active:
         active
           ? 'bg-prime-900 text-secondary-100 dark:bg-prime-700 dark:text-secondary-100'
           : 'text-prime-700 hover:text-prime-900 dark:text-tertiary-300 dark:hover:bg-prime-800 dark:hover:text-secondary-100 hover:bg-neutral-200'
+      )}
+    >
+      {label}
+    </Link>
+  );
+}
+
+function MobileNavItem({ label, href, active }: { label: string; href: string; active: boolean }) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        'rounded-xl px-4 py-3 text-base font-medium transition-all',
+        active
+          ? 'bg-prime-900 text-secondary-100 dark:bg-prime-700 dark:text-secondary-100'
+          : 'text-prime-700 hover:text-prime-900 dark:text-tertiary-300 dark:hover:bg-prime-800 dark:hover:text-secondary-100 hover:bg-neutral-100'
       )}
     >
       {label}
