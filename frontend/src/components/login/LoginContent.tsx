@@ -28,16 +28,26 @@ export function LoginContent({
 
       if (provider === 'kakao') {
         if (USE_MOCK) {
-          // Mock 모드: callback 페이지로 이동 (code 없이 → callback에서 mock code 생성)
           window.location.href = '/auth/callback';
         } else {
-          // 실제 카카오 인증
           const params = new URLSearchParams({
             client_id: oauthConfig.kakao.clientId,
             redirect_uri: oauthConfig.kakao.redirectUri,
             response_type: 'code',
           });
           window.location.href = `${oauthConfig.kakao.authUrl}?${params.toString()}`;
+        }
+      } else if (provider === 'google') {
+        if (USE_MOCK) {
+          window.location.href = '/auth/google/callback';
+        } else {
+          const params = new URLSearchParams({
+            client_id: oauthConfig.google.clientId,
+            redirect_uri: oauthConfig.google.redirectUri,
+            response_type: 'code',
+            scope: 'email profile',
+          });
+          window.location.href = `${oauthConfig.google.authUrl}?${params.toString()}`;
         }
       } else {
         // 다른 프로바이더 처리

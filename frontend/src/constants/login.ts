@@ -42,4 +42,10 @@ export const oauthConfig = {
     redirectUri:
       process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI || 'http://localhost:3000/auth/callback',
   },
+  google: {
+    clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
+    authUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
+    redirectUri:
+      process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback',
+  },
 } as const;
