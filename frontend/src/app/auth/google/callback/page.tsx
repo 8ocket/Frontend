@@ -4,16 +4,15 @@ import { Suspense } from 'react';
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth';
-import { kakaoLoginApi } from '@/lib/api';
+import { googleLoginApi } from '@/lib/api';
 
-function CallbackContent() {
+function GoogleCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialCode = searchParams.get('code');
 
   useEffect(() => {
     const handleLogin = async () => {
-      // code 결정
       let resolvedCode: string | null = initialCode;
 
       if (!initialCode) {
@@ -26,9 +25,8 @@ function CallbackContent() {
         }
       }
 
-      // 로그인 처리
       try {
-        const result = await kakaoLoginApi(resolvedCode!);
+        const result = await googleLoginApi(resolvedCode!);
 
         document.cookie = `accessToken=${result.accessToken}; path=/; max-age=3600`;
         document.cookie = `refreshToken=${result.refreshToken}; path=/; max-age=86400`;
@@ -42,10 +40,9 @@ function CallbackContent() {
           result.refreshToken
         );
 
-        // 신규 사용자면 회원가입, 기존 사용자면 홈으로
         router.push(result.isNewUser ? '/signup' : '/');
       } catch (error) {
-        console.error('❌ Kakao login error:', error);
+        console.error('❌ Google login error:', error);
         alert('로그인 처리 중 오류가 발생했습니다.');
         router.push('/login');
       }
@@ -64,7 +61,7 @@ function CallbackContent() {
   );
 }
 
-export default function KakaoCallback() {
+export default function GoogleCallback() {
   return (
     <Suspense
       fallback={
@@ -76,7 +73,7 @@ export default function KakaoCallback() {
         </div>
       }
     >
-      <CallbackContent />
+      <GoogleCallbackContent />
     </Suspense>
   );
 }

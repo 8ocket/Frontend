@@ -2,9 +2,12 @@
 // 개발 및 테스트용 mock 데이터를 여기서 export합니다.
 
 import { User, AuthResponse } from '@/types/auth';
+import { RefreshTokenResponse, KakaoLoginResponse, GoogleLoginResponse } from '@/types/login';
 
 // 감정카드 mock
 export * from './emotion';
+// 세션 mock
+export * from './session';
 
 /**
  * Mock 사용자 데이터
@@ -32,6 +35,33 @@ export const MOCK_USERS: Array<User & { password: string }> = [
     profileImage: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user',
   },
 ];
+
+/**
+ * Mock 카카오 로그인 (GET /v1/auth/kakao/callback)
+ */
+export const mockKakaoLogin = (): KakaoLoginResponse => ({
+  accessToken: `mock_access_token_${Date.now()}`,
+  refreshToken: `mock_refresh_token_${Date.now()}`,
+  isNewUser: true,
+});
+
+/**
+ * Mock 구글 로그인 (GET /v1/auth/google/callback)
+ */
+export const mockGoogleLogin = (): GoogleLoginResponse => ({
+  accessToken: `mock_access_token_${Date.now()}`,
+  refreshToken: `mock_refresh_token_${Date.now()}`,
+  isNewUser: true,
+});
+
+/**
+ * Mock 토큰 갱신 (GET /v1/auth/refresh)
+ */
+export const mockRefreshToken = (): RefreshTokenResponse => ({
+  access_token: `mock_access_token_${Date.now()}`,
+  refresh_token: `mock_refresh_token_${Date.now()}`,
+  is_new_user: null,
+});
 
 /**
  * Mock 토큰 생성
