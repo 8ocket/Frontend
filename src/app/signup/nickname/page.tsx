@@ -67,11 +67,11 @@ export default function NicknamePage() {
   };
 
   return (
-    <main className="relative h-screen w-full overflow-hidden bg-white">
+    <main className="relative min-h-screen-safe w-full overflow-y-auto bg-white">
       <WaveBackground />
 
-      {/* Figma: 340×707, 중앙 정렬, bg-cta-100, rounded-md(8px), px-2(8px) */}
-      <div className="bg-cta-100 absolute top-1/2 left-1/2 h-176.75 w-85 -translate-x-1/2 -translate-y-1/2 rounded-md px-2">
+      {/* 모바일: 전체 너비, 데스크톱: 중앙 고정 크기 카드 */}
+      <div className="bg-cta-100 relative mx-auto my-4 w-full max-w-85 rounded-md px-4 py-4 md:absolute md:top-1/2 md:left-1/2 md:my-0 md:h-176.75 md:w-85 md:-translate-x-1/2 md:-translate-y-1/2 md:px-2 md:py-0">
         {/* ── 헤더: 제목 + 뒤로가기 ── */}
         <div className="flex h-10.5 items-center justify-between">
           <h1 className="text-prime-900 text-[32px] leading-[1.3] font-semibold">
@@ -197,7 +197,7 @@ export default function NicknamePage() {
           disabled={!nickname.trim() || isLoading}
           variant="primary"
           size="cta"
-          className="absolute bottom-4 left-2 h-10.25 w-81"
+          className="mt-8 h-10.25 w-full md:absolute md:bottom-4 md:left-2 md:mt-0 md:w-81"
         >
           {isLoading ? '처리 중...' : '다음 단계로 진행'}
         </Button>

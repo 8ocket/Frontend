@@ -181,6 +181,7 @@
   --layout-columns: 12;
   --layout-column-width: 98px;
   --layout-gutter: 24px;
+  --gnb-height: 4rem; /* 64px mobile */
 
   --radius: 0.625rem;
   --font-pretendard: 'Pretendard', system-ui, -apple-system, sans-serif;
@@ -266,6 +267,32 @@
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
+  /* 모바일 안전 영역 (노치, 홈 인디케이터) */
+  :root {
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-left: env(safe-area-inset-left, 0px);
+    --safe-area-right: env(safe-area-inset-right, 0px);
+  }
+
+  /* 모바일 dvh 지원 */
+  @supports (height: 100dvh) {
+    .h-screen-safe {
+      height: 100dvh;
+    }
+    .min-h-screen-safe {
+      min-height: 100dvh;
+    }
+  }
+  @supports not (height: 100dvh) {
+    .h-screen-safe {
+      height: 100vh;
+    }
+    .min-h-screen-safe {
+      min-height: 100vh;
+    }
+  }
 }
 
 @layer components {
@@ -276,32 +303,54 @@
     margin-inline: auto;
   }
 
+  /* 모바일 반응형 레이아웃 그리드 */
   .layout-grid {
     display: grid;
-    grid-template-columns: repeat(var(--layout-columns), var(--layout-column-width));
-    gap: var(--layout-gutter);
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
     justify-content: center;
   }
+  @media (min-width: 768px) {
+    .layout-grid {
+      grid-template-columns: repeat(8, 1fr);
+      gap: 20px;
+    }
+    :root {
+      --gnb-height: 5rem; /* 80px desktop */
+    }
+  }
+  @media (min-width: 1024px) {
+    .layout-grid {
+      grid-template-columns: repeat(var(--layout-columns), var(--layout-column-width));
+      gap: var(--layout-gutter);
+    }
+  }
 
-  /* Display - Large headings */
+  /* 모바일 터치 최적화 */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Display - Large headings (모바일 반응형) */
   .display-01 {
-    @apply text-5xl leading-[120%] font-bold tracking-[-1.5%];
+    @apply text-3xl leading-[120%] font-bold tracking-[-1.5%] md:text-5xl;
     font-family: var(--font-pretendard);
   }
 
   .display-02 {
-    @apply text-4xl leading-[120%] font-bold tracking-[-1.5%];
+    @apply text-2xl leading-[120%] font-bold tracking-[-1.5%] md:text-4xl;
     font-family: var(--font-pretendard);
   }
 
-  /* Heading - Section headings */
+  /* Heading - Section headings (모바일 반응형) */
   .heading-01 {
-    @apply text-3xl leading-[130%] font-semibold tracking-[-1.5%];
+    @apply text-xl leading-[130%] font-semibold tracking-[-1.5%] md:text-3xl;
     font-family: var(--font-pretendard);
   }
 
   .heading-02 {
-    @apply text-2xl leading-[130%] font-semibold tracking-[-1.5%];
+    @apply text-lg leading-[130%] font-semibold tracking-[-1.5%] md:text-2xl;
     font-family: var(--font-pretendard);
   }
 

@@ -91,11 +91,11 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="relative h-screen w-full overflow-hidden bg-white">
+    <main className="relative min-h-screen-safe w-full overflow-y-auto bg-white">
       <WaveBackground />
 
-      {/* 좌측: 회원가입 폼 — Figma: x=240/1920=12.5%, 세로 중앙, w=358 고정 */}
-      <div className="absolute top-1/2 left-[12.5%] flex w-89.5 -translate-y-1/2 flex-col gap-12">
+      {/* 모바일: 세로 스택, 데스크톱: 좌측 고정 */}
+      <div className="relative z-10 flex w-full flex-col gap-12 px-6 py-8 md:absolute md:top-1/2 md:left-[12.5%] md:w-89.5 md:-translate-y-1/2 md:px-0 md:py-0">
         {/* 헤더 */}
         <div className="flex flex-col gap-4.75">
           <div className="flex items-center justify-between">
@@ -180,9 +180,9 @@ export default function SignupPage() {
         </Button>
       </div>
 
-      {/* 우측: 약관 세부내용 패널 — Figma: x=678/1920≈35.3%, y=217/1080≈20.1%, w=967/1920≈50.4%, h=646/1080≈59.8% */}
+      {/* 우측: 약관 세부내용 패널 — 모바일: 전체화면 오버레이, 데스크톱: 우측 패널 */}
       {selectedTerm && (
-        <div className="absolute top-[20.1%] left-[35.3%] h-[59.8vh] w-[50.4%]">
+        <div className="fixed inset-0 z-20 bg-white/95 p-4 md:absolute md:inset-auto md:top-[20.1%] md:left-[35.3%] md:h-[59.8vh] md:w-[50.4%] md:bg-transparent md:p-0">
           <TermsDetailPanel
             title={TERMS_LIST.find((t) => t.key === selectedTerm)!.label}
             onClose={() => setSelectedTerm(null)}

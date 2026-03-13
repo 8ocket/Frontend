@@ -65,9 +65,9 @@ export function LoginContent({
   const isLoading = externalLoading || loadingProvider !== null;
 
   return (
-    <div className="flex w-96 flex-col items-center justify-center">
+    <div className="flex w-full max-w-96 flex-col items-center justify-center px-6 md:px-0">
       {/* 로고 */}
-      <LogoSmall className="h-73.75 w-73.75" />
+      <LogoSmall className="h-48 w-48 md:h-73.75 md:w-73.75" />
       {/* 텍스트 섹션 */}
       <div className="mt-16 flex w-full flex-col items-center gap-4">
         <p className="text-center text-sm leading-[1.3] font-semibold text-[#1a222e]">
@@ -86,12 +86,13 @@ export function LoginContent({
           isLoading={loadingProvider === 'kakao'}
           disabled={isLoading}
         />
+        {/* 네이버 로그인 — 미연동, 추후 활성화
         <LoginButton
           provider="naver"
           onClick={() => handleLogin('naver')}
           isLoading={loadingProvider === 'naver'}
           disabled={isLoading}
-        />
+        /> */}
         <LoginButton
           provider="google"
           onClick={() => handleLogin('google')}
@@ -118,7 +119,7 @@ export function LoginContent({
         </button>
 
         {/* 디스클레이머 텍스트 */}
-        <p className="text-prime-500 text-center text-xs leading-[1.2] font-medium whitespace-pre-wrap">
+        <p className="text-prime-500 text-center text-xs leading-[1.2] font-medium whitespace-nowrap">
           {loginTexts.disclaimer}
         </p>
       </div>

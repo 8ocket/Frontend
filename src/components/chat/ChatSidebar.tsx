@@ -101,7 +101,7 @@ export function ChatSidebar({ onNewCounsel }: ChatSidebarProps = {}) {
   }, [visibleCount]);
 
   return (
-    <aside className="relative flex w-80.75 shrink-0 flex-col gap-4 bg-transparent">
+    <aside className="relative flex w-full shrink-0 flex-col gap-4 bg-transparent px-4 lg:w-80.75 lg:px-0">
       {/* Logo — Figma 1361:2679 */}
       <div className="flex h-10.5 w-36 items-center justify-center">
         <span
@@ -138,8 +138,7 @@ export function ChatSidebar({ onNewCounsel }: ChatSidebarProps = {}) {
 
       {/* Search Input — Figma 1361:2666 */}
       <div
-        className="border-neutral-300 bg-secondary-100 flex h-11 w-80 items-center justify-between rounded-lg border px-4 py-3"
-        style={{ gap: '212px' }}
+        className="border-neutral-300 bg-secondary-100 flex h-11 w-full items-center justify-between rounded-lg border px-4 py-3 lg:w-80"
       >
         <span
           className="text-prime-900 shrink-0"
