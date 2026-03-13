@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { LoginButton, type LoginProvider } from './LoginButton';
 import { LogoSmall } from './LogoSmall';
 import { loginTexts, oauthConfig } from '@/constants/login';
+import { getErrorMessage } from '@/lib/utils/error';
 
 interface LoginContentProps {
   onLogin?: (provider: LoginProvider | 'temp') => Promise<void>;
@@ -54,9 +55,7 @@ export function LoginContent({
         await onLogin?.(provider);
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : '로그인 중 오류가 발생했습니다.';
-      setError(message);
-      console.error('Login error:', err);
+      setError(getErrorMessage(err, '로그인 중 오류가 발생했습니다.'));
     } finally {
       setLoadingProvider(null);
     }
@@ -107,9 +106,7 @@ export function LoginContent({
             try {
               await onLogin?.('temp');
             } catch (err) {
-              const message = err instanceof Error ? err.message : '임시 로그인 중 오류가 발생했습니다.';
-              setError(message);
-              console.error('Temp login error:', err);
+              setError(getErrorMessage(err, '임시 로그인 중 오류가 발생했습니다.'));
             } finally {
               setLoadingProvider(null);
             }

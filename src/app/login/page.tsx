@@ -6,6 +6,7 @@ import WaveBackground from '@/components/common/WaveBackground';
 import { useAuthStore } from '@/stores/auth';
 import { socialLoginApi } from '@/lib/api';
 import { LoginContent, type LoginProvider } from '@/components/login';
+import { getErrorMessage } from '@/lib/utils/error';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -48,25 +49,7 @@ export default function LoginPage() {
         router.push('/signup');
       }
     } catch (err: unknown) {
-      console.error('Login error:', err);
-
-      let errorMessage = '로그인에 실패했습니다.';
-
-      if (err instanceof Error) {
-        errorMessage = err.message;
-      } else if (typeof err === 'object' && err !== null) {
-        // Axios 에러 처리
-        if ('response' in err) {
-          const apiError = err as { response?: { data?: { error?: { message?: string } } } };
-          errorMessage = apiError.response?.data?.error?.message || errorMessage;
-        }
-        // 기타 객체 에러
-        if ('message' in err) {
-          errorMessage = (err as { message: string }).message;
-        }
-      }
-
-      setError(errorMessage);
+      setError(getErrorMessage(err, '로그인에 실패했습니다.'));
     } finally {
       setIsLoading(false);
     }

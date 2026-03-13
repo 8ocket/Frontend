@@ -115,21 +115,13 @@ export const loginApi = async (email: string, password: string): Promise<AuthRes
     });
   }
 
-  // 실제 API 요청
-  try {
-    const response = await api.post<ApiResponse<AuthResponse>>('/auth/login', {
-      email,
-      password,
-    });
+  const response = await api.post<ApiResponse<AuthResponse>>('/auth/login', { email, password });
 
-    if (response.data.success && response.data.data) {
-      return response.data.data;
-    }
-
-    throw new Error(response.data.error?.message || '로그인 실패');
-  } catch (error: any) {
-    throw error;
+  if (response.data.success && response.data.data) {
+    return response.data.data;
   }
+
+  throw new Error(response.data.error?.message || '로그인 실패');
 };
 
 /**
@@ -150,15 +142,11 @@ export const socialLoginApi = async (
     });
   }
 
-  try {
-    const response = await api.post<ApiResponse<AuthResponse>>(`/auth/login/${provider}`);
+  const response = await api.post<ApiResponse<AuthResponse>>(`/auth/login/${provider}`);
 
-    if (response.data.success && response.data.data) {
-      return response.data.data;
-    }
-
-    throw new Error(response.data.error?.message || '소셜 로그인 실패');
-  } catch (error: any) {
-    throw error;
+  if (response.data.success && response.data.data) {
+    return response.data.data;
   }
+
+  throw new Error(response.data.error?.message || '소셜 로그인 실패');
 };
