@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   // React Strict Mode (개발 시 잠재적 문제 감지)
   reactStrictMode: true,
 
+  // Docker 배포용 standalone 출력 (이미지 크기 최소화)
+  output: 'standalone',
+
   // 이미지 최적화 설정
   images: {
     remotePatterns: [
