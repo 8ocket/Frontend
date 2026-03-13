@@ -44,7 +44,6 @@ export function ChatInputBar({
       {/* Left tools — 모바일에서 축소 */}
       <div className="flex shrink-0 flex-row items-center md:h-13 md:w-34">
         <div className="flex flex-row items-center gap-2 md:gap-4">
-
           {/* 상담 종료 — Figma 1845:6269 (Size=44)
               Default: frame white, icon #EF4444, text #3F526F
               Pressed: frame #BD1010, icon #E2E8F0
@@ -55,13 +54,28 @@ export function ChatInputBar({
             className="group flex h-11 w-13 flex-col items-center justify-center gap-2"
           >
             <div className="flex h-5.5 w-5.5 items-center justify-center overflow-hidden rounded bg-white transition-colors group-hover:bg-[#EF4444] group-active:bg-[#BD1010]">
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M11 2C6.03 2 2 6.03 2 11s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm3.5 12.5-1.06 1.06L11 13.06l-2.44 2.5L7.5 14.5 9.94 12 7.5 9.56l1.06-1.06L11 10.94l2.44-2.44 1.06 1.06L12.06 12l2.44 2.5z" fill="currentColor" className="text-[#EF4444] transition-colors group-hover:text-[#E2E8F0] group-active:text-[#E2E8F0]"/>
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 22 22"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M11 2C6.03 2 2 6.03 2 11s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm3.5 12.5-1.06 1.06L11 13.06l-2.44 2.5L7.5 14.5 9.94 12 7.5 9.56l1.06-1.06L11 10.94l2.44-2.44 1.06 1.06L12.06 12l2.44 2.5z"
+                  fill="currentColor"
+                  className="text-[#EF4444] transition-colors group-hover:text-[#E2E8F0] group-active:text-[#E2E8F0]"
+                />
               </svg>
             </div>
             <span
               className="text-[#3F526F]"
-              style={{ fontFamily: 'var(--font-pretendard)', fontSize: '14px', fontWeight: 500, lineHeight: '100%' }}
+              style={{
+                fontFamily: 'var(--font-pretendard)',
+                fontSize: '14px',
+                fontWeight: 500,
+                lineHeight: '100%',
+              }}
             >
               상담 종료
             </span>
@@ -99,12 +113,16 @@ export function ChatInputBar({
             </div>
             <span
               className="text-[#3F526F]"
-              style={{ fontFamily: 'var(--font-pretendard)', fontSize: '14px', fontWeight: 500, lineHeight: '100%' }}
+              style={{
+                fontFamily: 'var(--font-pretendard)',
+                fontSize: '14px',
+                fontWeight: 500,
+                lineHeight: '100%',
+              }}
             >
               음성 상담
             </span>
           </button>
-
         </div>
       </div>
 
@@ -117,8 +135,13 @@ export function ChatInputBar({
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Placeholder"
-          className="border-[#F1F5F9] bg-[#E2E8F0] text-prime-900 placeholder:text-prime-900 flex h-11 flex-1 rounded-lg border px-4 py-3 outline-none"
-          style={{ fontFamily: 'var(--font-pretendard)', fontSize: '14px', fontWeight: 400, lineHeight: '160%' }}
+          className="text-prime-900 placeholder:text-prime-900 flex h-11 flex-1 rounded-lg border border-[#F1F5F9] bg-[#E2E8F0] px-4 py-3 outline-none"
+          style={{
+            fontFamily: 'var(--font-pretendard)',
+            fontSize: '14px',
+            fontWeight: 400,
+            lineHeight: '160%',
+          }}
         />
 
         {/* Send button — 44×44, fill secondary-100, stroke #CACACA, radius:full
@@ -131,7 +154,7 @@ export function ChatInputBar({
           onClick={onSend}
           disabled={!isVoiceOn && !canSend}
           className={[
-            'flex h-11 w-11 shrink-0 items-center justify-center rounded-full border bg-secondary-100 p-2 transition-colors',
+            'bg-secondary-100 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border p-2 transition-colors',
             isVoiceOn
               ? 'border-[#10B981] text-[#10B981] hover:border-[#0A8C60] hover:text-[#0A8C60] active:border-[#085B40] active:text-[#085B40]'
               : canSend

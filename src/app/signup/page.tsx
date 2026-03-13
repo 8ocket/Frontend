@@ -91,7 +91,7 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="relative min-h-screen-safe w-full overflow-y-auto bg-white">
+    <main className="min-h-screen-safe relative w-full overflow-y-auto bg-white">
       <WaveBackground />
 
       {/* 모바일: 세로 스택, 데스크톱: 좌측 고정 */}

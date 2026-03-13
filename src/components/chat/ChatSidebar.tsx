@@ -58,9 +58,7 @@ const ALL_SESSION_GROUPS: ChatSessionGroup[] = [
   },
   {
     date: '2026년 2월 11일',
-    sessions: [
-      { id: '12', title: '대인관계 스트레스 줄이기' },
-    ],
+    sessions: [{ id: '12', title: '대인관계 스트레스 줄이기' }],
   },
 ];
 
@@ -137,9 +135,7 @@ export function ChatSidebar({ onNewCounsel }: ChatSidebarProps = {}) {
       </button>
 
       {/* Search Input — Figma 1361:2666 */}
-      <div
-        className="border-neutral-300 bg-secondary-100 flex h-11 w-full items-center justify-between rounded-lg border px-4 py-3 lg:w-80"
-      >
+      <div className="bg-secondary-100 flex h-11 w-full items-center justify-between rounded-lg border border-neutral-300 px-4 py-3 lg:w-80">
         <span
           className="text-prime-900 shrink-0"
           style={{
@@ -173,7 +169,7 @@ export function ChatSidebar({ onNewCounsel }: ChatSidebarProps = {}) {
         <button
           type="button"
           onClick={() => setFilterOpen((prev) => !prev)}
-          className="flex items-center justify-center rounded-lg px-2 transition-colors bg-success-700 hover:bg-[#0C8A60] active:bg-[#085B40]"
+          className="bg-success-700 flex items-center justify-center rounded-lg px-2 transition-colors hover:bg-[#0C8A60] active:bg-[#085B40]"
           style={{ height: '18px' }}
         >
           <span
@@ -203,11 +199,7 @@ export function ChatSidebar({ onNewCounsel }: ChatSidebarProps = {}) {
 
       {/* Chat Session List + 커스텀 스크롤바 — Figma 1379:2840, 1457:2423 */}
       <div className="relative flex flex-1 flex-row overflow-hidden">
-        <ChatSessionList
-          groups={visibleGroups}
-          scrollRef={scrollRef}
-          onScroll={handleScroll}
-        />
+        <ChatSessionList groups={visibleGroups} scrollRef={scrollRef} onScroll={handleScroll} />
         <ChatScrollbar
           scrollRatio={scrollRatio}
           thumbRatio={thumbRatio}

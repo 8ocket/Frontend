@@ -1,11 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
-// Figma 이미지 assets
-const imgFrame = 'https://www.figma.com/api/mcp/asset/7bc19b81-69ee-4b0f-af98-b6f5a776d983';
-const imgWave = 'https://www.figma.com/api/mcp/asset/e2d936b1-30e5-4dfd-8b0c-89e46c1fd873';
 
 export interface ConditionsProps {
   isOpen?: boolean;
@@ -67,7 +64,7 @@ export function Conditions({ isOpen = true, onClose, onAgree }: ConditionsProps)
               onClick={onClose}
               className="flex h-11 w-11 items-center justify-center text-2xl transition hover:opacity-70"
             >
-              <img src={imgFrame} alt="close" className="h-full w-full" />
+              <X size={24} />
             </button>
           </div>
 
