@@ -12,97 +12,12 @@ import {
   getEmotionDisplayName,
 } from '@/components/emotion/constants';
 import type { EmotionType, EmotionExtractions, EmotionCardData } from '@/types/emotion';
-
-// ─── Mock 데이터 ───
-
-/** 단일 감정 카드 mock */
-function makeSingleMock(type: EmotionType): EmotionExtractions[] {
-  return [
-    {
-      extraction_id: `mock-${type}`,
-      session_id: 'session-demo',
-      emotion_type: type,
-      intensity: 8,
-      score: 80,
-      is_primary: true,
-      created_at: new Date(),
-    },
-  ];
-}
-
-/** 이중 감정 mock */
-const dualMock: EmotionExtractions[] = [
-  {
-    extraction_id: 'mock-dual-1',
-    session_id: 'session-demo',
-    emotion_type: 'joy',
-    intensity: 8,
-    score: 65,
-    is_primary: true,
-    created_at: new Date(),
-  },
-  {
-    extraction_id: 'mock-dual-2',
-    session_id: 'session-demo',
-    emotion_type: 'trust',
-    intensity: 5,
-    score: 35,
-    is_primary: false,
-    created_at: new Date(),
-  },
-];
-
-/** 삼중 감정 mock */
-const tripleMock: EmotionExtractions[] = [
-  {
-    extraction_id: 'mock-triple-1',
-    session_id: 'session-demo',
-    emotion_type: 'trust',
-    intensity: 9,
-    score: 63,
-    is_primary: true,
-    created_at: new Date(),
-  },
-  {
-    extraction_id: 'mock-triple-2',
-    session_id: 'session-demo',
-    emotion_type: 'anger',
-    intensity: 4,
-    score: 19,
-    is_primary: false,
-    created_at: new Date(),
-  },
-  {
-    extraction_id: 'mock-triple-3',
-    session_id: 'session-demo',
-    emotion_type: 'fear',
-    intensity: 3,
-    score: 11,
-    is_primary: false,
-    created_at: new Date(),
-  },
-];
-
-/** 카드 뒷면 mock 데이터 */
-const backMockData: EmotionCardData = {
-  cardId: 'card-demo-back',
-  sessionId: 'session-demo',
-  userName: '민지',
-  layers: buildEmotionLayers(tripleMock),
-  keywords: [
-    { keyword: '신뢰', emotionType: 'trust', percentage: 63 },
-    { keyword: '공격성', emotionType: 'anger', percentage: 19 },
-    { keyword: '불안', emotionType: 'fear', percentage: 11 },
-  ],
-  summary: {
-    title: '상담 요약',
-    description: '오늘 민지님의 마음을 그려보았어요. 긍정적인 에너지가 가득한 날이에요.',
-  },
-  fact: '오전 기획 회의에서 내 제안이 수용되지 않아 무력감을 느꼈다. 부장님과의 대화에서 평소보다 더 큰 답답함을 경험한 하루였다.',
-  emotion: "단순한 화보다는 '나의 능력을 인정받지 못했다'는 서운함이 컸다. 상담을 통해 이 감정이 실패에 대한 두려움에서 기인했다는 것을 알게 되었다.",
-  insight: "단순한 화보다는 '나의 능력을 인정받지 못했다'는 서운함이 컸다. 상담을 통해 이 감정이 실패에 대한 두려움에서 기인했다는 것을 알게 되었다.",
-  createdAt: new Date(),
-};
+import {
+  mockSingleExtraction,
+  MOCK_DUAL_EXTRACTIONS,
+  MOCK_TRIPLE_EXTRACTIONS,
+  MOCK_BACK_CARD_DATA,
+} from '@/mocks/emotion';
 
 export default function EmotionCardDemoPage() {
   const { width: cardW, height: cardH } = CARD_SIZES.sample;
@@ -115,7 +30,8 @@ export default function EmotionCardDemoPage() {
         <div className="mb-12">
           <h1 className="heading-01 text-prime-900 mb-2">감정카드 데모</h1>
           <p className="body-2 text-prime-500">
-            Phase 2~4 — EmotionCardLabel / EmotionBrush / EmotionCardFront / EmotionCardBack / EmotionCard 플립 컴포넌트 확인용
+            Phase 2~4 — EmotionCardLabel / EmotionBrush / EmotionCardFront / EmotionCardBack /
+            EmotionCard 플립 컴포넌트 확인용
           </p>
         </div>
 
@@ -161,7 +77,7 @@ export default function EmotionCardDemoPage() {
           <h2 className="heading-02 text-prime-900 mb-6">2. 단일 감정 카드 (8종)</h2>
           <div className="grid grid-cols-4 gap-6">
             {EMOTION_TYPES.map((type) => {
-              const layers = buildEmotionLayers(makeSingleMock(type));
+              const layers = buildEmotionLayers(mockSingleExtraction(type));
               const label = getEmotionDisplayName(type).toUpperCase();
               return (
                 <div key={type} className="flex flex-col items-center gap-3">
@@ -186,17 +102,17 @@ export default function EmotionCardDemoPage() {
           <p className="body-2 text-prime-500 mb-4">
             기쁨(65%) + 신뢰(35%) — 규칙: A(60%) / B(30%) / A(10%)
           </p>
-          <div className="flex gap-8 items-end">
+          <div className="flex items-end gap-8">
             <EmotionCardFront
-              layers={buildEmotionLayers(dualMock)}
+              layers={buildEmotionLayers(MOCK_DUAL_EXTRACTIONS)}
               emotionLabel="ECSTASY"
               width={cardW}
               height={cardH}
             />
-            <div className="rounded-xl bg-white p-6 shadow-sm max-w-sm">
+            <div className="max-w-sm rounded-xl bg-white p-6 shadow-sm">
               <h3 className="subtitle-1 text-prime-900 mb-3">레이어 구성</h3>
-              {buildEmotionLayers(dualMock).map((layer) => (
-                <div key={layer.role} className="flex items-center gap-3 mb-2">
+              {buildEmotionLayers(MOCK_DUAL_EXTRACTIONS).map((layer) => (
+                <div key={layer.role} className="mb-2 flex items-center gap-3">
                   <div
                     className="size-4 rounded-full"
                     style={{
@@ -220,17 +136,17 @@ export default function EmotionCardDemoPage() {
           <p className="body-2 text-prime-500 mb-4">
             신뢰(63%) + 분노(19%) + 두려움(11%) — 규칙: A(60%) / B(30%) / C(10%)
           </p>
-          <div className="flex gap-8 items-end">
+          <div className="flex items-end gap-8">
             <EmotionCardFront
-              layers={buildEmotionLayers(tripleMock)}
+              layers={buildEmotionLayers(MOCK_TRIPLE_EXTRACTIONS)}
               emotionLabel="ADMIRATION"
               width={cardW}
               height={cardH}
             />
-            <div className="rounded-xl bg-white p-6 shadow-sm max-w-sm">
+            <div className="max-w-sm rounded-xl bg-white p-6 shadow-sm">
               <h3 className="subtitle-1 text-prime-900 mb-3">레이어 구성</h3>
-              {buildEmotionLayers(tripleMock).map((layer) => (
-                <div key={layer.role} className="flex items-center gap-3 mb-2">
+              {buildEmotionLayers(MOCK_TRIPLE_EXTRACTIONS).map((layer) => (
+                <div key={layer.role} className="mb-2 flex items-center gap-3">
                   <div
                     className="size-4 rounded-full"
                     style={{
@@ -251,14 +167,14 @@ export default function EmotionCardDemoPage() {
         {/* ─── 섹션 5: 카드 사이즈 비교 ─── */}
         <section className="mb-16">
           <h2 className="heading-02 text-prime-900 mb-6">5. 카드 사이즈 비교</h2>
-          <div className="flex gap-8 items-end">
+          <div className="flex items-end gap-8">
             {(
               [
                 { label: 'Sample (350×600)', ...CARD_SIZES.sample },
                 { label: 'Default (400×686)', ...CARD_SIZES.default },
               ] as const
             ).map(({ label, width, height }) => {
-              const layers = buildEmotionLayers(makeSingleMock('joy'));
+              const layers = buildEmotionLayers(mockSingleExtraction('joy'));
               return (
                 <div key={label} className="flex flex-col items-center gap-3">
                   <EmotionCardFront
@@ -280,11 +196,11 @@ export default function EmotionCardDemoPage() {
           <p className="body-2 text-prime-500 mb-4">
             신뢰(63%) + 분노(19%) + 두려움(11%) — 뒷면: 상담 요약 + 키워드 + 사건 + 감정 + 인사이트
           </p>
-          <div className="flex gap-8 items-start">
+          <div className="flex items-start gap-8">
             {/* 앞면 */}
             <div className="flex flex-col items-center gap-3">
               <EmotionCardFront
-                layers={backMockData.layers}
+                layers={MOCK_BACK_CARD_DATA.layers}
                 emotionLabel="ADMIRATION"
                 width={cardW}
                 height={cardH}
@@ -295,24 +211,26 @@ export default function EmotionCardDemoPage() {
             {/* 뒷면 */}
             <div className="flex flex-col items-center gap-3">
               <EmotionCardBack
-                data={backMockData}
-                layers={backMockData.layers}
+                data={MOCK_BACK_CARD_DATA}
+                layers={MOCK_BACK_CARD_DATA.layers}
                 emotionLabel="ADMIRATION"
                 width={backW}
                 height={backH}
               />
-              <p className="caption-1 text-prime-500">뒷면 ({backW}×{backH})</p>
+              <p className="caption-1 text-prime-500">
+                뒷면 ({backW}×{backH})
+              </p>
             </div>
 
             {/* 뒷면 — 기쁨 단일 감정 */}
             <div className="flex flex-col items-center gap-3">
               <EmotionCardBack
                 data={{
-                  ...backMockData,
-                  layers: buildEmotionLayers(makeSingleMock('joy')),
+                  ...MOCK_BACK_CARD_DATA,
+                  layers: buildEmotionLayers(mockSingleExtraction('joy')),
                   keywords: [{ keyword: '기쁨', emotionType: 'joy', percentage: 100 }],
                 }}
-                layers={buildEmotionLayers(makeSingleMock('joy'))}
+                layers={buildEmotionLayers(mockSingleExtraction('joy'))}
                 emotionLabel="ECSTASY"
                 width={backW}
                 height={backH}
@@ -324,14 +242,16 @@ export default function EmotionCardDemoPage() {
 
         {/* ─── 섹션 7: 플립 인터랙션 ─── */}
         <section className="mb-16">
-          <h2 className="heading-02 text-prime-900 mb-6">7. 카드 플립 인터랙션 (클릭하여 뒤집기)</h2>
+          <h2 className="heading-02 text-prime-900 mb-6">
+            7. 카드 플립 인터랙션 (클릭하여 뒤집기)
+          </h2>
           <p className="body-2 text-prime-500 mb-4">
             카드를 클릭하면 CSS 3D 플립으로 앞/뒤가 전환됩니다. 키보드(Enter/Space)도 지원합니다.
           </p>
-          <div className="flex gap-8 items-start flex-wrap">
+          <div className="flex flex-wrap items-start gap-8">
             {/* 삼중 감정 — backMockData */}
             <div className="flex flex-col items-center gap-3">
-              <EmotionCard data={backMockData} size="sample" />
+              <EmotionCard data={MOCK_BACK_CARD_DATA} size="sample" />
               <p className="caption-1 text-prime-500">신뢰 + 분노 + 두려움 (sample)</p>
             </div>
 
@@ -339,9 +259,9 @@ export default function EmotionCardDemoPage() {
             <div className="flex flex-col items-center gap-3">
               <EmotionCard
                 data={{
-                  ...backMockData,
+                  ...MOCK_BACK_CARD_DATA,
                   cardId: 'card-flip-joy',
-                  layers: buildEmotionLayers(makeSingleMock('joy')),
+                  layers: buildEmotionLayers(mockSingleExtraction('joy')),
                   keywords: [{ keyword: '기쁨', emotionType: 'joy', percentage: 100 }],
                 }}
                 size="sample"
@@ -353,9 +273,9 @@ export default function EmotionCardDemoPage() {
             <div className="flex flex-col items-center gap-3">
               <EmotionCard
                 data={{
-                  ...backMockData,
+                  ...MOCK_BACK_CARD_DATA,
                   cardId: 'card-flip-dual',
-                  layers: buildEmotionLayers(dualMock),
+                  layers: buildEmotionLayers(MOCK_DUAL_EXTRACTIONS),
                   keywords: [
                     { keyword: '기쁨', emotionType: 'joy', percentage: 65 },
                     { keyword: '신뢰', emotionType: 'trust', percentage: 35 },
@@ -370,9 +290,9 @@ export default function EmotionCardDemoPage() {
             <div className="flex flex-col items-center gap-3">
               <EmotionCard
                 data={{
-                  ...backMockData,
+                  ...MOCK_BACK_CARD_DATA,
                   cardId: 'card-flip-sadness',
-                  layers: buildEmotionLayers(makeSingleMock('sadness')),
+                  layers: buildEmotionLayers(mockSingleExtraction('sadness')),
                   keywords: [{ keyword: '슬픔', emotionType: 'sadness', percentage: 100 }],
                 }}
                 size="default"
