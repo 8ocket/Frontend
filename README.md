@@ -1,50 +1,60 @@
 # MindLog Frontend
 
-> AI 기반 초개인화 멘탈케어 서비스
-
 KT Cloud Tech Up 실무 통합 프로젝트 - MindLog 프론트엔드
-
-## 🌟 프로젝트 소개
-
-MindLog는 사용자가 자신의 감정을 구조화하여 인식하고, AI 상담을 통해 감정의 흐름과 변화를 확인할 수 있는 멘탈케어 서비스입니다.
-
-### 주요 기능
-
-- 🤖 **초개인화 AI 상담**: 3종의 전문 페르소나 (정신건강/진로/코칭)
-- 📝 **AI 일기 자동 생성**: 상담 기반 3단 요약 일기
-- 🎨 **감정 시각화**: 오로라 감정 카드
-- 📊 **AI 분석 리포트**: 주간/월간 감정 변화 추이
 
 ## 🛠 기술 스택
 
-| 구분                | 기술                  | 버전    |
-| ------------------- | --------------------- | ------- |
-| **Framework**       | Next.js (App Router)  | 16.1.5  |
-| **Language**        | TypeScript            | 5       |
-| **상태 관리**       | Zustand               | 5.0.10  |
-| **서버 상태**       | TanStack React Query  | 5.90.20 |
-| **HTTP 클라이언트** | Axios                 | 1.13.3  |
-| **스타일링**        | Tailwind CSS          | 4       |
-| **UI 컴포넌트**     | Radix UI + shadcn/ui  | -       |
-| **폼 관리**         | React Hook Form + Zod | 7.71.1  |
-| **날짜 처리**       | date-fns              | 4.1.0   |
-| **아이콘**          | Lucide React          | 0.563.0 |
+| 구분                | 기술                        |
+| ------------------- | --------------------------- |
+| **Framework**       | Next.js 16.1.5 (App Router) |
+| **Language**        | TypeScript                  |
+| **상태관리**        | Zustand                     |
+| **서버 상태**       | TanStack React Query        |
+| **HTTP 클라이언트** | Axios                       |
+| **스타일링**        | Tailwind CSS 4              |
+| **UI 컴포넌트**     | Radix UI + shadcn/ui        |
+| **폼 관리**         | React Hook Form + Zod       |
 
-### 주요 설정
+## 📁 프로젝트 구조
 
-- ✅ TypeScript strict mode
-- ✅ 절대 경로 설정 (`@/*`)
-- ✅ React Strict Mode
-- ✅ ESLint + Prettier
+```
+src/
+├── app/                    # Next.js App Router 페이지
+│   ├── login/              # 로그인 페이지
+│   └── auth/callback/      # OAuth 콜백
+├── components/             # React 컴포넌트
+│   ├── ui/                 # 공통 UI 컴포넌트 (Button, Card, Input, Label)
+│   ├── persona/            # 페르소나 관련 컴포넌트
+│   ├── chat/               # 채팅 관련 컴포넌트
+│   ├── emotion/            # 감정 분석 관련 컴포넌트
+│   ├── diary/              # 일기 관련 컴포넌트
+│   └── common/             # 공통 컴포넌트 (Header, Footer 등)
+├── lib/                    # 유틸리티 함수 및 설정
+│   ├── axios.ts            # Axios API 클라이언트
+│   ├── utils.ts            # 유틸리티 함수 (cn, 등)
+│   ├── api/                # API 요청 함수들
+│   ├── constants/          # 상수 (API 엔드포인트, 키 등)
+│   ├── utils/              # 추가 유틸리티 함수
+│   └── hooks/              # Custom Hooks (useAuth, useApi 등)
+├── stores/                 # Zustand 상태 관리 스토어
+│   └── auth.ts             # 인증 스토어
+├── types/                  # TypeScript 타입 정의
+│   ├── auth.ts             # 인증 관련 타입
+│   └── index.ts            # 타입 re-export
+├── mocks/                  # Mock 데이터 (개발/테스트용)
+│   └── index.ts            # Mock 데이터 export
+├── providers/              # React Context Providers
+│   └── query-provider.tsx  # React Query Provider
+├── middleware.ts           # Next.js 미들웨어
+└── globals.css             # 전역 스타일
+```
 
 ## 🚀 시작하기
 
 ### 환경 요구사항
 
-```
-Node.js >= 18.17.0
-npm >= 9.0.0
-```
+- Node.js 18.x 이상
+- npm, yarn, pnpm 또는 bun
 
 ### 설치 및 실행
 
@@ -54,6 +64,12 @@ npm install
 
 # 개발 서버 실행
 npm run dev
+
+# 빌드
+npm run build
+
+# 프로덕션 실행
+npm start
 ```
 
 개발 서버: [http://localhost:3000](http://localhost:3000)
@@ -64,112 +80,18 @@ npm run dev
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8080
-NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-## 💻 주요 스크립트
+## 📜 스크립트
 
-```bash
-# 개발
-npm run dev          # 개발 서버 (localhost:3000)
-npm run dev:turbo    # Turbopack으로 더 빠른 개발 서버
-npm run build        # 프로덕션 빌드
-npm run start        # 프로덕션 서버
-
-# 코드 품질
-npm run lint         # ESLint 검사
-npm run lint:fix     # ESLint 자동 수정
-npm run format       # Prettier 포매팅
-npm run format:check # 포맷 검사만 (수정 안 함)
-npm run type-check   # TypeScript 타입 체크
-npm run check        # 전체 검사 (타입+린트+포맷)
-
-# 유틸리티
-npm run clean        # 캐시 정리 (.next, node_modules/.cache)
-```
-
-## 📁 프로젝트 구조
-
-```
-src/
-├── app/                    # Next.js App Router
-│   ├── (auth)/            # 인증 라우트 그룹
-│   │   ├── login/         # 로그인
-│   │   └── signup/        # 회원가입
-│   ├── (main)/            # 메인 서비스
-│   │   ├── persona-select/  # 페르소나 선택
-│   │   ├── chat/          # AI 상담 채팅
-│   │   ├── diary/         # 일기 목록/상세
-│   │   └── reports/       # AI 분석 리포트
-│   └── globals.css        # 전역 스타일
-│
-├── components/
-│   ├── chat/              # 채팅 관련 (필요시 추가)
-│   ├── persona/           # 페르소나 관련
-│   ├── emotion/           # 감정 시각화
-│   ├── diary/             # 일기 관련
-│   ├── ui/                # 공통 UI (shadcn/ui)
-│   └── common/            # 기타 공통 컴포넌트
-│
-├── lib/
-│   ├── api/               # API 클라이언트
-│   ├── constants/         # 상수
-│   ├── utils/             # 유틸리티 함수
-│   └── hooks/             # Custom Hooks
-│
-├── stores/                # Zustand 스토어
-├── types/                 # TypeScript 타입
-├── providers/             # Context Providers
-└── mocks/                 # Mock 데이터 (개발용)
-```
-
-## 🌿 Git 컨벤션
-
-### 브랜치 전략
-
-```
-main (프로덕션)
-  └── develop (개발)
-       ├── feature/[기능명]
-       ├── fix/[버그명]
-       └── refactor/[리팩토링명]
-```
-
-### 커밋 메시지
-
-```bash
-<type>(<scope>): <subject>
-
-# 예시
-feat(chat): 채팅 인터페이스 추가
-fix(emotion): 감정 점수 계산 오류 수정
-refactor(store): Zustand 스토어 구조 개선
-```
-
-**타입**
-
-- `feat`: 새로운 기능
-- `fix`: 버그 수정
-- `refactor`: 리팩토링
-- `style`: 코드 포맷팅
-- `docs`: 문서 수정
-- `test`: 테스트 코드
-- `chore`: 빌드, 설정
-
-## 📖 문서
-
-- [Frontend 개발 가이드](노션 링크)
-- [컴포넌트 명세서](노션 링크)
-- [API 연동 가이드](노션 링크)
+| 명령어          | 설명               |
+| --------------- | ------------------ |
+| `npm run dev`   | 개발 서버 실행     |
+| `npm run build` | 프로덕션 빌드      |
+| `npm start`     | 프로덕션 서버 실행 |
+| `npm run lint`  | ESLint 검사        |
 
 ## 👥 팀원
 
-| 역할        | GitHub                                                   |
-| ----------- | -------------------------------------------------------- |
-| Frontend    | [@lnu8926-web](https://github.com/lnu8926-web)           |
-| Cloud/Infra | [@choitaeung-cloud](https://github.com/choitaeung-cloud) |
-
----
-
-**최종 업데이트**: 2026-02-03  
-**버전**: 1.0.0
+- [@lnu8926-web](https://github.com/lnu8926-web)
+- [@choitaeung-cloud](https://github.com/choitaeung-cloud)
