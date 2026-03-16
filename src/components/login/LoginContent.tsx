@@ -70,10 +70,10 @@ export function LoginContent({
       <LogoSmall className="h-48 w-48 md:h-73.75 md:w-73.75" />
       {/* 텍스트 섹션 */}
       <div className="mt-16 flex w-full flex-col items-center gap-4">
-        <p className="text-center text-sm leading-[1.3] font-semibold text-[#1a222e]">
+        <p className="text-center text-sm leading-[1.3] font-semibold text-prime-900 dark:text-secondary-100">
           {loginTexts.greeting}
         </p>
-        <h1 className="text-center text-xl leading-[1.3] font-semibold text-[#1a222e]">
+        <h1 className="text-center text-xl leading-[1.3] font-semibold text-prime-900 dark:text-secondary-100">
           {loginTexts.loginPrompt}
         </h1>
       </div>
@@ -113,20 +113,20 @@ export function LoginContent({
             }
           }}
           disabled={isLoading}
-          className="rounded-lg bg-gray-400 px-4 py-3 font-semibold text-white transition-colors hover:bg-gray-500 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-lg bg-gray-400 px-4 py-3 font-semibold text-white transition-colors hover:bg-gray-500 dark:bg-tertiary-600 dark:hover:bg-tertiary-500 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loadingProvider === 'kakao' ? '로그인 중...' : '임시 로그인 (개발용)'}
         </button>
 
         {/* 디스클레이머 텍스트 */}
-        <p className="text-prime-500 text-center text-xs leading-[1.2] font-medium whitespace-nowrap">
+        <p className="text-prime-500 dark:text-prime-400 text-center text-xs leading-[1.2] font-medium whitespace-nowrap">
           {loginTexts.disclaimer}
         </p>
       </div>
 
       {/* 에러 메시지 */}
       {displayError && (
-        <div className="w-full rounded-lg bg-red-50 p-3 text-sm text-red-600">{displayError}</div>
+        <div className="w-full rounded-lg bg-red-50 dark:bg-error-950/50 p-3 text-sm text-red-600 dark:text-error-400">{displayError}</div>
       )}
     </div>
   );

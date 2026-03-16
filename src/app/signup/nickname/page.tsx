@@ -28,15 +28,6 @@ export default function NicknamePage() {
 
     try {
       setIsLoading(true);
-      // TODO: 사용자 정보 저장 API 호출
-      // const response = await personalInfoApi.save({
-      //   nickname,
-      //   userType,
-      //   ageGroup,
-      //   gender,
-      // });
-
-      // 성공 모달 표시
       setShowSuccessModal(true);
     } finally {
       setIsLoading(false);
@@ -44,10 +35,8 @@ export default function NicknamePage() {
   };
 
   const handleSuccessModalClick = () => {
-    // 성공 모달 확인 → 메인 페이지로 이동
     setShowSuccessModal(false);
 
-    // 임시: 회원가입 완료 후 인증 상태 저장
     const token = localStorage.getItem('accessToken');
     if (token) {
       const { login } = useAuthStore.getState();
@@ -76,7 +65,7 @@ export default function NicknamePage() {
         >
           {/* ── 헤더: 제목 + 뒤로가기 ── */}
           <div className="flex h-10.5 items-center justify-between">
-            <h1 className="text-prime-900 text-[32px] leading-[1.3] font-semibold">
+            <h1 className="text-prime-900 dark:text-secondary-100 text-[32px] leading-[1.3] font-semibold">
               개인정보 설정하기
             </h1>
             <button
@@ -92,12 +81,12 @@ export default function NicknamePage() {
           <div className="mt-4 flex flex-col gap-4">
             {/* 프로필 영역 — Figma: 60×60 circle + helper text */}
             <div className="flex items-start gap-4">
-              <div className="border-cta-300 bg-secondary-100 relative flex size-15 shrink-0 items-center justify-center overflow-hidden rounded-full border-2">
+              <div className="border-cta-300 bg-secondary-100 dark:bg-prime-700 relative flex size-15 shrink-0 items-center justify-center overflow-hidden rounded-full border-2">
                 <div className="relative h-8 w-8">
                   <Image src={imgVector} alt="profile" fill className="object-contain" />
                 </div>
               </div>
-              <p className="text-prime-500 flex-1 pt-2.25 text-xs leading-[1.2] font-normal tracking-[-0.18px]">
+              <p className="text-prime-500 dark:text-prime-400 flex-1 pt-2.25 text-xs leading-[1.2] font-normal tracking-[-0.18px]">
                 프로필을 바꾸고 싶으시다면 아이콘을 눌러 사진을 추가하세요. 설정하지 않으시면 기본
                 프로필로 접속합니다.
               </p>

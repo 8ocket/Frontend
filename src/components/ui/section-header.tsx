@@ -21,7 +21,7 @@ export function SectionHeader({
 
   return (
     <HeadingComponent
-      className={`${baseClass} text-prime-800 leading-[1.3] font-semibold tracking-[-0.3px] ${className || ''}`}
+      className={`${baseClass} text-prime-800 dark:text-secondary-100 leading-[1.3] font-semibold tracking-[-0.3px] ${className || ''}`}
       {...props}
     >
       {children}

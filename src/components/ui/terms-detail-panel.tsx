@@ -93,19 +93,19 @@ export function TermsDetailPanel({
     <div
       className={cn(
         'relative flex size-full flex-col gap-2.5 overflow-hidden rounded-xl p-6',
-        'bg-[rgba(248,250,252,0.3)] backdrop-blur-[20px]',
+        'bg-[rgba(248,250,252,0.3)] dark:bg-[rgba(26,34,46,0.6)] backdrop-blur-[20px]',
         className
       )}
     >
       {/* 헤더: 제목 + 닫기 */}
       <div className="relative flex h-11 shrink-0 items-center">
-        <h2 className="text-prime-900 absolute top-px left-0 text-[32px] leading-[1.3] font-semibold tracking-[-0.48px] whitespace-nowrap">
+        <h2 className="text-prime-900 dark:text-secondary-100 absolute top-px left-0 text-[32px] leading-[1.3] font-semibold tracking-[-0.48px] whitespace-nowrap">
           {title}
         </h2>
         <button
           type="button"
           onClick={onClose}
-          className="absolute -top-px right-0 flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-black/5"
+          className="absolute -top-px right-0 flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-black/5 dark:hover:bg-white/10 text-prime-900 dark:text-secondary-100"
           aria-label="닫기"
         >
           <svg
@@ -117,7 +117,7 @@ export function TermsDetailPanel({
           >
             <path
               d="M18 6L6 18M6 6L18 18"
-              stroke="#1a222e"
+              stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -134,7 +134,7 @@ export function TermsDetailPanel({
           className="scrollbar-none min-w-0 flex-1 overflow-y-auto"
           style={{ scrollbarWidth: 'none' }}
         >
-          <div className="text-prime-700 text-sm leading-[1.6] font-normal">{children}</div>
+          <div className="text-prime-700 dark:text-prime-300 text-sm leading-[1.6] font-normal">{children}</div>
         </div>
 
         {/* 커스텀 스크롤바 트랙 */}
@@ -164,7 +164,7 @@ export function TermsDetailPanel({
           'absolute bottom-4 left-1/2 h-11 w-89.75 -translate-x-1/2 rounded-full text-base leading-[1.3] font-medium transition-colors',
           canAgree
             ? 'bg-cta-300 text-secondary-100 hover:bg-[#4ba1f0] active:bg-[#257cc0]'
-            : 'bg-secondary-100 border border-[#cacaca] text-[#cacaca]'
+            : 'bg-secondary-100 dark:bg-prime-800 border border-[#cacaca] dark:border-prime-600 text-[#cacaca] dark:text-prime-500'
         )}
       >
         동의하기

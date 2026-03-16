@@ -91,7 +91,7 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="min-h-screen-safe relative w-full overflow-y-auto bg-white">
+    <main className="min-h-screen-safe relative w-full overflow-y-auto bg-white dark:bg-prime-950">
       <WaveBackground />
 
       {/* 모바일: 세로 스택, 데스크톱: 좌측 고정 */}
@@ -99,7 +99,7 @@ export default function SignupPage() {
         {/* 헤더 */}
         <div className="flex flex-col gap-4.75">
           <div className="flex items-center justify-between">
-            <p className="text-prime-900 text-[20px] leading-[1.3] font-semibold tracking-[-0.3px]">
+            <p className="text-prime-900 dark:text-secondary-100 text-[20px] leading-[1.3] font-semibold tracking-[-0.3px]">
               회원가입
             </p>
             <button
@@ -125,10 +125,10 @@ export default function SignupPage() {
             </button>
           </div>
           <div className="flex flex-col gap-2.5">
-            <p className="text-prime-900 text-[24px] leading-[1.3] font-semibold tracking-[-0.36px]">
+            <p className="text-prime-900 dark:text-secondary-100 text-[24px] leading-[1.3] font-semibold tracking-[-0.36px]">
               이용약관 및 정책 동의
             </p>
-            <p className="text-prime-900 text-[12px] leading-[1.2] font-medium tracking-[-0.18px]">
+            <p className="text-prime-900 dark:text-prime-300 text-[12px] leading-[1.2] font-medium tracking-[-0.18px]">
               서비스 이용을 위해 약관에 동의해 주세요.
             </p>
           </div>
@@ -153,12 +153,12 @@ export default function SignupPage() {
           <button
             type="button"
             onClick={handleToggleAll}
-            className="border-cta-300 bg-interactive-glass-blue-50 flex h-11 items-center gap-2 rounded-xl border px-3.75"
+            className="border-cta-300 bg-interactive-glass-blue-50 dark:bg-prime-800/50 flex h-11 items-center gap-2 rounded-xl border px-3.75"
           >
             <div
               className={cn(
                 'flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border border-neutral-300 transition-colors',
-                allAgree ? 'bg-cta-300' : 'bg-white'
+                allAgree ? 'bg-cta-300' : 'bg-white dark:bg-prime-700'
               )}
             >
               {allAgree && <span className="text-secondary-100 text-[12px] leading-[1.6]">✓</span>}
@@ -182,7 +182,7 @@ export default function SignupPage() {
 
       {/* 우측: 약관 세부내용 패널 — 모바일: 전체화면 오버레이, 데스크톱: 우측 패널 */}
       {selectedTerm && (
-        <div className="fixed inset-0 z-20 bg-white/95 p-4 md:absolute md:inset-auto md:top-[20.1%] md:left-[35.3%] md:h-[59.8vh] md:w-[50.4%] md:bg-transparent md:p-0">
+        <div className="fixed inset-0 z-20 bg-white/95 dark:bg-prime-950/95 p-4 md:absolute md:inset-auto md:top-[20.1%] md:left-[35.3%] md:h-[59.8vh] md:w-[50.4%] md:bg-transparent md:dark:bg-transparent md:p-0">
           <TermsDetailPanel
             title={TERMS_LIST.find((t) => t.key === selectedTerm)!.label}
             onClose={() => setSelectedTerm(null)}

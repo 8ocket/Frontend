@@ -35,7 +35,7 @@ const providerConfig: Record<
   google: {
     label: 'googleButton',
     bgColor: 'white',
-    textColor: 'text-[#1a222e]',
+    textColor: 'text-[#1a222e] dark:text-secondary-100',
     borderColor: '#acb4bb',
     icon: loginImages.googleIcon,
   },
@@ -48,15 +48,16 @@ export function LoginButton({
   isLoading = false,
 }: LoginButtonProps) {
   const config = providerConfig[provider];
-  const borderClass = provider === 'google' ? 'border border-[#acb4bb] border-solid' : '';
+  const borderClass = provider === 'google' ? 'border border-[#acb4bb] dark:border-prime-600 border-solid' : '';
+  const bgClass = provider === 'google' ? 'bg-white dark:bg-prime-800' : '';
 
   return (
     <button
       onClick={onClick}
       disabled={disabled || isLoading}
-      className={`flex h-[52px] w-full items-center justify-center gap-[8px] rounded-[8px] px-[24px] py-[8px] font-medium transition-opacity duration-200 ${borderClass} disabled:opacity-50 ${!borderClass ? 'text-white' : ''} ${config.textColor}`}
+      className={`flex h-[52px] w-full items-center justify-center gap-[8px] rounded-[8px] px-[24px] py-[8px] font-medium transition-opacity duration-200 ${borderClass} ${bgClass} disabled:opacity-50 ${!borderClass ? 'text-white' : ''} ${config.textColor}`}
       style={{
-        backgroundColor: provider !== 'google' ? config.bgColor : 'white',
+        backgroundColor: provider !== 'google' ? config.bgColor : undefined,
         borderColor: provider === 'google' ? config.borderColor : 'transparent',
       }}
       data-testid={`login-button-${provider}`}

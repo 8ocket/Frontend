@@ -65,7 +65,8 @@ export default function WaveBackground() {
       const w = canvas.width;
       const h = canvas.height;
 
-      ctx.fillStyle = '#f4f8fb';
+      const isDark = document.documentElement.classList.contains('dark');
+      ctx.fillStyle = isDark ? '#11161e' : '#f4f8fb';
       ctx.fillRect(0, 0, w, h);
 
       for (let i = ripples.length - 1; i >= 0; i--) {

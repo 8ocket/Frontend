@@ -63,7 +63,7 @@ export function RadioGroup<T = string>({
       <legend
         className={cn(
           'text-xl leading-[1.3] font-semibold tracking-[-0.3px]',
-          error ? 'text-error-700' : 'text-prime-800'
+          error ? 'text-error-700' : 'text-prime-800 dark:text-secondary-100'
         )}
       >
         {legend}
@@ -81,7 +81,7 @@ export function RadioGroup<T = string>({
               : isSelected && !isDisabled
                 ? 'border-cta-300'
                 : 'border-neutral-300',
-            'bg-secondary-100'
+            'bg-secondary-100 dark:bg-prime-800'
           );
 
           // Figma: inner circle 색상 (10×10)
@@ -118,7 +118,7 @@ export function RadioGroup<T = string>({
                     ? 'text-error-700'
                     : isDisabled
                       ? 'text-neutral-400'
-                      : 'text-prime-600'
+                      : 'text-prime-600 dark:text-prime-300'
                 )}
               >
                 {option.label}

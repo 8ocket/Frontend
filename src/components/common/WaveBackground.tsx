@@ -44,14 +44,31 @@ interface WaveBackgroundProps {
 
 const COLOR: ColorPalette = {
   light: { r: 75, g: 161, b: 240 }, // #4BA1F0
-  dark: { r: 130, g: 201, b: 255 }, // #82C9FF
-  arc: { r: 130, g: 201, b: 255 }, // 항상 CTA 컬러
+  dark: { r: 59, g: 82, b: 111 },   // #3B526F — prime-700, dark mode mouse effect
+  arc: { r: 130, g: 201, b: 255 }, // CTA 컬러 (라이트)
 };
+
+const ARC_DARK: RGB = { r: 44, g: 62, b: 88 }; // #2C3E58 — dark mode arc color
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
+const DARK_MODE_KEY = 'theme-dark';
+
 export default function WaveBackground({ initialDark = false, children }: WaveBackgroundProps) {
   const [isDark, setIsDark] = useState<boolean>(initialDark);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(DARK_MODE_KEY);
+    if (stored !== null) setIsDark(stored === 'true');
+  }, []);
+
+  const toggleDark = () => {
+    setIsDark((v) => {
+      const next = !v;
+      localStorage.setItem(DARK_MODE_KEY, String(next));
+      return next;
+    });
+  };
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef<MousePosition>({ x: -500, y: -500 });
@@ -124,7 +141,7 @@ export default function WaveBackground({ initialDark = false, children }: WaveBa
       ctx.clearRect(0, 0, W, H);
       const arcs = getArcs();
       const mc = getMouseColor();
-      const ac = COLOR.arc;
+      const ac = isDarkRef.current ? ARC_DARK : COLOR.arc;
       const { x: mx, y: my } = mouseRef.current;
 
       // 1. 브러시 번짐
@@ -137,7 +154,7 @@ export default function WaveBackground({ initialDark = false, children }: WaveBa
       ctx.fillRect(0, 0, W, H);
 
       // 2. 호선
-      const arcMult = isDarkRef.current ? 1.0 : 1.4;
+      const arcMult = isDarkRef.current ? 0.7 : 1.4;
       arcs.forEach((arc) => {
         const glow = getGlow(arc);
         const alpha = Math.min((arc.opacity + glow * 0.4) * arcMult, 0.9);
@@ -191,7 +208,7 @@ export default function WaveBackground({ initialDark = false, children }: WaveBa
         width: '100vw',
         height: '100vh',
         overflow: 'hidden',
-        background: isDark ? '#0E1923' : '#F8FAFC',
+        background: isDark ? '#1a222e' : '#f8fafc',
         transition: 'background 0.4s',
       }}
     >
@@ -200,47 +217,39 @@ export default function WaveBackground({ initialDark = false, children }: WaveBa
         style={{ position: 'fixed', inset: 0, width: '100%', height: '100%' }}
       />
 
-      {/* 다크모드 토글 버튼 */}
+      {/* 다크모드 토글 버튼 — Figma: top 40px, right 40px, h 44px, radius 8px */}
       <button
-        onClick={() => setIsDark((v) => !v)}
+        onClick={toggleDark}
         style={{
           position: 'fixed',
-          top: 20,
-          right: 20,
+          top: 40,
+          right: 40,
           zIndex: 100,
-          background: 'rgba(130,201,255,0.12)',
-          border: '1px solid rgba(130,201,255,0.25)',
-          color: '#82C9FF',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: 44,
           padding: '8px 16px',
-          borderRadius: 20,
-          fontFamily: 'sans-serif',
-          fontSize: 11,
-          letterSpacing: '0.15em',
+          borderRadius: 8,
+          background: isDark ? '#f8fafc' : '#1a222e',
+          border: 'none',
           cursor: 'pointer',
-          backdropFilter: 'blur(8px)',
+          transition: 'background 0.4s',
         }}
       >
-        {isDark ? '라이트 모드 전환' : '다크 모드 전환'}
+        <span
+          style={{
+            fontSize: 16,
+            fontWeight: 600,
+            lineHeight: 1.3,
+            letterSpacing: '-0.24px',
+            color: isDark ? '#1a222e' : '#f8fafc',
+            transition: 'color 0.4s',
+          }}
+        >
+          {isDark ? '라이트 모드 선택' : '다크 모드 선택'}
+        </span>
       </button>
-
-      {/* 힌트 텍스트 */}
-      <p
-        style={{
-          position: 'fixed',
-          bottom: 24,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          color: 'rgba(130,201,255,0.4)',
-          fontFamily: 'sans-serif',
-          fontSize: 10,
-          letterSpacing: '0.2em',
-          zIndex: 100,
-          pointerEvents: 'none',
-          margin: 0,
-        }}
-      >
-        마우스를 움직여보세요
-      </p>
 
       {/* children은 캔버스 위에 렌더링 */}
       <div style={{ position: 'relative', zIndex: 1 }}>{children}</div>
