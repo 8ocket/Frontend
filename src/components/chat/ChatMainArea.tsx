@@ -30,6 +30,7 @@ const INITIAL_MESSAGES: ChatBubbleProps[] = [
   {
     variant: 'ai',
     senderName: '정신건강 상담사',
+    avatarSrc: '/images/personas/mental.png',
     content:
       'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
   },

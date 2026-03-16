@@ -20,45 +20,45 @@ const ALL_SESSION_GROUPS: ChatSessionGroup[] = [
   {
     date: '2026년 2월 17일',
     sessions: [
-      { id: '1', title: '설날 기간 친척들과의 불편한 이야기', isActive: true },
-      { id: '2', title: '잘 나가는 사촌과 비교 당하지 않기' },
+      { id: '1', title: '설날 기간 친척들과의 불편한 이야기', isActive: true, avatarSrc: '/images/personas/mental.png' },
+      { id: '2', title: '잘 나가는 사촌과 비교 당하지 않기', avatarSrc: '/images/personas/coaching.png' },
     ],
   },
   {
     date: '2026년 2월 16일',
     sessions: [
-      { id: '3', title: '명절기간 본가에 내려가야 하나' },
-      { id: '4', title: '명절 기간 동안  스펙쌓기' },
+      { id: '3', title: '명절기간 본가에 내려가야 하나', avatarSrc: '/images/personas/career.png' },
+      { id: '4', title: '명절 기간 동안  스펙쌓기', avatarSrc: '/images/personas/mental.png' },
     ],
   },
   {
     date: '2026년 2월 15일',
-    sessions: [{ id: '5', title: '면접 떨리고 긴장하는 현상 대비' }],
+    sessions: [{ id: '5', title: '면접 떨리고 긴장하는 현상 대비', avatarSrc: '/images/personas/career.png' }],
   },
   {
     date: '2026년 2월 14일',
     sessions: [
-      { id: '6', title: '팀 스터디 효율적인 진행 방식' },
-      { id: '7', title: '삼성전자 직군별 갖춰야 할 스펙' },
+      { id: '6', title: '팀 스터디 효율적인 진행 방식', avatarSrc: '/images/personas/coaching.png' },
+      { id: '7', title: '삼성전자 직군별 갖춰야 할 스펙', avatarSrc: '/images/personas/career.png' },
     ],
   },
   {
     date: '2026년 2월 13일',
     sessions: [
-      { id: '8', title: '면접 볼 때 면접관에게 하기 좋은 질문' },
-      { id: '9', title: '삼성전자 직군별 갖춰야 할 스펙' },
+      { id: '8', title: '면접 볼 때 면접관에게 하기 좋은 질문', avatarSrc: '/images/personas/mental.png' },
+      { id: '9', title: '삼성전자 직군별 갖춰야 할 스펙', avatarSrc: '/images/personas/coaching.png' },
     ],
   },
   {
     date: '2026년 2월 12일',
     sessions: [
-      { id: '10', title: '직장 동료와의 갈등 해소 방법' },
-      { id: '11', title: '번아웃 극복하기' },
+      { id: '10', title: '직장 동료와의 갈등 해소 방법', avatarSrc: '/images/personas/mental.png' },
+      { id: '11', title: '번아웃 극복하기', avatarSrc: '/images/personas/coaching.png' },
     ],
   },
   {
     date: '2026년 2월 11일',
-    sessions: [{ id: '12', title: '대인관계 스트레스 줄이기' }],
+    sessions: [{ id: '12', title: '대인관계 스트레스 줄이기', avatarSrc: '/images/personas/career.png' }],
   },
 ];
 
