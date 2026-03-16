@@ -1,11 +1,10 @@
 'use client';
 
 // Figma MODAL 14 (node 2113:9375) — 미완결 상담 알림
-// 350×279, bg secondary-100, border 2px glass-stroke/30, radius 12
-// Semantic: Yellow (제목 warning-600)
+// 350×279, VERTICAL layout, padding 24px all, gap 24
+// bg: secondary-100, border: 2px solid rgba(130,201,255,0.30), radius: 12
 
 import { DialogRoot, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 
 export interface ChatUnfinishedSessionModalProps {
   /** 모달 열림 여부 */
@@ -22,6 +21,31 @@ export interface ChatUnfinishedSessionModalProps {
   onResume: () => void;
 }
 
+const FONT_BASE = { fontFamily: 'var(--font-pretendard)' } as const;
+
+const TITLE_STYLE = {
+  ...FONT_BASE,
+  fontSize: '24px',
+  fontWeight: 600,
+  lineHeight: '31.2px',
+  color: '#C57F08',
+} as const;
+
+const BODY_STYLE = {
+  ...FONT_BASE,
+  fontSize: '16px',
+  fontWeight: 400,
+  lineHeight: '25.6px',
+  color: '#3F526F',
+} as const;
+
+const BTN_STYLE = {
+  ...FONT_BASE,
+  fontSize: '16px',
+  fontWeight: 500,
+  lineHeight: '16px',
+} as const;
+
 export function ChatUnfinishedSessionModal({
   isOpen,
   onClose,
@@ -32,42 +56,66 @@ export function ChatUnfinishedSessionModal({
 }: ChatUnfinishedSessionModalProps) {
   return (
     <DialogRoot open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent showClose={false} maxWidth="max-w-[350px]">
-        <div className="flex flex-col items-center gap-6">
-          {/* ── 텍스트 영역 ── */}
+      <DialogContent showClose={false} maxWidth="max-w-[350px]" className="p-6">
+        {/* Frame 1597882320 — VERTICAL, gap 24, cross CENTER */}
+        <div className="flex w-full flex-col items-center gap-6">
+
+          {/* Frame 1597882318 — VERTICAL, gap 24, cross CENTER */}
           <div className="flex w-full flex-col items-center gap-6">
-            {/* 제목 — Heading 02, warning-600 */}
-            <DialogTitle className="text-warning-600 w-full text-center text-2xl leading-[1.3] font-semibold tracking-[-0.36px]">
+            {/* 제목 — Pretendard 24px/600, lh 31.2px, #C57F08, CENTER */}
+            <DialogTitle className="w-full text-center" style={TITLE_STYLE}>
               마무리가 안 된 상담이 있습니다
             </DialogTitle>
 
-            {/* 설명 — Body 01, prime-700 */}
-            <DialogDescription className="text-prime-700 w-full text-center text-base leading-[1.6] font-normal">
-              이전에 중단되어 마무리가 되지 않은
-              <br />
-              상담이 있습니다. 돌아가서 진행하시습니까?
-            </DialogDescription>
+            {/* Frame 1597881574 — VERTICAL, gap 24, cross CENTER */}
+            <div className="flex w-full flex-col items-center gap-6">
+              {/* 본문 — Pretendard 16px/400, lh 25.6px, #3F526F, CENTER */}
+              <DialogDescription className="w-full text-center" style={BODY_STYLE}>
+                이전에 중단되어 마무리가 되지 않은 상담이 있습니다. 돌아가서 진행하시습니까?
+              </DialogDescription>
 
-            {/* 미완결 상담 정보 — Caption 01, warning-700 + prime-500 */}
-            <div className="flex flex-col items-center gap-1">
-              <span className="text-warning-700 text-center text-xs leading-[1.2] font-medium tracking-[-0.18px]">
-                [{sessionTitle}]
-              </span>
-              <span className="text-prime-500 text-center text-xs leading-[1.2] font-medium tracking-[-0.18px]">
-                {sessionDate}
-              </span>
+              {/* Frame 1597881573 — VERTICAL, gap 4, cross CENTER, 173×32 */}
+              <div className="flex flex-col items-center gap-1">
+                {/* 세션 제목 — Pretendard 12px/500, lh 14.4px, #945F06, CENTER */}
+                <span
+                  className="text-center"
+                  style={{ ...FONT_BASE, fontSize: '12px', fontWeight: 500, lineHeight: '14.4px', color: '#945F06' }}
+                >
+                  [{sessionTitle}]
+                </span>
+                {/* 날짜 — Pretendard 12px/500, lh 14.4px, #6983AA, CENTER */}
+                <span
+                  className="text-center"
+                  style={{ ...FONT_BASE, fontSize: '12px', fontWeight: 500, lineHeight: '14.4px', color: '#6983AA' }}
+                >
+                  {sessionDate}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* ── 버튼 영역 ── */}
-          <div className="flex w-full items-center justify-between">
-            <Button variant="secondary" semantic="yellow" onClick={onIgnore}>
+          {/* Frame 1597882319 — HORIZONTAL, SPACE_BETWEEN, gap 24, cross CENTER, 302×44 */}
+          <div className="flex w-full flex-row items-center justify-between">
+            {/* 무시한다 — 104×44, bg secondary-100, border #945F06, text #945F06, padding H24/V14, radius 8 */}
+            <button
+              type="button"
+              onClick={onIgnore}
+              className="flex items-center justify-center gap-2.5 rounded-lg border px-6 py-3.5 transition-colors"
+              style={{ ...BTN_STYLE, borderColor: '#945F06', color: '#945F06' }}
+            >
               무시한다
-            </Button>
-            <Button variant="primary" onClick={onResume}>
+            </button>
+            {/* 진행한다 — 104×44, bg cta-300 (#82C9FF), text prime-900, padding H24/V14, radius 8 */}
+            <button
+              type="button"
+              onClick={onResume}
+              className="bg-cta-300 text-prime-900 flex items-center justify-center gap-2.5 rounded-lg px-6 py-3.5 transition-colors"
+              style={BTN_STYLE}
+            >
               진행한다
-            </Button>
+            </button>
           </div>
+
         </div>
       </DialogContent>
     </DialogRoot>

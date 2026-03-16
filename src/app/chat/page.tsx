@@ -5,6 +5,7 @@ import { useState } from 'react';
 import {
   ChatMainArea,
   ChatSidebar,
+  ChatAlertModal,
   ChatCreditModal,
   ChatNewSessionModal,
   ChatUnfinishedSessionModal,
@@ -12,7 +13,6 @@ import {
   ChatPersonaSelectModal,
   type PersonaCardData,
 } from '@/components/chat';
-import { StatusModal } from '@/components/ui/status-modal';
 import { Menu } from 'lucide-react';
 
 // ── 모달 상태 타입 ──────────────────────────────────────────────
@@ -69,7 +69,10 @@ export default function ChatPage() {
 
   const handlePersonaStart = (personaId: string) => {
     closeModal();
-    // TODO: 크레딧 확인 → 부족하면 openModal('credit-shortage')
+    if (remainingCredits <= 0) {
+      openModal('credit-shortage');
+      return;
+    }
     // TODO: 세션 생성 API 호출 (personaId)
   };
 
@@ -155,17 +158,9 @@ export default function ChatPage() {
       />
 
       {/* 상담 종료 확인 모달 */}
-      <StatusModal
-        isOpen={activeModal === 'end-confirm'}
-        onClose={closeModal}
-        semantic="warning"
-        title="상담이 종료됩니다."
-        description="현재까지 상담한 내역들을 정리하여 리포트로 만듭니다. 현재 화면을 벗어나더라도 리포트는 자동으로 만들어집니다."
-        actions={[
-          { label: '상담내역 확인', variant: 'secondary', semantic: 'red', onClick: closeModal },
-          { label: '종료하기', variant: 'primary', onClick: handleConfirmEnd },
-        ]}
-      />
+      {activeModal === 'end-confirm' && (
+        <ChatAlertModal variant="end" onWait={closeModal} onEnd={handleConfirmEnd} />
+      )}
 
       {/* 마음기록 제작 대기 모달 */}
       <ChatRecordLoadingModal

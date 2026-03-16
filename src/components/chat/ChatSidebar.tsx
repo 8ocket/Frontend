@@ -67,7 +67,7 @@ export function ChatSidebar({ onNewCounsel }: ChatSidebarProps = {}) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollRatio, setScrollRatio] = useState(0);
   const [thumbRatio, setThumbRatio] = useState(0.2);
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [visibleCount, setVisibleCount] = useState(ALL_SESSION_GROUPS.length);
 
   const visibleGroups = ALL_SESSION_GROUPS.slice(0, visibleCount);
   const hasMore = visibleCount < ALL_SESSION_GROUPS.length;
@@ -91,15 +91,19 @@ export function ChatSidebar({ onNewCounsel }: ChatSidebarProps = {}) {
     el.scrollTop = ratio * (el.scrollHeight - el.clientHeight);
   }, []);
 
-  // thumbRatio 재계산 (데이터 추가 시)
+  // thumbRatio 재계산 (초기 렌더 + 데이터 추가 시)
+  // rAF로 지연하여 flex 레이아웃이 완전히 확정된 뒤 계산
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    setThumbRatio(el.clientHeight / el.scrollHeight);
+    const raf = requestAnimationFrame(() => {
+      setThumbRatio(el.clientHeight / el.scrollHeight);
+    });
+    return () => cancelAnimationFrame(raf);
   }, [visibleCount]);
 
   return (
-    <aside className="relative flex w-full shrink-0 flex-col gap-4 bg-transparent px-4 lg:w-80.75 lg:px-0">
+    <aside className="relative flex h-[calc(100dvh-4rem)] w-full shrink-0 flex-col gap-4 bg-transparent px-4 md:h-[calc(100dvh-5rem)] lg:w-80.75 lg:px-0">
       {/* Logo — Figma 1361:2679 */}
       <div className="flex h-10.5 w-36 items-center justify-center">
         <span
@@ -198,13 +202,19 @@ export function ChatSidebar({ onNewCounsel }: ChatSidebarProps = {}) {
       )}
 
       {/* Chat Session List + 커스텀 스크롤바 — Figma 1379:2840, 1457:2423 */}
-      <div className="relative flex flex-1 flex-row overflow-hidden">
-        <ChatSessionList groups={visibleGroups} scrollRef={scrollRef} onScroll={handleScroll} />
-        <ChatScrollbar
-          scrollRatio={scrollRatio}
-          thumbRatio={thumbRatio}
-          onScrollTo={handleScrollTo}
+      <div className="relative flex flex-1 flex-row overflow-hidden min-h-0">
+        <ChatSessionList
+          groups={visibleGroups}
+          scrollRef={scrollRef}
+          onScroll={handleScroll}
         />
+        {thumbRatio < 1 && (
+          <ChatScrollbar
+            scrollRatio={scrollRatio}
+            thumbRatio={thumbRatio}
+            onScrollTo={handleScrollTo}
+          />
+        )}
       </div>
     </aside>
   );

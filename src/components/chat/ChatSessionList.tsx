@@ -78,7 +78,7 @@ export function ChatSessionList({ groups, scrollRef, onScroll }: ChatSessionList
     <div
       ref={scrollRef}
       onScroll={onScroll}
-      className="flex w-78.75 flex-col gap-6 overflow-x-hidden overflow-y-scroll"
+      className="flex h-full w-78.75 flex-col gap-6 overflow-x-hidden overflow-y-scroll"
       style={{ scrollbarWidth: 'none' }}
     >
       {groups.map((group) => (

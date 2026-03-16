@@ -1,11 +1,10 @@
 'use client';
 
 // Figma MODAL 10 (node 2113:9240) — 크레딧 부족 알림
-// 350×273, bg secondary-100, border 2px glass-stroke/30, radius 12
-// Semantic: Red (제목 error-600)
+// 350×273, VERTICAL layout, padding 24px all, gap 24
+// bg: secondary-100, border: 2px solid rgba(130,201,255,0.30), radius: 12
 
 import { DialogRoot, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 
 export interface ChatCreditModalProps {
   /** 모달 열림 여부 */
@@ -20,6 +19,31 @@ export interface ChatCreditModalProps {
   onPurchase: () => void;
 }
 
+const FONT_BASE = { fontFamily: 'var(--font-pretendard)' } as const;
+
+const TITLE_STYLE = {
+  ...FONT_BASE,
+  fontSize: '24px',
+  fontWeight: 600,
+  lineHeight: '31.2px',
+  color: '#BD1010',
+} as const;
+
+const BODY_STYLE = {
+  ...FONT_BASE,
+  fontSize: '16px',
+  fontWeight: 400,
+  lineHeight: '25.6px',
+  color: '#3F526F',
+} as const;
+
+const BTN_STYLE = {
+  ...FONT_BASE,
+  fontSize: '16px',
+  fontWeight: 500,
+  lineHeight: '16px',
+} as const;
+
 export function ChatCreditModal({
   isOpen,
   onClose,
@@ -29,36 +53,58 @@ export function ChatCreditModal({
 }: ChatCreditModalProps) {
   return (
     <DialogRoot open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent showClose={false} maxWidth="max-w-[350px]">
-        <div className="flex flex-col items-center gap-6">
-          {/* ── 텍스트 영역 ── */}
+      <DialogContent showClose={false} maxWidth="max-w-[350px]" className="p-6">
+        {/* Frame 1597882320 — VERTICAL, gap 24, cross CENTER */}
+        <div className="flex w-full flex-col items-center gap-6">
+
+          {/* Frame 1597882318 — VERTICAL, gap 24, cross CENTER */}
           <div className="flex w-full flex-col items-center gap-6">
-            {/* 제목 — Heading 02, error-600 */}
-            <DialogTitle className="text-error-600 w-full text-center text-2xl leading-[1.3] font-semibold tracking-[-0.36px]">
+            {/* 제목 — Pretendard 24px/600, lh 31.2px, #BD1010, CENTER */}
+            <DialogTitle className="w-full text-center" style={TITLE_STYLE}>
               크레딧이 부족합니다
             </DialogTitle>
 
-            {/* 설명 — Body 01, prime-700 */}
-            <DialogDescription className="text-prime-700 w-full text-center text-base leading-[1.6] font-normal">
-              크레딧 부족으로 추가 상담을 진행할 수 없습니다. 크레딧을 구매하시겠습니까?
-            </DialogDescription>
+            {/* Frame 1597881574 — VERTICAL, gap 24, cross CENTER */}
+            <div className="flex w-full flex-col items-center gap-6">
+              {/* 본문 — Pretendard 16px/400, lh 25.6px, #3F526F, CENTER */}
+              <DialogDescription className="w-full text-center" style={BODY_STYLE}>
+                크레딧 부족으로 추가 상담을 진행할 수 없습니다. 크레딧을 구매하시겠습니까?
+              </DialogDescription>
 
-            {/* 잔여 크레딧 정보 */}
-            <div className="flex items-center gap-2 text-base leading-[1.6]">
-              <span className="text-tertiary-400">잔여 크레딧 :</span>
-              <span className="text-info-600">{remainingCredits.toLocaleString()}</span>
+              {/* Frame 1597882345 — HORIZONTAL, gap 8, primary CENTER, 124×26 */}
+              <div className="flex flex-row items-center justify-center gap-2">
+                {/* 잔여 크레딧 라벨 — Pretendard 16px/400, lh 25.6px, #8A9BA8 */}
+                <span style={{ ...BODY_STYLE, color: '#8A9BA8' }}>잔여 크레딧 :</span>
+                {/* 크레딧 값 — Pretendard 16px/400, lh 25.6px, #0B63F3 */}
+                <span style={{ ...BODY_STYLE, color: '#0B63F3' }}>
+                  {remainingCredits.toLocaleString()}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* ── 버튼 영역 ── */}
-          <div className="flex w-full items-center justify-between">
-            <Button variant="secondary" semantic="red" onClick={onEnd}>
+          {/* Frame 1597882319 — HORIZONTAL, SPACE_BETWEEN, gap 24, cross CENTER, 302×44 */}
+          <div className="flex w-full flex-row items-center justify-between">
+            {/* 종료하기 — 104×44, bg secondary-100, border #BD1010, text #BD1010, radius 8, padding H24/V14 */}
+            <button
+              type="button"
+              onClick={onEnd}
+              className="flex items-center justify-center gap-2.5 rounded-lg border px-6 py-3.5 transition-colors"
+              style={{ ...BTN_STYLE, borderColor: '#BD1010', color: '#BD1010' }}
+            >
               종료하기
-            </Button>
-            <Button variant="primary" onClick={onPurchase}>
+            </button>
+            {/* 구매하기 — 104×44, bg cta-300 (#82C9FF), text prime-900, radius 8, padding H24/V14 */}
+            <button
+              type="button"
+              onClick={onPurchase}
+              className="bg-cta-300 text-prime-900 flex items-center justify-center gap-2.5 rounded-lg px-6 py-3.5 transition-colors"
+              style={BTN_STYLE}
+            >
               구매하기
-            </Button>
+            </button>
           </div>
+
         </div>
       </DialogContent>
     </DialogRoot>

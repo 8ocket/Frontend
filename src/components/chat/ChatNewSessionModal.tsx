@@ -1,11 +1,10 @@
 'use client';
 
 // Figma MODAL 11 (node 2113:9317) — 새로운 상담 안내
-// 350×273, bg secondary-100, border 2px glass-stroke/30, radius 12
-// Semantic: Yellow (제목 warning-600)
+// 350×273, VERTICAL layout, padding 24px all, gap 24
+// bg: secondary-100, border: 2px solid rgba(130,201,255,0.30), radius: 12
 
 import { DialogRoot, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 
 export interface ChatNewSessionModalProps {
   /** 모달 열림 여부 */
@@ -16,37 +15,72 @@ export interface ChatNewSessionModalProps {
   onConfirm: () => void;
 }
 
+const FONT_BASE = { fontFamily: 'var(--font-pretendard)' } as const;
+
+const TITLE_STYLE = {
+  ...FONT_BASE,
+  fontSize: '24px',
+  fontWeight: 600,
+  lineHeight: '31.2px',
+  color: '#C57F08',
+} as const;
+
+const BODY_STYLE = {
+  ...FONT_BASE,
+  fontSize: '16px',
+  fontWeight: 400,
+  lineHeight: '25.6px',
+  color: '#3F526F',
+} as const;
+
+const BTN_STYLE = {
+  ...FONT_BASE,
+  fontSize: '16px',
+  fontWeight: 500,
+  lineHeight: '16px',
+} as const;
+
 export function ChatNewSessionModal({ isOpen, onClose, onConfirm }: ChatNewSessionModalProps) {
   return (
     <DialogRoot open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent showClose={false} maxWidth="max-w-[350px]">
-        <div className="flex flex-col items-center gap-6">
-          {/* ── 텍스트 영역 ── */}
+      <DialogContent showClose={false} maxWidth="max-w-[350px]" className="p-6">
+        {/* Frame 1597882320 — VERTICAL, gap 24, cross CENTER */}
+        <div className="flex w-full flex-col items-center gap-6">
+
+          {/* Frame 1597882318 — VERTICAL, gap 24, cross CENTER */}
           <div className="flex w-full flex-col items-center gap-6">
-            {/* 제목 — Heading 02, warning-600 */}
-            <DialogTitle className="text-warning-600 w-full text-center text-2xl leading-[1.3] font-semibold tracking-[-0.36px]">
+            {/* 제목 — Pretendard 24px/600, lh 31.2px, #C57F08, CENTER */}
+            <DialogTitle className="w-full text-center" style={TITLE_STYLE}>
               [새로운 상담] 버튼을 누르세요
             </DialogTitle>
 
-            {/* 설명 — Body 01, prime-700 */}
-            <DialogDescription className="text-prime-700 w-full text-center text-base leading-[1.6] font-normal">
-              왼쪽 사이드바의 [상담] 버튼을 누르시면
-              <br />
-              새로운 상담을 진행하실 수 있습니다.
-            </DialogDescription>
+            {/* Frame 1597881574 — VERTICAL, gap 24, cross CENTER */}
+            <div className="flex w-full flex-col items-center gap-6">
+              {/* 본문 — Pretendard 16px/400, lh 25.6px, #3F526F, CENTER */}
+              <DialogDescription className="w-full text-center" style={BODY_STYLE}>
+                왼쪽 사이드바의 [상담] 버튼을 누르시면 새로운 상담을 진행하실 수 있습니다.
+              </DialogDescription>
 
-            {/* 부가 안내 — Body 01, tertiary-400 */}
-            <p className="text-tertiary-400 w-full text-center text-base leading-[1.6]">
-              (하루 1회씩 무료로 상담 가능합니다.)
-            </p>
+              {/* 부가안내 — Pretendard 16px/400, lh 25.6px, #8A9BA8, CENTER */}
+              <p className="w-full text-center" style={{ ...BODY_STYLE, color: '#8A9BA8' }}>
+                (하루 1회씩 무료로 상담 가능합니다.)
+              </p>
+            </div>
           </div>
 
-          {/* ── 버튼 영역 (단일 버튼 중앙 정렬) ── */}
-          <div className="flex w-full items-center justify-center">
-            <Button variant="primary" onClick={onConfirm}>
+          {/* Frame 1597882319 — HORIZONTAL, SPACE_BETWEEN, cross CENTER, 302×44 */}
+          <div className="flex w-full flex-row items-center justify-between">
+            {/* 확인 버튼 — 76×44, bg cta-300 (#82C9FF), text prime-900, padding H24/V14, radius 8 */}
+            <button
+              type="button"
+              onClick={onConfirm}
+              className="bg-cta-300 text-prime-900 flex items-center justify-center gap-2.5 rounded-lg px-6 py-3.5 transition-colors"
+              style={BTN_STYLE}
+            >
               확인
-            </Button>
+            </button>
           </div>
+
         </div>
       </DialogContent>
     </DialogRoot>
