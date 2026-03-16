@@ -98,12 +98,18 @@ export default function NicknamePage() {
               <div className="flex flex-col gap-2">
                 <SectionHeader>닉네임 설정하기</SectionHeader>
                 <div className="flex flex-col gap-4">
-                  <Input
-                    type="text"
-                    value={nickname}
-                    onChange={(e) => setNickname(e.target.value)}
-                    placeholder="닉네임을 입력해 주세요"
-                  />
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      value={nickname}
+                      onChange={(e) => setNickname(e.target.value)}
+                      placeholder="닉네임을 입력해 주세요"
+                      maxLength={20}
+                    />
+                    <span className="text-prime-400 dark:text-prime-500 pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs">
+                      {nickname.length}/20
+                    </span>
+                  </div>
                   <div className="flex gap-6">
                     <Button onClick={() => {}} variant="primary" size="default" className="flex-1">
                       닉네임 사용하기

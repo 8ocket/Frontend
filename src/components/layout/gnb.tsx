@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User, Bell, Mic, Globe, HelpCircle, LogOut } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
 import { cn } from '@/lib/utils';
 import { LogoSmall } from '../login';
@@ -30,6 +30,18 @@ export function GNB() {
   const router = useRouter();
   const { isAuthenticated, user, logout } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // 경로 변경 시 모바일 메뉴 닫기
   useEffect(() => {
@@ -87,15 +99,26 @@ export function GNB() {
               </Link>
 
               {/* 유저 이름 버튼 — Figma 1738:4383: UserButton */}
-              <Link
-                href="/my"
-                className={cn(
-                  'inline-flex h-11 w-24.5 items-center justify-center rounded-full text-base font-medium transition-all',
-                  'text-cta-300 opacity-70 hover:opacity-100 hover:bg-neutral-200 dark:hover:bg-prime-800'
+              <div ref={dropdownRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => setProfileDropdownOpen((v) => !v)}
+                  className={cn(
+                    'inline-flex h-11 max-w-24.5 items-center justify-center rounded-full px-3 text-base font-medium transition-all',
+                    'text-cta-300 opacity-70 hover:opacity-100 hover:bg-neutral-200 dark:hover:bg-prime-800'
+                  )}
+                >
+                  <span className="truncate">{user?.name ?? 'MY'}</span>
+                </button>
+
+                {profileDropdownOpen && (
+                  <ProfileDropdown
+                    userName={user?.name ?? ''}
+                    onLogout={() => { setProfileDropdownOpen(false); handleLogout(); }}
+                    onClose={() => setProfileDropdownOpen(false)}
+                  />
                 )}
-              >
-                {user?.name ?? 'MY'}
-              </Link>
+              </div>
             </>
           ) : (
             /* 로그인 버튼 — Figma 1738:4381: LogInOutButton */
@@ -199,5 +222,123 @@ function MobileNavItem({ label, href, active }: { label: string; href: string; a
     >
       {label}
     </Link>
+  );
+}
+
+// ── ProfileDropdown — Figma node 1673:3947 ──────────────────────────────────
+function ProfileDropdown({
+  userName,
+  onLogout,
+  onClose,
+}: {
+  userName: string;
+  onLogout: () => void;
+  onClose: () => void;
+}) {
+  const router = useRouter();
+  const [alarmOff, setAlarmOff] = useState(false);
+  const [voiceChat, setVoiceChat] = useState(false);
+
+  const navigate = (href: string) => { onClose(); router.push(href); };
+
+  return (
+    <div className="absolute right-0 top-full z-50 mt-1 w-[217px] overflow-hidden rounded-[4px] bg-secondary-100 shadow-lg dark:bg-prime-900">
+      {/* 인사말 — Figma: greeting, glass blue-10 bg */}
+      <div className="flex items-center gap-2 bg-[rgba(130,201,255,0.1)] px-2 py-2">
+        <User size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
+        <p className="button-1 flex flex-col leading-snug">
+          <span className="text-tertiary-500 dark:text-tertiary-300">안녕하세요,</span>
+          <span>
+            <span className="text-cta-300">{userName}</span>
+            <span className="text-tertiary-500 dark:text-tertiary-300">님</span>
+          </span>
+        </p>
+      </div>
+
+      {/* 메뉴 목록 */}
+      <div className="flex flex-col px-2">
+        {/* 프로필 설정 */}
+        <button
+          type="button"
+          onClick={() => navigate('/my')}
+          className="flex items-center gap-2 border-t border-t-tertiary-400/30 py-2 dark:border-t-prime-700"
+        >
+          <User size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
+          <span className="button-1 text-tertiary-500 dark:text-tertiary-300">프로필 설정</span>
+        </button>
+
+        {/* 알람 끄기 */}
+        <div className="flex items-center justify-between py-2">
+          <div className="flex items-center gap-2">
+            <Bell size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
+            <span className="button-1 text-tertiary-500 dark:text-tertiary-300">알람 끄기</span>
+          </div>
+          <Toggle checked={alarmOff} onChange={() => setAlarmOff((v) => !v)} />
+        </div>
+
+        {/* 음성 채팅 */}
+        <div className="flex items-center justify-between py-2">
+          <div className="flex items-center gap-2">
+            <Mic size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
+            <span className="button-1 text-tertiary-500 dark:text-tertiary-300">음성 채팅</span>
+          </div>
+          <Toggle checked={voiceChat} onChange={() => setVoiceChat((v) => !v)} />
+        </div>
+
+        {/* 언어 설정 */}
+        <div className="flex items-center justify-between py-2">
+          <div className="flex items-center gap-2">
+            <Globe size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
+            <span className="button-1 text-tertiary-500 dark:text-tertiary-300">언어 설정</span>
+          </div>
+          <span className="subtitle-2 text-tertiary-500 dark:text-tertiary-300">한국어</span>
+        </div>
+
+        {/* 고객 지원 */}
+        <button
+          type="button"
+          onClick={() => navigate('/credit')}
+          className="flex items-center gap-2 border-b border-b-tertiary-400/30 py-2 dark:border-b-prime-700"
+        >
+          <HelpCircle size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
+          <span className="button-1 text-tertiary-500 dark:text-tertiary-300">고객 지원</span>
+        </button>
+
+        {/* 로그아웃 */}
+        <button
+          type="button"
+          onClick={onLogout}
+          className="flex items-center gap-2 py-2"
+        >
+          <LogOut size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
+          <span className="button-1 text-tertiary-500 dark:text-tertiary-300">로그아웃</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// 토글 스위치 — Figma: Toggle off (1679:5302)
+function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={onChange}
+      className={cn(
+        'relative h-5 w-[41px] shrink-0 rounded-full border transition-colors duration-200',
+        checked
+          ? 'bg-cta-300 border-cta-300'
+          : 'bg-neutral-200 border-neutral-200 dark:bg-prime-700 dark:border-prime-700'
+      )}
+    >
+      <span
+        className={cn(
+          'absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform duration-200',
+          checked ? 'translate-x-[23px]' : 'translate-x-0.5'
+        )}
+      />
+    </button>
   );
 }
