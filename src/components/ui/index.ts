@@ -27,3 +27,4 @@ export {
 export { SuccessModal, type SuccessModalProps } from './success-modal';
 export { TermsDetailPanel, type TermsDetailPanelProps } from './terms-detail-panel';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
+export { Switch } from './switch';
