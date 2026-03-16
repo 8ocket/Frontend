@@ -8,6 +8,8 @@ import { Menu, X, User, Bell, Mic, Globe, HelpCircle, LogOut } from 'lucide-reac
 import { useAuthStore } from '@/stores/auth';
 import { cn } from '@/lib/utils';
 import { LogoSmall } from '../login';
+import { UserProfileModal } from '../common/UserProfileModal';
+import { Switch } from '@/components/ui';
 
 // Figma: GNB (1738:4600)
 // 1440x80
@@ -31,6 +33,7 @@ export function GNB() {
   const { isAuthenticated, user, logout } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -116,9 +119,16 @@ export function GNB() {
                     userName={user?.name ?? ''}
                     onLogout={() => { setProfileDropdownOpen(false); handleLogout(); }}
                     onClose={() => setProfileDropdownOpen(false)}
+                    onProfileSettings={() => { setProfileDropdownOpen(false); setProfileModalOpen(true); }}
                   />
                 )}
               </div>
+
+              <UserProfileModal
+                isOpen={profileModalOpen}
+                onClose={() => setProfileModalOpen(false)}
+                userName={user?.name ?? ''}
+              />
             </>
           ) : (
             /* 로그인 버튼 — Figma 1738:4381: LogInOutButton */
@@ -230,14 +240,16 @@ function ProfileDropdown({
   userName,
   onLogout,
   onClose,
+  onProfileSettings,
 }: {
   userName: string;
   onLogout: () => void;
   onClose: () => void;
+  onProfileSettings: () => void;
 }) {
   const router = useRouter();
-  const [alarmOff, setAlarmOff] = useState(false);
-  const [voiceChat, setVoiceChat] = useState(false);
+  const [alarmOff, setAlarmOff] = useState(true);
+  const [voiceChat, setVoiceChat] = useState(true);
 
   const navigate = (href: string) => { onClose(); router.push(href); };
 
@@ -260,33 +272,33 @@ function ProfileDropdown({
         {/* 프로필 설정 */}
         <button
           type="button"
-          onClick={() => navigate('/my')}
-          className="flex items-center gap-2 border-t border-t-tertiary-400/30 py-2 dark:border-t-prime-700"
+          onClick={onProfileSettings}
+          className="flex w-full cursor-pointer items-center gap-2 rounded-sm border-t border-t-tertiary-400/30 px-1 py-2 transition-colors hover:bg-neutral-100 dark:border-t-prime-700 dark:hover:bg-prime-800"
         >
           <User size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
           <span className="button-1 text-tertiary-500 dark:text-tertiary-300">프로필 설정</span>
         </button>
 
         {/* 알람 끄기 */}
-        <div className="flex items-center justify-between py-2">
+        <div className="flex cursor-default items-center justify-between rounded-sm px-1 py-2 transition-colors hover:bg-neutral-100 dark:hover:bg-prime-800">
           <div className="flex items-center gap-2">
             <Bell size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
             <span className="button-1 text-tertiary-500 dark:text-tertiary-300">알람 끄기</span>
           </div>
-          <Toggle checked={alarmOff} onChange={() => setAlarmOff((v) => !v)} />
+          <Switch checked={alarmOff} onCheckedChange={setAlarmOff} />
         </div>
 
         {/* 음성 채팅 */}
-        <div className="flex items-center justify-between py-2">
+        <div className="flex cursor-default items-center justify-between rounded-sm px-1 py-2 transition-colors hover:bg-neutral-100 dark:hover:bg-prime-800">
           <div className="flex items-center gap-2">
             <Mic size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
             <span className="button-1 text-tertiary-500 dark:text-tertiary-300">음성 채팅</span>
           </div>
-          <Toggle checked={voiceChat} onChange={() => setVoiceChat((v) => !v)} />
+          <Switch checked={voiceChat} onCheckedChange={setVoiceChat} />
         </div>
 
         {/* 언어 설정 */}
-        <div className="flex items-center justify-between py-2">
+        <div className="flex cursor-default items-center justify-between rounded-sm px-1 py-2 transition-colors hover:bg-neutral-100 dark:hover:bg-prime-800">
           <div className="flex items-center gap-2">
             <Globe size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
             <span className="button-1 text-tertiary-500 dark:text-tertiary-300">언어 설정</span>
@@ -298,7 +310,7 @@ function ProfileDropdown({
         <button
           type="button"
           onClick={() => navigate('/credit')}
-          className="flex items-center gap-2 border-b border-b-tertiary-400/30 py-2 dark:border-b-prime-700"
+          className="flex w-full cursor-pointer items-center gap-2 rounded-sm border-b border-b-tertiary-400/30 px-1 py-2 transition-colors hover:bg-neutral-100 dark:border-b-prime-700 dark:hover:bg-prime-800"
         >
           <HelpCircle size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
           <span className="button-1 text-tertiary-500 dark:text-tertiary-300">고객 지원</span>
@@ -308,37 +320,12 @@ function ProfileDropdown({
         <button
           type="button"
           onClick={onLogout}
-          className="flex items-center gap-2 py-2"
+          className="flex w-full cursor-pointer items-center gap-2 rounded-sm px-1 py-2 transition-colors hover:bg-neutral-100 dark:hover:bg-prime-800"
         >
           <LogOut size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
           <span className="button-1 text-tertiary-500 dark:text-tertiary-300">로그아웃</span>
         </button>
       </div>
     </div>
-  );
-}
-
-// 토글 스위치 — Figma: Toggle off (1679:5302)
-function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void }) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      onClick={onChange}
-      className={cn(
-        'relative h-5 w-[41px] shrink-0 rounded-full border transition-colors duration-200',
-        checked
-          ? 'bg-cta-300 border-cta-300'
-          : 'bg-neutral-200 border-neutral-200 dark:bg-prime-700 dark:border-prime-700'
-      )}
-    >
-      <span
-        className={cn(
-          'absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform duration-200',
-          checked ? 'translate-x-[23px]' : 'translate-x-0.5'
-        )}
-      />
-    </button>
   );
 }
