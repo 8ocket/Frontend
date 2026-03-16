@@ -11,6 +11,7 @@ import {
   ChatUnfinishedSessionModal,
   ChatRecordLoadingModal,
   ChatPersonaSelectModal,
+  ChatPersonaConfirmModal,
   type PersonaCardData,
 } from '@/components/chat';
 import { Menu } from 'lucide-react';
@@ -18,6 +19,7 @@ import { Menu } from 'lucide-react';
 // ── 모달 상태 타입 ──────────────────────────────────────────────
 export type ChatModalType =
   | 'persona-select'
+  | 'persona-confirm'
   | 'credit-shortage'
   | 'new-session'
   | 'unfinished-session'
@@ -56,6 +58,7 @@ const MOCK_PERSONAS: PersonaCardData[] = [
 export default function ChatPage() {
   const [activeModal, setActiveModal] = useState<ChatModalType>(null);
   const [remainingCredits] = useState(0); // TODO: 실제 크레딧 조회 연동
+  const [selectedPersonaId, setSelectedPersonaId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const openModal = (type: ChatModalType) => setActiveModal(type);
@@ -68,12 +71,21 @@ export default function ChatPage() {
   };
 
   const handlePersonaStart = (personaId: string) => {
+    setSelectedPersonaId(personaId);
+    openModal('persona-confirm');
+  };
+
+  const handlePersonaConfirm = () => {
     closeModal();
     if (remainingCredits <= 0) {
       openModal('credit-shortage');
       return;
     }
-    // TODO: 세션 생성 API 호출 (personaId)
+    // TODO: 세션 생성 API 호출 (selectedPersonaId)
+  };
+
+  const handlePersonaReselect = () => {
+    openModal('persona-select');
   };
 
   const handleEndChat = () => openModal('end-confirm');
@@ -126,6 +138,14 @@ export default function ChatPage() {
         personas={MOCK_PERSONAS}
         onStart={handlePersonaStart}
         onPurchase={closeModal}
+      />
+
+      {/* 페르소나 확인 모달 */}
+      <ChatPersonaConfirmModal
+        isOpen={activeModal === 'persona-confirm'}
+        onClose={closeModal}
+        onReselect={handlePersonaReselect}
+        onConfirm={handlePersonaConfirm}
       />
 
       {/* 크레딧 부족 모달 */}
