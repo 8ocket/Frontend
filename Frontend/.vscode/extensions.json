@@ -1,0 +1,23 @@
+{
+  "recommendations": [
+    // 필수 익스텐션
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "bradlc.vscode-tailwindcss",
+    
+    // TypeScript/React
+    "formulahendry.auto-rename-tag",
+    "dsznajder.es7-react-js-snippets",
+    
+    // 생산성
+    "christian-kohler.path-intellisense",
+    "mikestead.dotenv",
+    
+    // Git
+    "eamodio.gitlens",
+    
+    // 기타 유용한 것들
+    "streetsidesoftware.code-spell-checker"
+  ],
+  "unwantedRecommendations": []
+}
