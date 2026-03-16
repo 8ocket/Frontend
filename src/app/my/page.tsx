@@ -1,13 +1,33 @@
 'use client';
 
-
+import { useState } from 'react';
+import { useAuthStore } from '@/stores/auth';
+import { UserProfileModal } from '@/components/common';
 
 export default function MyPage() {
+  const { user } = useAuthStore();
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+
   return (
     <div className="dark:bg-prime-900 min-h-screen bg-white">
       <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <h1 className="text-prime-900 text-4xl font-bold dark:text-white">마이페이지</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-prime-900 text-4xl font-bold dark:text-white">마이페이지</h1>
+          <button
+            type="button"
+            onClick={() => setProfileModalOpen(true)}
+            className="bg-cta-300 text-prime-900 rounded-lg px-4 py-2 text-sm font-medium transition-colors hover:bg-[#4ba1f0]"
+          >
+            프로필 편집
+          </button>
+        </div>
       </main>
+
+      <UserProfileModal
+        isOpen={profileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
+        userName={user?.name ?? ''}
+      />
     </div>
   );
 }
