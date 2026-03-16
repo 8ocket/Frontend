@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import WaveBackground from '@/components/common/WaveBackground';
-import { Button, Input, RadioGroup, SectionHeader, StatusModal } from '@/components/ui';
+import { Button, Input, RadioGroup, SectionHeader } from '@/components/ui';
+import { SignupCreditModal } from '@/components/signup/SignupCreditModal';
 import { useAuthStore } from '@/stores/auth';
 import { generatePositiveNickname } from '@/lib/utils/nickname';
 
@@ -35,8 +36,6 @@ export default function NicknamePage() {
   };
 
   const handleSuccessModalClick = () => {
-    setShowSuccessModal(false);
-
     const token = localStorage.getItem('accessToken');
     if (token) {
       const { login } = useAuthStore.getState();
@@ -186,21 +185,10 @@ export default function NicknamePage() {
           </Button>
         </div>
 
-        {/* 성공 모달 */}
-        <StatusModal
+        {/* 성공 모달 — Figma: 1303:3182 */}
+        <SignupCreditModal
           isOpen={showSuccessModal}
-          onClose={() => setShowSuccessModal(false)}
-          semantic="safe"
-          title="가입해 주셔서 감사드립니다."
-          description="감사의 의미로 150 크레딧을 선물로 드립니다."
-          creditAmount={150}
-          actions={[
-            {
-              label: '150 크레딧 받기',
-              variant: 'primary',
-              onClick: handleSuccessModalClick,
-            },
-          ]}
+          onConfirm={handleSuccessModalClick}
         />
       </div>
     </WaveBackground>
