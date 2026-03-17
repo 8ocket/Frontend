@@ -10,7 +10,6 @@ import { PersonaSection } from '@/components/about/PersonaSection';
 import { SmallCardsSection } from '@/components/about/SmallCardsSection';
 import { LargeCardSection } from '@/components/about/LargeCardSection';
 import { CtaSection } from '@/components/about/CtaSection';
-import { AboutFooter } from '@/components/about/AboutFooter';
 
 export default function AboutPage() {
   return (
@@ -36,7 +35,6 @@ export default function AboutPage() {
         <LargeCardSection />
         <CtaSection />
       </main>
-      <AboutFooter />
     </div>
   );
 }
