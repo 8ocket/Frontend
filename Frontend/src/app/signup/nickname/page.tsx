@@ -7,6 +7,7 @@ import WaveBackground from '@/components/common/WaveBackground';
 import { Button, Input, RadioGroup, SectionHeader } from '@/components/ui';
 import { SignupCreditModal } from '@/components/signup/SignupCreditModal';
 import { useAuthStore } from '@/stores/auth';
+import { getCookie } from '@/lib/utils/cookie';
 import { generatePositiveNickname } from '@/lib/utils/nickname';
 
 const imgVector = '/images/icons/profile-default.svg';
@@ -29,6 +30,9 @@ export default function NicknamePage() {
 
     try {
       setIsLoading(true);
+      const { user, login } = useAuthStore.getState();
+      const token = getCookie('accessToken') || '';
+      login({ ...(user ?? { id: 0, email: '' }), name: nickname }, token);
       setShowSuccessModal(true);
     } finally {
       setIsLoading(false);
@@ -36,17 +40,6 @@ export default function NicknamePage() {
   };
 
   const handleSuccessModalClick = () => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      const { login } = useAuthStore.getState();
-      const mockUser = {
-        id: Date.now(),
-        email: 'user@example.com',
-        name: nickname,
-      };
-      login(mockUser, token, localStorage.getItem('refreshToken') || '');
-    }
-
     router.push('/');
   };
 

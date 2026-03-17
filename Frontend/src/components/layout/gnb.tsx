@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, User, Bell, Mic, Globe, HelpCircle, LogOut } from 'lucide-react';
+import { Menu, X, User, Bell, Mic, Globe, HelpCircle, LogOut, Info } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
 import { cn } from '@/lib/utils';
 import { LogoSmall } from '../login';
@@ -91,17 +90,16 @@ export function GNB() {
 
           {isAuthenticated ? (
             <>
-              {/* 크레딧 버튼 — Figma 1738:4382: CreditButton */}
-              <Link
-                href="/credit"
-                className={cn(
-                  'inline-flex h-11 items-center gap-1 rounded-full px-3 text-base font-medium transition-all',
-                  'text-prime-700 hover:text-prime-900 dark:text-tertiary-300 dark:hover:bg-prime-800 dark:hover:text-secondary-100 hover:bg-neutral-200'
-                )}
+              {/* 크레딧 버튼 — Figma 1738:4579: CreditButton */}
+              <span
+                className="inline-flex h-11 cursor-default items-center gap-1 rounded-full px-2.5 text-base font-medium"
               >
-                <span className="text-info-500">크레딧</span>
-                <Image src="/images/icons/credit.svg" alt="" width={20} height={20} />
-              </Link>
+                {user?.creditBalance !== undefined && (
+                  <span className="text-info-500 opacity-70">{user.creditBalance}</span>
+                )}
+                <span className="text-prime-900 dark:text-secondary-100">크레딧</span>
+                <Info size={24} className="text-prime-700 dark:text-tertiary-300" />
+              </span>
 
               {/* 유저 이름 버튼 — Figma 1738:4383: UserButton */}
               <div ref={dropdownRef} className="relative">
@@ -119,15 +117,8 @@ export function GNB() {
                 {profileDropdownOpen && (
                   <ProfileDropdown
                     userName={user?.name ?? ''}
-                    onLogout={() => {
-                      setProfileDropdownOpen(false);
-                      handleLogout();
-                    }}
-                    onClose={() => setProfileDropdownOpen(false)}
-                    onProfileSettings={() => {
-                      setProfileDropdownOpen(false);
-                      setProfileModalOpen(true);
-                    }}
+                    onLogout={() => { setProfileDropdownOpen(false); handleLogout(); }}
+                    onProfileSettings={() => { setProfileDropdownOpen(false); setProfileModalOpen(true); }}
                   />
                 )}
               </div>
@@ -174,7 +165,7 @@ export function GNB() {
             {isAuthenticated ? (
               <>
                 <MobileNavItem label="마이페이지" href="/my" active={pathname === '/my'} />
-                <MobileNavItem label="고객지원" href="/credit" active={pathname === '/credit'} />
+                <span className="cursor-default rounded-xl px-4 py-3 text-base font-medium text-prime-700 dark:text-tertiary-300">고객지원</span>
                 <div className="dark:border-prime-700 my-2 border-t border-neutral-200" />
                 <button
                   onClick={handleLogout}
@@ -247,22 +238,14 @@ function MobileNavItem({ label, href, active }: { label: string; href: string; a
 function ProfileDropdown({
   userName,
   onLogout,
-  onClose,
   onProfileSettings,
 }: {
   userName: string;
   onLogout: () => void;
-  onClose: () => void;
   onProfileSettings: () => void;
 }) {
-  const router = useRouter();
   const [alarmOff, setAlarmOff] = useState(true);
   const [voiceChat, setVoiceChat] = useState(true);
-
-  const navigate = (href: string) => {
-    onClose();
-    router.push(href);
-  };
 
   return (
     <div className="bg-secondary-100 dark:bg-prime-900 absolute top-full right-0 z-50 mt-1 w-[217px] overflow-hidden rounded-[4px] shadow-lg">
@@ -318,14 +301,10 @@ function ProfileDropdown({
         </div>
 
         {/* 고객 지원 */}
-        <button
-          type="button"
-          onClick={() => navigate('/credit')}
-          className="border-b-tertiary-400/30 dark:border-b-prime-700 dark:hover:bg-prime-800 flex w-full cursor-pointer items-center gap-2 rounded-sm border-b px-1 py-2 transition-colors hover:bg-neutral-100"
-        >
-          <HelpCircle size={24} className="text-tertiary-500 dark:text-tertiary-300 shrink-0" />
+        <div className="flex cursor-default items-center gap-2 rounded-sm border-b border-b-tertiary-400/30 px-1 py-2 dark:border-b-prime-700">
+          <HelpCircle size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
           <span className="button-1 text-tertiary-500 dark:text-tertiary-300">고객 지원</span>
-        </button>
+        </div>
 
         {/* 로그아웃 */}
         <button

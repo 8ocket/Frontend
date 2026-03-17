@@ -20,7 +20,7 @@ function formatDate(date: Date): string {
 
 function CollectionCardItem({ data }: { data: EmotionCardData }) {
   return (
-    <div className="flex w-87.5 flex-col gap-2">
+    <div className="flex w-full flex-col gap-2">
       {/* 날짜 */}
       <div className="flex items-center gap-1.75">
         <span className="subtitle-1 text-prime-600">Date :</span>
@@ -55,7 +55,7 @@ function CollectionCardItem({ data }: { data: EmotionCardData }) {
 export default function CollectionPage() {
   return (
     <div className="bg-secondary-100 min-h-screen">
-      <div className="mx-auto max-w-360 px-0 py-12">
+      <div className="mx-auto max-w-360 px-4 py-12 sm:px-8">
         {/* 헤더 */}
         <div className="mb-10 flex flex-col items-center gap-4">
           <h1 className="heading-01 text-prime-900 text-center">마음기록 모음</h1>
@@ -65,8 +65,11 @@ export default function CollectionPage() {
         </div>
 
         {/* 카드 그리드 — 3열 */}
-        <div className="grid grid-cols-3 gap-x-10 gap-y-10">
-          {MOCK_COLLECTION_CARDS.map((card) => (
+        <div className="grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          {[...MOCK_COLLECTION_CARDS]
+            .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime())
+            .slice(0, 7)
+            .map((card) => (
             <CollectionCardItem key={card.cardId} data={card} />
           ))}
         </div>

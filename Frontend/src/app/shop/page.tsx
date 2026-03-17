@@ -91,7 +91,7 @@ export default function ShopPage() {
               </h2>
 
               {/* 상품 카드 3열 — Figma: 카드 간 gap 160px */}
-              <div className="flex flex-wrap justify-center gap-10">
+              <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-10">
                 {CREDIT_PRODUCTS.map((product) => (
                   <CreditProductCard
                     key={product.id}
@@ -117,7 +117,7 @@ export default function ShopPage() {
                     귀여운 동물 친구들과 함께 즐거운 소통을 합니다.
                   </p>
                 </div>
-                <div className="flex flex-wrap gap-6">
+                <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
                   {ANIMAL_PERSONAS.map((persona) => (
                     <PersonaCard key={persona.id} persona={persona} onUnlock={handleUnlock} />
                   ))}
