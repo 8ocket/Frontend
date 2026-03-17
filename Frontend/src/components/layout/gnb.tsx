@@ -34,7 +34,14 @@ export function GNB() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [prevPathname, setPrevPathname] = useState(pathname);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // 경로 변경 시 모바일 메뉴 닫기 (render 중 state 리셋 패턴)
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
+    setMobileMenuOpen(false);
+  }
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -45,11 +52,6 @@ export function GNB() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  // 경로 변경 시 모바일 메뉴 닫기
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [pathname]);
 
   // 모바일 메뉴 열림 시 스크롤 방지
   useEffect(() => {
@@ -94,7 +96,7 @@ export function GNB() {
                 href="/credit"
                 className={cn(
                   'inline-flex h-11 items-center gap-1 rounded-full px-3 text-base font-medium transition-all',
-                  'text-prime-700 hover:bg-neutral-200 hover:text-prime-900 dark:text-tertiary-300 dark:hover:bg-prime-800 dark:hover:text-secondary-100'
+                  'text-prime-700 hover:text-prime-900 dark:text-tertiary-300 dark:hover:bg-prime-800 dark:hover:text-secondary-100 hover:bg-neutral-200'
                 )}
               >
                 <span className="text-info-500">크레딧</span>
@@ -108,7 +110,7 @@ export function GNB() {
                   onClick={() => setProfileDropdownOpen((v) => !v)}
                   className={cn(
                     'inline-flex h-11 max-w-24.5 items-center justify-center rounded-full px-3 text-base font-medium transition-all',
-                    'text-cta-300 opacity-70 hover:opacity-100 hover:bg-neutral-200 dark:hover:bg-prime-800'
+                    'text-cta-300 dark:hover:bg-prime-800 opacity-70 hover:bg-neutral-200 hover:opacity-100'
                   )}
                 >
                   <span className="truncate">{user?.name ?? 'MY'}</span>
@@ -117,9 +119,15 @@ export function GNB() {
                 {profileDropdownOpen && (
                   <ProfileDropdown
                     userName={user?.name ?? ''}
-                    onLogout={() => { setProfileDropdownOpen(false); handleLogout(); }}
+                    onLogout={() => {
+                      setProfileDropdownOpen(false);
+                      handleLogout();
+                    }}
                     onClose={() => setProfileDropdownOpen(false)}
-                    onProfileSettings={() => { setProfileDropdownOpen(false); setProfileModalOpen(true); }}
+                    onProfileSettings={() => {
+                      setProfileDropdownOpen(false);
+                      setProfileModalOpen(true);
+                    }}
                   />
                 )}
               </div>
@@ -136,7 +144,7 @@ export function GNB() {
               href="/login"
               className={cn(
                 'inline-flex h-11 w-24.5 items-center justify-center rounded-full text-base font-medium transition-all',
-                'text-prime-700 hover:bg-neutral-200 hover:text-prime-900 dark:text-tertiary-300 dark:hover:bg-prime-800 dark:hover:text-secondary-100'
+                'text-prime-700 hover:text-prime-900 dark:text-tertiary-300 dark:hover:bg-prime-800 dark:hover:text-secondary-100 hover:bg-neutral-200'
               )}
             >
               로그인
@@ -205,7 +213,7 @@ function NavItem({ label, href, active }: { label: string; href: string; active:
         'flex h-11 w-24.5 flex-col items-center justify-center gap-0.5 rounded-full text-base font-medium transition-all',
         active
           ? 'text-prime-900 dark:text-secondary-100'
-          : 'text-prime-700 hover:bg-neutral-200 hover:text-prime-900 dark:text-tertiary-300 dark:hover:bg-prime-800 dark:hover:text-secondary-100'
+          : 'text-prime-700 hover:text-prime-900 dark:text-tertiary-300 dark:hover:bg-prime-800 dark:hover:text-secondary-100 hover:bg-neutral-200'
       )}
     >
       {label}
@@ -251,13 +259,16 @@ function ProfileDropdown({
   const [alarmOff, setAlarmOff] = useState(true);
   const [voiceChat, setVoiceChat] = useState(true);
 
-  const navigate = (href: string) => { onClose(); router.push(href); };
+  const navigate = (href: string) => {
+    onClose();
+    router.push(href);
+  };
 
   return (
-    <div className="absolute right-0 top-full z-50 mt-1 w-[217px] overflow-hidden rounded-[4px] bg-secondary-100 shadow-lg dark:bg-prime-900">
+    <div className="bg-secondary-100 dark:bg-prime-900 absolute top-full right-0 z-50 mt-1 w-[217px] overflow-hidden rounded-[4px] shadow-lg">
       {/* 인사말 — Figma: greeting, glass blue-10 bg */}
       <div className="flex items-center gap-2 bg-[rgba(130,201,255,0.1)] px-2 py-2">
-        <User size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
+        <User size={24} className="text-tertiary-500 dark:text-tertiary-300 shrink-0" />
         <p className="button-1 flex flex-col leading-snug">
           <span className="text-tertiary-500 dark:text-tertiary-300">안녕하세요,</span>
           <span>
@@ -273,34 +284,34 @@ function ProfileDropdown({
         <button
           type="button"
           onClick={onProfileSettings}
-          className="flex w-full cursor-pointer items-center gap-2 rounded-sm border-t border-t-tertiary-400/30 px-1 py-2 transition-colors hover:bg-neutral-100 dark:border-t-prime-700 dark:hover:bg-prime-800"
+          className="border-t-tertiary-400/30 dark:border-t-prime-700 dark:hover:bg-prime-800 flex w-full cursor-pointer items-center gap-2 rounded-sm border-t px-1 py-2 transition-colors hover:bg-neutral-100"
         >
-          <User size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
+          <User size={24} className="text-tertiary-500 dark:text-tertiary-300 shrink-0" />
           <span className="button-1 text-tertiary-500 dark:text-tertiary-300">프로필 설정</span>
         </button>
 
         {/* 알람 끄기 */}
-        <div className="flex cursor-default items-center justify-between rounded-sm px-1 py-2 transition-colors hover:bg-neutral-100 dark:hover:bg-prime-800">
+        <div className="dark:hover:bg-prime-800 flex cursor-default items-center justify-between rounded-sm px-1 py-2 transition-colors hover:bg-neutral-100">
           <div className="flex items-center gap-2">
-            <Bell size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
+            <Bell size={24} className="text-tertiary-500 dark:text-tertiary-300 shrink-0" />
             <span className="button-1 text-tertiary-500 dark:text-tertiary-300">알람 끄기</span>
           </div>
           <Switch checked={alarmOff} onCheckedChange={setAlarmOff} />
         </div>
 
         {/* 음성 채팅 */}
-        <div className="flex cursor-default items-center justify-between rounded-sm px-1 py-2 transition-colors hover:bg-neutral-100 dark:hover:bg-prime-800">
+        <div className="dark:hover:bg-prime-800 flex cursor-default items-center justify-between rounded-sm px-1 py-2 transition-colors hover:bg-neutral-100">
           <div className="flex items-center gap-2">
-            <Mic size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
+            <Mic size={24} className="text-tertiary-500 dark:text-tertiary-300 shrink-0" />
             <span className="button-1 text-tertiary-500 dark:text-tertiary-300">음성 채팅</span>
           </div>
           <Switch checked={voiceChat} onCheckedChange={setVoiceChat} />
         </div>
 
         {/* 언어 설정 */}
-        <div className="flex cursor-default items-center justify-between rounded-sm px-1 py-2 transition-colors hover:bg-neutral-100 dark:hover:bg-prime-800">
+        <div className="dark:hover:bg-prime-800 flex cursor-default items-center justify-between rounded-sm px-1 py-2 transition-colors hover:bg-neutral-100">
           <div className="flex items-center gap-2">
-            <Globe size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
+            <Globe size={24} className="text-tertiary-500 dark:text-tertiary-300 shrink-0" />
             <span className="button-1 text-tertiary-500 dark:text-tertiary-300">언어 설정</span>
           </div>
           <span className="subtitle-2 text-tertiary-500 dark:text-tertiary-300">한국어</span>
@@ -310,9 +321,9 @@ function ProfileDropdown({
         <button
           type="button"
           onClick={() => navigate('/credit')}
-          className="flex w-full cursor-pointer items-center gap-2 rounded-sm border-b border-b-tertiary-400/30 px-1 py-2 transition-colors hover:bg-neutral-100 dark:border-b-prime-700 dark:hover:bg-prime-800"
+          className="border-b-tertiary-400/30 dark:border-b-prime-700 dark:hover:bg-prime-800 flex w-full cursor-pointer items-center gap-2 rounded-sm border-b px-1 py-2 transition-colors hover:bg-neutral-100"
         >
-          <HelpCircle size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
+          <HelpCircle size={24} className="text-tertiary-500 dark:text-tertiary-300 shrink-0" />
           <span className="button-1 text-tertiary-500 dark:text-tertiary-300">고객 지원</span>
         </button>
 
@@ -320,9 +331,9 @@ function ProfileDropdown({
         <button
           type="button"
           onClick={onLogout}
-          className="flex w-full cursor-pointer items-center gap-2 rounded-sm px-1 py-2 transition-colors hover:bg-neutral-100 dark:hover:bg-prime-800"
+          className="dark:hover:bg-prime-800 flex w-full cursor-pointer items-center gap-2 rounded-sm px-1 py-2 transition-colors hover:bg-neutral-100"
         >
-          <LogOut size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
+          <LogOut size={24} className="text-tertiary-500 dark:text-tertiary-300 shrink-0" />
           <span className="button-1 text-tertiary-500 dark:text-tertiary-300">로그아웃</span>
         </button>
       </div>
