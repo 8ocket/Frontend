@@ -40,7 +40,7 @@ export const oauthConfig = {
     clientId: process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY || '',
     authUrl: 'https://kauth.kakao.com/oauth/authorize',
     redirectUri:
-      process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI || 'http://localhost:3000/auth/callback',
+      process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI || 'http://localhost:3000/auth/kakao/callback',
   },
   google: {
     clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',

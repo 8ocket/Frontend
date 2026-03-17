@@ -57,18 +57,18 @@ const DARK_MODE_KEY = 'theme-dark';
 export default function WaveBackground({ initialDark = false, children }: WaveBackgroundProps) {
   const [isDark, setIsDark] = useState<boolean>(initialDark);
 
-  useEffect(() => {
-    const stored = localStorage.getItem(DARK_MODE_KEY);
-    if (stored !== null) setIsDark(stored === 'true');
-  }, []);
+  // useEffect(() => {
+  //   const stored = localStorage.getItem(DARK_MODE_KEY);
+  //   if (stored !== null) setIsDark(stored === 'true');
+  // }, []);
 
-  const toggleDark = () => {
-    setIsDark((v) => {
-      const next = !v;
-      localStorage.setItem(DARK_MODE_KEY, String(next));
-      return next;
-    });
-  };
+  // const toggleDark = () => {
+  //   setIsDark((v) => {
+  //     const next = !v;
+  //     localStorage.setItem(DARK_MODE_KEY, String(next));
+  //     return next;
+  //   });
+  // };
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef<MousePosition>({ x: -500, y: -500 });
@@ -217,8 +217,8 @@ export default function WaveBackground({ initialDark = false, children }: WaveBa
         style={{ position: 'fixed', inset: 0, width: '100%', height: '100%' }}
       />
 
-      {/* 토글 버튼 — Figma: top 40px, right 40px, h 44px, radius 8px
-      <button
+      {/* 다크모드 토글 버튼 — Figma: top 40px, right 40px, h 44px, radius 8px */}
+      {/* <button
         onClick={toggleDark}
         style={{
           position: 'fixed',
