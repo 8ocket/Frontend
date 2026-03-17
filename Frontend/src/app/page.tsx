@@ -2,12 +2,10 @@
 
 import { format, getDate, getDaysInMonth } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import { EmotionCardFront, getEmotionDisplayName } from '@/components/emotion';
-import { LogoSmall } from '@/components/login';
 import { cn } from '@/lib/utils';
 import { getCookie } from '@/lib/utils/cookie';
 import { MOCK_COLLECTION_CARDS } from '@/mocks/emotion';
@@ -27,15 +25,6 @@ const MOCK_ATTENDED = new Set([1, 2, 3, 5, 7, 9, 11]);
 // Plutchik 복합 감정 8종 — 배너 좌측 팬 카드용
 
 // ── Footer nav ───────────────────────────────────────────────────────────────
-const FOOTER_LINKS = [
-  { label: '홈', href: '/' },
-  { label: 'AI 상담', href: '/chat' },
-  { label: '브랜드 소개', href: '/about' },
-  { label: '마음기록 모음', href: '/collection' },
-  { label: '상점', href: '/shop' },
-  { label: '고객지원', href: '#' },
-];
-
 // ── Lorem ipsum filler text ───────────────────────────────────────────────────
 const LOREM_LONG =
   '상담이 진행될 때마다 하루 단위로 분석된 내용은 저희의 데이터베이스에 저장되며, 이 내역은 마음기록에서 확인하실 수 있습니다. 저장된 내역은 철저한 보안에 의해 외부로부터 보호 받습니다. 이렇게 저장된 데이터를 모아서 주기적으로 분석하여 사용자에게 심층적인 리포트를 제공합니다. 리포트는 월간, 분기 단위로 제공되며, 감정 변화 추이, 주요 고민 키워드 분석 등 다양한 통계를 담고 있습니다.';
@@ -309,39 +298,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* ── Section 5: Footer ────────────────────────────────────────────────── */}
-      <footer className="mt-[150px] border-t border-[#e2e8f0] bg-[#f8fafc] dark:border-[#2c3a4f] dark:bg-[#1a222e]">
-        <div className="mx-auto max-w-[1440px] px-8 py-12">
-          <div className="flex flex-col items-start gap-8 sm:flex-row sm:items-start sm:justify-between">
-            {/* 로고 */}
-            <div className="flex shrink-0 items-center gap-2">
-              <LogoSmall className="h-10 w-10" />
-              <span className="text-[20px] leading-[1.3] font-semibold tracking-[-0.48px] text-[#82c9ff]">
-                마인드 로그
-              </span>
-            </div>
-
-            {/* 내비게이션 그리드 — 6열 */}
-            <nav className="grid grid-cols-2 gap-x-12 gap-y-3 sm:grid-cols-3 md:grid-cols-6">
-              {FOOTER_LINKS.map(({ label, href }) => (
-                <Link
-                  key={label}
-                  href={href}
-                  className="text-[14px] font-normal text-[#3f526f] transition-colors hover:text-[#82c9ff] dark:text-[#a7b4be] dark:hover:text-[#82c9ff]"
-                >
-                  {label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-
-          {/* 저작권 */}
-          <p className="mt-10 text-[12px] font-normal text-[#6983aa] dark:text-[#6983aa]">
-            © 2026 MindLog. All rights reserved.
-          </p>
-        </div>
-      </footer>
 
       {/* ── Floating AI 상담 버튼 ─────────────────────────────────────────────── */}
       <button

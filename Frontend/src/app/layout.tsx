@@ -3,6 +3,7 @@ import { Geist_Mono, Cormorant_Garamond } from 'next/font/google';
 import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { GNB } from '@/components/layout/gnb';
+import { Footer } from '@/components/layout/footer';
 import './globals.css';
 
 const geistMono = Geist_Mono({
@@ -47,6 +48,7 @@ export default function RootLayout({
           <QueryProvider>
             <GNB />
             <main>{children}</main>
+            <Footer />
           </QueryProvider>
         </ThemeProvider>
       </body>
