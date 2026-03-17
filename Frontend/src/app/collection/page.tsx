@@ -54,7 +54,7 @@ function CollectionCardItem({ data }: { data: EmotionCardData }) {
 
 export default function CollectionPage() {
   return (
-    <div className="bg-secondary-100 min-h-screen">
+    <div className="min-h-screen bg-white">
       <div className="mx-auto max-w-360 px-4 py-12 sm:px-8">
         {/* 헤더 */}
         <div className="mb-10 flex flex-col items-center gap-4">

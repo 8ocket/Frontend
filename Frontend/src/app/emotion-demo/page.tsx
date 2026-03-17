@@ -24,7 +24,7 @@ export default function EmotionCardDemoPage() {
   const { width: backW, height: backH } = CARD_SIZES.back;
 
   return (
-    <div className="min-h-screen bg-neutral-100 px-8 py-12">
+    <div className="min-h-screen bg-white px-8 py-12">
       <div className="mx-auto max-w-[1400px]">
         {/* 헤더 */}
         <div className="mb-12">
