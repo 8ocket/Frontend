@@ -30,7 +30,7 @@ function CollectionCardItem({ data }: { data: EmotionCardData }) {
       </div>
 
       {/* 감정 카드 (뒷면이 기본) + 버튼 */}
-      <div className="flex flex-col gap-4">
+      <div className="flex w-87.5 flex-col gap-4">
         <EmotionCard data={data} initialFace="back" size="sample" />
 
         {/* 전체 상담내역 보기 */}
