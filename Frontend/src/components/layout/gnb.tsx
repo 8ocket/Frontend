@@ -97,18 +97,14 @@ export function GNB() {
           {isAuthenticated ? (
             <>
               {/* 크레딧 버튼 — Figma 1738:4579: CreditButton */}
-              <span
-                className="flex h-11 cursor-default flex-col items-center justify-center gap-0.5 rounded-full px-3 text-base font-medium"
+              <Link
+                href="/shop"
+                className="flex h-11 items-center gap-1.5 rounded-full px-3 text-base font-medium transition-colors hover:bg-neutral-200"
               >
-                <span className="flex items-center gap-1">
-                  {user?.creditBalance !== undefined && (
-                    <span className="text-info-500 opacity-70">{user.creditBalance}</span>
-                  )}
-                  <span className="text-prime-900 dark:text-secondary-100">크레딧</span>
-                  <Info size={24} className="text-prime-700 dark:text-tertiary-300" />
-                </span>
-                <span className="block h-0.75 w-0 rounded-full" />
-              </span>
+                <span className="text-cta-300 font-semibold">{user?.creditBalance ?? 0}</span>
+                <span className="text-prime-700">크레딧</span>
+                <Info size={16} className="text-prime-400" />
+              </Link>
 
               {/* 유저 이름 버튼 — Figma 1738:4383: UserButton */}
               <div ref={dropdownRef} className="relative">

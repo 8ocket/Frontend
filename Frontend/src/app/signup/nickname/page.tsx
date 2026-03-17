@@ -32,7 +32,7 @@ export default function NicknamePage() {
       setIsLoading(true);
       const { user, login } = useAuthStore.getState();
       const token = getCookie('accessToken') || '';
-      login({ ...(user ?? { id: 0, email: '' }), name: nickname }, token);
+      login({ ...(user ?? { id: 0, email: '' }), name: nickname, creditBalance: 0 }, token);
       setShowSuccessModal(true);
     } finally {
       setIsLoading(false);
