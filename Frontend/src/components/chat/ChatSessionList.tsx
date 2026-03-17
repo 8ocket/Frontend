@@ -16,14 +16,17 @@ export type ChatSessionGroup = {
 
 type ChatSessionItemProps = {
   session: ChatSession;
+  isActive?: boolean;
+  onSelect?: (id: string) => void;
 };
 
-function ChatSessionItem({ session }: ChatSessionItemProps) {
+function ChatSessionItem({ session, isActive, onSelect }: ChatSessionItemProps) {
   return (
     <div
+      onClick={() => onSelect?.(session.id)}
       className={[
-        'flex h-11 w-78.75 shrink-0 flex-row items-center rounded-lg',
-        session.isActive ? 'bg-cta-300' : 'bg-transparent',
+        'flex h-11 w-78.75 shrink-0 cursor-pointer flex-row items-center rounded-lg transition-colors',
+        isActive ? 'bg-cta-300' : 'hover:bg-cta-300/20',
       ].join(' ')}
     >
       {/* AI Persona Profile Photo — 21×21 circle */}
@@ -69,11 +72,13 @@ function ChatSessionItem({ session }: ChatSessionItemProps) {
 
 type ChatSessionListProps = {
   groups: ChatSessionGroup[];
+  activeSessionId?: string;
+  onSelectSession?: (id: string) => void;
   scrollRef?: React.RefObject<HTMLDivElement | null>;
   onScroll?: () => void;
 };
 
-export function ChatSessionList({ groups, scrollRef, onScroll }: ChatSessionListProps) {
+export function ChatSessionList({ groups, activeSessionId, onSelectSession, scrollRef, onScroll }: ChatSessionListProps) {
   return (
     <div
       ref={scrollRef}
@@ -98,7 +103,12 @@ export function ChatSessionList({ groups, scrollRef, onScroll }: ChatSessionList
 
           {/* Chat Session Items */}
           {group.sessions.map((session) => (
-            <ChatSessionItem key={session.id} session={session} />
+            <ChatSessionItem
+              key={session.id}
+              session={session}
+              isActive={session.id === activeSessionId}
+              onSelect={onSelectSession}
+            />
           ))}
         </div>
       ))}

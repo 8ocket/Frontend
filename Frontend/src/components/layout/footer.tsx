@@ -1,5 +1,10 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { LogoSmall } from '../login';
+
+const NO_FOOTER_PATHS = ['/chat'];
 
 const FOOTER_NAV = [
   { label: '홈', href: '/', items: [] },
@@ -43,6 +48,9 @@ const FOOTER_NAV = [
 ];
 
 export function Footer() {
+  const pathname = usePathname();
+  if (NO_FOOTER_PATHS.includes(pathname)) return null;
+
   return (
     <footer className="mt-37.5 bg-[rgba(130,201,255,0.1)]">
       <div className="mx-auto max-w-360 px-12 py-8">

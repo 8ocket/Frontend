@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { ChatBubble, ChatBubbleProps } from './ChatBubble';
 import { ChatInputBar } from './ChatInputBar';
@@ -17,6 +17,8 @@ export interface ChatMainAreaProps {
   onCreditShortage?: () => void;
   /** 미완결 상담 발견 시 호출 */
   onUnfinishedSession?: () => void;
+  /** 표시할 메시지 목록 */
+  initialMessages?: ChatBubbleProps[];
 }
 
 const PERSONA_OPTIONS: PersonaOption[] = [
@@ -25,27 +27,15 @@ const PERSONA_OPTIONS: PersonaOption[] = [
   { id: 'coaching', label: '코칭 심리 상담사' },
 ];
 
-// Figma 샘플 메시지
-const INITIAL_MESSAGES: ChatBubbleProps[] = [
-  {
-    variant: 'ai',
-    senderName: '정신건강 상담사',
-    avatarSrc: '/images/personas/mental.png',
-    content:
-      'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-  },
-  {
-    variant: 'user',
-    senderName: 'User Name',
-    content:
-      'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-  },
-];
-
-export function ChatMainArea({ onEndChat, onCreditShortage, onUnfinishedSession }: ChatMainAreaProps = {}) {
-  const [messages, setMessages] = useState<ChatBubbleProps[]>(INITIAL_MESSAGES);
+export function ChatMainArea({ onEndChat, onCreditShortage, onUnfinishedSession, initialMessages = [] }: ChatMainAreaProps = {}) {
+  const [messages, setMessages] = useState<ChatBubbleProps[]>(initialMessages);
   const [inputValue, setInputValue] = useState('');
   const [showSelectOptions, setShowSelectOptions] = useState(false);
+
+  // 세션 변경 시 메시지 교체
+  useEffect(() => {
+    setMessages(initialMessages);
+  }, [initialMessages]);
 
   function handleSend() {
     if (!inputValue.trim()) return;
