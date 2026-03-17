@@ -20,6 +20,8 @@ export interface EmotionCardProps {
   width?: number;
   /** 카드 클릭(플립) 핸들러 */
   onFlip?: (face: CardFace) => void;
+  /** 감정명 라벨 직접 지정 (미지정 시 getEmotionDisplayName 사용) */
+  labelOverride?: string;
   /** 추가 클래스 */
   className?: string;
 }

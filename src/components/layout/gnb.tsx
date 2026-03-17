@@ -70,8 +70,17 @@ export function GNB() {
     router.push('/login');
   };
 
+  const isAbout = pathname === '/about';
+
   return (
-    <header className="bg-secondary-100 dark:bg-prime-900 dark:border-prime-800 w-full border-b border-neutral-200">
+    <header
+      className={cn(
+        'fixed left-0 right-0 top-0 z-50 w-full border-b',
+        isAbout
+          ? 'border-transparent bg-transparent'
+          : 'bg-secondary-100 dark:bg-prime-900 dark:border-prime-800 border-neutral-200'
+      )}
+    >
       <nav className="layout-container flex h-16 items-center justify-between px-4 md:h-20 md:px-6">
         {/* 로고 영역 — Figma: LogoSmall(80×80) + 텍스트(cta-300, 32px) */}
         <Link href="/" className="flex shrink-0 items-center gap-2 md:w-60">

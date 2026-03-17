@@ -6,6 +6,10 @@ import type {
   EmotionExtractions,
 } from '@/types/emotion';
 
+
+// hex 색상: Figma CARD BRUSH 컴포넌트 실제 fill 값 기준
+// (globals.css --color-emotion-* 변수는 감정 Wheel UI용으로 별도 유지)
+
 // ─── 감정별 메타데이터 ───
 //
 // CSS 변수: globals.css → --color-emotion-*
@@ -17,8 +21,7 @@ export const EMOTION_META: Record<EmotionType, EmotionMeta> = {
     englishLabel: 'Joy',
     intensityLabels: { mild: 'Serenity', basic: 'Joy', intense: 'Ecstasy' },
     cssVar: '--color-emotion-ecstasy',
-    hex: '#ffb900',
-    brushShape: 'circle',
+    hex: '#f9e07a',
   },
   trust: {
     type: 'trust',
@@ -26,8 +29,7 @@ export const EMOTION_META: Record<EmotionType, EmotionMeta> = {
     englishLabel: 'Trust',
     intensityLabels: { mild: 'Acceptance', basic: 'Trust', intense: 'Admiration' },
     cssVar: '--color-emotion-admiration',
-    hex: '#16781e',
-    brushShape: 'circle',
+    hex: '#7dc87c',
   },
   fear: {
     type: 'fear',
@@ -35,8 +37,7 @@ export const EMOTION_META: Record<EmotionType, EmotionMeta> = {
     englishLabel: 'Fear',
     intensityLabels: { mild: 'Apprehension', basic: 'Fear', intense: 'Terror' },
     cssVar: '--color-emotion-terror',
-    hex: '#00735f',
-    brushShape: 'textured-circle',
+    hex: '#3aad6a',
   },
   surprise: {
     type: 'surprise',
@@ -44,8 +45,7 @@ export const EMOTION_META: Record<EmotionType, EmotionMeta> = {
     englishLabel: 'Surprise',
     intensityLabels: { mild: 'Distraction', basic: 'Surprise', intense: 'Amazement' },
     cssVar: '--color-emotion-amazement',
-    hex: '#1c5ac3',
-    brushShape: 'four-point-star',
+    hex: '#4aaee0',
   },
   sadness: {
     type: 'sadness',
@@ -53,8 +53,7 @@ export const EMOTION_META: Record<EmotionType, EmotionMeta> = {
     englishLabel: 'Sadness',
     intensityLabels: { mild: 'Pensiveness', basic: 'Sadness', intense: 'Grief' },
     cssVar: '--color-emotion-grief',
-    hex: '#411e9b',
-    brushShape: 'gradient-circle',
+    hex: '#3b6cb7',
   },
   disgust: {
     type: 'disgust',
@@ -62,8 +61,7 @@ export const EMOTION_META: Record<EmotionType, EmotionMeta> = {
     englishLabel: 'Disgust',
     intensityLabels: { mild: 'Boredom', basic: 'Disgust', intense: 'Loathing' },
     cssVar: '--color-emotion-loathing',
-    hex: '#7314aa',
-    brushShape: 'spiky-star',
+    hex: '#8a4fbd',
   },
   anger: {
     type: 'anger',
@@ -71,8 +69,7 @@ export const EMOTION_META: Record<EmotionType, EmotionMeta> = {
     englishLabel: 'Anger',
     intensityLabels: { mild: 'Annoyance', basic: 'Anger', intense: 'Rage' },
     cssVar: '--color-emotion-rage',
-    hex: '#c40a0a',
-    brushShape: 'lightning',
+    hex: '#c0392b',
   },
   anticipation: {
     type: 'anticipation',
@@ -80,8 +77,7 @@ export const EMOTION_META: Record<EmotionType, EmotionMeta> = {
     englishLabel: 'Anticipation',
     intensityLabels: { mild: 'Interest', basic: 'Anticipation', intense: 'Vigilance' },
     cssVar: '--color-emotion-vigilance',
-    hex: '#da5500',
-    brushShape: 'circle',
+    hex: '#b86c00',
   },
 } as const;
 
@@ -92,14 +88,14 @@ export const EMOTION_META: Record<EmotionType, EmotionMeta> = {
  *
  * | 역할       | opacity | blur | 설명             |
  * |-----------|---------|------|-----------------|
- * | primary   | 60%     | 10px | 주감정 (Brush 01) |
- * | secondary | 30%     | 20px | 부감정 (Brush 02) |
- * | background| 10%     | 30px | 보조감정 (배경)    |
+ * | primary   | 60%     | 20px | 주감정 (Brush 01) |
+ * | secondary | 30%     | 40px | 부감정 (Brush 02) |
+ * | background| 10%     | 60px | 보조감정 (배경)    |
  */
 export const BRUSH_LAYER_CONFIG: Record<BrushRole, { opacity: number; blur: number }> = {
-  primary: { opacity: 0.6, blur: 10 },
-  secondary: { opacity: 0.3, blur: 20 },
-  background: { opacity: 0.1, blur: 30 },
+  primary: { opacity: 0.6, blur: 20 },
+  secondary: { opacity: 0.3, blur: 40 },
+  background: { opacity: 0.1, blur: 60 },
 } as const;
 
 // ─── 카드 크기 (Figma 기준) ───
