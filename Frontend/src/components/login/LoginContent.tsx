@@ -29,7 +29,7 @@ export function LoginContent({
 
       if (provider === 'kakao') {
         if (USE_MOCK) {
-          window.location.href = '/auth/callback';
+          window.location.href = '/auth/kakao/callback';
         } else {
           const params = new URLSearchParams({
             client_id: oauthConfig.kakao.clientId,
