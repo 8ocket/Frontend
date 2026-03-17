@@ -14,15 +14,6 @@ export type EmotionType =
 /** 감정 강도 레벨 (플루치크 감정 휠의 3단계) */
 export type EmotionIntensity = 'mild' | 'basic' | 'intense';
 
-/** 브러시 형태 타입 */
-export type BrushShape =
-  | 'circle' // 기쁨, 신뢰, 기대
-  | 'textured-circle' // 두려움
-  | 'gradient-circle' // 슬픔
-  | 'four-point-star' // 놀람
-  | 'spiky-star' // 혐오
-  | 'lightning'; // 분노
-
 /** 카드 내 브러시 역할 (Figma 원칙) */
 export type BrushRole = 'primary' | 'secondary' | 'background';
 
@@ -41,10 +32,8 @@ export interface EmotionMeta {
   intensityLabels: Record<EmotionIntensity, string>;
   /** CSS 변수명 (color-emotion-* 에 대응) */
   cssVar: string;
-  /** hex 색상값 (CSS 변수의 기본값) */
+  /** hex 색상값 (Figma CARD BRUSH 브러시 실제 색상) */
   hex: string;
-  /** 브러시 형태 */
-  brushShape: BrushShape;
 }
 
 /**

@@ -47,7 +47,7 @@ export default function RootLayout({
         <ThemeProvider>
           <QueryProvider>
             <GNB />
-            <main>{children}</main>
+            <main className="pt-16 md:pt-20">{children}</main>
             <Footer />
           </QueryProvider>
         </ThemeProvider>

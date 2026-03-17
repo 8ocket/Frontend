@@ -21,6 +21,7 @@ export function EmotionCard({
   size = 'default',
   width: customWidth,
   onFlip,
+  labelOverride,
   className,
 }: EmotionCardProps) {
   const [face, setFace] = useState<CardFace>(initialFace);
@@ -34,9 +35,8 @@ export function EmotionCard({
 
   // 주감정에서 영문 라벨 추출
   const primaryLayer = data.layers.find((l) => l.role === 'primary');
-  const emotionLabel = primaryLayer
-    ? getEmotionDisplayName(primaryLayer.type, null).toUpperCase()
-    : 'EMOTION';
+  const emotionLabel = labelOverride?.toUpperCase()
+    ?? (primaryLayer ? getEmotionDisplayName(primaryLayer.type, null).toUpperCase() : 'EMOTION');
 
   const handleFlip = useCallback(() => {
     const next: CardFace = isFlipped ? 'front' : 'back';

@@ -44,14 +44,21 @@ export function EmotionCardBack({
     background: { top: '15%', left: '80%' },
   };
 
+  // CARD TEXT 크기 — Figma 기준: 175px→12px(card-03), 350px→24px(card-02), 400px→26px(card-01)
+  const labelClass = width < 200 ? 'card-03' : width < 380 ? 'card-02' : 'card-01';
+
   // 글래스 패널 내부 패딩
   const panelPadding = 8;
   const panelWidth = width - panelPadding * 2;
 
   return (
     <div
-      className={cn('bg-secondary-100 relative overflow-hidden rounded-3xl', className)}
-      style={{ width, height }}
+      className={cn('relative overflow-hidden rounded-3xl', className)}
+      style={{
+        width,
+        height,
+        backgroundColor: `color-mix(in srgb, ${bgColor} 10%, transparent)`,
+      }}
     >
       {/* 브러시 레이어 (앞면과 동일) */}
       {sortedLayers.map((layer) => {
@@ -73,15 +80,15 @@ export function EmotionCardBack({
       })}
 
       {/* 감정명 라벨 */}
-      <EmotionCardLabel label={emotionLabel} position="top-left" />
-      <EmotionCardLabel label={emotionLabel} position="bottom-right" />
+      <EmotionCardLabel label={emotionLabel} position="top-left" className={labelClass} />
+      <EmotionCardLabel label={emotionLabel} position="bottom-right" className={labelClass} />
 
       {/* ─── 글래스모피즘 정보 패널 ─── */}
       <div
-        className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col gap-6 rounded-2xl p-2 backdrop-blur-md"
+        className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col gap-6 rounded-2xl p-4 backdrop-blur-md"
         style={{
           width: panelWidth,
-          backgroundColor: 'rgba(248, 250, 252, 0.3)',
+          backgroundColor: 'rgba(255, 255, 255, 0.88)',
         }}
       >
         <div className="flex w-full flex-col gap-4">
@@ -155,19 +162,24 @@ function SummaryHeader({
   const parts = description.split(highlightName);
 
   return (
-    <div className="flex flex-col gap-1">
-      <h3 className="heading-03 text-prime-900">{title}</h3>
-      <p className="caption-1 text-prime-500 leading-[1.2]">
-        {parts.length > 1 ? (
-          <>
-            {parts[0]}
-            <span className="text-cta-300">{highlightName}</span>
-            {parts[1]}
-          </>
-        ) : (
-          description
-        )}
-      </p>
+    <div className="flex flex-col gap-2">
+      {/* Figma 1905:7296 — "상담 요약" 섹션 라벨 */}
+      <h4 className="subtitle-1 text-prime-900">상담 요약</h4>
+      {/* Figma 1905:7297 — 요약 내용 (Input 오버라이드) */}
+      <p className="body-2 text-prime-500 whitespace-pre-line leading-relaxed">{title}</p>
+      {description && (
+        <p className="caption-1 text-prime-500 leading-[1.2]">
+          {parts.length > 1 ? (
+            <>
+              {parts[0]}
+              <span className="text-cta-300">{highlightName}</span>
+              {parts[1]}
+            </>
+          ) : (
+            description
+          )}
+        </p>
+      )}
     </div>
   );
 }

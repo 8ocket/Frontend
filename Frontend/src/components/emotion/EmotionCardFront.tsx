@@ -31,8 +31,12 @@ export function EmotionCardFront({
   const primaryMeta = primaryLayer ? EMOTION_META[primaryLayer.type] : null;
   const bgColor = primaryMeta?.hex ?? '#f8fafc';
 
-  // 브러시 크기는 카드 너비 기준
-  const brushSize = width;
+  // 브러시 크기 — Figma: primary 100%, secondary 86%, background 71%
+  const brushSizeMap: Record<string, number> = {
+    primary: width,
+    secondary: Math.round(width * 0.86),
+    background: Math.round(width * 0.71),
+  };
 
   // 레이어를 역순으로 (background → secondary → primary) 렌더링
   const sortedLayers = [...layers].sort((a, b) => {
@@ -41,15 +45,19 @@ export function EmotionCardFront({
   });
 
   // 각 브러시의 위치 오프셋 (Figma 기준)
+  // secondary/background는 카드 경계 밖으로 밀어 ambient glow 효과
   const positionMap: Record<string, { top: string; left: string }> = {
-    primary: { top: '60%', left: '50%' },
-    secondary: { top: '20%', left: '10%' },
-    background: { top: '15%', left: '80%' },
+    primary:    { top: '71%', left: '50%' },
+    secondary:  { top: '25%', left: '-5%' },
+    background: { top: '21%', left: '103%' },
   };
+
+  // CARD TEXT 크기 — Figma 기준: 175px→12px(card-03), 350px→24px(card-02), 400px→26px(card-01)
+  const labelClass = width < 200 ? 'card-03' : width < 380 ? 'card-02' : 'card-01';
 
   return (
     <div
-      className={cn('relative overflow-hidden rounded-2xl', className)}
+      className={cn('relative overflow-hidden rounded-3xl', className)}
       style={{
         width,
         height,
@@ -68,23 +76,23 @@ export function EmotionCardFront({
             color={meta.hex}
             opacity={layer.opacity}
             blur={layer.blur}
-            size={brushSize}
+            size={brushSizeMap[layer.role]}
             className="absolute -translate-x-1/2 -translate-y-1/2"
             style={{ top: pos.top, left: pos.left }}
           />
         );
       })}
 
-      {/* 스크린 블렌드 필터 (Figma: mix-blend-mode: screen) */}
+      {/* 스크린 블렌드 필터 (Figma: Filter frame, blend=SCREEN, blur 100px) */}
       <div
         className="absolute inset-0 rounded-2xl mix-blend-screen pointer-events-none"
-        style={{ filter: 'blur(50px)' }}
+        style={{ filter: 'blur(100px)' }}
         aria-hidden="true"
       />
 
       {/* 감정명 라벨 */}
-      <EmotionCardLabel label={emotionLabel} position="top-left" />
-      <EmotionCardLabel label={emotionLabel} position="bottom-right" />
+      <EmotionCardLabel label={emotionLabel} position="top-left" className={labelClass} />
+      <EmotionCardLabel label={emotionLabel} position="bottom-right" className={labelClass} />
     </div>
   );
 }

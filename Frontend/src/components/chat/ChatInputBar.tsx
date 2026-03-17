@@ -134,7 +134,7 @@ export function ChatInputBar({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Placeholder"
+          placeholder="채팅을 입력하세요"
           className="text-prime-900 placeholder:text-prime-900 flex h-11 flex-1 rounded-lg border border-[#F1F5F9] bg-[#E2E8F0] px-4 py-3 outline-none"
           style={{
             fontFamily: 'var(--font-pretendard)',

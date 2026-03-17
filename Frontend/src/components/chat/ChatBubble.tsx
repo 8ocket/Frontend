@@ -10,6 +10,7 @@ export type ChatBubbleProps = {
   senderName: string;
   content: string;
   avatarSrc?: string;
+  userAvatarSrc?: string;
 };
 
 // User Profile Photo — 21×21 흰 원 + 사용자 실루엣 벡터 (fill=#2b4764)
@@ -30,7 +31,7 @@ function UserProfilePhoto() {
   );
 }
 
-export function ChatBubble({ variant, senderName, content, avatarSrc }: ChatBubbleProps) {
+export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatarSrc }: ChatBubbleProps) {
   const isAi = variant === 'ai';
 
   return (
@@ -52,6 +53,12 @@ export function ChatBubble({ variant, senderName, content, avatarSrc }: ChatBubb
             ) : (
               <div className="bg-secondary-300 h-full w-full" />
             )}
+          </div>
+        ) : userAvatarSrc ? (
+          /* Custom user avatar (about 페이지 등 특정 컨텍스트) */
+          <div className="h-5.25 w-5.25 shrink-0 overflow-hidden rounded-full">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={userAvatarSrc} alt={senderName} className="h-full w-full object-cover" />
           </div>
         ) : (
           /* User Profile Photo — 21×21, fill=#ffffff, Vector 16×16 fill=#2b4764 */
