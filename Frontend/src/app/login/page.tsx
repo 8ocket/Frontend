@@ -26,6 +26,7 @@ export default function LoginPage() {
           id: Math.floor(Math.random() * 10000),
           email: `temp_user_${Date.now()}@mindlog.local`,
           name: `Temp User ${Math.floor(Math.random() * 1000)}`,
+          creditBalance: 0,
         };
 
         const tempToken = `temp_token_${Date.now()}`;

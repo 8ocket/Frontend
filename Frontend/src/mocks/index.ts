@@ -22,6 +22,7 @@ export const MOCK_USERS: Array<User & { password: string }> = [
     password: 'password123',
     name: '테스트 사용자',
     profileImage: 'https://api.dicebear.com/7.x/avataaars/svg?seed=test',
+    creditBalance: 0,
   },
   {
     id: 2,
@@ -29,6 +30,7 @@ export const MOCK_USERS: Array<User & { password: string }> = [
     password: 'demo123',
     name: '데모 사용자',
     profileImage: 'https://api.dicebear.com/7.x/avataaars/svg?seed=demo',
+    creditBalance: 0,
   },
   {
     id: 3,
@@ -36,6 +38,7 @@ export const MOCK_USERS: Array<User & { password: string }> = [
     password: 'user123',
     name: '일반 사용자',
     profileImage: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user',
+    creditBalance: 0,
   },
 ];
 

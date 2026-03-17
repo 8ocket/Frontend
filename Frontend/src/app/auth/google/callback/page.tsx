@@ -31,7 +31,7 @@ function GoogleCallbackContent() {
 
         const login = useAuthStore.getState().login;
         login(
-          { id: Date.now(), email: 'user@example.com', name: 'User' },
+          { id: Date.now(), email: 'user@example.com', name: 'User', creditBalance: 0 },
           result.accessToken,
           result.refreshToken
         );
