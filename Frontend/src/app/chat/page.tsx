@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/stores/auth';
 
 import {
   ChatMainArea,
@@ -56,8 +58,12 @@ const MOCK_PERSONAS: PersonaCardData[] = [
 ];
 
 export default function ChatPage() {
+  const router = useRouter();
   const [activeModal, setActiveModal] = useState<ChatModalType>(null);
-  const [remainingCredits] = useState(0); // TODO: 실제 크레딧 조회 연동
+  const remainingCredits = useAuthStore((s) => s.user?.creditBalance ?? 0);
+  const useCredit = useAuthStore((s) => s.useCredit);
+
+  const COUNSEL_CREDIT_COST = 70;
   const [selectedPersonaId, setSelectedPersonaId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -77,10 +83,11 @@ export default function ChatPage() {
 
   const handlePersonaConfirm = () => {
     closeModal();
-    if (remainingCredits <= 0) {
+    if (remainingCredits < COUNSEL_CREDIT_COST) {
       openModal('credit-shortage');
       return;
     }
+    useCredit(COUNSEL_CREDIT_COST);
     // TODO: 세션 생성 API 호출 (selectedPersonaId)
   };
 
@@ -154,7 +161,7 @@ export default function ChatPage() {
         onClose={closeModal}
         remainingCredits={remainingCredits}
         onEnd={closeModal}
-        onPurchase={closeModal}
+        onPurchase={() => { closeModal(); router.push('/shop'); }}
       />
 
       {/* 새로운 상담 안내 모달 */}
