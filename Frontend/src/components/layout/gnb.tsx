@@ -15,13 +15,19 @@ import { Switch } from '@/components/ui';
 // Light mode: bg secondary-100 (#f8fafc) — 흰색
 // Dark mode:  bg prime-900 (#1a222e)     — 네이비
 
-const NAV_ITEMS = [
+const MEMBER_NAV_ITEMS = [
   { label: '홈', href: '/' },
   { label: 'AI 상담', href: '/chat' },
-  { label: '브랜드 소개', href: '/about' },
   { label: '마음기록 모음', href: '/collection' },
   { label: '심화 리포트', href: '/report' },
   { label: '상점', href: '/shop' },
+  { label: '브랜드 소개', href: '/about' },
+  { label: '고객 지원', href: '/support' },
+] as const;
+
+const GUEST_NAV_ITEMS = [
+  { label: '브랜드 소개', href: '/about' },
+  { label: '고객 지원', href: '/support' },
 ] as const;
 
 const NO_GNB_PATHS = ['/login', '/signup', '/signup/nickname', '/auth/callback'];
@@ -84,7 +90,7 @@ export function GNB() {
 
         {/* 데스크톱 메뉴 — Figma: 각 버튼 98×44, rounded-full, gap 16px */}
         <div className="hidden items-center gap-4 lg:flex">
-          {NAV_ITEMS.map(({ label, href }) => (
+          {(isAuthenticated ? MEMBER_NAV_ITEMS : GUEST_NAV_ITEMS).map(({ label, href }) => (
             <NavItem key={href} label={label} href={href} active={pathname === href} />
           ))}
 
@@ -92,13 +98,16 @@ export function GNB() {
             <>
               {/* 크레딧 버튼 — Figma 1738:4579: CreditButton */}
               <span
-                className="inline-flex h-11 cursor-default items-center gap-1 rounded-full px-2.5 text-base font-medium"
+                className="flex h-11 cursor-default flex-col items-center justify-center gap-0.5 rounded-full px-3 text-base font-medium"
               >
-                {user?.creditBalance !== undefined && (
-                  <span className="text-info-500 opacity-70">{user.creditBalance}</span>
-                )}
-                <span className="text-prime-900 dark:text-secondary-100">크레딧</span>
-                <Info size={24} className="text-prime-700 dark:text-tertiary-300" />
+                <span className="flex items-center gap-1">
+                  {user?.creditBalance !== undefined && (
+                    <span className="text-info-500 opacity-70">{user.creditBalance}</span>
+                  )}
+                  <span className="text-prime-900 dark:text-secondary-100">크레딧</span>
+                  <Info size={24} className="text-prime-700 dark:text-tertiary-300" />
+                </span>
+                <span className="block h-0.75 w-0 rounded-full" />
               </span>
 
               {/* 유저 이름 버튼 — Figma 1738:4383: UserButton */}
@@ -158,14 +167,13 @@ export function GNB() {
       {mobileMenuOpen && (
         <div className="bg-secondary-100 dark:bg-prime-900 fixed inset-0 top-16 z-50 flex flex-col overflow-y-auto lg:hidden">
           <div className="flex flex-col gap-1 px-4 py-4">
-            {NAV_ITEMS.map(({ label, href }) => (
+            {(isAuthenticated ? MEMBER_NAV_ITEMS : GUEST_NAV_ITEMS).map(({ label, href }) => (
               <MobileNavItem key={href} label={label} href={href} active={pathname === href} />
             ))}
 
             {isAuthenticated ? (
               <>
                 <MobileNavItem label="마이페이지" href="/my" active={pathname === '/my'} />
-                <span className="cursor-default rounded-xl px-4 py-3 text-base font-medium text-prime-700 dark:text-tertiary-300">고객지원</span>
                 <div className="dark:border-prime-700 my-2 border-t border-neutral-200" />
                 <button
                   onClick={handleLogout}
@@ -201,7 +209,7 @@ function NavItem({ label, href, active }: { label: string; href: string; active:
     <Link
       href={href}
       className={cn(
-        'flex h-11 w-24.5 flex-col items-center justify-center gap-0.5 rounded-full text-base font-medium transition-all',
+        'flex h-11 flex-col items-center justify-center gap-0.5 rounded-full px-3 text-base font-medium transition-all',
         active
           ? 'text-prime-900 dark:text-secondary-100'
           : 'text-prime-700 hover:text-prime-900 dark:text-tertiary-300 dark:hover:bg-prime-800 dark:hover:text-secondary-100 hover:bg-neutral-200'

@@ -3,7 +3,6 @@ import type { NextRequest } from 'next/server';
 
 // 로그인 필요한 페이지들
 const protectedRoutes = [
-  '/',
   '/signup',
   '/chat',
   '/collection',
@@ -11,7 +10,6 @@ const protectedRoutes = [
   '/shop',
   '/report',
   '/my',
-  '/about',
 ];
 
 // 로그인 페이지들 (인증된 사용자는 접근 불가)
@@ -21,6 +19,13 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const token = request.cookies.get('accessToken')?.value;
+
+  // 홈('/') + 토큰 없음 → 브랜드 소개로
+  if (pathname === '/') {
+    if (!token) {
+      return NextResponse.redirect(new URL('/about', request.url));
+    }
+  }
 
   // 보호된 라우트 + 토큰 없음 → 로그인으로
   if (protectedRoutes.some((route) => pathname === route || pathname.startsWith(route + '/'))) {
