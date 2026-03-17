@@ -32,7 +32,7 @@ export function CreditProductCard({
   return (
     <div
       className={cn(
-        'bg-secondary-100 relative flex w-64.5 flex-col overflow-clip rounded-lg p-2',
+        'bg-secondary-100 relative flex w-full flex-col overflow-clip rounded-lg p-2 sm:w-64.5',
         featured && 'ring-cta-300 ring-2',
         className
       )}

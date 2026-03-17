@@ -155,38 +155,45 @@ export const MOCK_BACK_CARD_DATA: EmotionCardData = mockCardData(
   }
 );
 
+/** 오늘 기준 n일 전 날짜 반환 */
+function daysAgo(n: number): Date {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return d;
+}
+
 /** 컬렉션 페이지용 카드 목록 (7개, 다양한 감정 조합) */
 export const MOCK_COLLECTION_CARDS: EmotionCardData[] = [
-  mockCardData('card-01', new Date(2026, 1, 7), mockExtractions('joy')),
-  mockCardData('card-02', new Date(2026, 1, 6), mockExtractions('surprise', 'trust'), {
+  mockCardData('card-01', daysAgo(0), mockExtractions('joy')),
+  mockCardData('card-02', daysAgo(1), mockExtractions('surprise', 'trust'), {
     keywords: [
       { keyword: '놀람', emotionType: 'surprise', percentage: 65 },
       { keyword: '신뢰', emotionType: 'trust', percentage: 35 },
     ],
   }),
-  mockCardData('card-03', new Date(2026, 1, 5), mockExtractions('joy', 'anticipation'), {
+  mockCardData('card-03', daysAgo(2), mockExtractions('joy', 'anticipation'), {
     keywords: [
       { keyword: '기쁨', emotionType: 'joy', percentage: 65 },
       { keyword: '기대', emotionType: 'anticipation', percentage: 35 },
     ],
   }),
-  mockCardData('card-04', new Date(2026, 1, 4), mockExtractions('trust', 'anger', 'fear'), {
+  mockCardData('card-04', daysAgo(3), mockExtractions('trust', 'anger', 'fear'), {
     keywords: [
       { keyword: '신뢰', emotionType: 'trust', percentage: 60 },
       { keyword: '분노', emotionType: 'anger', percentage: 25 },
       { keyword: '두려움', emotionType: 'fear', percentage: 15 },
     ],
   }),
-  mockCardData('card-05', new Date(2026, 1, 3), mockExtractions('surprise'), {
+  mockCardData('card-05', daysAgo(4), mockExtractions('surprise'), {
     keywords: [{ keyword: '놀람', emotionType: 'surprise', percentage: 100 }],
   }),
-  mockCardData('card-06', new Date(2026, 1, 2), mockExtractions('sadness', 'fear'), {
+  mockCardData('card-06', daysAgo(5), mockExtractions('sadness', 'fear'), {
     keywords: [
       { keyword: '슬픔', emotionType: 'sadness', percentage: 65 },
       { keyword: '두려움', emotionType: 'fear', percentage: 35 },
     ],
   }),
-  mockCardData('card-07', new Date(2026, 1, 1), mockExtractions('anger', 'disgust'), {
+  mockCardData('card-07', daysAgo(6), mockExtractions('anger', 'disgust'), {
     keywords: [
       { keyword: '분노', emotionType: 'anger', percentage: 65 },
       { keyword: '혐오', emotionType: 'disgust', percentage: 35 },

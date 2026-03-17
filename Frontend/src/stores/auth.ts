@@ -7,6 +7,7 @@ interface User {
   email: string;
   name: string;
   profileImage?: string;
+  creditBalance?: number;
 }
 
 interface AuthState {

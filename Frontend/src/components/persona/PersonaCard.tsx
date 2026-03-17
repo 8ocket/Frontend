@@ -16,7 +16,7 @@ interface PersonaCardProps {
 export function PersonaCard({ persona, onUnlock, className }: PersonaCardProps) {
   return (
     <div
-      className={cn('flex w-55 flex-col gap-6 items-center', className)}
+      className={cn('flex w-full flex-col gap-6 items-center', className)}
     >
       {/* 상단: 이미지 + 이름/뱃지 + 설명 + 크레딧 */}
       <div className="flex flex-col gap-4 items-start w-full">

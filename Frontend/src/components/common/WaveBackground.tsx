@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback, ReactNode } from 'react';
+import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -44,7 +44,7 @@ interface WaveBackgroundProps {
 
 const COLOR: ColorPalette = {
   light: { r: 75, g: 161, b: 240 }, // #4BA1F0
-  dark: { r: 59, g: 82, b: 111 },   // #3B526F — prime-700, dark mode mouse effect
+  dark: { r: 59, g: 82, b: 111 }, // #3B526F — prime-700, dark mode mouse effect
   arc: { r: 130, g: 201, b: 255 }, // CTA 컬러 (라이트)
 };
 
@@ -217,7 +217,7 @@ export default function WaveBackground({ initialDark = false, children }: WaveBa
         style={{ position: 'fixed', inset: 0, width: '100%', height: '100%' }}
       />
 
-      {/* 다크모드 토글 버튼 — Figma: top 40px, right 40px, h 44px, radius 8px */}
+      {/* 토글 버튼 — Figma: top 40px, right 40px, h 44px, radius 8px
       <button
         onClick={toggleDark}
         style={{
@@ -249,7 +249,7 @@ export default function WaveBackground({ initialDark = false, children }: WaveBa
         >
           {isDark ? '라이트 모드 선택' : '다크 모드 선택'}
         </span>
-      </button>
+      </button> */}
 
       {/* children은 캔버스 위에 렌더링 */}
       <div style={{ position: 'relative', zIndex: 1 }}>{children}</div>

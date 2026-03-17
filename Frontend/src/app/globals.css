@@ -295,6 +295,15 @@
   }
 }
 
+/* ── Swiper pagination — 홈 배너 (home-banner) ──────────────────────────── */
+.home-banner .swiper-pagination-bullet {
+  background: rgba(130, 201, 255, 0.5);
+  opacity: 1;
+}
+.home-banner .swiper-pagination-bullet-active {
+  background: #82c9ff;
+}
+
 @layer components {
   /* Layout */
   .layout-container {

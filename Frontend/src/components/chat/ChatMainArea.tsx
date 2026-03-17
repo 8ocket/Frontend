@@ -66,7 +66,7 @@ export function ChatMainArea({ onEndChat, onCreditShortage, onUnfinishedSession 
     >
       {/* Background logo — Figma 1382:2757, left=156px top=2px within chat frame, opacity 0.1 */}
       <div
-        className="pointer-events-none absolute"
+        className="pointer-events-none absolute hidden lg:block"
         style={{ left: '156px', top: '2px', opacity: 0.1 }}
         aria-hidden="true"
       >
