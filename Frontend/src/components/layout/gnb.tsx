@@ -78,7 +78,7 @@ export function GNB() {
   };
 
   return (
-    <header className="bg-secondary-100 dark:bg-prime-900 dark:border-prime-800 w-full border-b border-neutral-200">
+    <header className="bg-white dark:bg-prime-900 w-full">
       <nav className="layout-container flex h-16 items-center justify-between px-4 md:h-20 md:px-6">
         {/* 로고 영역 — Figma: LogoSmall(80×80) + 텍스트(cta-300, 32px) */}
         <Link href="/" className="flex shrink-0 items-center gap-2 md:w-60">
@@ -165,7 +165,7 @@ export function GNB() {
 
       {/* 모바일 메뉴 오버레이 */}
       {mobileMenuOpen && (
-        <div className="bg-secondary-100 dark:bg-prime-900 fixed inset-0 top-16 z-50 flex flex-col overflow-y-auto lg:hidden">
+        <div className="bg-white dark:bg-prime-900 fixed inset-0 top-16 z-50 flex flex-col overflow-y-auto lg:hidden">
           <div className="flex flex-col gap-1 px-4 py-4">
             {(isAuthenticated ? MEMBER_NAV_ITEMS : GUEST_NAV_ITEMS).map(({ label, href }) => (
               <MobileNavItem key={href} label={label} href={href} active={pathname === href} />
@@ -256,7 +256,7 @@ function ProfileDropdown({
   const [voiceChat, setVoiceChat] = useState(true);
 
   return (
-    <div className="bg-secondary-100 dark:bg-prime-900 absolute top-full right-0 z-50 mt-1 w-[217px] overflow-hidden rounded-[4px] shadow-lg">
+    <div className="bg-white dark:bg-prime-900 absolute top-full right-0 z-50 mt-1 w-[217px] overflow-hidden rounded-[4px] shadow-lg">
       {/* 인사말 — Figma: greeting, glass blue-10 bg */}
       <div className="flex items-center gap-2 bg-[rgba(130,201,255,0.1)] px-2 py-2">
         <User size={24} className="text-tertiary-500 dark:text-tertiary-300 shrink-0" />
