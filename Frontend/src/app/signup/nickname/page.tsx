@@ -40,6 +40,7 @@ export default function NicknamePage() {
   };
 
   const handleSuccessModalClick = () => {
+    useAuthStore.getState().addCredit(150);
     router.push('/');
   };
 
