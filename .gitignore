@@ -1,0 +1,6 @@
+# 모노레포 내 타 파트 폴더 (Frontend 레포에서 제외)
+AI/
+Backend/
+
+# env
+.env.local
