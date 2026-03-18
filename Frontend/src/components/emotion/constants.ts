@@ -93,9 +93,9 @@ export const EMOTION_META: Record<EmotionType, EmotionMeta> = {
  * | background| 10%     | 60px | 보조감정 (배경)    |
  */
 export const BRUSH_LAYER_CONFIG: Record<BrushRole, { opacity: number; blur: number }> = {
-  primary: { opacity: 0.6, blur: 20 },
-  secondary: { opacity: 0.3, blur: 40 },
-  background: { opacity: 0.1, blur: 60 },
+  primary: { opacity: 0.6, blur: 10 },
+  secondary: { opacity: 0.3, blur: 20 },
+  background: { opacity: 0.1, blur: 30 },
 } as const;
 
 // ─── 카드 크기 (Figma 기준) ───

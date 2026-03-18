@@ -35,7 +35,7 @@ export function EmotionCardFront({
   const brushSizeMap: Record<string, number> = {
     primary: width,
     secondary: Math.round(width * 0.86),
-    background: Math.round(width * 0.71),
+    background: Math.round(width * 0.75),
   };
 
   // 레이어를 역순으로 (background → secondary → primary) 렌더링
