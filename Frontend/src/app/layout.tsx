@@ -3,8 +3,6 @@ import { Cormorant_Garamond } from 'next/font/google';
 import localFont from 'next/font/local';
 import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
-import { GNB } from '@/components/layout/gnb';
-import { Footer } from '@/components/layout/footer';
 import './globals.css';
 
 const pretendard = localFont({
@@ -38,9 +36,7 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <QueryProvider>
-            <GNB />
-            <main className="pt-16 md:pt-20">{children}</main>
-            <Footer />
+            {children}
           </QueryProvider>
         </ThemeProvider>
       </body>

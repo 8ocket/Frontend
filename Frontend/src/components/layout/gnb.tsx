@@ -30,8 +30,6 @@ const GUEST_NAV_ITEMS = [
   { label: '고객 지원', href: '/support' },
 ] as const;
 
-const NO_GNB_PATHS = ['/login', '/signup', '/signup/nickname', '/auth/callback'];
-
 export function GNB() {
   const pathname = usePathname();
   const router = useRouter();
@@ -70,7 +68,6 @@ export function GNB() {
     };
   }, [mobileMenuOpen]);
 
-  if (NO_GNB_PATHS.includes(pathname)) return null;
 
   const handleLogout = () => {
     logout();
@@ -103,11 +100,14 @@ export function GNB() {
               {/* 크레딧 버튼 — Figma 1738:4579: CreditButton */}
               <Link
                 href="/shop"
-                className="flex h-11 items-center gap-1.5 rounded-full px-3 text-base font-medium transition-colors hover:bg-neutral-200"
+                className="flex h-11 flex-col items-center justify-center gap-0.5 rounded-full px-3 text-base font-medium transition-colors hover:bg-neutral-200"
               >
-                <span className="text-cta-300 font-semibold">{user?.creditBalance ?? 0}</span>
-                <span className="text-prime-700">크레딧</span>
-                <Info size={16} className="text-prime-400" />
+                <span className="flex items-center gap-1.5">
+                  <span className="text-cta-300 font-semibold">{user?.creditBalance ?? 0}</span>
+                  <span className="text-prime-700">크레딧</span>
+                  <Info size={16} className="text-prime-400" />
+                </span>
+                <span className="block h-0.75 w-0 rounded-full" />
               </Link>
 
               {/* 유저 이름 버튼 — Figma 1738:4383: UserButton */}
