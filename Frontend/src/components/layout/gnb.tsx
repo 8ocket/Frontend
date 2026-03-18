@@ -38,6 +38,7 @@ export function GNB() {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [prevPathname, setPrevPathname] = useState(pathname);
+  const [scrolled, setScrolled] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // 경로 변경 시 모바일 메뉴 닫기 (render 중 state 리셋 패턴)
@@ -54,6 +55,12 @@ export function GNB() {
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 0);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // 모바일 메뉴 열림 시 스크롤 방지
@@ -77,7 +84,8 @@ export function GNB() {
   return (
     <header
       className={cn(
-        'fixed left-0 right-0 top-0 z-50 w-full border-b border-transparent bg-transparent'
+        'fixed left-0 right-0 top-0 z-50 w-full border-b transition-colors duration-200',
+        scrolled ? 'border-neutral-200 bg-white/90 backdrop-blur-md' : 'border-transparent bg-transparent'
       )}
     >
       <nav className="layout-container flex h-16 items-center justify-between px-4 md:h-20 md:px-6">
