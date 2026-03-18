@@ -184,7 +184,6 @@
   --gnb-height: 4rem; /* 64px mobile */
 
   --radius: 0.625rem;
-  --font-pretendard: 'Pretendard', system-ui, -apple-system, sans-serif;
   --font-cormorant-garamond: 'Cormorant Garamond', Georgia, serif;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

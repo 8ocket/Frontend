@@ -1,14 +1,17 @@
 import type { Metadata } from 'next';
-import { Geist_Mono, Cormorant_Garamond } from 'next/font/google';
+import { Cormorant_Garamond } from 'next/font/google';
+import localFont from 'next/font/local';
 import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { GNB } from '@/components/layout/gnb';
 import { Footer } from '@/components/layout/footer';
 import './globals.css';
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
+const pretendard = localFont({
+  src: './fonts/PretendardVariable.woff2',
+  variable: '--font-pretendard',
+  display: 'swap',
+  weight: '45 920',
 });
 
 const cormorantGaramond = Cormorant_Garamond({
@@ -16,10 +19,6 @@ const cormorantGaramond = Cormorant_Garamond({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600', '700'],
 });
-
-// Pretendard 폰트 (system-ui fallback 사용)
-const fontFamily =
-  "'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
 
 export const metadata: Metadata = {
   title: 'MindLog',
@@ -33,16 +32,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css"
-        />
-      </head>
       <body
-        className={`${geistMono.variable} ${cormorantGaramond.variable} antialiased`}
-        style={{ fontFamily }}
+        className={`${pretendard.variable} ${cormorantGaramond.variable} antialiased`}
+        style={{ fontFamily: 'var(--font-pretendard)' }}
       >
         <ThemeProvider>
           <QueryProvider>
