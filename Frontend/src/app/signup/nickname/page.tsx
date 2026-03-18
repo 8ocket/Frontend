@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import WaveBackground from '@/components/common/WaveBackground';
@@ -24,6 +24,17 @@ export default function NicknamePage() {
   const [gender, setGender] = useState<Gender>('남성');
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleProfileClick = () => fileInputRef.current?.click();
+
+  const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setProfileImage(url);
+  };
 
   const handleNext = async () => {
     if (!nickname.trim()) return;
@@ -74,11 +85,26 @@ export default function NicknamePage() {
           <div className="mt-4 flex flex-col gap-4">
             {/* 프로필 영역 — Figma: 60×60 circle + helper text */}
             <div className="flex items-start gap-4">
-              <div className="border-cta-300 bg-secondary-100 dark:bg-prime-700 relative flex size-15 shrink-0 items-center justify-center overflow-hidden rounded-full border-2">
-                <div className="relative h-8 w-8">
-                  <Image src={imgVector} alt="profile" fill className="object-contain" />
-                </div>
-              </div>
+              <button
+                type="button"
+                onClick={handleProfileClick}
+                className="border-cta-300 bg-secondary-100 dark:bg-prime-700 relative flex size-15 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2"
+              >
+                {profileImage ? (
+                  <Image src={profileImage} alt="profile" fill className="object-cover" />
+                ) : (
+                  <div className="relative h-8 w-8">
+                    <Image src={imgVector} alt="profile" fill className="object-contain" />
+                  </div>
+                )}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleProfileChange}
+              />
               <p className="text-prime-500 dark:text-prime-400 flex-1 pt-2.25 text-xs leading-[1.2] font-normal tracking-[-0.18px]">
                 프로필을 바꾸고 싶으시다면 아이콘을 눌러 사진을 추가하세요. 설정하지 않으시면 기본
                 프로필로 접속합니다.
