@@ -66,7 +66,7 @@ export default function NicknamePage() {
               onClick={() => router.back()}
               className="bg-cta-300 flex h-6 w-6 items-center justify-center overflow-hidden rounded-full"
             >
-              <Image src="/images/icons/back-arrow.svg" alt="뒤로가기" width={24} height={24} />
+              <Image src="/images/icons/Back.png" alt="뒤로가기" width={24} height={24} />
             </button>
           </div>
 
