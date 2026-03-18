@@ -77,22 +77,17 @@ export function GNB() {
     router.push('/login');
   };
 
-  const isAbout = pathname === '/about';
-
   return (
     <header
       className={cn(
-        'fixed left-0 right-0 top-0 z-50 w-full border-b',
-        isAbout
-          ? 'border-transparent bg-transparent'
-          : 'bg-secondary-100 dark:bg-prime-900 dark:border-prime-800 border-neutral-200'
+        'fixed left-0 right-0 top-0 z-50 w-full border-b border-transparent bg-transparent'
       )}
     >
       <nav className="layout-container flex h-16 items-center justify-between px-4 md:h-20 md:px-6">
         {/* 로고 영역 — Figma: LogoSmall(80×80) + 텍스트(cta-300, 32px) */}
-        <Link href="/" className="flex shrink-0 items-center gap-2 md:w-60">
-          <LogoSmall className="h-10 w-10 md:h-20 md:w-20" />
-          <span className="text-cta-300 text-xl leading-[1.3] font-semibold tracking-[-0.48px] md:text-[32px]">
+        <Link href="/" className="flex shrink-0 items-center gap-2 lg:w-60">
+          <LogoSmall className="h-10 w-10 lg:h-20 lg:w-20" />
+          <span className="text-cta-300 whitespace-nowrap text-xl leading-[1.3] font-semibold tracking-[-0.48px] lg:text-[32px]">
             마인드 로그
           </span>
         </Link>
