@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import WaveBackground from '@/shared/ui/WaveBackground';
 import { Button, Input, RadioGroup, SectionHeader } from '@/shared/ui';
-import { SignupCreditModal } from '@/components/signup/SignupCreditModal';
+import { SignupCreditModal } from '@/features/auth';
 import { useAuthStore } from '@/entities/user/store';
 import { getCookie } from '@/shared/lib/utils/cookie';
 import { generatePositiveNickname } from '@/shared/lib/utils/nickname';
