@@ -7,7 +7,6 @@ import { useEffect, useRef, useState } from 'react';
 
 import { EmotionCardFront, getEmotionDisplayName } from '@/widgets/emotion-card';
 import { cn } from '@/shared/lib/utils';
-import { getCookie } from '@/shared/lib/utils/cookie';
 import { MOCK_COLLECTION_CARDS } from '@/mocks/emotion';
 import { useAuthStore } from '@/entities/user/store';
 
@@ -51,12 +50,6 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const token = getCookie('accessToken');
-    if (!token) {
-      setLoading(false);
-      router.push('/login');
-      return;
-    }
     setLoading(false);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

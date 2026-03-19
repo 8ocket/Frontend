@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/entities/user/store';
+import { useChatModals } from '@/features/select-persona';
 import type { ChatBubbleProps } from '@/widgets/chat-main-area';
 import type { ChatSessionGroup } from '@/widgets/chat-sidebar';
 
@@ -275,7 +276,7 @@ const MOCK_PERSONAS: PersonaCardData[] = [
 
 export default function ChatPage() {
   const router = useRouter();
-  const [activeModal, setActiveModal] = useState<ChatModalType>(null);
+  const { activeModal, openModal, closeModal } = useChatModals();
   const remainingCredits = useAuthStore((s) => s.user?.creditBalance ?? 0);
   const useCredit = useAuthStore((s) => s.useCredit);
 
@@ -285,9 +286,6 @@ export default function ChatPage() {
   const [activeSessionId, setActiveSessionId] = useState<string>('1');
 
   const activeMessages = MOCK_SESSIONS.find((s) => s.id === activeSessionId)?.messages ?? [];
-
-  const openModal = (type: ChatModalType) => setActiveModal(type);
-  const closeModal = () => setActiveModal(null);
 
   const handleNewCounsel = () => {
     setSidebarOpen(false);
