@@ -1,4 +1,4 @@
-// import type { SSEEventType } from '@/types/session'; // TODO: 백엔드 연동 시 주석 해제
+// import type { SSEEventType } from '@/entities/session'; // TODO: 백엔드 연동 시 주석 해제
 
 export const sendMessageStream = async (
   sessionId: string,

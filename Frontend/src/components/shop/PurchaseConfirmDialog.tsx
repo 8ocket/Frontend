@@ -7,7 +7,7 @@ import { Dialog } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
 import { StatusModal } from '@/shared/ui/status-modal';
 import type { CreditProduct } from '@/types/credit';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/entities/user/store';
 
 // ── 구매 확인 다이얼로그 ────────────────────────────────────────
 // Figma Shop MODAL 01 ~ 04, MODAL 16 구현

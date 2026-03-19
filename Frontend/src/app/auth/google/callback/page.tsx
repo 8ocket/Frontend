@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/entities/user/store';
 import { googleLoginApi } from '@/shared/api';
 
 function GoogleCallbackContent() {

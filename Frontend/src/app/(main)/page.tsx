@@ -9,7 +9,7 @@ import { EmotionCardFront, getEmotionDisplayName } from '@/components/emotion';
 import { cn } from '@/shared/lib/utils';
 import { getCookie } from '@/shared/lib/utils/cookie';
 import { MOCK_COLLECTION_CARDS } from '@/mocks/emotion';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/entities/user/store';
 
 // ── Figma: 대시보드(홈) — 1675:3805 ─────────────────────────────────────────
 

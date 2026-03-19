@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/entities/user/store';
 import { UserProfileModal } from '@/components/common';
 
 export default function MyPage() {

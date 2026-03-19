@@ -6,7 +6,7 @@ import Image from 'next/image';
 import WaveBackground from '@/components/common/WaveBackground';
 import { Button, Input, RadioGroup, SectionHeader } from '@/shared/ui';
 import { SignupCreditModal } from '@/components/signup/SignupCreditModal';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/entities/user/store';
 import { getCookie } from '@/shared/lib/utils/cookie';
 import { generatePositiveNickname } from '@/shared/lib/utils/nickname';
 

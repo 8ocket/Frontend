@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X, User, Bell, Mic, Globe, HelpCircle, LogOut, Info } from 'lucide-react';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/entities/user/store';
 import { cn } from '@/shared/lib/utils';
 import { LogoSmall } from '../login';
 import { UserProfileModal } from '../common/UserProfileModal';

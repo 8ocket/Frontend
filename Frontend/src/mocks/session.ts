@@ -1,4 +1,4 @@
-import { SessionListQuery, SessionListResponse } from '@/types/session';
+import { SessionListQuery, SessionListResponse } from '@/entities/session';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

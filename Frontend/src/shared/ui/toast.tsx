@@ -43,7 +43,7 @@ const AUTO_DISMISS_MS = 3000;
 
 function ToastCard({ item, onRemove }: { item: ToastItem; onRemove: (id: string) => void }) {
   const [visible, setVisible] = useState(true);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     timerRef.current = setTimeout(() => setVisible(false), AUTO_DISMISS_MS);

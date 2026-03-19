@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import WaveBackground from '@/components/common/WaveBackground';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/entities/user/store';
 import { socialLoginApi } from '@/shared/api';
 import { LoginContent, type LoginProvider } from '@/components/login';
 import { getErrorMessage } from '@/shared/lib/utils/error';

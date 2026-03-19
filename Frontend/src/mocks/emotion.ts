@@ -6,7 +6,7 @@
  */
 
 import { buildEmotionLayers } from '@/components/emotion/constants';
-import type { EmotionCardData, EmotionExtractions, EmotionType } from '@/types/emotion';
+import type { EmotionCardData, EmotionExtractions, EmotionType } from '@/entities/emotion';
 
 // ─── Extractions 팩토리 ───
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/entities/user/store';
 import { getCookie } from '@/shared/lib/utils/cookie';
 
 export function AuthInitializer() {

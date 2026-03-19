@@ -4,8 +4,8 @@
 // 페르소나 mock
 export * from './persona';
 
-import { User, AuthResponse } from '@/types/auth';
-import { RefreshTokenResponse, KakaoLoginResponse, GoogleLoginResponse } from '@/types/login';
+import { User, AuthResponse } from '@/entities/user';
+import { RefreshTokenResponse, KakaoLoginResponse, GoogleLoginResponse } from '@/entities/user/model';
 
 // 감정카드 mock
 export * from './emotion';

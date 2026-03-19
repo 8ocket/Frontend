@@ -5,7 +5,7 @@ import { cn } from '@/shared/lib/utils';
 import {
   EmotionCard,
 } from '@/components/emotion';
-import type { EmotionCardData } from '@/types/emotion';
+import type { EmotionCardData } from '@/entities/emotion';
 import { MOCK_COLLECTION_CARDS } from '@/mocks/emotion';
 
 /** 날짜를 Figma 형식으로 포맷 (YYYY.MM.DD) */

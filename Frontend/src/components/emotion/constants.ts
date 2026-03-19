@@ -4,7 +4,7 @@ import type {
   BrushRole,
   EmotionLayer,
   EmotionExtractions,
-} from '@/types/emotion';
+} from '@/entities/emotion';
 
 
 // hex 색상: Figma CARD BRUSH 컴포넌트 실제 fill 값 기준

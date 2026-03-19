@@ -11,7 +11,7 @@
 //   → EmotionCard size="sample" (350×600px 프리셋)
 
 import { EmotionCardBack } from '@/components/emotion/EmotionCardBack';
-import type { EmotionCardData } from '@/types/emotion';
+import type { EmotionCardData } from '@/entities/emotion';
 
 // Figma 2515:11383 "Card sample" — 350×600px
 const CARD_DATA: EmotionCardData = {

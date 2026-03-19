@@ -1,4 +1,4 @@
-import type { EmotionCardData, EmotionLayer, EmotionType } from '@/types/emotion';
+import type { EmotionCardData, EmotionLayer, EmotionType } from '@/entities/emotion';
 
 // ─── EmotionCard 컴포넌트 Props ───
 

@@ -11,7 +11,7 @@ import {
   buildEmotionLayers,
   getEmotionDisplayName,
 } from '@/components/emotion/constants';
-import type { EmotionType, EmotionExtractions, EmotionCardData } from '@/types/emotion';
+import type { EmotionType, EmotionExtractions, EmotionCardData } from '@/entities/emotion';
 import {
   mockSingleExtraction,
   MOCK_DUAL_EXTRACTIONS,

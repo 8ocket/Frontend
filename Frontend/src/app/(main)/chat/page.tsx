@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/entities/user/store';
 import type { ChatBubbleProps } from '@/components/chat/ChatBubble';
 import type { ChatSessionGroup } from '@/components/chat/ChatSessionList';
 
