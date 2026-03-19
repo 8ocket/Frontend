@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import WaveBackground from '@/components/common/WaveBackground';
+import WaveBackground from '@/shared/ui/WaveBackground';
 import { Button, Input, RadioGroup, SectionHeader } from '@/shared/ui';
 import { SignupCreditModal } from '@/components/signup/SignupCreditModal';
 import { useAuthStore } from '@/entities/user/store';

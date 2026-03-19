@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import WaveBackground from '@/components/common/WaveBackground';
+import WaveBackground from '@/shared/ui/WaveBackground';
 import { Button, CheckboxItem, TermsDetailPanel } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
 

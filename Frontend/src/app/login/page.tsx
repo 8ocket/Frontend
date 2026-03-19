@@ -1,6 +1,6 @@
 'use client';
 
-import WaveBackground from '@/components/common/WaveBackground';
+import WaveBackground from '@/shared/ui/WaveBackground';
 import { LoginContent, useAuth } from '@/features/auth';
 
 export default function LoginPage() {

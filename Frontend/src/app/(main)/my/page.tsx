@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAuthStore } from '@/entities/user/store';
-import { UserProfileModal } from '@/components/common';
+import { UserProfileModal } from '@/shared/ui/UserProfileModal';
 
 export default function MyPage() {
   const { user } = useAuthStore();

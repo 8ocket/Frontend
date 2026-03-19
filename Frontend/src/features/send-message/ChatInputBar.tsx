@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 
-import { MicIcon } from '@/components/icons/MicIcon';
-import { SendIcon } from '@/components/icons/SendIcon';
+import { MicIcon } from '@/shared/ui/MicIcon';
+import { SendIcon } from '@/shared/ui/SendIcon';
 import { Input } from '@/shared/ui/input';
 
 // Figma 1512:3708 — 채팅 (full chatbar)

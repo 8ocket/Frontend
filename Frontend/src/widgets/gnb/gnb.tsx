@@ -7,7 +7,7 @@ import { Menu, X, User, Bell, Mic, Globe, HelpCircle, LogOut, Info } from 'lucid
 import { useAuthStore } from '@/entities/user/store';
 import { cn } from '@/shared/lib/utils';
 import { LogoSmall } from '@/features/auth';
-import { UserProfileModal } from '@/components/common/UserProfileModal';
+import { UserProfileModal } from '@/shared/ui/UserProfileModal';
 import { Switch } from '@/shared/ui';
 
 // Figma: GNB (1738:4600)
