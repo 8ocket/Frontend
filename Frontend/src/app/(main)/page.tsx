@@ -5,7 +5,7 @@ import { ko } from 'date-fns/locale';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
-import { EmotionCardFront, getEmotionDisplayName } from '@/components/emotion';
+import { EmotionCardFront, getEmotionDisplayName } from '@/widgets/emotion-card';
 import { cn } from '@/shared/lib/utils';
 import { getCookie } from '@/shared/lib/utils/cookie';
 import { MOCK_COLLECTION_CARDS } from '@/mocks/emotion';

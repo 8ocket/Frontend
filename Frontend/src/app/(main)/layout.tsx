@@ -1,5 +1,5 @@
-import { GNB } from '@/components/layout/gnb';
-import { Footer } from '@/components/layout/footer';
+import { GNB } from '@/widgets/gnb';
+import { Footer } from '@/widgets/gnb';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (

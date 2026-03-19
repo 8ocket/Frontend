@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { cn } from '@/shared/lib/utils';
 import {
   EmotionCard,
-} from '@/components/emotion';
+} from '@/widgets/emotion-card';
 import type { EmotionCardData } from '@/entities/emotion';
 import { MOCK_COLLECTION_CARDS } from '@/mocks/emotion';
 

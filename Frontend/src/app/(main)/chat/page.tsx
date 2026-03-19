@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/entities/user/store';
-import type { ChatBubbleProps } from '@/components/chat/ChatBubble';
-import type { ChatSessionGroup } from '@/components/chat/ChatSessionList';
+import type { ChatBubbleProps } from '@/widgets/chat-main-area';
+import type { ChatSessionGroup } from '@/widgets/chat-sidebar';
 
 import {
   ChatMainArea,

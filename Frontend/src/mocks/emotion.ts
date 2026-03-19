@@ -5,7 +5,7 @@
  * 백엔드 연동 시 이 파일의 데이터는 API 응답으로 대체됩니다.
  */
 
-import { buildEmotionLayers } from '@/components/emotion/constants';
+import { buildEmotionLayers } from '@/widgets/emotion-card/constants';
 import type { EmotionCardData, EmotionExtractions, EmotionType } from '@/entities/emotion';
 
 // ─── Extractions 팩토리 ───

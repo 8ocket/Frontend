@@ -1,6 +1,6 @@
 'use client';
 
-import { ChatLogo } from './ChatLogo';
+import { ChatLogo } from '@/widgets/chat-main-area';
 
 // Figma 1363:2926 — 첫 화면시
 // 1440×80, fill secondary-100 (#f8fafc)

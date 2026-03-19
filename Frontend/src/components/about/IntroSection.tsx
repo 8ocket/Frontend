@@ -10,7 +10,7 @@
 // YOU Group (2515:11317): 968×303px
 //   8개 user 메시지 버블 — 절대 위치 겹침 레이아웃
 
-import { ChatBubble } from '@/components/chat/ChatBubble';
+import { ChatBubble } from '@/widgets/chat-main-area';
 
 // Figma 확인 텍스트 (2515:11318 ~ 2515:11325 "Input text" 노드)
 const YOU_MESSAGES = [

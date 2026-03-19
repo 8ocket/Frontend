@@ -11,7 +11,7 @@
 //   fills: white visible:false — VECTOR 기반 장식 일러스트레이션
 //   → ChatBubble 컴포넌트로 데모 대화 구현
 
-import { ChatBubble } from '@/components/chat/ChatBubble';
+import { ChatBubble } from '@/widgets/chat-main-area';
 import { ChatInputBar } from '@/features/send-message';
 
 export function ChatDemoSection() {
