@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { MicIcon } from '@/components/icons/MicIcon';
 import { SendIcon } from '@/components/icons/SendIcon';
+import { Input } from '@/components/ui/input';
 
 // Figma 1512:3708 — 채팅 (full chatbar)
 // 1058×52, HORIZONTAL, gap:8, cross:CENTER, fill:secondary-100, radius:16
@@ -129,19 +130,13 @@ export function ChatInputBar({
       {/* Right: Chatting Methods — Figma 1512:3708, 914×52, pad:4, gap:24 */}
       <div className="bg-secondary-100 flex h-13 flex-1 flex-row items-center gap-6 rounded-lg p-1">
         {/* Text Input — 44px, fill #E2E8F0, stroke #F1F5F9, pad:12/16 */}
-        <input
+        <Input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="채팅을 입력하세요"
-          className="text-prime-900 placeholder:text-prime-900 flex h-11 flex-1 rounded-lg border border-[#F1F5F9] bg-[#E2E8F0] px-4 py-3 outline-none"
-          style={{
-            fontFamily: 'var(--font-pretendard)',
-            fontSize: '14px',
-            fontWeight: 400,
-            lineHeight: '160%',
-          }}
+          className="text-prime-900 placeholder:text-prime-900 flex-1 border-[#F1F5F9] bg-[#E2E8F0] text-sm"
         />
 
         {/* Send button — 44×44, fill secondary-100, stroke #CACACA, radius:full
