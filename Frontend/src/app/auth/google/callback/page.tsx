@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth';
-import { googleLoginApi } from '@/lib/api';
+import { googleLoginApi } from '@/shared/api';
 
 function GoogleCallbackContent() {
   const router = useRouter();

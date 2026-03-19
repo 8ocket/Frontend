@@ -4,7 +4,7 @@
 // 350×279, VERTICAL layout, padding 24px all, gap 24
 // bg: secondary-100, border: 2px solid rgba(130,201,255,0.30), radius: 12
 
-import { DialogRoot, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { DialogRoot, DialogContent, DialogTitle, DialogDescription } from '@/shared/ui/dialog';
 
 export interface ChatUnfinishedSessionModalProps {
   /** 모달 열림 여부 */

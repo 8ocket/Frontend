@@ -1,4 +1,4 @@
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
 
 export type ShopTabType = 'credit' | 'persona' | 'event';
 

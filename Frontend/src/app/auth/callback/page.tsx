@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth';
-import { kakaoLoginApi } from '@/lib/api';
+import { kakaoLoginApi } from '@/shared/api';
 
 function CallbackContent() {
   const router = useRouter();

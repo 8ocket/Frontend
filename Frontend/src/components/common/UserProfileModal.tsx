@@ -6,10 +6,10 @@
 import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { X } from 'lucide-react';
-import { DialogRoot, DialogContent, DialogTitle } from '@/components/ui';
-import { Input } from '@/components/ui';
-import { Button } from '@/components/ui';
-import { cn } from '@/lib/utils';
+import { DialogRoot, DialogContent, DialogTitle } from '@/shared/ui';
+import { Input } from '@/shared/ui';
+import { Button } from '@/shared/ui';
+import { cn } from '@/shared/lib/utils';
 
 const MAX_NICKNAME_CHANGES = 3;
 

@@ -3,8 +3,8 @@
 // ──────────────────────────────────────────────────────────────────
 
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { cn } from '@/shared/lib/utils';
+import { Button } from '@/shared/ui/button';
 import type { PersonaProduct } from '@/types/persona';
 
 interface PersonaCardProps {

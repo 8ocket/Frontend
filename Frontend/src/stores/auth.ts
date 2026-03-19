@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { setCookie, deleteCookie } from '@/lib/utils/cookie';
+import { setCookie, deleteCookie } from '@/shared/lib/utils/cookie';
 
 interface User {
   id: number;

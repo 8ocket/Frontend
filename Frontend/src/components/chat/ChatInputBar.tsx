@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { MicIcon } from '@/components/icons/MicIcon';
 import { SendIcon } from '@/components/icons/SendIcon';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/shared/ui/input';
 
 // Figma 1512:3708 — 채팅 (full chatbar)
 // 1058×52, HORIZONTAL, gap:8, cross:CENTER, fill:secondary-100, radius:16

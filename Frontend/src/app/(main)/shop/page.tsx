@@ -6,7 +6,7 @@ import { CreditProductCard } from '@/components/shop/CreditProductCard';
 import { PurchaseConfirmDialog } from '@/components/shop/PurchaseConfirmDialog';
 import { PersonaCard } from '@/components/persona/PersonaCard';
 import { UnlockConfirmDialog } from '@/components/persona/UnlockConfirmDialog';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
 import type { CreditProduct } from '@/types/credit';
 import type { PersonaProduct } from '@/types/persona';
 import { ANIMAL_PERSONAS } from '@/mocks/persona';

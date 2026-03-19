@@ -9,13 +9,13 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ChevronRight, X } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 import {
   DialogRoot,
   DialogContent,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from '@/shared/ui/dialog';
+import { Button } from '@/shared/ui/button';
 
 /* ── 타입 ─────────────────────────────────────────────────────── */
 

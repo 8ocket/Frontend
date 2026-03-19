@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import { EmotionCardFront, getEmotionDisplayName } from '@/components/emotion';
-import { cn } from '@/lib/utils';
-import { getCookie } from '@/lib/utils/cookie';
+import { cn } from '@/shared/lib/utils';
+import { getCookie } from '@/shared/lib/utils/cookie';
 import { MOCK_COLLECTION_CARDS } from '@/mocks/emotion';
 import { useAuthStore } from '@/stores/auth';
 

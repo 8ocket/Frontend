@@ -4,8 +4,8 @@
 // 350×249, VERTICAL layout, padding 24px all, gap 24
 // bg: secondary-100, border: 2px solid rgba(130,201,255,0.30), radius: 12
 
-import { Button } from '@/components/ui/button';
-import { DialogRoot, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/shared/ui/button';
+import { DialogRoot, DialogContent, DialogTitle } from '@/shared/ui/dialog';
 
 type EndModalProps = {
   variant: 'end';

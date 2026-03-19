@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 
-import { Dialog } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { StatusModal } from '@/components/ui/status-modal';
+import { Dialog } from '@/shared/ui/dialog';
+import { Button } from '@/shared/ui/button';
+import { StatusModal } from '@/shared/ui/status-modal';
 import type { CreditProduct } from '@/types/credit';
 import { useAuthStore } from '@/stores/auth';
 

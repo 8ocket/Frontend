@@ -2,14 +2,14 @@
 
 import { useState } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { CheckboxItem } from '@/components/ui/checkbox-item';
+import { Button } from '@/shared/ui/button';
+import { CheckboxItem } from '@/shared/ui/checkbox-item';
 import {
   DialogRoot,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/shared/ui/dialog';
 
 export interface ConditionsProps {
   isOpen?: boolean;

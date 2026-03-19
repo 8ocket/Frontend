@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { StatusModal } from '@/components/ui/status-modal';
+import { StatusModal } from '@/shared/ui/status-modal';
 import { PurchaseConfirmDialog } from '@/components/shop/PurchaseConfirmDialog';
 import type { CreditProduct } from '@/types/credit';
 

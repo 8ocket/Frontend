@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { LoginButton, type LoginProvider } from './LoginButton';
 import { LogoSmall } from './LogoSmall';
 import { loginTexts, oauthConfig } from '@/constants/login';
-import { getErrorMessage } from '@/lib/utils/error';
+import { getErrorMessage } from '@/shared/lib/utils/error';
 
 interface LoginContentProps {
   onLogin?: (provider: LoginProvider | 'temp') => Promise<void>;

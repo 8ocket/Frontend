@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { CheckboxItem } from '@/components/ui/checkbox-item';
+import { Button } from '@/shared/ui/button';
+import { CheckboxItem } from '@/shared/ui/checkbox-item';
 
 import { TermsItem } from './TermsItem';
 

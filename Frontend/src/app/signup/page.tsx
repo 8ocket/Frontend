@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import WaveBackground from '@/components/common/WaveBackground';
-import { Button, CheckboxItem, TermsDetailPanel } from '@/components/ui';
-import { cn } from '@/lib/utils';
+import { Button, CheckboxItem, TermsDetailPanel } from '@/shared/ui';
+import { cn } from '@/shared/lib/utils';
 
 type AgreementKey = 'age14' | 'personalInfo' | 'sensitiveInfo' | 'multimodal' | 'marketing';
 

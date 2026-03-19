@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 import { EMOTION_META } from './constants';
 import { EmotionBrush } from './EmotionBrush';
 import { EmotionCardLabel } from './EmotionCardLabel';

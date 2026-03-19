@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useAuthStore } from '@/stores/auth';
-import { getCookie } from '@/lib/utils/cookie';
+import { getCookie } from '@/shared/lib/utils/cookie';
 
 export function AuthInitializer() {
   useEffect(() => {

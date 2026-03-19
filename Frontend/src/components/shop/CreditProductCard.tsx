@@ -1,7 +1,7 @@
 import Image from 'next/image';
 
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { cn } from '@/shared/lib/utils';
+import { Button } from '@/shared/ui/button';
 import type { CreditProduct } from '@/types/credit';
 
 // ── Figma: 크레딧 상품 카드 (node 1738:3816) ──────────────────

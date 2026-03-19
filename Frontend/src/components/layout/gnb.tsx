@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X, User, Bell, Mic, Globe, HelpCircle, LogOut, Info } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 import { LogoSmall } from '../login';
 import { UserProfileModal } from '../common/UserProfileModal';
-import { Switch } from '@/components/ui';
+import { Switch } from '@/shared/ui';
 
 // Figma: GNB (1738:4600)
 // 1440x80

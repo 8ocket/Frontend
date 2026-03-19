@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckboxItem } from '@/components/ui/checkbox-item';
+import { CheckboxItem } from '@/shared/ui/checkbox-item';
 
 interface TermsItemProps {
   checked: boolean;

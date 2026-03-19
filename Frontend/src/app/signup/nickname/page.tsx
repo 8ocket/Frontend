@@ -4,11 +4,11 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import WaveBackground from '@/components/common/WaveBackground';
-import { Button, Input, RadioGroup, SectionHeader } from '@/components/ui';
+import { Button, Input, RadioGroup, SectionHeader } from '@/shared/ui';
 import { SignupCreditModal } from '@/components/signup/SignupCreditModal';
 import { useAuthStore } from '@/stores/auth';
-import { getCookie } from '@/lib/utils/cookie';
-import { generatePositiveNickname } from '@/lib/utils/nickname';
+import { getCookie } from '@/shared/lib/utils/cookie';
+import { generatePositiveNickname } from '@/shared/lib/utils/nickname';
 
 const imgVector = '/images/icons/profile-default.svg';
 

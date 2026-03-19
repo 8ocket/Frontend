@@ -10,7 +10,7 @@ import {
   ChatPersonaSelectModal,
   type PersonaCardData,
 } from '@/components/chat';
-import { StatusModal } from '@/components/ui/status-modal';
+import { StatusModal } from '@/shared/ui/status-modal';
 
 const MOCK_PERSONAS: PersonaCardData[] = [
   {
