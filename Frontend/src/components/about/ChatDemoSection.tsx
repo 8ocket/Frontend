@@ -12,7 +12,7 @@
 //   → ChatBubble 컴포넌트로 데모 대화 구현
 
 import { ChatBubble } from '@/components/chat/ChatBubble';
-import { ChatInputBar } from '@/components/chat/ChatInputBar';
+import { ChatInputBar } from '@/features/send-message';
 
 export function ChatDemoSection() {
   return (

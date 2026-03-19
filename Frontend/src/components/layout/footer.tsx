@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LogoSmall } from '../login';
+import { LogoSmall } from '@/features/auth';
 
 const NO_FOOTER_PATHS = ['/chat'];
 

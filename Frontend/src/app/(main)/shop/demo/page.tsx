@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import { StatusModal } from '@/shared/ui/status-modal';
-import { PurchaseConfirmDialog } from '@/components/shop/PurchaseConfirmDialog';
+import { PurchaseConfirmDialog } from '@/features/purchase-credit';
 import type { CreditProduct } from '@/types/credit';
 
 // ── 데모용 mock 상품 ────────────────────────────────────────────

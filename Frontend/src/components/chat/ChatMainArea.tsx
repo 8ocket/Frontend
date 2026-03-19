@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 
 import { ChatBubble, ChatBubbleProps } from './ChatBubble';
-import { ChatInputBar } from './ChatInputBar';
+import { ChatInputBar } from '@/features/send-message';
 import { ChatLogo } from './ChatLogo';
 import { type PersonaOption } from './ChatSelectOptions';
 

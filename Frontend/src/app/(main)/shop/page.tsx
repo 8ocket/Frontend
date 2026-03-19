@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CreditProductCard } from '@/components/shop/CreditProductCard';
-import { PurchaseConfirmDialog } from '@/components/shop/PurchaseConfirmDialog';
+import { CreditProductCard } from '@/features/purchase-credit';
+import { PurchaseConfirmDialog } from '@/features/purchase-credit';
 import { PersonaCard } from '@/components/persona/PersonaCard';
 import { UnlockConfirmDialog } from '@/components/persona/UnlockConfirmDialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';

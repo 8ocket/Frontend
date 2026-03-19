@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X, User, Bell, Mic, Globe, HelpCircle, LogOut, Info } from 'lucide-react';
 import { useAuthStore } from '@/entities/user/store';
 import { cn } from '@/shared/lib/utils';
-import { LogoSmall } from '../login';
+import { LogoSmall } from '@/features/auth';
 import { UserProfileModal } from '../common/UserProfileModal';
 import { Switch } from '@/shared/ui';
 
