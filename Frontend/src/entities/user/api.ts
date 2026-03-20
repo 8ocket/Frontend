@@ -1,11 +1,16 @@
+import { format } from 'date-fns';
 import { api } from '@/shared/api/axios';
-import { AuthResponse, ApiResponse, RefreshTokenResponse, KakaoLoginResponse, GoogleLoginResponse } from '@/entities/user/model';
 import {
-  mockLogin,
-  mockRefreshToken,
-  mockKakaoLogin,
-  mockGoogleLogin,
-} from '@/mocks';
+  AuthResponse,
+  ApiResponse,
+  RefreshTokenResponse,
+  KakaoLoginResponse,
+  GoogleLoginResponse,
+  OccupationType,
+  AgeGroup,
+  Gender,
+} from '@/entities/user/model';
+import { mockLogin, mockRefreshToken, mockKakaoLogin, mockGoogleLogin } from '@/mocks';
 
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
 
@@ -127,4 +132,37 @@ export const socialLoginApi = async (
   }
 
   throw new Error(response.data.error?.message || '소셜 로그인 실패');
+};
+
+/**
+ * 회원가입 (온보딩 정보 저장) API
+ * PATCH /v1/users/signup
+ */
+export const signupApi = async (
+  nickname: string,
+  occupation: OccupationType,
+  age: AgeGroup,
+  gender: Gender,
+  profileImage?: File
+): Promise<void> => {
+  if (USE_MOCK) return;
+
+  const formData = new FormData();
+
+  if (profileImage) {
+    formData.append('profile_image', profileImage);
+  } else {
+    const res = await fetch('/images/icons/profile-default.svg');
+    const blob = await res.blob();
+    formData.append('profile_image', blob, 'profile-default.svg');
+  }
+
+  console.log(formData);
+
+  const contentsBlob = new Blob([JSON.stringify({ nickname, occupation, age, gender })], {
+    type: 'application/json',
+  });
+  formData.append('contents', contentsBlob);
+
+  await api.patch('/users/signup', formData);
 };

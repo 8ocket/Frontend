@@ -103,3 +103,25 @@ export interface UserItems {
   is_equipped: boolean | null;
   acquired_at: Date | null;
 }
+
+// ─── 온보딩 ───
+export type OccupationType = 'STUDENT' | 'JOB_SEEKER' | 'EMPLOYEE' | 'CAREER_SWITCHER';
+export type AgeGroup = 20 | 30 | 40;
+export type Gender = 'MALE' | 'FEMALE';
+
+export const OCCUPATION_MAP: Record<string, OccupationType> = {
+  '대학생 / 대학원생': 'STUDENT',
+  '취업 준비생': 'JOB_SEEKER',
+  직장인: 'EMPLOYEE',
+  '이직 준비': 'CAREER_SWITCHER',
+};
+
+export const AGE_MAP: Record<string, AgeGroup> = {
+  '20대': 20,
+  '30대': 30,
+  '40대': 40,
+};
+export const GENDER_MAP: Record<string, Gender> = {
+  남성: 'MALE',
+  여성: 'FEMALE',
+};
