@@ -9,22 +9,21 @@ import { SignupCreditModal } from '@/features/auth';
 import { useAuthStore } from '@/entities/user/store';
 import { getCookie } from '@/shared/lib/utils/cookie';
 import { generatePositiveNickname } from '@/shared/lib/utils/nickname';
+import { signupApi } from '@/shared/api';
+import { OCCUPATION_MAP, AGE_MAP, GENDER_MAP } from '@/entities/user/model';
 
 const imgVector = '/images/icons/profile-default.svg';
-
-type UserType = '대학생 / 대학원생' | '취업 준비생' | '직장인' | '이직 준비';
-type AgeGroup = '20대' | '30대' | '40대';
-type Gender = '남성' | '여성';
 
 export default function NicknamePage() {
   const router = useRouter();
   const [nickname, setNickname] = useState(generatePositiveNickname);
-  const [userType, setUserType] = useState<UserType>('대학생 / 대학원생');
-  const [ageGroup, setAgeGroup] = useState<AgeGroup>('20대');
-  const [gender, setGender] = useState<Gender>('남성');
+  const [userType, setUserType] = useState<keyof typeof OCCUPATION_MAP>('대학생 / 대학원생');
+  const [ageGroup, setAgeGroup] = useState<keyof typeof AGE_MAP>('20대');
+  const [gender, setGender] = useState<keyof typeof GENDER_MAP>('남성');
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profileImage, setProfileImage] = useState<string | null>(null); // 프로필 미리보기 <URL>
+  const [profileFile, setProfileFile] = useState<File | null>(null); // 실제 업로드할 파일 객체
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleProfileClick = () => fileInputRef.current?.click();
@@ -34,17 +33,26 @@ export default function NicknamePage() {
     if (!file) return;
     const url = URL.createObjectURL(file);
     setProfileImage(url);
+    setProfileFile(file);
   };
 
   const handleNext = async () => {
     if (!nickname.trim()) return;
-
     try {
       setIsLoading(true);
+      await signupApi(
+        nickname,
+        OCCUPATION_MAP[userType],
+        AGE_MAP[ageGroup],
+        GENDER_MAP[gender],
+        profileFile ?? undefined
+      );
       const { user, login } = useAuthStore.getState();
       const token = getCookie('accessToken') || '';
       login({ ...(user ?? { id: 0, email: '' }), name: nickname, creditBalance: 0 }, token);
       setShowSuccessModal(true);
+    } catch (error) {
+      console.error('회원가입 실패:', error);
     } finally {
       setIsLoading(false);
     }
@@ -125,14 +133,11 @@ export default function NicknamePage() {
                       placeholder="닉네임을 입력해 주세요"
                       maxLength={20}
                     />
-                    <span className="text-prime-400 dark:text-prime-500 pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs">
+                    <span className="text-prime-400 dark:text-prime-500 pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-xs">
                       {nickname.length}/20
                     </span>
                   </div>
                   <div className="flex gap-6">
-                    <Button onClick={() => {}} variant="primary" size="default" className="flex-1">
-                      닉네임 사용하기
-                    </Button>
                     <Button
                       onClick={generateRandomNickname}
                       variant="secondary"
@@ -149,14 +154,9 @@ export default function NicknamePage() {
               <RadioGroup
                 legend="직업 선택하기"
                 name="userType"
-                options={[
-                  { label: '대학생 / 대학원생', value: '대학생 / 대학원생' },
-                  { label: '취업 준비생', value: '취업 준비생' },
-                  { label: '직장인', value: '직장인' },
-                  { label: '이직 준비', value: '이직 준비' },
-                ]}
+                options={Object.keys(OCCUPATION_MAP).map((label) => ({ label, value: label }))}
                 value={userType}
-                onChange={(value) => setUserType(value as UserType)}
+                onChange={(value) => setUserType(value as keyof typeof OCCUPATION_MAP)}
                 legendGap="gap-2"
                 contentClassName="grid grid-rows-2 grid-flow-col gap-x-[35px] gap-y-2"
               />
@@ -165,13 +165,9 @@ export default function NicknamePage() {
               <RadioGroup
                 legend="나이"
                 name="ageGroup"
-                options={[
-                  { label: '20대', value: '20대' },
-                  { label: '30대', value: '30대' },
-                  { label: '40대', value: '40대' },
-                ]}
+                options={Object.keys(AGE_MAP).map((label) => ({ label, value: label }))}
                 value={ageGroup}
-                onChange={(value) => setAgeGroup(value as AgeGroup)}
+                onChange={(value) => setAgeGroup(value as keyof typeof AGE_MAP)}
                 legendGap="gap-4"
                 contentClassName="flex gap-4"
                 itemClassName="flex-1"
@@ -181,12 +177,9 @@ export default function NicknamePage() {
               <RadioGroup
                 legend="성별"
                 name="gender"
-                options={[
-                  { label: '남성', value: '남성' },
-                  { label: '여성', value: '여성' },
-                ]}
+                options={Object.keys(GENDER_MAP).map((label) => ({ label, value: label }))}
                 value={gender}
-                onChange={(value) => setGender(value as Gender)}
+                onChange={(value) => setGender(value as keyof typeof GENDER_MAP)}
                 legendGap="gap-4"
                 contentClassName="flex gap-4"
               />
@@ -206,10 +199,7 @@ export default function NicknamePage() {
         </div>
 
         {/* 성공 모달 — Figma: 1303:3182 */}
-        <SignupCreditModal
-          isOpen={showSuccessModal}
-          onConfirm={handleSuccessModalClick}
-        />
+        <SignupCreditModal isOpen={showSuccessModal} onConfirm={handleSuccessModalClick} />
       </div>
     </WaveBackground>
   );
