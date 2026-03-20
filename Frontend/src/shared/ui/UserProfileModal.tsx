@@ -52,22 +52,18 @@ export function UserProfileModal({
 
   return (
     <DialogRoot open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent
-        showClose={false}
-        maxWidth="max-w-[340px]"
-        className="p-2"
-      >
+      <DialogContent showClose={false} maxWidth="max-w-[340px]" className="p-2">
         <div className="flex flex-col gap-4">
           {/* 헤더 — 제목 + 닫기 */}
           <div className="flex items-center justify-between">
-            <DialogTitle className="text-prime-900 dark:text-secondary-100 text-2xl font-semibold leading-[1.3] tracking-[-0.36px]">
+            <DialogTitle className="text-prime-900 dark:text-secondary-100 text-2xl leading-[1.3] font-semibold tracking-[-0.36px]">
               User profile
             </DialogTitle>
             <button
               type="button"
               onClick={onClose}
               aria-label="닫기"
-              className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-neutral-200 dark:hover:bg-prime-700"
+              className="dark:hover:bg-prime-700 flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-neutral-200"
             >
               <X size={20} className="text-prime-900 dark:text-secondary-100" />
             </button>
@@ -108,7 +104,7 @@ export function UserProfileModal({
 
           {/* 닉네임 변경 영역 */}
           <div className="flex flex-col gap-2">
-            <p className="text-prime-700 dark:text-prime-300 w-full text-center text-sm font-medium leading-none">
+            <p className="text-prime-700 dark:text-prime-300 w-full text-center text-sm leading-none font-medium">
               닉네임을 바꾸고 싶으시다면 새로 입력해 주세요.
             </p>
             <div className="relative">
@@ -120,17 +116,18 @@ export function UserProfileModal({
                 maxLength={20}
                 disabled={!canChangeNickname}
               />
-              <span className="text-prime-400 dark:text-prime-500 pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs">
+              <span className="text-prime-400 dark:text-prime-500 pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-xs">
                 {nickname.length}/20
               </span>
             </div>
             <p
               className={cn(
                 'w-full text-center text-xs leading-[1.2] tracking-[-0.18px]',
-                canChangeNickname ? 'text-error-500' : 'text-neutral-400 dark:text-tertiary-500'
+                canChangeNickname ? 'text-error-500' : 'dark:text-tertiary-500 text-neutral-400'
               )}
             >
-              닉네임 교체는 매월 {MAX_NICKNAME_CHANGES}회까지 가능합니다 ({nicknameChangesUsed}/{MAX_NICKNAME_CHANGES})
+              닉네임 교체는 매월 {MAX_NICKNAME_CHANGES}회까지 가능합니다 ({nicknameChangesUsed}/
+              {MAX_NICKNAME_CHANGES})
             </p>
           </div>
 
@@ -139,12 +136,7 @@ export function UserProfileModal({
             <p className="text-prime-700 dark:text-prime-300 text-center text-sm leading-[1.6]">
               현재 바뀐 설정으로 저장하시겠습니까?
             </p>
-            <Button
-              onClick={handleSave}
-              variant="primary"
-              size="default"
-              className="w-full"
-            >
+            <Button onClick={handleSave} variant="primary" size="default" className="w-full">
               저장하기
             </Button>
           </div>
