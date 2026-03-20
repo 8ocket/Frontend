@@ -91,8 +91,8 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="min-h-screen-safe relative w-full overflow-y-auto bg-white dark:bg-prime-950">
-      <WaveBackground />
+    <WaveBackground>
+      <main className="min-h-screen-safe relative w-full overflow-y-auto px-0 py-0">
 
       {/* 모바일: 세로 스택, 데스크톱: 좌측 고정 */}
       <div className="relative z-10 flex w-full flex-col gap-12 px-6 py-8 md:absolute md:top-1/2 md:left-[12.5%] md:w-89.5 md:-translate-y-1/2 md:px-0 md:py-0">
@@ -193,6 +193,7 @@ export default function SignupPage() {
           </TermsDetailPanel>
         </div>
       )}
-    </main>
+      </main>
+    </WaveBackground>
   );
 }
