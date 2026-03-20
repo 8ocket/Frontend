@@ -26,7 +26,7 @@ export const refreshTokenApi = async (refreshToken: string): Promise<RefreshToke
   }
 
   const response = await api.get<ApiResponse<RefreshTokenResponse>>('/auth/refresh', {
-    headers: { Authorization: `Bearer ${refreshToken}` },
+    params: { refreshToken },
   });
 
   if (response.data.success && response.data.data) {
