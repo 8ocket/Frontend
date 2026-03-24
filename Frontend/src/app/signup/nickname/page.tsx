@@ -49,7 +49,7 @@ export default function NicknamePage() {
       );
       const { user, login } = useAuthStore.getState();
       const token = getCookie('accessToken') || '';
-      login({ ...(user ?? { id: 0, email: '' }), name: nickname, creditBalance: 0 }, token);
+      login({ ...(user ?? { id: 0, email: '' }), name: nickname, creditBalance: 0, profileImage: profileImage ?? '/images/icons/profile-default.svg' }, token);
       setShowSuccessModal(true);
     } catch (error) {
       console.error('회원가입 실패:', error);
