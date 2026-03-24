@@ -164,5 +164,7 @@ export const signupApi = async (
   });
   formData.append('contents', contentsBlob);
 
-  await api.patch('/users/signup', formData);
+  await api.patch('/users/signup', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
 };
