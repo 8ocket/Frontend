@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, User, Bell, Mic, Globe, HelpCircle, LogOut, Info } from 'lucide-react';
+import { Menu, X, User, Bell, Mic, Globe, HelpCircle, LogOut } from 'lucide-react';
 import { useAuthStore } from '@/entities/user/store';
 import { cn } from '@/shared/lib/utils';
-import { LogoSmall } from '@/features/auth';
 import { UserProfileModal } from '@/shared/ui/UserProfileModal';
 import { Switch } from '@/shared/ui';
 
@@ -38,7 +38,6 @@ export function GNB() {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [prevPathname, setPrevPathname] = useState(pathname);
-  const [scrolled, setScrolled] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // 경로 변경 시 모바일 메뉴 닫기 (render 중 state 리셋 패턴)
@@ -55,12 +54,6 @@ export function GNB() {
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 0);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // 모바일 메뉴 열림 시 스크롤 방지
@@ -82,53 +75,45 @@ export function GNB() {
   };
 
   return (
-    <header
-      className={cn(
-        'fixed left-0 right-0 top-0 z-50 w-full border-b transition-colors duration-200',
-        scrolled ? 'border-neutral-200 bg-white/90 backdrop-blur-md' : 'border-transparent bg-transparent'
-      )}
-    >
-      <nav className="layout-container flex h-16 items-center justify-between px-4 md:h-20 md:px-6">
-        {/* 로고 영역 — Figma: LogoSmall(80×80) + 텍스트(cta-300, 32px) */}
-        <Link href="/" className="flex shrink-0 items-center gap-2 lg:w-60">
-          <LogoSmall className="h-10 w-10 lg:h-20 lg:w-20" />
-          <span className="text-cta-300 whitespace-nowrap text-xl leading-[1.3] font-semibold tracking-[-0.48px] lg:text-[32px]">
+    <header className="fixed left-0 right-0 top-0 z-50 w-full border-b border-white/60 bg-white/80 backdrop-blur-md">
+      <nav className="layout-container flex h-16 items-center justify-between px-10">
+        {/* 로고 — Figma: 32px 원형 + 텍스트 18px */}
+        <Link href="/" className="flex shrink-0 items-center gap-2">
+          <div className="relative size-8 overflow-hidden rounded-full">
+            <Image src="/images/logo/logo-small.svg" alt="MindLog" fill className="object-contain" />
+          </div>
+          <span className="text-prime-900 whitespace-nowrap text-lg font-normal leading-6.75 tracking-[-0.27px]">
             마인드 로그
           </span>
         </Link>
 
-        {/* 데스크톱 메뉴 — Figma: 각 버튼 98×44, rounded-full, gap 16px */}
-        <div className="hidden items-center gap-4 lg:flex">
+        {/* 데스크톱 메뉴 */}
+        <div className="hidden items-center gap-6 lg:flex">
           {(isAuthenticated ? MEMBER_NAV_ITEMS : GUEST_NAV_ITEMS).map(({ label, href }) => (
             <NavItem key={href} label={label} href={href} active={pathname === href} />
           ))}
+        </div>
 
+        {/* 우측 영역 */}
+        <div className="hidden items-center gap-6 lg:flex">
           {isAuthenticated ? (
             <>
-              {/* 크레딧 버튼 — Figma 1738:4579: CreditButton */}
+              {/* 크레딧 */}
               <Link
                 href="/shop"
-                className="flex h-11 flex-col items-center justify-center gap-0.5 rounded-full px-3 text-base font-medium transition-colors hover:bg-neutral-200"
+                className="text-prime-600 text-sm font-medium transition-colors hover:text-prime-900"
               >
-                <span className="flex items-center gap-1.5">
-                  <span className="text-cta-300 font-semibold">{user?.creditBalance ?? 0}</span>
-                  <span className="text-prime-700">크레딧</span>
-                  <Info size={16} className="text-prime-400" />
-                </span>
-                <span className="block h-0.75 w-0 rounded-full" />
+                {user?.creditBalance ?? 0} 크레딧
               </Link>
 
-              {/* 유저 이름 버튼 — Figma 1738:4383: UserButton */}
+              {/* 유저 이름 */}
               <div ref={dropdownRef} className="relative">
                 <button
                   type="button"
                   onClick={() => setProfileDropdownOpen((v) => !v)}
-                  className={cn(
-                    'inline-flex h-11 max-w-24.5 items-center justify-center rounded-full px-3 text-base font-medium transition-all',
-                    'text-cta-300 dark:hover:bg-prime-800 opacity-70 hover:bg-neutral-200 hover:opacity-100'
-                  )}
+                  className="text-prime-900 text-sm font-medium transition-opacity hover:opacity-70"
                 >
-                  <span className="truncate">{user?.name ?? 'MY'}</span>
+                  {user?.name ?? 'MY'}
                 </button>
 
                 {profileDropdownOpen && (
@@ -140,6 +125,15 @@ export function GNB() {
                 )}
               </div>
 
+              {/* 프로필 아이콘 버튼 — Figma: 32px 원형, bg-secondary-100, border-cta-300 */}
+              <button
+                type="button"
+                onClick={() => setProfileModalOpen(true)}
+                className="bg-secondary-100 border-cta-300 flex size-8 items-center justify-center rounded-full border transition-opacity hover:opacity-80"
+              >
+                <User size={18} className="text-prime-500" />
+              </button>
+
               <UserProfileModal
                 isOpen={profileModalOpen}
                 onClose={() => setProfileModalOpen(false)}
@@ -147,13 +141,9 @@ export function GNB() {
               />
             </>
           ) : (
-            /* 로그인 버튼 — Figma 1738:4381: LogInOutButton */
             <Link
               href="/login"
-              className={cn(
-                'inline-flex h-11 w-24.5 items-center justify-center rounded-full text-base font-medium transition-all',
-                'text-prime-700 hover:text-prime-900 dark:text-tertiary-300 dark:hover:bg-prime-800 dark:hover:text-secondary-100 hover:bg-neutral-200'
-              )}
+              className="text-prime-700 text-sm font-medium transition-colors hover:text-prime-900"
             >
               로그인
             </Link>
@@ -217,17 +207,15 @@ function NavItem({ label, href, active }: { label: string; href: string; active:
     <Link
       href={href}
       className={cn(
-        'flex h-11 flex-col items-center justify-center gap-0.5 rounded-full px-3 text-base font-medium transition-all',
-        active
-          ? 'text-prime-900 dark:text-secondary-100'
-          : 'text-prime-700 hover:text-prime-900 dark:text-tertiary-300 dark:hover:bg-prime-800 dark:hover:text-secondary-100 hover:bg-neutral-200'
+        'flex flex-col items-center gap-0.5 text-sm font-medium tracking-[-0.21px] transition-colors',
+        active ? 'text-prime-900' : 'text-prime-900/70 hover:text-prime-900'
       )}
     >
       {label}
       <span
         className={cn(
-          'block h-0.75 rounded-full bg-current transition-all duration-200',
-          active ? 'w-7' : 'w-0'
+          'block h-0.5 rounded-full bg-current transition-all duration-200',
+          active ? 'w-full' : 'w-0'
         )}
       />
     </Link>
