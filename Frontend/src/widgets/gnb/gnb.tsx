@@ -4,16 +4,13 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, User, Bell, Mic, Globe, HelpCircle, LogOut } from 'lucide-react';
+import { Menu, X, User, Settings, LogOut } from 'lucide-react';
 import { useAuthStore } from '@/entities/user/store';
 import { cn } from '@/shared/lib/utils';
 import { UserProfileModal } from '@/shared/ui/UserProfileModal';
-import { Switch } from '@/shared/ui';
 
 // Figma: GNB (1738:4600)
 // 1440x80
-// Light mode: bg secondary-100 (#f8fafc) — 흰색
-// Dark mode:  bg prime-900 (#1a222e)     — 네이비
 
 const MEMBER_NAV_ITEMS = [
   { label: '홈', href: '/' },
@@ -68,21 +65,20 @@ export function GNB() {
     };
   }, [mobileMenuOpen]);
 
-
   const handleLogout = () => {
     logout();
     router.push('/');
   };
 
   return (
-    <header className="fixed left-0 right-0 top-0 z-50 w-full border-b border-white/60 bg-white/80 backdrop-blur-md">
+    <header className="fixed left-0 right-0 top-0 z-50 w-full border-b border-white/60 bg-white/80 backdrop-blur-md text-prime-900">
       <nav className="layout-container flex h-16 items-center justify-between px-10">
         {/* 로고 — Figma: 32px 원형 + 텍스트 18px */}
         <Link href="/" className="flex shrink-0 items-center gap-2">
           <div className="relative size-8 overflow-hidden rounded-full">
             <Image src="/images/logo/logo-small.svg" alt="MindLog" fill className="object-contain" />
           </div>
-          <span className="text-prime-900 whitespace-nowrap text-lg font-normal leading-6.75 tracking-[-0.27px]">
+          <span className="whitespace-nowrap text-lg font-normal leading-6.75 tracking-[-0.27px] text-prime-900">
             마인드 로그
           </span>
         </Link>
@@ -99,40 +95,41 @@ export function GNB() {
           {isAuthenticated ? (
             <>
               {/* 크레딧 */}
-              <Link
-                href="/shop"
-                className="text-prime-600 text-sm font-medium transition-colors hover:text-prime-900"
-              >
+              <Link href="/shop" className="text-sm font-medium text-prime-600 transition-colors hover:text-prime-900">
                 {user?.creditBalance ?? 0} 크레딧
               </Link>
 
-              {/* 유저 이름 */}
+              {/* 프로필 버튼 (아이콘 + 이름) + 드롭다운 */}
               <div ref={dropdownRef} className="relative">
                 <button
                   type="button"
                   onClick={() => setProfileDropdownOpen((v) => !v)}
-                  className="text-prime-900 text-sm font-medium transition-opacity hover:opacity-70"
+                  className="flex items-center gap-2 transition-opacity hover:opacity-70"
                 >
-                  {user?.name ?? 'MY'}
+                  <div className="border-cta-300 relative size-8 shrink-0 overflow-hidden rounded-full border bg-secondary-100">
+                    <Image
+                      src={user?.profileImage ?? '/images/icons/profile-default.svg'}
+                      alt="프로필"
+                      fill
+                      className={user?.profileImage && user.profileImage !== '/images/icons/profile-default.svg' ? 'object-cover' : 'object-contain p-1'}
+                    />
+                  </div>
+                  <span className="text-sm font-medium text-prime-900">
+                    {user?.name ?? 'MY'}
+                  </span>
                 </button>
 
                 {profileDropdownOpen && (
                   <ProfileDropdown
                     userName={user?.name ?? ''}
+                    userEmail={user?.email ?? ''}
+                    userProfileImage={user?.profileImage}
                     onLogout={() => { setProfileDropdownOpen(false); handleLogout(); }}
-                    onProfileSettings={() => { setProfileDropdownOpen(false); setProfileModalOpen(true); }}
+                    onProfile={() => { setProfileDropdownOpen(false); setProfileModalOpen(true); }}
+                    onSettings={() => { setProfileDropdownOpen(false); router.push('/my'); }}
                   />
                 )}
               </div>
-
-              {/* 프로필 아이콘 버튼 — Figma: 32px 원형, bg-secondary-100, border-cta-300 */}
-              <button
-                type="button"
-                onClick={() => setProfileModalOpen(true)}
-                className="bg-secondary-100 border-cta-300 flex size-8 items-center justify-center rounded-full border transition-opacity hover:opacity-80"
-              >
-                <User size={18} className="text-prime-500" />
-              </button>
 
               <UserProfileModal
                 isOpen={profileModalOpen}
@@ -141,10 +138,7 @@ export function GNB() {
               />
             </>
           ) : (
-            <Link
-              href="/login"
-              className="text-prime-700 text-sm font-medium transition-colors hover:text-prime-900"
-            >
+            <Link href="/login" className="text-prime-700 text-sm font-medium transition-colors hover:text-prime-900">
               로그인
             </Link>
           )}
@@ -154,7 +148,7 @@ export function GNB() {
         <button
           type="button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="dark:hover:bg-prime-800 flex h-10 w-10 items-center justify-center rounded-lg transition-colors hover:bg-neutral-200 lg:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-lg transition-colors hover:bg-neutral-200 lg:hidden"
           aria-label={mobileMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -163,7 +157,7 @@ export function GNB() {
 
       {/* 모바일 메뉴 오버레이 */}
       {mobileMenuOpen && (
-        <div className="bg-white dark:bg-prime-900 fixed inset-0 top-16 z-50 flex flex-col overflow-y-auto lg:hidden">
+        <div className="fixed inset-0 top-16 z-50 flex flex-col overflow-y-auto bg-white lg:hidden">
           <div className="flex flex-col gap-1 px-4 py-4">
             {(isAuthenticated ? MEMBER_NAV_ITEMS : GUEST_NAV_ITEMS).map(({ label, href }) => (
               <MobileNavItem key={href} label={label} href={href} active={pathname === href} />
@@ -172,20 +166,17 @@ export function GNB() {
             {isAuthenticated ? (
               <>
                 <MobileNavItem label="마이페이지" href="/my" active={pathname === '/my'} />
-                <div className="dark:border-prime-700 my-2 border-t border-neutral-200" />
+                <div className="my-2 border-t border-neutral-200" />
                 <button
                   onClick={handleLogout}
-                  className={cn(
-                    'w-full rounded-xl px-4 py-3 text-left text-base font-medium transition-all',
-                    'text-error-500 hover:bg-error-100 dark:hover:bg-prime-800'
-                  )}
+                  className="w-full rounded-xl px-4 py-3 text-left text-base font-medium text-error-500 transition-all hover:bg-error-100"
                 >
                   로그아웃
                 </button>
               </>
             ) : (
               <>
-                <div className="dark:border-prime-700 my-2 border-t border-neutral-200" />
+                <div className="my-2 border-t border-neutral-200" />
                 <Link
                   href="/login"
                   className="bg-cta-300 text-secondary-100 rounded-xl px-4 py-3 text-center text-base font-medium transition-all hover:bg-[#4ba1f0] active:bg-[#257cc0]"
@@ -201,7 +192,7 @@ export function GNB() {
   );
 }
 
-// NavItem — Figma: 98×44, rounded-full, active = 하단 3px 언더라인 바
+// NavItem — Figma: 98×44, active = 하단 언더라인 바
 function NavItem({ label, href, active }: { label: string; href: string; active: boolean }) {
   return (
     <Link
@@ -229,8 +220,8 @@ function MobileNavItem({ label, href, active }: { label: string; href: string; a
       className={cn(
         'rounded-xl px-4 py-3 text-base font-medium transition-all',
         active
-          ? 'bg-prime-900 text-secondary-100 dark:bg-prime-700 dark:text-secondary-100'
-          : 'text-prime-700 hover:text-prime-900 dark:text-tertiary-300 dark:hover:bg-prime-800 dark:hover:text-secondary-100 hover:bg-neutral-100'
+          ? 'bg-prime-900 text-secondary-100'
+          : 'text-prime-700 hover:bg-neutral-100 hover:text-prime-900'
       )}
     >
       {label}
@@ -238,86 +229,79 @@ function MobileNavItem({ label, href, active }: { label: string; href: string; a
   );
 }
 
-// ── ProfileDropdown — Figma node 1673:3947 ──────────────────────────────────
+// ── ProfileDropdown — Figma node 18:368 ─────────────────────────────────────
 function ProfileDropdown({
   userName,
+  userEmail,
+  userProfileImage,
   onLogout,
-  onProfileSettings,
+  onProfile,
+  onSettings,
 }: {
   userName: string;
+  userEmail: string;
+  userProfileImage?: string;
   onLogout: () => void;
-  onProfileSettings: () => void;
+  onProfile: () => void;
+  onSettings: () => void;
 }) {
-  const [alarmOff, setAlarmOff] = useState(true);
-  const [voiceChat, setVoiceChat] = useState(true);
+  const isDefaultImage = !userProfileImage || userProfileImage === '/images/icons/profile-default.svg';
 
   return (
-    <div className="bg-white dark:bg-prime-900 absolute top-full right-0 z-50 mt-1 w-[217px] overflow-hidden rounded-[4px] shadow-lg">
-      {/* 인사말 — Figma: greeting, glass blue-10 bg */}
-      <div className="flex items-center gap-2 bg-[rgba(130,201,255,0.1)] px-2 py-2">
-        <User size={24} className="text-tertiary-500 dark:text-tertiary-300 shrink-0" />
-        <p className="button-1 flex flex-col leading-snug">
-          <span className="text-tertiary-500 dark:text-tertiary-300">안녕하세요,</span>
-          <span>
-            <span className="text-cta-300">{userName}</span>
-            <span className="text-tertiary-500 dark:text-tertiary-300">님</span>
+    <div className="absolute top-full right-0 z-50 mt-2 w-[238px] overflow-hidden rounded-2xl border border-white/60 bg-white/80 shadow-[0px_8px_32px_0px_rgba(0,0,0,0.12)] backdrop-blur-md">
+      {/* 헤더: 아바타 + 이름 + 이메일 */}
+      <div className="flex items-center gap-3 border-b border-white/60 px-5 py-4">
+        <div className="relative size-10 shrink-0 overflow-hidden rounded-full border border-cta-300 bg-secondary-100">
+          <Image
+            src={userProfileImage ?? '/images/icons/profile-default.svg'}
+            alt="프로필"
+            fill
+            className={isDefaultImage ? 'object-contain p-1.5' : 'object-cover'}
+          />
+        </div>
+        <div className="flex min-w-0 flex-col">
+          <span className="truncate text-sm font-medium leading-[1.5] tracking-[-0.21px] text-prime-900">
+            {userName}
           </span>
-        </p>
+          <span className="truncate text-xs leading-[1.5] tracking-[-0.18px] text-prime-500">
+            {userEmail}
+          </span>
+        </div>
       </div>
 
-      {/* 메뉴 목록 */}
-      <div className="flex flex-col px-2">
-        {/* 프로필 설정 */}
+      {/* 메뉴 항목 */}
+      <div className="py-2">
+        {/* 내 프로필 */}
         <button
           type="button"
-          onClick={onProfileSettings}
-          className="border-t-tertiary-400/30 dark:border-t-prime-700 dark:hover:bg-prime-800 flex w-full cursor-pointer items-center gap-2 rounded-sm border-t px-1 py-2 transition-colors hover:bg-neutral-100"
+          onClick={onProfile}
+          className="flex w-full items-center gap-4 px-5 py-3 text-sm font-medium tracking-[-0.21px] text-prime-900 transition-colors hover:bg-black/5"
         >
-          <User size={24} className="text-tertiary-500 dark:text-tertiary-300 shrink-0" />
-          <span className="button-1 text-tertiary-500 dark:text-tertiary-300">프로필 설정</span>
+          <User size={18} className="shrink-0 text-prime-500" />
+          내 프로필
         </button>
 
-        {/* 알람 끄기 */}
-        <div className="dark:hover:bg-prime-800 flex cursor-default items-center justify-between rounded-sm px-1 py-2 transition-colors hover:bg-neutral-100">
-          <div className="flex items-center gap-2">
-            <Bell size={24} className="text-tertiary-500 dark:text-tertiary-300 shrink-0" />
-            <span className="button-1 text-tertiary-500 dark:text-tertiary-300">알람 끄기</span>
-          </div>
-          <Switch checked={alarmOff} onCheckedChange={setAlarmOff} />
-        </div>
+        {/* 설정 */}
+        <button
+          type="button"
+          onClick={onSettings}
+          className="flex w-full items-center gap-4 px-5 py-3 text-sm font-medium tracking-[-0.21px] text-prime-900 transition-colors hover:bg-black/5"
+        >
+          <Settings size={18} className="shrink-0 text-prime-500" />
+          설정
+        </button>
 
-        {/* 음성 채팅 */}
-        <div className="dark:hover:bg-prime-800 flex cursor-default items-center justify-between rounded-sm px-1 py-2 transition-colors hover:bg-neutral-100">
-          <div className="flex items-center gap-2">
-            <Mic size={24} className="text-tertiary-500 dark:text-tertiary-300 shrink-0" />
-            <span className="button-1 text-tertiary-500 dark:text-tertiary-300">음성 채팅</span>
-          </div>
-          <Switch checked={voiceChat} onCheckedChange={setVoiceChat} />
-        </div>
-
-        {/* 언어 설정 */}
-        <div className="dark:hover:bg-prime-800 flex cursor-default items-center justify-between rounded-sm px-1 py-2 transition-colors hover:bg-neutral-100">
-          <div className="flex items-center gap-2">
-            <Globe size={24} className="text-tertiary-500 dark:text-tertiary-300 shrink-0" />
-            <span className="button-1 text-tertiary-500 dark:text-tertiary-300">언어 설정</span>
-          </div>
-          <span className="subtitle-2 text-tertiary-500 dark:text-tertiary-300">한국어</span>
-        </div>
-
-        {/* 고객 지원 */}
-        <div className="flex cursor-default items-center gap-2 rounded-sm border-b border-b-tertiary-400/30 px-1 py-2 dark:border-b-prime-700">
-          <HelpCircle size={24} className="shrink-0 text-tertiary-500 dark:text-tertiary-300" />
-          <span className="button-1 text-tertiary-500 dark:text-tertiary-300">고객 지원</span>
-        </div>
+        {/* 구분선 */}
+        <div className="mx-3 my-1 h-px bg-white/60" />
 
         {/* 로그아웃 */}
         <button
           type="button"
           onClick={onLogout}
-          className="dark:hover:bg-prime-800 flex w-full cursor-pointer items-center gap-2 rounded-sm px-1 py-2 transition-colors hover:bg-neutral-100"
+          className="flex w-full items-center gap-4 px-5 py-3 text-sm font-medium tracking-[-0.21px] text-error-500 transition-colors hover:bg-black/5"
         >
-          <LogOut size={24} className="text-tertiary-500 dark:text-tertiary-300 shrink-0" />
-          <span className="button-1 text-tertiary-500 dark:text-tertiary-300">로그아웃</span>
+          <LogOut size={18} className="shrink-0 text-error-500" />
+          로그아웃
         </button>
       </div>
     </div>
