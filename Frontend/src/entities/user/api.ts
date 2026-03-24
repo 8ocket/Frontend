@@ -1,4 +1,3 @@
-import { format } from 'date-fns';
 import { api } from '@/shared/api/axios';
 import {
   AuthResponse,
@@ -156,8 +155,6 @@ export const signupApi = async (
     const blob = await res.blob();
     formData.append('profile_image', blob, 'profile-default.svg');
   }
-
-  console.log(formData);
 
   const contentsBlob = new Blob([JSON.stringify({ nickname, occupation, age, gender })], {
     type: 'application/json',
