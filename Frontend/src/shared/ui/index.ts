@@ -1,4 +1,6 @@
 export { Button, type ButtonVariant, type ButtonSemantic } from './button';
+export { default as AuroraBackground } from './AuroraBackground';
+export { ToggleGroup } from './toggle-group';
 export { Input } from './input';
 export { Card } from './card';
 export { Label } from './label';

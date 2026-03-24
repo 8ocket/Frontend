@@ -4,8 +4,7 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import AuroraBackground from '@/shared/ui/AuroraBackground';
-import { Button, Input } from '@/shared/ui';
-import { cn } from '@/shared/lib/utils';
+import { Button, Input, ToggleGroup } from '@/shared/ui';
 import { SignupCreditModal } from '@/features/auth';
 import { useAuthStore } from '@/entities/user/store';
 import { getCookie } from '@/shared/lib/utils/cookie';
@@ -150,77 +149,29 @@ export default function NicknamePage() {
                 </div>
               </div>
 
-              {/* 직업 선택 — 2×2 토글 버튼 */}
-              <div className="flex flex-col gap-3">
-                <p className="text-prime-900 text-base font-medium leading-6 tracking-[-0.24px]">
-                  직업 선택하기
-                </p>
-                <div className="grid grid-cols-2 gap-4">
-                  {Object.keys(OCCUPATION_MAP).map((label) => (
-                    <button
-                      key={label}
-                      type="button"
-                      onClick={() => setUserType(label as keyof typeof OCCUPATION_MAP)}
-                      className={cn(
-                        'h-14 rounded-xl text-base font-medium transition-all',
-                        userType === label
-                          ? 'bg-cta-300 text-white shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1),0px_2px_4px_0px_rgba(0,0,0,0.1)]'
-                          : 'bg-prime-100 text-prime-600 hover:bg-prime-200'
-                      )}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <ToggleGroup
+                legend="직업 선택하기"
+                options={Object.keys(OCCUPATION_MAP) as (keyof typeof OCCUPATION_MAP)[]}
+                value={userType}
+                onChange={setUserType}
+                columns={2}
+              />
 
-              {/* 나이 — 3열 토글 버튼 */}
-              <div className="flex flex-col gap-3">
-                <p className="text-prime-900 text-base font-medium leading-6 tracking-[-0.24px]">
-                  나이
-                </p>
-                <div className="flex gap-4">
-                  {Object.keys(AGE_MAP).map((label) => (
-                    <button
-                      key={label}
-                      type="button"
-                      onClick={() => setAgeGroup(label as keyof typeof AGE_MAP)}
-                      className={cn(
-                        'h-14 flex-1 rounded-xl text-base font-medium transition-all',
-                        ageGroup === label
-                          ? 'bg-cta-300 text-white shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1),0px_2px_4px_0px_rgba(0,0,0,0.1)]'
-                          : 'bg-prime-100 text-prime-600 hover:bg-prime-200'
-                      )}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <ToggleGroup
+                legend="나이"
+                options={Object.keys(AGE_MAP) as (keyof typeof AGE_MAP)[]}
+                value={ageGroup}
+                onChange={setAgeGroup}
+                columns={3}
+              />
 
-              {/* 성별 — 2열 토글 버튼 */}
-              <div className="flex flex-col gap-3">
-                <p className="text-prime-900 text-base font-medium leading-6 tracking-[-0.24px]">
-                  성별
-                </p>
-                <div className="flex gap-4">
-                  {Object.keys(GENDER_MAP).map((label) => (
-                    <button
-                      key={label}
-                      type="button"
-                      onClick={() => setGender(label as keyof typeof GENDER_MAP)}
-                      className={cn(
-                        'h-14 flex-1 rounded-xl text-base font-medium transition-all',
-                        gender === label
-                          ? 'bg-cta-300 text-white shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1),0px_2px_4px_0px_rgba(0,0,0,0.1)]'
-                          : 'bg-prime-100 text-prime-600 hover:bg-prime-200'
-                      )}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <ToggleGroup
+                legend="성별"
+                options={Object.keys(GENDER_MAP) as (keyof typeof GENDER_MAP)[]}
+                value={gender}
+                onChange={setGender}
+                columns={2}
+              />
             </div>
           </div>
 
