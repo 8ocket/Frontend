@@ -30,7 +30,7 @@ export default function LoginPage() {
         className="pointer-events-none absolute inset-0"
         initial={{ opacity: 0 }}
         animate={{ opacity: isMouseActive ? 1 : 0 }}
-        transition={{ duration: isMouseActive ? 2.5 : 1.5, ease: 'easeInOut' }}
+        transition={{ duration: isMouseActive ? 2.5 : 6, ease: 'easeInOut' }}
       >
         <motion.div
           className="absolute inset-0"
@@ -50,7 +50,7 @@ export default function LoginPage() {
         className="pointer-events-none absolute inset-0"
         initial={{ opacity: 0 }}
         animate={{ opacity: isMouseActive ? 1 : 0 }}
-        transition={{ duration: isMouseActive ? 3 : 1.5, ease: 'easeInOut', delay: isMouseActive ? 0.3 : 0 }}
+        transition={{ duration: isMouseActive ? 3 : 6, ease: 'easeInOut', delay: isMouseActive ? 0.3 : 0 }}
       >
         <motion.div
           className="absolute inset-0"
@@ -70,7 +70,7 @@ export default function LoginPage() {
         className="pointer-events-none absolute inset-0"
         initial={{ opacity: 0 }}
         animate={{ opacity: isMouseActive ? 1 : 0 }}
-        transition={{ duration: isMouseActive ? 3.5 : 1.5, ease: 'easeInOut', delay: isMouseActive ? 0.6 : 0 }}
+        transition={{ duration: isMouseActive ? 3.5 : 6, ease: 'easeInOut', delay: isMouseActive ? 0.6 : 0 }}
       >
         <motion.div
           className="absolute inset-0"
@@ -92,7 +92,7 @@ export default function LoginPage() {
         className="pointer-events-none absolute inset-0"
         initial={{ opacity: 0 }}
         animate={{ opacity: isMouseActive ? 0.4 : 0, x: mousePosition.x * 60, y: mousePosition.y * 60 }}
-        transition={{ opacity: { duration: isMouseActive ? 2.5 : 1.5, ease: 'easeInOut' }, x: { type: 'spring', stiffness: 50, damping: 20 }, y: { type: 'spring', stiffness: 50, damping: 20 } }}
+        transition={{ opacity: { duration: isMouseActive ? 2.5 : 6, ease: 'easeInOut' }, x: { type: 'spring', stiffness: 50, damping: 20 }, y: { type: 'spring', stiffness: 50, damping: 20 } }}
       >
         <div className="absolute h-200 w-200 rounded-full bg-linear-to-br from-blue-300/60 to-transparent blur-3xl -top-50 left-[10%]" />
       </motion.div>
@@ -101,7 +101,7 @@ export default function LoginPage() {
         className="pointer-events-none absolute inset-0"
         initial={{ opacity: 0 }}
         animate={{ opacity: isMouseActive ? 0.35 : 0, x: mousePosition.x * -50, y: mousePosition.y * -50 }}
-        transition={{ opacity: { duration: isMouseActive ? 3 : 1.5, ease: 'easeInOut' }, x: { type: 'spring', stiffness: 40, damping: 25 }, y: { type: 'spring', stiffness: 40, damping: 25 } }}
+        transition={{ opacity: { duration: isMouseActive ? 3 : 6, ease: 'easeInOut' }, x: { type: 'spring', stiffness: 40, damping: 25 }, y: { type: 'spring', stiffness: 40, damping: 25 } }}
       >
         <div className="absolute h-250 w-250 rounded-full bg-linear-to-tl from-cyan-200/60 to-transparent blur-3xl -bottom-75 right-[5%]" />
       </motion.div>
@@ -110,7 +110,7 @@ export default function LoginPage() {
         className="pointer-events-none absolute inset-0"
         initial={{ opacity: 0 }}
         animate={{ opacity: isMouseActive ? 0.3 : 0, x: mousePosition.x * 35, y: mousePosition.y * 35 }}
-        transition={{ opacity: { duration: isMouseActive ? 3.5 : 1.5, ease: 'easeInOut' }, x: { type: 'spring', stiffness: 30, damping: 30 }, y: { type: 'spring', stiffness: 30, damping: 30 } }}
+        transition={{ opacity: { duration: isMouseActive ? 3.5 : 6, ease: 'easeInOut' }, x: { type: 'spring', stiffness: 30, damping: 30 }, y: { type: 'spring', stiffness: 30, damping: 30 } }}
       >
         <div className="absolute h-150 w-150 rounded-full bg-linear-to-br from-blue-200/70 to-transparent blur-2xl top-[20%] right-[20%]" />
       </motion.div>
