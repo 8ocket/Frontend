@@ -163,7 +163,7 @@ export function TermsDetailPanel({
         className={cn(
           'absolute bottom-4 left-1/2 h-11 w-89.75 -translate-x-1/2 rounded-full text-base leading-[1.3] font-medium transition-colors',
           canAgree
-            ? 'bg-cta-300 text-secondary-100 hover:bg-[#4ba1f0] active:bg-[#257cc0]'
+            ? 'bg-secondary-100 dark:bg-prime-800 border border-prime-900 dark:border-secondary-100 text-prime-900 dark:text-secondary-100 hover:bg-neutral-100'
             : 'bg-secondary-100 dark:bg-prime-800 border border-[#cacaca] dark:border-prime-600 text-[#cacaca] dark:text-prime-500'
         )}
       >
