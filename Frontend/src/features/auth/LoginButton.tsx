@@ -35,7 +35,7 @@ const providerConfig: Record<
   google: {
     label: 'googleButton',
     bgColor: 'white',
-    textColor: 'text-[#1a222e] dark:text-secondary-100',
+    textColor: 'text-[#1a222e]',
     borderColor: '#acb4bb',
     icon: loginImages.googleIcon,
   },
@@ -48,8 +48,8 @@ export function LoginButton({
   isLoading = false,
 }: LoginButtonProps) {
   const config = providerConfig[provider];
-  const borderClass = provider === 'google' ? 'border border-[#acb4bb] dark:border-prime-600 border-solid' : '';
-  const bgClass = provider === 'google' ? 'bg-white dark:bg-prime-800' : '';
+  const borderClass = provider === 'google' ? 'border border-[#acb4bb] border-solid' : '';
+  const bgClass = provider === 'google' ? 'bg-white' : '';
 
   return (
     <button

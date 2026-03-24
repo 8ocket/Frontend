@@ -121,7 +121,7 @@ export function LoginContent({
               }
             }}
             disabled={isLoading}
-            className="dark:bg-tertiary-600 dark:hover:bg-tertiary-500 rounded-xl bg-gray-400 px-4 py-3 font-semibold text-white transition-colors hover:bg-gray-500 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-xl bg-gray-400 px-4 py-3 font-semibold text-white transition-colors hover:bg-gray-500 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loadingProvider === 'kakao' ? '로그인 중...' : '임시 로그인 (개발용)'}
           </button>
@@ -134,7 +134,7 @@ export function LoginContent({
 
         {/* 에러 메시지 */}
         {displayError && (
-          <div className="dark:bg-error-950/50 dark:text-error-400 mt-4 w-full rounded-xl bg-red-50 p-3 text-sm text-red-600">
+          <div className="mt-4 w-full rounded-xl bg-red-50 p-3 text-sm text-red-600">
             {displayError}
           </div>
         )}

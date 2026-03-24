@@ -42,7 +42,7 @@ export function CheckboxItem({
       ? 'border-error-700'
       : 'border-neutral-300',
     checked && !disabled && !error && 'bg-cta-300',
-    !checked && !disabled && 'bg-secondary-100 dark:bg-prime-800',
+    !checked && !disabled && 'bg-secondary-100',
     disabled && 'bg-transparent cursor-not-allowed',
   );
 
@@ -76,7 +76,7 @@ export function CheckboxItem({
         <p
           className={cn(
             'text-base leading-6 font-medium',
-            error ? 'text-error-700' : disabled ? 'text-neutral-400' : 'text-prime-800 dark:text-secondary-100'
+            error ? 'text-error-700' : disabled ? 'text-neutral-400' : 'text-prime-800'
           )}
         >
           <span>{label}</span>
