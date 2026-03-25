@@ -22,19 +22,13 @@ function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
         // Light mode
         'bg-secondary-100 border-neutral-300',
         'text-sm text-prime-900 placeholder:text-neutral-400',
-        // Dark mode
-        'dark:bg-prime-800 dark:border-tertiary-700',
-        'dark:text-secondary-100 dark:placeholder:text-tertiary-400',
         // Focus
         'transition-[border-color,box-shadow]',
         'focus-visible:outline-none focus-visible:border-cta-300 focus-visible:ring-2 focus-visible:ring-cta-300/20',
-        'dark:focus-visible:border-cta-400 dark:focus-visible:ring-cta-400/20',
         // Error
         'aria-invalid:border-error-700 aria-invalid:ring-2 aria-invalid:ring-error-700/20',
-        'dark:aria-invalid:border-error-400 dark:aria-invalid:ring-error-400/20',
         // Disabled
         'disabled:bg-neutral-300 disabled:border-neutral-200 disabled:cursor-not-allowed disabled:placeholder:text-neutral-400',
-        'dark:disabled:bg-prime-900 dark:disabled:border-prime-700',
         className
       )}
       {...props}

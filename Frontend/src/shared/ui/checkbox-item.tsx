@@ -42,7 +42,7 @@ export function CheckboxItem({
       ? 'border-error-700'
       : 'border-neutral-300',
     checked && !disabled && !error && 'bg-cta-300',
-    !checked && !disabled && 'bg-secondary-100 dark:bg-prime-800',
+    !checked && !disabled && 'bg-secondary-100',
     disabled && 'bg-transparent cursor-not-allowed',
   );
 
@@ -52,7 +52,7 @@ export function CheckboxItem({
     : 'text-secondary-100';
 
   return (
-    <div className={cn('flex items-center gap-2', disabled && 'opacity-60')}>
+    <div className={cn('flex w-full items-center gap-2', disabled && 'opacity-60')}>
       {/* 체크박스 */}
       <button
         type="button"
@@ -71,12 +71,12 @@ export function CheckboxItem({
         type="button"
         onClick={onLabelClick ?? onChange}
         disabled={disabled}
-        className="cursor-pointer text-left disabled:cursor-not-allowed"
+        className="min-w-0 flex-1 cursor-pointer text-left disabled:cursor-not-allowed"
       >
         <p
           className={cn(
-            'text-base leading-none font-medium',
-            error ? 'text-error-700' : disabled ? 'text-neutral-400' : 'text-prime-800 dark:text-secondary-100'
+            'text-base leading-6 font-medium',
+            error ? 'text-error-700' : disabled ? 'text-neutral-400' : 'text-prime-800'
           )}
         >
           <span>{label}</span>
@@ -99,6 +99,16 @@ export function CheckboxItem({
           )}
         </p>
       </button>
+      {/* 보기 버튼 */}
+      {onLabelClick && !disabled && (
+        <button
+          type="button"
+          onClick={onLabelClick}
+          className="shrink-0 text-[14px] font-medium leading-5.25 text-prime-700 underline decoration-solid"
+        >
+          보기
+        </button>
+      )}
     </div>
   );
 }

@@ -52,7 +52,7 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          'bg-secondary-100 dark:bg-prime-900 fixed top-1/2 left-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2',
+          'bg-secondary-100 fixed top-1/2 left-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2',
           'rounded-xl border-2 border-[rgba(130,201,255,0.3)] p-6 shadow-lg',
           'focus:outline-none',
           maxWidth,
@@ -62,7 +62,7 @@ function DialogContent({
       >
         {children}
         {showClose && (
-          <DialogPrimitive.Close className="absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:outline-none disabled:pointer-events-none text-prime-900 dark:text-secondary-100">
+          <DialogPrimitive.Close className="absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:outline-none disabled:pointer-events-none text-prime-900">
             <svg
               width="20"
               height="20"
@@ -100,7 +100,7 @@ function DialogTitle({ className, ...props }: React.ComponentProps<typeof Dialog
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn('text-prime-900 dark:text-secondary-100 text-lg leading-[1.3] font-semibold', className)}
+      className={cn('text-prime-900 text-lg leading-[1.3] font-semibold', className)}
       {...props}
     />
   );
@@ -113,7 +113,7 @@ function DialogDescription({
   return (
     <DialogPrimitive.Description
       data-slot="dialog-description"
-      className={cn('text-prime-700 dark:text-prime-300 text-base leading-[1.6]', className)}
+      className={cn('text-prime-700 text-base leading-[1.6]', className)}
       {...props}
     />
   );

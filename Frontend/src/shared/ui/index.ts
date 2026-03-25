@@ -1,4 +1,6 @@
 export { Button, type ButtonVariant, type ButtonSemantic } from './button';
+export { default as AuroraBackground } from './AuroraBackground';
+export { ToggleGroup } from './toggle-group';
 export { Input } from './input';
 export { Card } from './card';
 export { Label } from './label';
@@ -29,3 +31,5 @@ export { TermsDetailPanel, type TermsDetailPanelProps } from './terms-detail-pan
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
 export { Switch } from './switch';
 export { ToastProvider, useToast, type ToastSemantic } from './toast';
+export { Calendar, type CalendarProps } from './calendar';
+export { Popover, PopoverTrigger, PopoverContent } from './popover';

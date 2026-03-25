@@ -72,7 +72,7 @@ export default function ShopPage() {
   };
 
   return (
-    <div className="dark:bg-prime-900 min-h-screen bg-white">
+    <div className="min-h-screen bg-white">
       <main className="flex flex-col items-center px-4 py-12">
         {/* Radix Tabs — Figma: 탭 네비게이션 */}
         <Tabs defaultValue="credit" className="flex w-full flex-col items-center">
@@ -86,7 +86,7 @@ export default function ShopPage() {
           <TabsContent value="credit" className="w-full">
             <div className="flex flex-col items-center gap-10">
               {/* 제목 — Figma: Heading 01 (32px SemiBold) */}
-              <h2 className="text-prime-900 dark:text-secondary-100 text-[32px] leading-[1.3] font-semibold tracking-[-0.48px]">
+              <h2 className="text-prime-900 text-[32px] leading-[1.3] font-semibold tracking-[-0.48px]">
                 크레딧 구매하기
               </h2>
 
@@ -110,10 +110,10 @@ export default function ShopPage() {
               {/* 동물 친구들 */}
               <section className="flex flex-col gap-6">
                 <div className="flex flex-col gap-1">
-                  <h3 className="text-prime-900 dark:text-secondary-100 text-2xl leading-[1.3] font-semibold tracking-[-0.36px]">
+                  <h3 className="text-prime-900 text-2xl leading-[1.3] font-semibold tracking-[-0.36px]">
                     동물 친구들
                   </h3>
-                  <p className="text-prime-500 dark:text-prime-400 text-sm leading-[1.6]">
+                  <p className="text-prime-500 text-sm leading-[1.6]">
                     귀여운 동물 친구들과 함께 즐거운 소통을 합니다.
                   </p>
                 </div>
@@ -131,10 +131,10 @@ export default function ShopPage() {
           {/* ── 이벤트 탭 ──────────────────────────────────────── */}
           <TabsContent value="event" className="w-full">
             <div className="flex flex-col items-center gap-10 py-12">
-              <h2 className="text-prime-900 dark:text-secondary-100 text-[32px] leading-[1.3] font-semibold tracking-[-1.5px]">
+              <h2 className="text-prime-900 text-[32px] leading-[1.3] font-semibold tracking-[-1.5px]">
                 이벤트
               </h2>
-              <p className="text-prime-600 dark:text-prime-400 text-center text-lg">
+              <p className="text-prime-600 text-center text-lg">
                 진행 중인 이벤트가 없습니다.
               </p>
             </div>

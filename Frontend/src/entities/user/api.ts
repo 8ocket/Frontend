@@ -1,4 +1,3 @@
-import { format } from 'date-fns';
 import { api } from '@/shared/api/axios';
 import {
   AuthResponse,
@@ -157,12 +156,12 @@ export const signupApi = async (
     formData.append('profile_image', blob, 'profile-default.svg');
   }
 
-  console.log(formData);
-
   const contentsBlob = new Blob([JSON.stringify({ nickname, occupation, age, gender })], {
     type: 'application/json',
   });
   formData.append('contents', contentsBlob);
 
-  await api.patch('/users/signup', formData);
+  await api.patch('/users/signup', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
 };

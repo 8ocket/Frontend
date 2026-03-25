@@ -92,13 +92,13 @@ export default function Home() {
   const { cardWidth, cardHeight, visibleCount } = getCardDimensions(cardContainerWidth);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a222e]">
+    <div className="min-h-screen bg-white">
       {/* ── Section 1: Welcome Banner — Figma 1675:3805 ──────────────────────── */}
-      <section className="dark:bg-[#2c3a4f]">
+      <section>
         <div className="mx-auto max-w-[1440px] px-8 pt-[8px] pb-6">
           {/* 인사말 */}
           <h1
-            className="text-[32px] leading-[1.3] font-semibold tracking-[-0.48px] text-[#1a222e] dark:text-white"
+            className="text-[32px] leading-[1.3] font-semibold tracking-[-0.48px] text-[#1a222e]"
             style={{ marginTop: 8 }}
           >
             <span className="text-[#82c9ff] underline">{userName}</span>
@@ -107,7 +107,7 @@ export default function Home() {
 
           {/* 날짜 스트립 */}
           <div className="mt-[14px] flex flex-wrap items-center gap-x-3 gap-y-2">
-            <span className="shrink-0 text-[12px] font-normal tracking-[-0.18px] text-[#3f526f] dark:text-[#a7b4be]">
+            <span className="shrink-0 text-[12px] font-normal tracking-[-0.18px] text-[#3f526f]">
               Today : {TODAY_LABEL}
             </span>
             <div className="no-scrollbar flex items-center gap-[8px] overflow-x-auto">
@@ -123,7 +123,7 @@ export default function Home() {
                   <div
                     key={day}
                     className={cn(
-                      'flex h-[24px] w-[24px] shrink-0 items-center justify-center rounded-full text-[16px] font-medium text-[#3f526f] transition-colors dark:text-[#a7b4be]',
+                      'flex h-[24px] w-[24px] shrink-0 items-center justify-center rounded-full text-[16px] font-medium text-[#3f526f] transition-colors',
                       isToday && 'bg-[#82c9ff] !text-[#1a222e]',
                       !isToday && isAttended && 'bg-[rgba(130,201,255,0.4)]',
                       isNearFuture && 'opacity-50',
@@ -167,7 +167,7 @@ export default function Home() {
               <p className="text-warning-500 text-[14px] font-medium tracking-[-0.21px]">
                 Coming Soon
               </p>
-              <p className="text-prime-600 dark:text-tertiary-300 text-[16px] font-normal">
+              <p className="text-prime-600 text-[16px] font-normal">
                 곧 찾아올 새로운 소식을 기대해 주세요.
               </p>
             </div>
@@ -177,10 +177,10 @@ export default function Home() {
 
       {/* ── Section 3: 감정카드 — Figma 1675:3982 ───────────────────────────── */}
       <section className="mx-auto mt-[150px] max-w-[1440px] px-8">
-        <p className="text-[24px] leading-[1.3] font-semibold tracking-[-0.36px] text-[#1a222e] dark:text-white">
+        <p className="text-[24px] leading-[1.3] font-semibold tracking-[-0.36px] text-[#1a222e]">
           감정카드
         </p>
-        <p className="mt-1 text-[12px] font-normal tracking-[-0.18px] text-[#3f526f] dark:text-[#a7b4be]">
+        <p className="mt-1 text-[12px] font-normal tracking-[-0.18px] text-[#3f526f]">
           최근 7건의 상담결과를 반영한 카드를 보여드립니다.
         </p>
 
@@ -208,10 +208,10 @@ export default function Home() {
       <section className="mx-auto mt-[150px] max-w-[1440px] px-4 sm:px-8">
         {/* 헤더 (우측 정렬) */}
         <div className="flex flex-col items-end gap-[8px]">
-          <p className="text-right text-[24px] leading-[1.3] font-semibold tracking-[-0.36px] text-[#1a222e] dark:text-white">
+          <p className="text-right text-[24px] leading-[1.3] font-semibold tracking-[-0.36px] text-[#1a222e]">
             심화 리포트
           </p>
-          <p className="max-w-90.75 text-right text-[12px] font-normal tracking-[-0.18px] text-prime-700 dark:text-tertiary-300">
+          <p className="max-w-90.75 text-right text-[12px] font-normal tracking-[-0.18px] text-prime-700">
             사용자분의 장기적인 상담 내역을 분석하여 자세한 정보를 드리는 컨텐츠입니다.
           </p>
         </div>
@@ -222,14 +222,14 @@ export default function Home() {
           <div className="w-full shrink-0 overflow-hidden rounded-[24px] bg-[rgba(130,201,255,0.1)] p-4 backdrop-blur-[25px] lg:w-183">
             {/* 상단 헤더 */}
             <div className="flex items-start justify-between">
-              <p className="text-[32px] font-semibold text-[#1a222e] dark:text-white">
+              <p className="text-[32px] font-semibold text-[#1a222e]">
                 심화 리포트
               </p>
               <div className="flex flex-col items-end gap-1">
-                <p className="text-[12px] font-normal text-[#1a222e] dark:text-[#a7b4be]">
+                <p className="text-[12px] font-normal text-[#1a222e]">
                   형식 구분 : 월간
                 </p>
-                <p className="text-[12px] font-normal text-[#1a222e] dark:text-[#a7b4be]">
+                <p className="text-[12px] font-normal text-[#1a222e]">
                   기준 일자 : {TODAY_MONTH_LABEL} 기준
                 </p>
               </div>
@@ -239,7 +239,7 @@ export default function Home() {
             <div className="mt-4 flex flex-col gap-4 sm:flex-row">
               {/* 항목 1 — 월간 감정 그래프 */}
               <div className="flex-1">
-                <p className="text-[16px] font-semibold tracking-[-0.24px] text-prime-800 dark:text-white">
+                <p className="text-[16px] font-semibold tracking-[-0.24px] text-prime-800">
                   1. 월간 감정 그래프
                 </p>
                 <div className="mt-2 h-38.5 rounded-xl bg-white/80" />
@@ -247,7 +247,7 @@ export default function Home() {
 
               {/* 항목 2 — 주요 고민 주제 */}
               <div className="flex-1 sm:max-w-57.5">
-                <p className="text-[16px] font-semibold tracking-[-0.24px] text-prime-800 dark:text-white">
+                <p className="text-[16px] font-semibold tracking-[-0.24px] text-prime-800">
                   2. 주요 고민 주제 및 키워드 분석
                 </p>
                 <div className="mt-2 h-38.5 rounded-xl bg-white/80" />
@@ -256,7 +256,7 @@ export default function Home() {
 
             {/* 항목 3 — 사용자 성향 분석 */}
             <div className="mt-4">
-              <p className="text-[16px] font-semibold tracking-[-0.24px] text-prime-800 dark:text-white">
+              <p className="text-[16px] font-semibold tracking-[-0.24px] text-prime-800">
                 3. 상담 기반 사용자 성향 분석
               </p>
               <p className="mt-2 line-clamp-10 text-[14px] leading-[1.6] font-normal text-prime-500">
@@ -266,7 +266,7 @@ export default function Home() {
 
             {/* 항목 4 — AI 맞춤형 행동 제언 */}
             <div className="mt-4">
-              <p className="text-[14px] font-semibold tracking-[-0.21px] text-[#1a222e] dark:text-white">
+              <p className="text-[14px] font-semibold tracking-[-0.21px] text-[#1a222e]">
                 4. AI 맞춤형 행동 제언
               </p>
               <p className="mt-2 line-clamp-8 text-[14px] leading-[1.6] font-normal text-prime-500">
