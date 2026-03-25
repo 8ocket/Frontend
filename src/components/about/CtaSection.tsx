@@ -14,7 +14,7 @@
 //   text: "로그인 하기" — 16px Medium(500)
 
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 
 export function CtaSection() {
   return (

@@ -13,8 +13,8 @@
 //   Card 2: TRUST (CARD TEXT "TRUST")
 //   Card 3: SADNESS (CARD TEXT "SADNESS")
 
-import { EmotionCard } from '@/components/emotion/EmotionCard';
-import type { EmotionCardData } from '@/types/emotion';
+import { EmotionCard } from '@/widgets/emotion-card';
+import type { EmotionCardData } from '@/entities/emotion';
 
 // Figma 확인 — JOY / TRUST / SADNESS 3개 카드 (2515:11376 ~ 2515:11378)
 const SAMPLE_CARDS: EmotionCardData[] = [
