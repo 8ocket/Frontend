@@ -31,3 +31,5 @@ export { TermsDetailPanel, type TermsDetailPanelProps } from './terms-detail-pan
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
 export { Switch } from './switch';
 export { ToastProvider, useToast, type ToastSemantic } from './toast';
+export { Calendar, type CalendarProps } from './calendar';
+export { Popover, PopoverTrigger, PopoverContent } from './popover';
