@@ -50,8 +50,8 @@ export function ChatMainArea({ onEndChat, onCreditShortage, onUnfinishedSession,
     <div className="relative flex flex-1 flex-col overflow-hidden rounded-3xl bg-[#F8FAFF]">
       {/* Background logo */}
       <div
-        className="pointer-events-none absolute hidden lg:block"
-        style={{ left: '156px', top: '2px', opacity: 0.04 }}
+        className="pointer-events-none absolute inset-0 hidden items-center justify-center lg:flex"
+        style={{ opacity: 0.07 }}
         aria-hidden="true"
       >
         <ChatLogo size={884} />
