@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, User, Settings, LogOut } from 'lucide-react';
+import { Menu, X, User, Settings, LogOut, Coins } from 'lucide-react';
 import { useAuthStore } from '@/entities/user/store';
 import { cn } from '@/shared/lib/utils';
 import { UserProfileModal } from '@/shared/ui/UserProfileModal';
@@ -95,7 +95,10 @@ export function GNB() {
           {isAuthenticated ? (
             <>
               {/* 크레딧 */}
-              <Link href="/shop" className="text-sm font-medium text-prime-600 transition-colors hover:text-prime-900">
+              <Link href="/shop" className="flex items-center gap-2 text-sm font-medium text-prime-600 transition-colors hover:text-prime-900">
+                <div className="flex size-7 items-center justify-center rounded-full bg-blue-50">
+                  <Coins size={14} strokeWidth={2} className="text-main-blue" />
+                </div>
                 {user?.creditBalance ?? 0} 크레딧
               </Link>
 
@@ -106,7 +109,7 @@ export function GNB() {
                   onClick={() => setProfileDropdownOpen((v) => !v)}
                   className="flex items-center gap-2 transition-opacity hover:opacity-70"
                 >
-                  <div className="border-cta-300 relative size-8 shrink-0 overflow-hidden rounded-full border bg-secondary-100">
+                  <div className="border-cta-300 relative size-8 shrink-0 overflow-hidden rounded-full border bg-blue-50">
                     <Image
                       src={user?.profileImage ?? '/images/icons/profile-default.svg'}
                       alt="프로필"
@@ -251,7 +254,7 @@ function ProfileDropdown({
     <div className="absolute top-full right-0 z-50 mt-2 w-[238px] overflow-hidden rounded-2xl border border-white/60 bg-white/80 shadow-[0px_8px_32px_0px_rgba(0,0,0,0.12)] backdrop-blur-md">
       {/* 헤더: 아바타 + 이름 + 이메일 */}
       <div className="flex items-center gap-3 border-b border-white/60 px-5 py-4">
-        <div className="relative size-10 shrink-0 overflow-hidden rounded-full border border-cta-300 bg-secondary-100">
+        <div className="relative size-10 shrink-0 overflow-hidden rounded-full border border-cta-300 bg-blue-50">
           <Image
             src={userProfileImage ?? '/images/icons/profile-default.svg'}
             alt="프로필"
