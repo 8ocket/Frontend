@@ -52,6 +52,8 @@
   --color-cta-500: #1c9dff;
   --color-cta-400: #4fb3ff;
   --color-cta-300: #82c9ff;
+  --color-main-blue: var(--main-blue);
+  --color-bg-light: var(--bg-light);
   --color-cta-200: #b5dfff;
   --color-cta-100: #e8f5ff;
 
@@ -175,6 +177,11 @@
 }
 
 :root {
+  /* Brand alias tokens */
+  --main-blue: #82c9ff;
+  --bg-light: #f8fafc;
+  --white: #ffffff;
+
   /* Layout */
   --layout-full-width: 1920px;
   --layout-container-width: 1440px;
