@@ -320,7 +320,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="relative flex h-[calc(100dvh-4rem)] overflow-hidden md:h-[calc(100dvh-5rem)] lg:gap-10.75 lg:px-60">
+    <div className="layout-container relative flex overflow-hidden bg-[#F8FAFF]" style={{ height: 'calc(100dvh - var(--gnb-height))' }}>
       {/* 모바일 사이드바 토글 버튼 */}
       <button
         type="button"
@@ -341,7 +341,7 @@ export default function ChatPage() {
 
       {/* 사이드바 — 모바일: 슬라이드 오버레이, 데스크톱: 고정 */}
       <div
-        className={`fixed inset-y-0 left-0 z-40 w-[min(320px,85vw)] transform bg-white pt-16 transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:z-auto lg:w-80.75 lg:translate-x-0 lg:bg-transparent lg:pt-0 lg:transition-none`}
+        className={`fixed inset-y-0 left-0 z-40 w-[min(320px,85vw)] transform bg-white pt-16 transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:z-auto lg:w-80.75 lg:translate-x-0 lg:pt-0 lg:transition-none`}
       >
         <ChatSidebar
           onNewCounsel={handleNewCounsel}

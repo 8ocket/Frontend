@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 
-import { Search } from 'lucide-react';
+import { Search, PlusCircle } from 'lucide-react';
 
 import { ChatFilterPanel } from './ChatFilterPanel';
 import { ChatScrollbar } from './ChatScrollbar';
@@ -59,81 +59,49 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, se
   }, [visibleCount]);
 
   return (
-    <aside className="relative flex h-[calc(100dvh-4rem)] w-full shrink-0 flex-col gap-4 bg-transparent px-4 pt-4 md:h-[calc(100dvh-5rem)] md:pt-6 lg:w-80.75 lg:px-0">
-      {/* 새로운 상담 버튼 — Figma 340:19 */}
-      <button
-        type="button"
-        onClick={onNewCounsel}
-        className="flex w-full items-center justify-center gap-2.5 rounded-lg transition-colors hover:bg-[#4BA1F0] active:bg-[#257CC0]"
-        style={{
-          padding: '14px 24px',
-          background: '#82C9FF',
-          fontFamily: 'var(--font-pretendard)',
-          fontSize: '16px',
-          fontWeight: 500,
-          color: '#1A222E',
-          lineHeight: '100%',
-        }}
-      >
-        새로운 상담
-      </button>
+    <aside className="relative flex w-full shrink-0 flex-col bg-white lg:w-80.75 lg:border-r lg:border-prime-100" style={{ height: 'calc(100dvh - var(--gnb-height))' }}>
+      {/* 헤더 영역 */}
+      <div className="border-b border-prime-100 px-5 py-4">
+        <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-prime-400">
+          Consultation History
+        </p>
 
-      {/* Search Input — Figma 1361:2666 */}
-      <div className="bg-secondary-100 flex h-11 w-full items-center justify-between rounded-lg border border-neutral-300 px-4 py-3 lg:w-80">
-        <span
-          className="text-prime-900 shrink-0"
-          style={{
-            fontFamily: 'var(--font-pretendard)',
-            fontSize: '14px',
-            fontWeight: 400,
-            lineHeight: '160%',
-          }}
+        {/* 새로운 상담 버튼 */}
+        <button
+          type="button"
+          onClick={onNewCounsel}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-prime-200 py-2.5 text-sm font-semibold text-prime-500 transition-all hover:border-main-blue hover:text-main-blue active:opacity-80"
+          style={{ fontFamily: 'var(--font-pretendard)' }}
         >
-          Search
-        </span>
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center p-1.25">
-          <Search className="text-prime-900" size={22} strokeWidth={1.5} />
-        </div>
+          <PlusCircle size={16} strokeWidth={2} className="text-main-blue" />
+          새로운 상담
+        </button>
       </div>
 
-      {/* 최근 항목 + 필터 옵션 — Figma 1457:2758 */}
-      <div className="flex w-full items-center justify-between">
-        <span
-          className="text-tertiary-400"
-          style={{
-            fontFamily: 'var(--font-pretendard)',
-            fontSize: '14px',
-            fontWeight: 500,
-            letterSpacing: '-0.21px',
-            lineHeight: '130%',
-          }}
-        >
-          최근 항목
-        </span>
+      {/* 검색 + 필터 영역 */}
+      <div className="flex items-center gap-2 border-b border-prime-100 px-5 py-3">
+        <div className="flex flex-1 items-center gap-2 rounded-lg border border-prime-100 bg-[#F8FAFF] px-3 py-2">
+          <Search className="shrink-0 text-main-blue" size={15} strokeWidth={2} />
+          <span
+            className="text-prime-400 text-[13px]"
+            style={{ fontFamily: 'var(--font-pretendard)' }}
+          >
+            검색
+          </span>
+        </div>
         <button
           type="button"
           onClick={() => setFilterOpen((prev) => !prev)}
-          className="bg-success-700 flex items-center justify-center rounded-lg px-2 transition-colors hover:bg-[#0C8A60] active:bg-[#085B40]"
-          style={{ height: '18px' }}
+          className="rounded-lg border border-prime-100 bg-[#F8FAFF] px-3 py-2 text-[13px] font-medium text-prime-500 transition-colors hover:border-main-blue hover:text-main-blue"
+          style={{ fontFamily: 'var(--font-pretendard)' }}
         >
-          <span
-            className="text-inverse"
-            style={{
-              fontFamily: 'var(--font-pretendard)',
-              fontSize: '14px',
-              fontWeight: 500,
-              letterSpacing: '-0.21px',
-              lineHeight: '130%',
-            }}
-          >
-            필터 옵션
-          </span>
+          필터
         </button>
       </div>
 
       {/* Filter Panel — absolute 오버레이, 목록 위에 떠있음 */}
       {filterOpen && (
-        <div className="absolute top-53 left-0 z-10 w-full">
+        <div className="absolute top-36 left-0 z-10 w-full">
           <ChatFilterPanel
             onClose={() => setFilterOpen(false)}
             onApply={() => setFilterOpen(false)}
@@ -141,8 +109,8 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, se
         </div>
       )}
 
-      {/* Chat Session List + 커스텀 스크롤바 — Figma 1379:2840, 1457:2423 */}
-      <div className="relative flex flex-1 flex-row overflow-hidden min-h-0">
+      {/* Chat Session List + 커스텀 스크롤바 */}
+      <div className="relative flex min-h-0 flex-1 flex-row overflow-hidden px-3 py-3">
         <ChatSessionList
           groups={visibleGroups}
           activeSessionId={activeSessionId}

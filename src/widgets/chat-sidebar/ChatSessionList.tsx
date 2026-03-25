@@ -25,12 +25,22 @@ function ChatSessionItem({ session, isActive, onSelect }: ChatSessionItemProps) 
     <div
       onClick={() => onSelect?.(session.id)}
       className={[
-        'flex h-11 w-78.75 shrink-0 cursor-pointer flex-row items-center rounded-lg transition-colors',
-        isActive ? 'bg-cta-300' : 'hover:bg-cta-300/20',
+        'relative flex h-11 w-full shrink-0 cursor-pointer flex-row items-center overflow-hidden rounded-lg transition-colors',
+        isActive
+          ? 'bg-(--main-blue)/10'
+          : 'hover:bg-prime-100/60',
       ].join(' ')}
     >
-      {/* AI Persona Profile Photo — 21×21 circle */}
-      <div className="flex h-5.25 w-5.25 shrink-0 items-center justify-center overflow-hidden rounded-full">
+      {/* 선택 인디케이터 */}
+      {isActive && (
+        <div
+          className="absolute left-0 top-0 h-full w-0.5 rounded-r-sm"
+          style={{ background: 'var(--main-blue)', width: '2px' }}
+        />
+      )}
+
+      {/* AI Persona Profile Photo */}
+      <div className="ml-3 flex h-5.25 w-5.25 shrink-0 items-center justify-center overflow-hidden rounded-full">
         {session.avatarSrc ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -43,26 +53,24 @@ function ChatSessionItem({ session, isActive, onSelect }: ChatSessionItemProps) 
         )}
       </div>
 
-      {/* Content — 254×44, pad 8 all, gap 10 */}
-      <div className="flex h-11 w-63.5 shrink-0 flex-row items-center justify-center gap-2.5 p-2">
+      {/* Content */}
+      <div className="flex flex-1 items-center overflow-hidden px-2">
         <span
-          className="text-prime-800 w-59.5 overflow-hidden text-ellipsis whitespace-nowrap"
-          style={{
-            fontFamily: 'var(--font-pretendard)',
-            fontSize: '16px',
-            fontWeight: 600,
-            lineHeight: '130%',
-          }}
+          className={[
+            'overflow-hidden text-ellipsis whitespace-nowrap text-sm',
+            isActive ? 'font-semibold' : 'font-medium text-prime-700',
+          ].join(' ')}
+          style={isActive ? { color: 'var(--main-blue)', fontFamily: 'var(--font-pretendard)' } : { fontFamily: 'var(--font-pretendard)' }}
         >
           {session.title}
         </span>
       </div>
 
-      {/* Options (3-dot menu) — 40×40 */}
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center">
+      {/* Options (3-dot menu) */}
+      <div className="flex h-10 w-9 shrink-0 items-center justify-center">
         <MoreHorizontal
-          className="text-prime-800"
-          size={22}
+          className="text-prime-400"
+          size={18}
           strokeWidth={1.5}
         />
       </div>
@@ -83,23 +91,22 @@ export function ChatSessionList({ groups, activeSessionId, onSelectSession, scro
     <div
       ref={scrollRef}
       onScroll={onScroll}
-      className="flex h-full w-78.75 flex-col gap-6 overflow-x-hidden overflow-y-scroll"
+      className="flex h-full w-full flex-col gap-4 overflow-x-hidden overflow-y-scroll"
       style={{ scrollbarWidth: 'none' }}
     >
-      {groups.map((group) => (
-        <div key={group.date} className="flex flex-col gap-2">
-          {/* Date Label — 12px Medium */}
-          <span
-            className="text-prime-800"
-            style={{
-              fontFamily: 'var(--font-pretendard)',
-              fontSize: '12px',
-              fontWeight: 500,
-              lineHeight: '130%',
-            }}
-          >
-            {group.date}
-          </span>
+      {groups.map((group, idx) => (
+        <div key={group.date} className="flex flex-col gap-1">
+          {/* Date Label */}
+          <div className={['flex items-center gap-2', idx > 0 ? 'mt-3' : ''].join(' ')}>
+            <div className="h-px flex-1 bg-slate-100" />
+            <span
+              className="shrink-0 text-[10px] font-medium tracking-wide text-slate-300"
+              style={{ fontFamily: 'var(--font-pretendard)' }}
+            >
+              {group.date}
+            </span>
+            <div className="h-px flex-1 bg-slate-100" />
+          </div>
 
           {/* Chat Session Items */}
           {group.sessions.map((session) => (

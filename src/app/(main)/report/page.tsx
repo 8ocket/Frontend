@@ -126,8 +126,24 @@ export default function ReportPage() {
       {/* 메인 콘텐츠 */}
       <div className="flex-1 overflow-y-auto">
         {viewState === 'idle' && (
-          <div className="flex min-h-full items-center justify-center px-6 py-12 sm:px-12">
-            <div className="w-full max-w-xl">
+          <div className="relative flex min-h-full items-center justify-center bg-[#F8FAFF] px-6 py-12 sm:px-12">
+            {/* 배경 로고 — 채팅창과 동일한 브랜드 패턴 */}
+            <div
+              className="pointer-events-none absolute inset-0 flex items-center justify-center"
+              aria-hidden="true"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/logo/logo-small.svg"
+                width={884}
+                height={884}
+                alt=""
+                className="opacity-[0.07]"
+              />
+            </div>
+
+            {/* 폼 컨텐츠 */}
+            <div className="relative z-10 w-full max-w-xl">
               <header className="mb-8 text-center">
                 <h1 className="text-prime-900 text-3xl font-bold tracking-tight md:text-4xl">
                   나를 위한 마음 분석 리포트

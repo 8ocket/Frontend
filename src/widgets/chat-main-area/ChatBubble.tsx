@@ -35,17 +35,15 @@ export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatar
   const isAi = variant === 'ai';
 
   return (
-    // Root — VERTICAL, gap=4, max-w=450, hSizing=FIXED, vSizing=HUG
     <div
       className={[
-        'flex max-w-112.5 flex-col gap-1',
+        'flex max-w-[60%] flex-col gap-1',
         isAi ? 'items-start self-start' : 'items-end self-end',
       ].join(' ')}
     >
-      {/* Header — HORIZONTAL, crossAxis=CENTER, gap=8, hSizing=HUG, vSizing=HUG */}
-      <div className="flex flex-row items-center gap-2">
+      {/* Header */}
+      <div className={['flex flex-row items-center gap-2', isAi ? '' : 'flex-row-reverse'].join(' ')}>
         {isAi ? (
-          /* AI Persona Profile Photo — 21×21, r=9999, IMAGE */
           <div className="h-5.25 w-5.25 shrink-0 overflow-hidden rounded-full">
             {avatarSrc ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -55,64 +53,39 @@ export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatar
             )}
           </div>
         ) : userAvatarSrc ? (
-          /* Custom user avatar (about 페이지 등 특정 컨텍스트) */
           <div className="h-5.25 w-5.25 shrink-0 overflow-hidden rounded-full">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={userAvatarSrc} alt={senderName} className="h-full w-full object-cover" />
           </div>
         ) : (
-          /* User Profile Photo — 21×21, fill=#ffffff, Vector 16×16 fill=#2b4764 */
           <UserProfilePhoto />
         )}
 
-        {/* Sender name
-            AI:   Pretendard 16px SemiBold(600) lh=130% fill=#2b4764
-            User: Pretendard 16px Regular(400)  lh=160% fill=#2b4764 */}
         <span
           style={{
             fontFamily: 'var(--font-pretendard)',
-            fontSize: '16px',
+            fontSize: '14px',
             fontWeight: isAi ? 600 : 400,
-            lineHeight: isAi ? '130%' : '160%',
-            color: '#2b4764',
+            lineHeight: '130%',
+            color: '#6983aa',
           }}
         >
           {senderName}
         </span>
       </div>
 
-      {/* Bubble body — HORIZONTAL, crossAxis=CENTER, gap=10, pad=[T12,R16,B12,L16]
-          hSizing=FILL, vSizing=HUG, r=16, stroke=#82c9ff 1px
-          AI:   fill=#f1f5f9 @30%, backdropFilter=blur(25px)
-          User: fill=#82c9ff @10%, backdropFilter=blur(12px), dropShadow */}
+      {/* Bubble body */}
       <div
-        className="w-full rounded-2xl px-4 py-3"
-        style={
+        className={[
+          'w-full rounded-2xl px-5 py-4 shadow-sm',
           isAi
-            ? {
-                background: 'rgba(241, 245, 249, 0.30)',
-                border: '1px solid #82c9ff',
-                backdropFilter: 'blur(25px)',
-              }
-            : {
-                background: 'rgba(130, 201, 255, 0.10)',
-                border: '1px solid #82c9ff',
-                backdropFilter: 'blur(12px)',
-                boxShadow: '0 2px 8px rgba(130, 201, 255, 0.20)',
-              }
-        }
+            ? 'border border-slate-100 bg-white'
+            : 'bg-main-blue text-white',
+        ].join(' ')}
       >
-        {/* Text — hSizing=FILL, vSizing=FILL, grow=1
-            Pretendard 16px Regular(400) lh=160% fill=#1a222e */}
         <p
-          className="whitespace-pre-wrap"
-          style={{
-            fontFamily: 'var(--font-pretendard)',
-            fontSize: '16px',
-            fontWeight: 400,
-            lineHeight: '160%',
-            color: '#1a222e',
-          }}
+          className={['whitespace-pre-wrap text-[15px] leading-[165%]', isAi ? 'text-prime-900' : 'text-white'].join(' ')}
+          style={{ fontFamily: 'var(--font-pretendard)' }}
         >
           {content}
         </p>
