@@ -325,7 +325,7 @@ export default function ChatPage() {
       <button
         type="button"
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="bg-secondary-100/80 dark:bg-prime-900/80 absolute top-3 left-3 z-30 flex h-10 w-10 items-center justify-center rounded-lg shadow-md backdrop-blur-sm lg:hidden"
+        className="bg-secondary-100/80 absolute top-3 left-3 z-30 flex h-10 w-10 items-center justify-center rounded-lg shadow-md backdrop-blur-sm lg:hidden"
         aria-label="상담 목록 열기"
       >
         <Menu size={20} />
@@ -341,7 +341,7 @@ export default function ChatPage() {
 
       {/* 사이드바 — 모바일: 슬라이드 오버레이, 데스크톱: 고정 */}
       <div
-        className={`dark:bg-prime-900 fixed inset-y-0 left-0 z-40 w-[min(320px,85vw)] transform bg-white pt-16 transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:z-auto lg:w-80.75 lg:translate-x-0 lg:bg-transparent lg:pt-0 lg:transition-none dark:lg:bg-transparent`}
+        className={`fixed inset-y-0 left-0 z-40 w-[min(320px,85vw)] transform bg-white pt-16 transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:z-auto lg:w-80.75 lg:translate-x-0 lg:bg-transparent lg:pt-0 lg:transition-none`}
       >
         <ChatSidebar
           onNewCounsel={handleNewCounsel}

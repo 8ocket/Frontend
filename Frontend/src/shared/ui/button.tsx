@@ -24,7 +24,7 @@ const buttonVariants = cva(
         primary:
           'bg-cta-300 text-prime-900 hover:bg-[#4ba1f0] active:bg-[#257cc0]' +
           ' disabled:bg-[#cacaca] disabled:text-neutral-400' +
-          ' dark:bg-cta-400 dark:text-prime-950 dark:hover:bg-cta-300 dark:active:bg-cta-500 dark:disabled:bg-tertiary-700 dark:disabled:text-tertiary-500',
+          '',
 
         // ── Secondary (outlined) ─────────────────────────────────
         // Blue default: bg secondary-100, border cta-300, text prime-600
@@ -33,7 +33,7 @@ const buttonVariants = cva(
           ' hover:bg-neutral-300 hover:text-prime-700 hover:border-[#4ba1f0]' +
           ' active:bg-neutral-300 active:text-prime-800 active:border-[#257cc0]' +
           ' disabled:bg-secondary-100 disabled:text-[#cacaca] disabled:border-[#cacaca]' +
-          ' dark:bg-prime-800 dark:text-cta-300 dark:border-cta-300 dark:hover:bg-prime-700 dark:hover:text-cta-400 dark:hover:border-cta-400 dark:disabled:text-tertiary-500 dark:disabled:border-tertiary-700',
+          '',
 
         // ── Ghost (transparent) ──────────────────────────────────
         // Blue default: bg transparent, text prime-800
@@ -42,7 +42,7 @@ const buttonVariants = cva(
           ' hover:bg-neutral-300 hover:text-prime-700' +
           ' active:bg-neutral-300 active:text-prime-800' +
           ' disabled:text-neutral-400' +
-          ' dark:text-cta-300 dark:hover:bg-prime-800 dark:hover:text-cta-400 dark:disabled:text-tertiary-500',
+          '',
 
         // ── Allow (동의 버튼) ────────────────────────────────────
         // rounded-sm(4px), border neutral-300
