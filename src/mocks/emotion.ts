@@ -164,7 +164,16 @@ function daysAgo(n: number): Date {
 
 /** 컬렉션 페이지용 카드 목록 (7개, 다양한 감정 조합) */
 export const MOCK_COLLECTION_CARDS: EmotionCardData[] = [
-  mockCardData('card-01', daysAgo(0), mockExtractions('joy')),
+  mockCardData('card-01', daysAgo(0), mockExtractions('joy'), {
+    keywords: [{ keyword: '합격', emotionType: 'joy', percentage: 100 }],
+    summary: {
+      title: '오늘의 기쁨을 충분히 누려도 괜찮아요. 당신은 그럴 자격이 있어요.',
+      description: '',
+    },
+    fact: '오랫동안 준비해온 취업 면접 결과가 나왔고, 최종 합격 통보를 받았다.',
+    emotion: '몇 달간의 긴장과 불안이 한꺼번에 풀리는 느낌이었다. 온몸이 가벼워지고 눈물이 날 것 같은 기쁨이었다.',
+    insight: '이 기쁨이 단순한 성공이 아니라, 포기하지 않은 나 자신에 대한 보상임을 느꼈다.',
+  }),
   mockCardData('card-02', daysAgo(1), mockExtractions('surprise', 'trust'), {
     keywords: [
       { keyword: '놀람', emotionType: 'surprise', percentage: 65 },
@@ -189,14 +198,28 @@ export const MOCK_COLLECTION_CARDS: EmotionCardData[] = [
   }),
   mockCardData('card-06', daysAgo(5), mockExtractions('sadness', 'fear'), {
     keywords: [
-      { keyword: '슬픔', emotionType: 'sadness', percentage: 65 },
-      { keyword: '두려움', emotionType: 'fear', percentage: 35 },
+      { keyword: '이별', emotionType: 'sadness', percentage: 65 },
+      { keyword: '외로움', emotionType: 'fear', percentage: 35 },
     ],
+    summary: {
+      title: '슬픔은 소중했던 것이 있었다는 증거예요. 충분히 슬퍼해도 괜찮아요.',
+      description: '',
+    },
+    fact: '오랫동안 함께했던 친구가 멀리 이사를 가게 되었다는 소식을 들었다.',
+    emotion: '앞으로 자주 볼 수 없다는 사실이 실감나면서 가슴이 먹먹해졌다. 혼자 남겨지는 것 같은 두려움도 들었다.',
+    insight: '이 슬픔은 관계를 소중히 여기는 내 마음에서 비롯된 것임을 알게 되었다.',
   }),
   mockCardData('card-07', daysAgo(6), mockExtractions('anger', 'disgust'), {
     keywords: [
-      { keyword: '분노', emotionType: 'anger', percentage: 65 },
-      { keyword: '혐오', emotionType: 'disgust', percentage: 35 },
+      { keyword: '불공정', emotionType: 'anger', percentage: 65 },
+      { keyword: '무시', emotionType: 'disgust', percentage: 35 },
     ],
+    summary: {
+      title: '그 분노는 당신의 기준과 가치관이 살아있다는 신호예요.',
+      description: '',
+    },
+    fact: '팀 프로젝트에서 내가 작성한 보고서가 팀장의 이름으로 윗선에 보고되었다는 것을 알게 되었다.',
+    emotion: '배신감과 함께 억울함이 치밀어 올랐다. 노력이 무시당한 것 같아 분하고 불쾌했다.',
+    insight: '이 분노의 근원은 공정함과 인정에 대한 나의 강한 욕구임을 이해하게 되었다.',
   }),
 ];
