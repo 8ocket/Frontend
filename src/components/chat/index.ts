@@ -16,7 +16,6 @@ export type { ChatNewSessionModalProps } from './ChatNewSessionModal';
 export { ChatUnfinishedSessionModal } from './ChatUnfinishedSessionModal';
 export type { ChatUnfinishedSessionModalProps } from './ChatUnfinishedSessionModal';
 export { ChatFilterPanel } from '@/widgets/chat-sidebar';
-export type { PersonaFilter } from '@/widgets/chat-sidebar';
 export { ChatWelcomeHeader } from './ChatWelcomeHeader';
 export { ChatLogo } from '@/widgets/chat-main-area';
 export { ChatScrollbar } from '@/widgets/chat-sidebar';

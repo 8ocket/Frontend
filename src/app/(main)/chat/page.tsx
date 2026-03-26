@@ -298,7 +298,7 @@ export default function ChatPage() {
 
   /** 종료 확인 → "마음 기록 제작 중" 메시지 전송 후 세션 비활성화 */
   const handleEndConfirmed = () => {
-    setAppendMessage({ variant: 'ai', senderName: '마음 기록', content: '마음 기록 제작 중' });
+    setAppendMessage({ variant: 'ai', senderName: '마음 기록', content: '마음 기록을 생성 중입니다.' });
     setIsSessionActive(false);
     closeModal();
     // TODO: 마음 기록 생성 API 호출

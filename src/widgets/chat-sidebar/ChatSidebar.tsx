@@ -20,7 +20,23 @@ const PAGE_SIZE = 5;
 
 export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, sessionGroups = [] }: ChatSidebarProps = {}) {
   const [filterOpen, setFilterOpen] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
+  const filterBtnRef = useRef<HTMLButtonElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        filterOpen &&
+        filterRef.current && !filterRef.current.contains(e.target as Node) &&
+        filterBtnRef.current && !filterBtnRef.current.contains(e.target as Node)
+      ) {
+        setFilterOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [filterOpen]);
   const [scrollRatio, setScrollRatio] = useState(0);
   const [thumbRatio, setThumbRatio] = useState(0.2);
   const [visibleCount, setVisibleCount] = useState(sessionGroups.length);
@@ -82,14 +98,15 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, se
       <div className="flex items-center gap-2 border-b border-prime-100 px-5 py-3">
         <div className="flex flex-1 items-center gap-2 rounded-lg border border-prime-100 bg-[#F8FAFF] px-3 py-2">
           <Search className="shrink-0 text-main-blue" size={15} strokeWidth={2} />
-          <span
-            className="text-prime-400 text-[13px]"
+          <input
+            type="text"
+            placeholder="검색"
+            className="w-full bg-transparent text-[13px] text-prime-900 outline-none placeholder:text-prime-400"
             style={{ fontFamily: 'var(--font-pretendard)' }}
-          >
-            검색
-          </span>
+          />
         </div>
         <button
+          ref={filterBtnRef}
           type="button"
           onClick={() => setFilterOpen((prev) => !prev)}
           className="rounded-lg border border-prime-100 bg-[#F8FAFF] px-3 py-2 text-[13px] font-medium text-prime-500 transition-colors hover:border-main-blue hover:text-main-blue"
@@ -99,15 +116,17 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, se
         </button>
       </div>
 
-      {/* Filter Panel — absolute 오버레이, 목록 위에 떠있음 */}
-      {filterOpen && (
-        <div className="absolute top-36 left-0 z-10 w-full">
-          <ChatFilterPanel
-            onClose={() => setFilterOpen(false)}
-            onApply={() => setFilterOpen(false)}
-          />
-        </div>
-      )}
+      {/* Filter Panel — 인라인 아코디언 */}
+      <div
+        ref={filterRef}
+        className="overflow-hidden transition-all duration-300 ease-in-out"
+        style={{ maxHeight: filterOpen ? '600px' : '0px', opacity: filterOpen ? 1 : 0 }}
+      >
+        <ChatFilterPanel
+          onClose={() => setFilterOpen(false)}
+          onApply={() => setFilterOpen(false)}
+        />
+      </div>
 
       {/* Chat Session List + 커스텀 스크롤바 */}
       <div className="relative flex min-h-0 flex-1 flex-row overflow-hidden px-3 py-3">
