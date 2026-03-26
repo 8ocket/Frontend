@@ -32,22 +32,20 @@ export function GNB() {
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, user, logout } = useAuthStore();
-  const [scrolled, setScrolled] = useState(false);
+  const [scrollRatio, setScrollRatio] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
-  const [prevPathname, setPrevPathname] = useState(pathname);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // 경로 변경 시 모바일 메뉴 닫기 (render 중 state 리셋 패턴)
-  if (prevPathname !== pathname) {
-    setPrevPathname(pathname);
-    setMobileMenuOpen(false);
-  }
-
-  // 스크롤 감지 — 80px 이상 시 glass 헤더 (너무 낮으면 살짝 스크롤에 바로 반응)
+  // 경로 변경 시 모바일 메뉴 닫기
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 80);
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  // 스크롤 감지 — 0~80px 구간을 0~1로 정규화
+  useEffect(() => {
+    const handleScroll = () => setScrollRatio(Math.min(window.scrollY / 80, 1));
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
@@ -76,14 +74,22 @@ export function GNB() {
 
   return (
     <header
-      className={cn(
-        'text-prime-900 fixed top-0 right-0 left-0 z-50 w-full transition-all duration-500 ease-in-out',
-        scrolled
-          ? 'bg-white/60 shadow-[0_4px_30px_rgba(0,0,0,0.03)] backdrop-blur-xl'
-          : 'bg-transparent'
-      )}
+      className="text-prime-900 fixed top-0 right-0 left-0 z-50 w-full backdrop-blur-md"
+      style={
+        pathname === '/about'
+          ? {
+              backgroundColor: `rgba(255,255,255,${scrollRatio * 0.6})`,
+              boxShadow: `0 4px 30px rgba(0,0,0,${scrollRatio * 0.03})`,
+            }
+          : {
+              backgroundColor: `rgba(255,255,255,${0.6 + scrollRatio * 0.3})`,
+              boxShadow: scrollRatio > 0
+                ? `0 4px 30px rgba(0,0,0,${scrollRatio * 0.08})`
+                : '0 1px 0 rgba(0,0,0,0.06)',
+            }
+      }
     >
-      <nav className="layout-container flex items-center justify-between px-10 py-3">
+      <nav className="layout-container flex h-16 items-center justify-between px-8 md:h-20">
         {/* 로고 */}
         <Link href="/" className="flex shrink-0 items-center gap-2">
           <div className="relative size-8 overflow-hidden rounded-full">
@@ -110,16 +116,16 @@ export function GNB() {
         <div className="hidden lg:flex">
           {isAuthenticated ? (
             // 크레딧 + 프로필 — 하나의 그룹으로 묶어 시각 분리
-            <div className="flex items-center gap-3 rounded-full border border-slate-200/70 bg-white/30 px-4 py-1.5">
+            <div className="flex items-center gap-3 rounded-full border border-neutral-300/70 bg-white/30 px-4 py-1.5">
               {/* 크레딧 */}
               <Link
                 href="/shop"
                 className="text-prime-600 hover:text-prime-900 flex items-center gap-1.5 text-sm font-medium transition-colors"
               >
-                <div className="flex size-6 items-center justify-center rounded-full bg-blue-50">
+                <div className="flex size-6 items-center justify-center rounded-full bg-cta-100">
                   <Coins size={13} strokeWidth={2} className="text-main-blue" />
                 </div>
-                {user?.creditBalance ?? 0} 크레딧
+                {user?.creditBalance ?? '—'} 크레딧
               </Link>
 
               {/* 구분선 */}
@@ -132,7 +138,7 @@ export function GNB() {
                   onClick={() => setProfileDropdownOpen((v) => !v)}
                   className="flex items-center gap-2 transition-opacity hover:opacity-70"
                 >
-                  <div className="border-cta-300 relative size-7 shrink-0 overflow-hidden rounded-full border bg-blue-50">
+                  <div className="border-cta-300 relative size-7 shrink-0 overflow-hidden rounded-full border bg-cta-100">
                     <Image
                       src={user?.profileImage ?? '/images/icons/profile-default.svg'}
                       alt="프로필"
@@ -190,6 +196,7 @@ export function GNB() {
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-neutral-200 lg:hidden"
           aria-label={mobileMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
+          aria-expanded={mobileMenuOpen}
         >
           {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
@@ -197,7 +204,7 @@ export function GNB() {
 
       {/* 모바일 메뉴 오버레이 */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 top-13 z-50 flex flex-col overflow-y-auto bg-white lg:hidden">
+        <div className="fixed inset-0 top-13 z-40 flex flex-col overflow-y-auto bg-white lg:hidden">
           <div className="flex flex-col gap-1 px-4 py-4">
             {(isAuthenticated ? MEMBER_NAV_ITEMS : GUEST_NAV_ITEMS).map(({ label, href }) => (
               <MobileNavItem key={href} label={label} href={href} active={pathname === href} />
@@ -219,7 +226,7 @@ export function GNB() {
                 <div className="my-2 border-t border-neutral-200" />
                 <Link
                   href="/login"
-                  className="bg-cta-300 text-secondary-100 rounded-xl px-4 py-3 text-center text-base font-medium transition-all hover:bg-[#4ba1f0] active:bg-[#257cc0]"
+                  className="bg-cta-300 text-secondary-100 rounded-xl px-4 py-3 text-center text-base font-medium transition-all hover:bg-cta-400 active:bg-cta-700"
                 >
                   로그인
                 </Link>
@@ -249,8 +256,8 @@ function NavItem({ label, href, active }: { label: string; href: string; active:
       <AnimatePresence>
         {hovered && (
           <motion.div
-            layoutId="nav-hover-pill"
-            className="absolute inset-0 rounded-full bg-slate-100"
+            layoutId={`nav-hover-${href}`}
+            className="absolute inset-0 rounded-full bg-neutral-200"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -312,7 +319,7 @@ function ProfileDropdown({
         onClick={onProfileHeader}
         className="flex w-full items-center gap-3 border-b border-white/60 px-5 py-4 transition-colors hover:bg-black/5"
       >
-        <div className="border-cta-300 relative size-10 shrink-0 overflow-hidden rounded-full border bg-blue-50">
+        <div className="border-cta-300 relative size-10 shrink-0 overflow-hidden rounded-full border bg-cta-100">
           <Image
             src={userProfileImage ?? '/images/icons/profile-default.svg'}
             alt="프로필"
@@ -337,7 +344,7 @@ function ProfileDropdown({
           onClick={onMypage}
           className="text-prime-900 flex w-full items-center gap-3 px-5 py-3 text-sm font-medium tracking-[-0.21px] transition-colors hover:bg-black/5"
         >
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-blue-50">
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-cta-100">
             <User size={15} className="text-main-blue" />
           </div>
           마이페이지

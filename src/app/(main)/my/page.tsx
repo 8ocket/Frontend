@@ -58,7 +58,7 @@ export default function MyPage() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFF]">
-      <div className="layout-container px-10">
+      <div className="layout-container px-8">
         <main className="mx-auto max-w-6xl pb-20 pt-24">
 
           <h1 className="mb-6 text-2xl font-semibold tracking-[-0.36px] text-prime-900">
