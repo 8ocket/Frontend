@@ -6,6 +6,7 @@ export interface User {
   name: string;
   profileImage?: string;
   creditBalance: number;
+  createdAt?: string;
 }
 
 export interface AuthResponse {

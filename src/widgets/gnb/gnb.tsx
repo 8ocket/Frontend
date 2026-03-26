@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, User, Settings, LogOut, Coins } from 'lucide-react';
+import { Menu, X, User, LogOut, Coins } from 'lucide-react';
 import { useAuthStore } from '@/entities/user/store';
 import { cn } from '@/shared/lib/utils';
 import { UserProfileModal } from '@/shared/ui/UserProfileModal';
@@ -71,14 +71,19 @@ export function GNB() {
   };
 
   return (
-    <header className="fixed left-0 right-0 top-0 z-50 w-full border-b border-white/60 bg-white/80 backdrop-blur-md text-prime-900">
+    <header className="text-prime-900 fixed top-0 right-0 left-0 z-50 w-full border-b border-white/60 bg-white/80 backdrop-blur-md">
       <nav className="layout-container flex h-16 items-center justify-between px-10">
         {/* 로고 — Figma: 32px 원형 + 텍스트 18px */}
         <Link href="/" className="flex shrink-0 items-center gap-2">
           <div className="relative size-8 overflow-hidden rounded-full">
-            <Image src="/images/logo/logo-small.svg" alt="MindLog" fill className="object-contain" />
+            <Image
+              src="/images/logo/logo-small.svg"
+              alt="MindLog"
+              fill
+              className="object-contain"
+            />
           </div>
-          <span className="whitespace-nowrap text-lg font-normal leading-6.75 tracking-[-0.27px] text-prime-900">
+          <span className="text-prime-900 text-lg leading-6.75 font-normal tracking-[-0.27px] whitespace-nowrap">
             마인드 로그
           </span>
         </Link>
@@ -95,7 +100,10 @@ export function GNB() {
           {isAuthenticated ? (
             <>
               {/* 크레딧 */}
-              <Link href="/shop" className="flex items-center gap-2 text-sm font-medium text-prime-600 transition-colors hover:text-prime-900">
+              <Link
+                href="/shop"
+                className="text-prime-600 hover:text-prime-900 flex items-center gap-2 text-sm font-medium transition-colors"
+              >
                 <div className="flex size-7 items-center justify-center rounded-full bg-blue-50">
                   <Coins size={14} strokeWidth={2} className="text-main-blue" />
                 </div>
@@ -114,12 +122,15 @@ export function GNB() {
                       src={user?.profileImage ?? '/images/icons/profile-default.svg'}
                       alt="프로필"
                       fill
-                      className={user?.profileImage && user.profileImage !== '/images/icons/profile-default.svg' ? 'object-cover' : 'object-contain p-1'}
+                      className={
+                        user?.profileImage &&
+                        user.profileImage !== '/images/icons/profile-default.svg'
+                          ? 'object-cover'
+                          : 'object-contain p-1'
+                      }
                     />
                   </div>
-                  <span className="text-sm font-medium text-prime-900">
-                    {user?.name ?? 'MY'}
-                  </span>
+                  <span className="text-prime-900 text-sm font-medium">{user?.name ?? 'MY'}</span>
                 </button>
 
                 {profileDropdownOpen && (
@@ -127,9 +138,18 @@ export function GNB() {
                     userName={user?.name ?? ''}
                     userEmail={user?.email ?? ''}
                     userProfileImage={user?.profileImage}
-                    onLogout={() => { setProfileDropdownOpen(false); handleLogout(); }}
-                    onProfile={() => { setProfileDropdownOpen(false); setProfileModalOpen(true); }}
-                    onSettings={() => { setProfileDropdownOpen(false); router.push('/my'); }}
+                    onLogout={() => {
+                      setProfileDropdownOpen(false);
+                      handleLogout();
+                    }}
+                    onMypage={() => {
+                      setProfileDropdownOpen(false);
+                      router.push('/my');
+                    }}
+                    onProfileHeader={() => {
+                      setProfileDropdownOpen(false);
+                      setProfileModalOpen(true);
+                    }}
                   />
                 )}
               </div>
@@ -137,11 +157,13 @@ export function GNB() {
               <UserProfileModal
                 isOpen={profileModalOpen}
                 onClose={() => setProfileModalOpen(false)}
-                userName={user?.name ?? ''}
               />
             </>
           ) : (
-            <Link href="/login" className="text-prime-700 text-sm font-medium transition-colors hover:text-prime-900">
+            <Link
+              href="/login"
+              className="text-prime-700 hover:text-prime-900 text-sm font-medium transition-colors"
+            >
               로그인
             </Link>
           )}
@@ -172,7 +194,7 @@ export function GNB() {
                 <div className="my-2 border-t border-neutral-200" />
                 <button
                   onClick={handleLogout}
-                  className="w-full rounded-xl px-4 py-3 text-left text-base font-medium text-error-500 transition-all hover:bg-error-100"
+                  className="text-error-500 hover:bg-error-100 w-full rounded-xl px-4 py-3 text-left text-base font-medium transition-all"
                 >
                   로그아웃
                 </button>
@@ -224,7 +246,7 @@ function MobileNavItem({ label, href, active }: { label: string; href: string; a
         'rounded-xl px-4 py-3 text-base font-medium transition-all',
         active
           ? 'bg-prime-900 text-secondary-100'
-          : 'text-prime-700 hover:bg-neutral-100 hover:text-prime-900'
+          : 'text-prime-700 hover:text-prime-900 hover:bg-neutral-100'
       )}
     >
       {label}
@@ -238,23 +260,28 @@ function ProfileDropdown({
   userEmail,
   userProfileImage,
   onLogout,
-  onProfile,
-  onSettings,
+  onMypage,
+  onProfileHeader,
 }: {
   userName: string;
   userEmail: string;
   userProfileImage?: string;
   onLogout: () => void;
-  onProfile: () => void;
-  onSettings: () => void;
+  onMypage: () => void;
+  onProfileHeader: () => void;
 }) {
-  const isDefaultImage = !userProfileImage || userProfileImage === '/images/icons/profile-default.svg';
+  const isDefaultImage =
+    !userProfileImage || userProfileImage === '/images/icons/profile-default.svg';
 
   return (
     <div className="absolute top-full right-0 z-50 mt-2 w-[238px] overflow-hidden rounded-2xl border border-white/60 bg-white/80 shadow-[0px_8px_32px_0px_rgba(0,0,0,0.12)] backdrop-blur-md">
       {/* 헤더: 아바타 + 이름 + 이메일 */}
-      <div className="flex items-center gap-3 border-b border-white/60 px-5 py-4">
-        <div className="relative size-10 shrink-0 overflow-hidden rounded-full border border-cta-300 bg-blue-50">
+      <button
+        type="button"
+        onClick={onProfileHeader}
+        className="flex w-full items-center gap-3 border-b border-white/60 px-5 py-4 transition-colors hover:bg-black/5"
+      >
+        <div className="border-cta-300 relative size-10 shrink-0 overflow-hidden rounded-full border bg-blue-50">
           <Image
             src={userProfileImage ?? '/images/icons/profile-default.svg'}
             alt="프로필"
@@ -263,35 +290,27 @@ function ProfileDropdown({
           />
         </div>
         <div className="flex min-w-0 flex-col">
-          <span className="truncate text-sm font-medium leading-[1.5] tracking-[-0.21px] text-prime-900">
+          <span className="text-prime-900 truncate text-sm leading-[1.5] font-medium tracking-[-0.21px]">
             {userName}
           </span>
-          <span className="truncate text-xs leading-[1.5] tracking-[-0.18px] text-prime-500">
+          <span className="text-prime-500 truncate text-xs leading-[1.5] tracking-[-0.18px]">
             {userEmail}
           </span>
         </div>
-      </div>
+      </button>
 
       {/* 메뉴 항목 */}
       <div className="py-2">
-        {/* 내 프로필 */}
+        {/* 마이페이지 */}
         <button
           type="button"
-          onClick={onProfile}
-          className="flex w-full items-center gap-4 px-5 py-3 text-sm font-medium tracking-[-0.21px] text-prime-900 transition-colors hover:bg-black/5"
+          onClick={onMypage}
+          className="text-prime-900 flex w-full items-center gap-3 px-5 py-3 text-sm font-medium tracking-[-0.21px] transition-colors hover:bg-black/5"
         >
-          <User size={18} className="shrink-0 text-prime-500" />
-          내 프로필
-        </button>
-
-        {/* 설정 */}
-        <button
-          type="button"
-          onClick={onSettings}
-          className="flex w-full items-center gap-4 px-5 py-3 text-sm font-medium tracking-[-0.21px] text-prime-900 transition-colors hover:bg-black/5"
-        >
-          <Settings size={18} className="shrink-0 text-prime-500" />
-          설정
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-blue-50">
+            <User size={15} className="text-main-blue" />
+          </div>
+          마이페이지
         </button>
 
         {/* 구분선 */}
@@ -301,9 +320,11 @@ function ProfileDropdown({
         <button
           type="button"
           onClick={onLogout}
-          className="flex w-full items-center gap-4 px-5 py-3 text-sm font-medium tracking-[-0.21px] text-error-500 transition-colors hover:bg-black/5"
+          className="text-error-500 flex w-full items-center gap-3 px-5 py-3 text-sm font-medium tracking-[-0.21px] transition-colors hover:bg-black/5"
         >
-          <LogOut size={18} className="shrink-0 text-error-500" />
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-red-50">
+            <LogOut size={15} className="text-error-500" />
+          </div>
           로그아웃
         </button>
       </div>
