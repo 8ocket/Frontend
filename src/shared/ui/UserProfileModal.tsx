@@ -74,7 +74,6 @@ export function UserProfileModal({
               {/* 프로필 사진 */}
               <div className="flex flex-col items-center gap-3">
                 <div className="relative">
-                  {/* 아바타 */}
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
@@ -88,7 +87,6 @@ export function UserProfileModal({
                     )}
                   </button>
 
-                  {/* 카메라 버튼 */}
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
@@ -108,14 +106,14 @@ export function UserProfileModal({
                 />
 
                 <p className="text-center text-xs leading-[1.5] tracking-[-0.18px] text-prime-500">
-                  프로필 사진을 변경하려면 상단의 카메라 아이콘을 눌러주세요
+                  프로필 사진을 바꾸고 싶다면 새로 업로드를 해주세요.
                 </p>
               </div>
 
               {/* 닉네임 입력 */}
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium tracking-[-0.21px] text-prime-900">
-                  닉네임
+                <label className="text-sm font-medium tracking-[-0.21px] text-prime-700">
+                  닉네임을 바꾸고 싶으시다면 새로 입력해 주세요.
                 </label>
                 <input
                   type="text"
@@ -125,17 +123,15 @@ export function UserProfileModal({
                   maxLength={20}
                   className="h-14 w-full rounded-xl border border-neutral-300 bg-white/50 px-5 text-sm text-prime-900 placeholder:text-neutral-300 focus:border-cta-300 focus:outline-none focus:ring-2 focus:ring-cta-300/20"
                 />
+                <p className="text-center text-xs tracking-[-0.18px] text-error-500">
+                  닉네임 교체는 매월 3회까지 가능합니다 (0/3)
+                </p>
               </div>
 
-              {/* 안내 문구 */}
-              <div className="rounded-xl bg-secondary-100/60 px-4 py-3">
-                <p className="text-xs leading-[1.5] tracking-[-0.18px] text-prime-500">
-                  내 정보를 변경하신 후에는 아래 버튼을 눌러 저장해 주세요.
-                </p>
-                <p className="mt-1 text-xs leading-[1.5] tracking-[-0.18px] text-error-500">
-                  * 프로필 수정 시, 반영까지 약 10초 내외의 시간이 소요됩니다.
-                </p>
-              </div>
+              {/* 저장 확인 문구 */}
+              <p className="text-center text-sm leading-[1.5] tracking-[-0.21px] text-prime-700">
+                현재 바뀐 설정으로 저장하시겠습니까?
+              </p>
 
               {/* 저장 버튼 */}
               <button
