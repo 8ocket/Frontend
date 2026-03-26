@@ -33,7 +33,7 @@ export function ReportDetailSkeleton() {
         </div>
         <Bone className="h-5 w-52 rounded-lg" />
         <Bone className="mt-8 h-90 rounded-2xl" />
-        <div className="mt-8 border-t border-prime-100 pt-8">
+        <div className="border-prime-100 mt-8 border-t pt-8">
           <div className="grid grid-cols-3 gap-6">
             {Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="space-y-2">
@@ -53,10 +53,14 @@ export function ReportDetailSkeleton() {
         </div>
         <div className="flex flex-wrap gap-3">
           {[80, 64, 56, 72, 88].map((w) => (
-            <Bone key={w} className={`h-11 rounded-3xl`} style={{ width: `${w}px` }} />
+            <div
+              key={w}
+              className="h-11 animate-pulse rounded-3xl bg-neutral-200"
+              style={{ width: `${w}px` }}
+            />
           ))}
         </div>
-        <div className="mt-8 grid grid-cols-3 gap-6 border-t border-prime-100 pt-8">
+        <div className="border-prime-100 mt-8 grid grid-cols-3 gap-6 border-t pt-8">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="space-y-2">
               <Bone className="h-4 w-20" />
@@ -81,7 +85,7 @@ export function ReportDetailSkeleton() {
             </div>
           ))}
         </div>
-        <div className="mt-8 grid grid-cols-2 gap-4 border-t border-prime-100 pt-8">
+        <div className="border-prime-100 mt-8 grid grid-cols-2 gap-4 border-t pt-8">
           {Array.from({ length: 2 }).map((_, i) => (
             <div key={i} className="bg-bg-light space-y-3 rounded-2xl p-5">
               <div className="flex items-center justify-between">
@@ -95,7 +99,7 @@ export function ReportDetailSkeleton() {
       </div>
 
       {/* 맞춤 행동 제언 */}
-      <div className="rounded-[24px] bg-prime-100 p-12">
+      <div className="bg-prime-100 rounded-[24px] p-12">
         <div className="mb-10 flex flex-col items-center gap-4">
           <Bone className="size-16 rounded-full" />
           <Bone className="h-9 w-40" />
@@ -103,7 +107,7 @@ export function ReportDetailSkeleton() {
         </div>
         <div className="space-y-4">
           {Array.from({ length: 2 }).map((_, i) => (
-            <div key={i} className="rounded-4xl bg-prime-200/40 p-7">
+            <div key={i} className="bg-prime-200/40 rounded-4xl p-7">
               <div className="flex items-start gap-5">
                 <Bone className="size-10 shrink-0 rounded-full" />
                 <div className="flex-1 space-y-3">
