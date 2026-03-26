@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/entities/user/store';
 import { useChatModals } from '@/features/select-persona';
@@ -14,22 +14,15 @@ import {
   ChatCreditModal,
   ChatNewSessionModal,
   ChatUnfinishedSessionModal,
-  ChatRecordLoadingModal,
-  ChatPersonaSelectModal,
-  ChatPersonaConfirmModal,
-  type PersonaCardData,
 } from '@/components/chat';
 import { Menu } from 'lucide-react';
 
 // ── 모달 상태 타입 ──────────────────────────────────────────────
 export type ChatModalType =
-  | 'persona-select'
-  | 'persona-confirm'
   | 'credit-shortage'
   | 'new-session'
   | 'unfinished-session'
   | 'end-confirm'
-  | 'record-loading'
   | null;
 
 // ── 더미 세션 데이터 (TODO: API 연동 시 제거) ───────────────────
@@ -246,77 +239,69 @@ const MOCK_SESSION_GROUPS: ChatSessionGroup[] = [
   },
 ];
 
-// ── 샘플 페르소나 데이터 (TODO: API 연동 시 제거) ───────────────
-const MOCK_PERSONAS: PersonaCardData[] = [
-  {
-    id: 'mental',
-    name: '정신건강 상담사',
-    description: '감정 소진, 불안, 우울감 등 정서적 케어와 공감에 집중',
-    imageUrl: '/images/personas/mental.png',
-  },
-  {
-    id: 'career',
-    name: '진로 및 학업 상담사',
-    description: '목표 설정, 번아웃 관리, 진로 탐색 등 성취와 관련된 고민 구조화',
-    imageUrl: '/images/personas/career.png',
-  },
-  {
-    id: 'coaching',
-    name: '코칭 심리 상담사',
-    description: '대인관계, 의사소통 일상적 스트레스 관리 등 실질적인 행동 변화와 솔루션 제안',
-    imageUrl: '/images/personas/coaching.png',
-  },
-  {
-    id: 'locked-1',
-    name: '새로운 페르소나',
-    description: '페르소나를 해금하여 더 많은 방식의 상담을 진행해 보세요.',
-    isLocked: true,
-  },
-];
 
 export default function ChatPage() {
   const router = useRouter();
   const { activeModal, openModal, closeModal } = useChatModals();
   const remainingCredits = useAuthStore((s) => s.user?.creditBalance ?? 0);
-  const useCredit = useAuthStore((s) => s.useCredit);
 
-  const COUNSEL_CREDIT_COST = 70;
-  const [selectedPersonaId, setSelectedPersonaId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSessionId, setActiveSessionId] = useState<string>('1');
+  /** 현재 채팅 세션 활성 여부 — false면 입력창 비활성화 */
+  const [isSessionActive, setIsSessionActive] = useState(false);
+  /** 채팅창에 외부에서 append할 메시지 */
+  const [appendMessage, setAppendMessage] = useState<ChatBubbleProps | null>(null);
 
   const activeMessages = MOCK_SESSIONS.find((s) => s.id === activeSessionId)?.messages ?? [];
 
+  // ── 진입 시 분기 로직 ────────────────────────────────────────────
+  // TODO: API 연동 시 실제 미완성 상담 여부로 교체
+  const hasUnfinishedSession = false; // mock
+
+  useEffect(() => {
+    if (hasUnfinishedSession) {
+      // 미완성 상담 있음 → [마무리 안된 상담] 모달 (블러 배경)
+      openModal('unfinished-session');
+    }
+    // 미완성 상담 없음 → 입력창 비활성 상태 유지 (모달 없음)
+  }, []);
+
+  // ── 핸들러 ───────────────────────────────────────────────────────
+
+  /** 사이드바 [새로운 상담] 버튼 → 세션 시작, 입력창 활성화 */
   const handleNewCounsel = () => {
     setSidebarOpen(false);
-    // TODO: 미완결 상담 체크 API → 있으면 'unfinished-session', 없으면 'persona-select'
-    openModal('persona-select');
-  };
-
-  const handlePersonaStart = (personaId: string) => {
-    setSelectedPersonaId(personaId);
-    openModal('persona-confirm');
-  };
-
-  const handlePersonaConfirm = () => {
     closeModal();
-    if (remainingCredits < COUNSEL_CREDIT_COST) {
-      openModal('credit-shortage');
-      return;
-    }
-    useCredit(COUNSEL_CREDIT_COST);
-    // TODO: 세션 생성 API 호출 (selectedPersonaId)
+    setIsSessionActive(true);
+    // TODO: 세션 생성 API 호출
   };
 
-  const handlePersonaReselect = () => {
-    openModal('persona-select');
+  /** 비활성 입력창/전송 버튼 탭 → [새로운 상담] 안내 모달 (블러 없음) */
+  const handleDisabledInputClick = () => {
+    openModal('new-session');
+  };
+
+  /** [마무리 안된 상담] → 진행한다: 기존 세션 이어가기 */
+  const handleUnfinishedResume = () => {
+    closeModal();
+    setIsSessionActive(true);
+    // TODO: 기존 세션 복귀 API 호출
+  };
+
+  /** [마무리 안된 상담] → 무시하기: 모달 닫고 입력창 비활성 유지 */
+  const handleUnfinishedIgnore = () => {
+    closeModal();
+    // 입력창은 비활성 유지 → 사이드바 [새로운 상담] 버튼으로 세션 시작 유도
   };
 
   const handleEndChat = () => openModal('end-confirm');
 
-  const handleConfirmEnd = () => {
+  /** 종료 확인 → "마음 기록 제작 중" 메시지 전송 후 세션 비활성화 */
+  const handleEndConfirmed = () => {
+    setAppendMessage({ variant: 'ai', senderName: '마음 기록', content: '마음 기록을 생성 중입니다.' });
+    setIsSessionActive(false);
     closeModal();
-    openModal('record-loading');
+    // TODO: 마음 기록 생성 API 호출
   };
 
   return (
@@ -358,25 +343,11 @@ export default function ChatPage() {
           onCreditShortage={() => openModal('credit-shortage')}
           onUnfinishedSession={() => openModal('unfinished-session')}
           initialMessages={activeMessages}
+          isSessionActive={isSessionActive}
+          onDisabledInputClick={handleDisabledInputClick}
+          appendMessage={appendMessage}
         />
       </div>
-
-      {/* 페르소나 선택 모달 */}
-      <ChatPersonaSelectModal
-        isOpen={activeModal === 'persona-select'}
-        onClose={closeModal}
-        personas={MOCK_PERSONAS}
-        onStart={handlePersonaStart}
-        onPurchase={closeModal}
-      />
-
-      {/* 페르소나 확인 모달 */}
-      <ChatPersonaConfirmModal
-        isOpen={activeModal === 'persona-confirm'}
-        onClose={closeModal}
-        onReselect={handlePersonaReselect}
-        onConfirm={handlePersonaConfirm}
-      />
 
       {/* 크레딧 부족 모달 */}
       <ChatCreditModal
@@ -387,37 +358,31 @@ export default function ChatPage() {
         onPurchase={() => { closeModal(); router.push('/shop'); }}
       />
 
-      {/* 새로운 상담 안내 모달 */}
+      {/* 새로운 상담 안내 모달 — 블러 없음 */}
       <ChatNewSessionModal
         isOpen={activeModal === 'new-session'}
         onClose={closeModal}
         onConfirm={closeModal}
+        overlayBlur={false}
       />
 
-      {/* 미완결 상담 모달 */}
+      {/* 미완결 상담 모달 — 블러 있음 */}
       <ChatUnfinishedSessionModal
         isOpen={activeModal === 'unfinished-session'}
         onClose={closeModal}
         sessionTitle="설날 기간 친척들과의 불편한 이야기"
         sessionDate="2026. 02. 17"
-        onIgnore={() => {
-          closeModal();
-          openModal('persona-select');
-        }}
-        onResume={closeModal}
+        onIgnore={handleUnfinishedIgnore}
+        onResume={handleUnfinishedResume}
+        overlayBlur
       />
 
       {/* 상담 종료 확인 모달 */}
-      {activeModal === 'end-confirm' && (
-        <ChatAlertModal variant="end" onWait={closeModal} onEnd={handleConfirmEnd} />
-      )}
-
-      {/* 마음기록 제작 대기 모달 */}
-      <ChatRecordLoadingModal
-        isOpen={activeModal === 'record-loading'}
+      <ChatAlertModal
+        isOpen={activeModal === 'end-confirm'}
         onClose={closeModal}
         onWait={closeModal}
-        onExit={closeModal}
+        onEnd={handleEndConfirmed}
       />
     </div>
   );

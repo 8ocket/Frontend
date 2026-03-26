@@ -6,49 +6,13 @@ import {
   ChatCreditModal,
   ChatNewSessionModal,
   ChatUnfinishedSessionModal,
-  ChatRecordLoadingModal,
-  ChatPersonaSelectModal,
-  type PersonaCardData,
 } from '@/components/chat';
 import { StatusModal } from '@/shared/ui/status-modal';
-
-const MOCK_PERSONAS: PersonaCardData[] = [
-  {
-    id: 'mental',
-    name: '정신건강 상담사',
-    description: '감정 소진, 불안, 우울감 등 정서적 케어와 공감에 집중',
-  },
-  {
-    id: 'career',
-    name: '진로 및 학업 상담사',
-    description: '목표 설정, 번아웃 관리, 진로 탐색 등 성취와 관련된 고민 구조화',
-  },
-  {
-    id: 'coaching',
-    name: '코칭 심리 상담사',
-    description:
-      '대인관계, 의사소통 일상적 스트레스 관리 등 실질적인 행동 변화와 솔루션 제안',
-  },
-  {
-    id: 'locked-1',
-    name: '새로운 페르소나',
-    description: '페르소나를 해금하여 더 많은 방식의 상담을 진행해 보세요.',
-    isLocked: true,
-  },
-  {
-    id: 'locked-2',
-    name: '새로운 페르소나',
-    description: '페르소나를 해금하여 더 많은 방식의 상담을 진행해 보세요.',
-    isLocked: true,
-  },
-];
 
 type ModalKey =
   | 'credit'
   | 'new-session'
   | 'unfinished'
-  | 'record-loading'
-  | 'persona-select'
   | 'end-confirm'
   | null;
 
@@ -57,8 +21,6 @@ const MODAL_LIST: { key: ModalKey; label: string; semantic: string }[] = [
   { key: 'new-session', label: '새로운 상담 안내', semantic: '🟡 Yellow' },
   { key: 'unfinished', label: '미완결 상담', semantic: '🟡 Yellow' },
   { key: 'end-confirm', label: '상담 종료 확인', semantic: '🔴 Red (StatusModal)' },
-  { key: 'record-loading', label: '마음기록 제작 대기', semantic: '🔵 Blue + Spinner' },
-  { key: 'persona-select', label: '페르소나 선택', semantic: '🌫️ Glass (대형)' },
 ];
 
 export default function ModalDemoPage() {
@@ -111,22 +73,6 @@ export default function ModalDemoPage() {
         sessionDate="2026. 02. 17"
         onIgnore={() => { close(); alert('무시한다 클릭'); }}
         onResume={() => { close(); alert('진행한다 클릭'); }}
-      />
-
-      <ChatRecordLoadingModal
-        isOpen={active === 'record-loading'}
-        onClose={close}
-        onWait={() => { close(); alert('대기한다 클릭'); }}
-        onExit={() => { close(); alert('종료하기 클릭'); }}
-      />
-
-      <ChatPersonaSelectModal
-        isOpen={active === 'persona-select'}
-        onClose={close}
-        personas={MOCK_PERSONAS}
-        defaultSelectedId="career"
-        onStart={(id) => { close(); alert(`상담 시작: ${id}`); }}
-        onPurchase={() => { close(); alert('구매하러 가기 클릭'); }}
       />
 
       <StatusModal

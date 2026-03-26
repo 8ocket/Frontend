@@ -41,14 +41,17 @@ function DialogContent({
   children,
   showClose = true,
   maxWidth = 'max-w-[602px]',
+  overlayBlur = true,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showClose?: boolean;
   maxWidth?: string;
+  /** 오버레이 블러 처리 여부 (기본 true) */
+  overlayBlur?: boolean;
 }) {
   return (
     <DialogPortal>
-      <DialogOverlay />
+      <DialogOverlay className={overlayBlur ? '' : 'backdrop-blur-none'} />
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(

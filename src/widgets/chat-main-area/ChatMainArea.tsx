@@ -19,6 +19,12 @@ export interface ChatMainAreaProps {
   onUnfinishedSession?: () => void;
   /** 표시할 메시지 목록 */
   initialMessages?: ChatBubbleProps[];
+  /** 활성 세션 여부 — false면 입력창 비활성화 */
+  isSessionActive?: boolean;
+  /** 비활성 입력창/전송 버튼 클릭 시 호출 */
+  onDisabledInputClick?: () => void;
+  /** 외부에서 채팅에 추가할 메시지 — 변경될 때마다 목록에 append */
+  appendMessage?: ChatBubbleProps | null;
 }
 
 const PERSONA_OPTIONS: PersonaOption[] = [
@@ -27,7 +33,7 @@ const PERSONA_OPTIONS: PersonaOption[] = [
   { id: 'coaching', label: '코칭 심리 상담사' },
 ];
 
-export function ChatMainArea({ onEndChat, onCreditShortage, onUnfinishedSession, initialMessages = [] }: ChatMainAreaProps = {}) {
+export function ChatMainArea({ onEndChat, onCreditShortage, onUnfinishedSession, initialMessages = [], isSessionActive = true, onDisabledInputClick, appendMessage }: ChatMainAreaProps = {}) {
   const [messages, setMessages] = useState<ChatBubbleProps[]>(initialMessages);
   const [inputValue, setInputValue] = useState('');
   const [showSelectOptions, setShowSelectOptions] = useState(false);
@@ -36,6 +42,13 @@ export function ChatMainArea({ onEndChat, onCreditShortage, onUnfinishedSession,
   useEffect(() => {
     setMessages(initialMessages);
   }, [initialMessages]);
+
+  // 외부에서 메시지 추가 (예: 종료 시 "마음 기록 제작 중")
+  useEffect(() => {
+    if (appendMessage) {
+      setMessages((prev) => [...prev, appendMessage]);
+    }
+  }, [appendMessage]);
 
   function handleSend() {
     if (!inputValue.trim()) return;
@@ -72,6 +85,8 @@ export function ChatMainArea({ onEndChat, onCreditShortage, onUnfinishedSession,
           onChange={setInputValue}
           onSend={handleSend}
           onEndChat={onEndChat}
+          disabled={!isSessionActive}
+          onDisabledClick={onDisabledInputClick}
         />
       </div>
 
