@@ -16,7 +16,7 @@ export type ChatBubbleProps = {
 // User Profile Photo — 21×21 흰 원 + 사용자 실루엣 벡터 (fill=#2b4764)
 function UserProfilePhoto() {
   return (
-    <div className="flex h-5.25 w-5.25 shrink-0 items-center justify-center rounded-full bg-white">
+    <div className="flex h-5.25 w-5.25 shrink-0 items-center justify-center rounded-full bg-slate-100">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
           d="M8 8C9.933 8 11.5 6.433 11.5 4.5C11.5 2.567 9.933 1 8 1C6.067 1 4.5 2.567 4.5 4.5C4.5 6.433 6.067 8 8 8Z"
@@ -80,12 +80,12 @@ export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatar
         className={[
           'w-full rounded-2xl px-5 py-4 shadow-sm',
           isAi
-            ? 'border border-slate-100 bg-white'
-            : 'bg-main-blue text-white',
+            ? 'bg-white'
+            : 'bg-[#4A90E2] text-white',
         ].join(' ')}
       >
         <p
-          className={['whitespace-pre-wrap text-[15px] leading-[165%]', isAi ? 'text-prime-900' : 'text-white'].join(' ')}
+          className={['whitespace-pre-wrap text-[15px] leading-[185%]', isAi ? 'text-prime-900' : 'text-white'].join(' ')}
           style={{ fontFamily: 'var(--font-pretendard)' }}
         >
           {content}
