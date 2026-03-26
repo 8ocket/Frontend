@@ -23,6 +23,7 @@ export function ChatSelectOptions({ title, options, onSelect }: ChatSelectOption
     >
       {/* Header — "원하시는 상담사를 고르세요" */}
       <div className="flex flex-row items-center gap-2">
+        {/* TODO: 타이포그래피 토큰으로 전환 → className="heading-03 text-prime-900" */}
         <span
           className="text-prime-900"
           style={{

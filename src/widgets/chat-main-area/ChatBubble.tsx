@@ -61,6 +61,7 @@ export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatar
           <UserProfilePhoto />
         )}
 
+        {/* TODO: 타이포그래피 토큰으로 전환 → isAi ? "subtitle-1" : "body-2" + text-prime-500 */}
         <span
           style={{
             fontFamily: 'var(--font-pretendard)',

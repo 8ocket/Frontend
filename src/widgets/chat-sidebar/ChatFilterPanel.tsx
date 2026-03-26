@@ -71,6 +71,7 @@ function CustomSelect({
         className="flex h-6 items-center gap-1 rounded bg-white px-1.5"
         aria-label={placeholder + ' 선택'}
       >
+        {/* TODO: 타이포그래피 토큰으로 전환 → 13px는 토큰 미정의, 신규 토큰 추가 필요 */}
         <span
           style={{
             fontFamily: 'var(--font-pretendard)',
@@ -82,6 +83,7 @@ function CustomSelect({
         >
           {value || placeholder}
         </span>
+        {/* TODO: 8px는 토큰 미정의, 아이콘으로 교체 검토 필요 */}
         <span style={{ fontSize: '8px', color: value ? '#1A222E' : '#E2E8F0', lineHeight: 1 }}>▼</span>
       </button>
 

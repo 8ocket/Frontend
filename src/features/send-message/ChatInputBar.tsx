@@ -50,6 +50,7 @@ export function ChatInputBar({ value, onChange, onSend, onEndChat }: ChatInputBa
         <div className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-50 transition-colors group-hover:bg-red-50 group-active:bg-red-100">
           <X size={12} strokeWidth={1} className="text-slate-400 transition-colors group-hover:text-red-400 group-active:text-red-500" />
         </div>
+        {/* TODO: 타이포그래피 토큰으로 전환 → 11px는 토큰 미정의, 신규 토큰 추가 필요 */}
         <span
           className="text-slate-400"
           style={{ fontFamily: 'var(--font-pretendard)', fontSize: '11px', fontWeight: 400, lineHeight: '100%' }}

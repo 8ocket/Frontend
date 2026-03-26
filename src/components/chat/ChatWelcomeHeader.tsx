@@ -58,7 +58,7 @@ export function ChatWelcomeHeader({ activeId }: ChatWelcomeHeaderProps) {
                   isActive ? 'bg-secondary-100' : '',
                 ].join(' ')}
               >
-                {/* 텍스트 — Medium 16px, prime-900 */}
+                {/* TODO: 타이포그래피 토큰으로 전환 → className="button-1 text-prime-900" */}
                 <span
                   className="text-prime-900"
                   style={{

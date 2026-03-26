@@ -21,6 +21,10 @@ export interface ChatCreditModalProps {
 
 const FONT_BASE = { fontFamily: 'var(--font-pretendard)' } as const;
 
+// TODO: 타이포그래피 토큰으로 전환
+// TITLE_STYLE → className="heading-02 text-error-600"
+// BODY_STYLE  → className="body-1 text-prime-700"
+// BTN_STYLE   → className="button-1"
 const TITLE_STYLE = {
   ...FONT_BASE,
   fontSize: '24px',
