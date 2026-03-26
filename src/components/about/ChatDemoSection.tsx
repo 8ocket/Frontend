@@ -29,7 +29,7 @@ export function ChatDemoSection() {
             fontWeight: 600,
             lineHeight: '130%',
             letterSpacing: '-0.015em',
-            color: 'var(--color-prime-900)',
+            color: '#1A222E',
           }}
         >
           여러분의 마음은 안전한가요?
@@ -37,7 +37,8 @@ export function ChatDemoSection() {
 
         {/* Body — 16px Regular #3F527E, lh:25.6px */}
         <p
-          className="body-1 whitespace-pre-line text-center text-prime-700"
+          className="body-1 whitespace-pre-line text-center"
+          style={{ color: '#3F527E' }}
         >
           {'마음속 이야기를 꺼내고 싶어도, 어디서부터 어떻게 말해야 할지 막막할 때가 있죠.\n판단받을까봐, 혹은 괜한 걱정을 끼칠까봐 혼자 삼켜온 감정들이 있으셨을 거예요.\n여러분의 마음을 편하게 꺼내놓을 수 있는 곳, 여기 있습니다.'}
         </p>
