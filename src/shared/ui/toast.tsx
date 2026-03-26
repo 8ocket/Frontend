@@ -26,7 +26,7 @@ interface ToastContextValue {
 const ToastContext = createContext<ToastContextValue | null>(null);
 
 const SEMANTIC_STYLES: Record<ToastSemantic, string> = {
-  info: 'border-l-cta-300 text-cta-300',
+  info: 'border-l-info-600 text-info-600',
   success: 'border-l-success-800 text-success-800',
   error: 'border-l-error-600 text-error-600',
   warning: 'border-l-warning-600 text-warning-600',

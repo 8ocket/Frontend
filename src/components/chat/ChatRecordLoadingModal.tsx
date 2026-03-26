@@ -24,7 +24,7 @@ const TITLE_STYLE = {
   fontSize: '24px',
   fontWeight: 600,
   lineHeight: '31.2px',
-  color: '#0B63F3',
+  color: 'var(--color-info-600)',
 } as const;
 
 const BODY_STYLE = {
@@ -32,7 +32,7 @@ const BODY_STYLE = {
   fontSize: '16px',
   fontWeight: 400,
   lineHeight: '25.6px',
-  color: '#3F526F',
+  color: 'var(--color-prime-700)',
 } as const;
 
 const BTN_STYLE = {
@@ -83,7 +83,7 @@ export function ChatRecordLoadingModal({
               type="button"
               onClick={onWait}
               className="flex items-center justify-center gap-2.5 rounded-lg border px-6 py-3.5 transition-colors"
-              style={{ ...BTN_STYLE, borderColor: '#82C9FF', color: '#516A90' }}
+              style={{ ...BTN_STYLE, borderColor: 'var(--color-cta-300)', color: 'var(--color-prime-600)' }}
             >
               대기한다
             </button>

@@ -62,7 +62,7 @@ export function ProductCard({ onPurchase }: ProductCardProps) {
         </div>
 
         {/* Disclaimer */}
-        <div className="text-warning-500 w-full text-xs leading-[1.2] font-normal tracking-[-0.18px]">
+        <div className="text-tertiary-400 w-full text-xs leading-[1.2] font-normal tracking-[-0.18px]">
           혜택의 수치는 평균 사용패턴 기준이며, 개인 이용 방식에 따라 달라질 수 있습니다.
         </div>
       </div>
@@ -130,7 +130,7 @@ export function ProductCard2({ onPurchase }: ProductCardProps) {
         </div>
 
         {/* Disclaimer */}
-        <div className="text-warning-500 w-full text-xs leading-[1.2] font-normal tracking-[-0.18px]">
+        <div className="text-tertiary-400 w-full text-xs leading-[1.2] font-normal tracking-[-0.18px]">
           혜택의 수치는 평균 사용패턴 기준이며, 개인 이용 방식에 따라 달라질 수 있습니다.
         </div>
       </div>

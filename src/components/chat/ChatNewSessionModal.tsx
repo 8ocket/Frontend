@@ -22,7 +22,7 @@ const TITLE_STYLE = {
   fontSize: '24px',
   fontWeight: 600,
   lineHeight: '31.2px',
-  color: '#C57F08',
+  color: 'var(--color-warning-600)',
 } as const;
 
 const BODY_STYLE = {
@@ -30,7 +30,7 @@ const BODY_STYLE = {
   fontSize: '16px',
   fontWeight: 400,
   lineHeight: '25.6px',
-  color: '#3F526F',
+  color: 'var(--color-prime-700)',
 } as const;
 
 const BTN_STYLE = {
@@ -62,7 +62,7 @@ export function ChatNewSessionModal({ isOpen, onClose, onConfirm }: ChatNewSessi
               </DialogDescription>
 
               {/* 부가안내 — Pretendard 16px/400, lh 25.6px, #8A9BA8, CENTER */}
-              <p className="w-full text-center" style={{ ...BODY_STYLE, color: '#8A9BA8' }}>
+              <p className="w-full text-center" style={{ ...BODY_STYLE, color: 'var(--color-tertiary-400)' }}>
                 (하루 1회씩 무료로 상담 가능합니다.)
               </p>
             </div>

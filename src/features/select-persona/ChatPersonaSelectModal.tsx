@@ -94,7 +94,7 @@ function PersonaCard({
             fontSize: '24px',
             fontWeight: 600,
             lineHeight: '31.2px',
-            color: '#3F526F',
+            color: 'var(--color-prime-700)',
           }}
         >
           {persona.name}
@@ -106,7 +106,7 @@ function PersonaCard({
             fontSize: '14px',
             fontWeight: 400,
             lineHeight: '22.4px',
-            color: '#516A90',
+            color: 'var(--color-prime-600)',
           }}
         >
           {persona.description}
@@ -152,7 +152,7 @@ function BuyCard({ onPurchase }: { onPurchase?: () => void }) {
             fontSize: '24px',
             fontWeight: 600,
             lineHeight: '31.2px',
-            color: '#3F526F',
+            color: 'var(--color-prime-700)',
           }}
         >
           새로운 페르소나
@@ -163,7 +163,7 @@ function BuyCard({ onPurchase }: { onPurchase?: () => void }) {
             fontSize: '14px',
             fontWeight: 400,
             lineHeight: '22.4px',
-            color: '#516A90',
+            color: 'var(--color-prime-600)',
           }}
         >
           페르소나를 해금하여 더 많은 방식의 상담을 진행해 보세요.
@@ -235,7 +235,7 @@ export function ChatPersonaSelectModal({
                   fontSize: '32px',
                   fontWeight: 600,
                   lineHeight: '41.6px',
-                  color: '#2C3A4F',
+                  color: 'var(--color-prime-800)',
                 }}
               >
                 원하시는 상담사를 선택해 주세요.

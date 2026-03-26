@@ -53,7 +53,7 @@ export function LargeCardSection() {
             fontWeight: 600,
             lineHeight: '130%',
             letterSpacing: '-0.015em',
-            color: '#1A222E',
+            color: 'var(--color-prime-900)',
           }}
         >
           여러분의 감정에는 패턴이 있습니다
@@ -61,8 +61,7 @@ export function LargeCardSection() {
 
         {/* Body — 16px Regular #3F527E */}
         <p
-          className="body-1 whitespace-pre-line text-center"
-          style={{ color: '#3F527E' }}
+          className="body-1 whitespace-pre-line text-center text-prime-700"
         >
           {'반복되는 감정에는 이유가 있어요.\n어떤 상황에서, 어떤 사람과 함께할 때 마음이 흔들리는지.\n저희는 그 흐름을 함께 기록하고, 여러분이 스스로를 더 잘 이해할 수 있도록 돕습니다.'}
         </p>

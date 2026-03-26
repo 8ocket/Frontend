@@ -68,8 +68,8 @@ export function EmotionAreaChart({ data, type }: EmotionAreaChartProps) {
             className="rounded-full px-4 py-2 text-[13px] font-bold tracking-tight"
             style={
               type === 'weekly'
-                ? { background: 'var(--main-blue)', color: '#1a222e', opacity: 0.9 }
-                : { background: '#d1d9e0', color: '#334155' }
+                ? { background: 'var(--main-blue)', color: 'var(--color-prime-900)', opacity: 0.9 }
+                : { background: '#d1d9e0', color: 'var(--color-neutral-800)' }
             }
           >
             {type === 'weekly' ? '주간' : '월간'}
@@ -133,8 +133,8 @@ export function EmotionAreaChart({ data, type }: EmotionAreaChartProps) {
         <div className="grid grid-cols-3 gap-6">
           {[
             { label: '평균 점수', value: avg, color: 'var(--main-blue)' },
-            { label: '최고 점수', value: max, color: '#10b981' },
-            { label: '최저 점수', value: min, color: '#f43f5e' },
+            { label: '최고 점수', value: max, color: 'var(--color-score-high)' },
+            { label: '최저 점수', value: min, color: 'var(--color-score-low)' },
           ].map(({ label, value, color }) => (
             <div key={label}>
               <p className="mb-2 text-[13px] text-prime-500">{label}</p>

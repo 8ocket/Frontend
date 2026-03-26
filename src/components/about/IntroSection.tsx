@@ -46,16 +46,14 @@ export function IntroSection() {
 
         {/* Heading — 32px SemiBold #1A222E, lh:41.6px, ls:-0.48px */}
         <h1
-          className="heading-01 text-center"
-          style={{ color: '#1A222E' }}
+          className="heading-01 text-center text-prime-900"
         >
           여러분의 마음엔 무엇이 보이나요?
         </h1>
 
         {/* Body — 16px Regular #3F527E, lh:25.6px */}
         <p
-          className="body-1 whitespace-pre-line text-center"
-          style={{ color: '#3F527E' }}
+          className="body-1 whitespace-pre-line text-center text-prime-700"
         >
           {'매일 반복되는 일상 속에서도, 여러분은 묵묵히 하루를 살아내고 있습니다.\n그 안에서 지치고, 흔들리고, 때로는 무너질 것 같은 순간도 있었을 거예요.\n그런데 정작 지금 내 마음이 어떤 상태인지, 스스로 알고 있으신가요?'}
         </p>

@@ -80,7 +80,7 @@ export function SmallCardsSection() {
             fontWeight: 600,
             lineHeight: '130%',
             letterSpacing: '-0.015em',
-            color: '#1A222E',
+            color: 'var(--color-prime-900)',
           }}
         >
           여러분의 마음을 있는 그대로 바라보세요
@@ -88,8 +88,7 @@ export function SmallCardsSection() {
 
         {/* Body — 16px Regular #3F527E */}
         <p
-          className="body-1 whitespace-pre-line text-center"
-          style={{ color: '#3F527E' }}
+          className="body-1 whitespace-pre-line text-center text-prime-700"
         >
           {'감정은 억누른다고 사라지지 않아요.\n다만 제대로 바라보지 못하면, 어느새 쌓이고 굳어버리기도 하죠.\n지금 여러분의 감정이 어디서 왔는지, 어떻게 흘러가고 있는지, 함께 들여다보고 싶습니다.'}
         </p>

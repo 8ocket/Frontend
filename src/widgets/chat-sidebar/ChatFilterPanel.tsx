@@ -153,7 +153,7 @@ function DateBlock({
           fontFamily: 'var(--font-pretendard)',
           fontSize: '14px',
           fontWeight: 400,
-          color: '#B1C7DD',
+          color: 'var(--color-secondary-300)',
           lineHeight: '160%',
         }}
       >
@@ -211,7 +211,7 @@ const LABEL_STYLE = {
   fontFamily: 'var(--font-pretendard)',
   fontSize: '14px',
   fontWeight: 600,
-  color: '#D4E0ED',
+  color: 'var(--color-secondary-200)',
   lineHeight: '130%',
 } as const;
 

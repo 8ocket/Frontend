@@ -159,22 +159,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Section 2: 배너 ───────────────────────────────────────────────────── */}
-      <section className="mt-10">
-        <div className="mx-auto max-w-360 px-8">
-          <div className="flex h-100 items-center justify-center rounded-[24px] bg-[rgba(130,201,255,0.1)]">
-            <div className="flex flex-col items-center gap-2">
-              <p className="text-warning-500 text-[14px] font-medium tracking-[-0.21px]">
-                Coming Soon
-              </p>
-              <p className="text-prime-600 text-[16px] font-normal">
-                곧 찾아올 새로운 소식을 기대해 주세요.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ── Section 3: 감정카드 — Figma 1675:3982 ───────────────────────────── */}
       <section className="mx-auto mt-[150px] max-w-[1440px] px-8">
         <p className="text-[24px] leading-[1.3] font-semibold tracking-[-0.36px] text-[#1a222e]">

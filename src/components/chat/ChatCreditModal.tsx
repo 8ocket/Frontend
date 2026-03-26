@@ -26,7 +26,7 @@ const TITLE_STYLE = {
   fontSize: '24px',
   fontWeight: 600,
   lineHeight: '31.2px',
-  color: '#BD1010',
+  color: 'var(--color-error-600)',
 } as const;
 
 const BODY_STYLE = {
@@ -34,7 +34,7 @@ const BODY_STYLE = {
   fontSize: '16px',
   fontWeight: 400,
   lineHeight: '25.6px',
-  color: '#3F526F',
+  color: 'var(--color-prime-700)',
 } as const;
 
 const BTN_STYLE = {
@@ -74,9 +74,9 @@ export function ChatCreditModal({
               {/* Frame 1597882345 — HORIZONTAL, gap 8, primary CENTER, 124×26 */}
               <div className="flex flex-row items-center justify-center gap-2">
                 {/* 잔여 크레딧 라벨 — Pretendard 16px/400, lh 25.6px, #8A9BA8 */}
-                <span style={{ ...BODY_STYLE, color: '#8A9BA8' }}>잔여 크레딧 :</span>
+                <span style={{ ...BODY_STYLE, color: 'var(--color-tertiary-400)' }}>잔여 크레딧 :</span>
                 {/* 크레딧 값 — Pretendard 16px/400, lh 25.6px, #0B63F3 */}
-                <span style={{ ...BODY_STYLE, color: '#0B63F3' }}>
+                <span style={{ ...BODY_STYLE, color: 'var(--color-info-600)' }}>
                   {remainingCredits.toLocaleString()}
                 </span>
               </div>
@@ -90,7 +90,7 @@ export function ChatCreditModal({
               type="button"
               onClick={onEnd}
               className="flex items-center justify-center gap-2.5 rounded-lg border px-6 py-3.5 transition-colors"
-              style={{ ...BTN_STYLE, borderColor: '#BD1010', color: '#BD1010' }}
+              style={{ ...BTN_STYLE, borderColor: 'var(--color-error-600)', color: 'var(--color-error-600)' }}
             >
               종료하기
             </button>

@@ -67,7 +67,7 @@ export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatar
             fontSize: '14px',
             fontWeight: isAi ? 600 : 400,
             lineHeight: '130%',
-            color: '#6983aa',
+            color: 'var(--color-prime-500)',
           }}
         >
           {senderName}

@@ -38,7 +38,7 @@ const headerStyle: React.CSSProperties = {
   fontWeight: 600,
   lineHeight: '130%',
   letterSpacing: '-0.24px',
-  color: '#1A222E',
+  color: 'var(--color-prime-900)',
   whiteSpace: 'nowrap',
 };
 
@@ -47,7 +47,7 @@ const subStyle: React.CSSProperties = {
   fontWeight: 400,
   lineHeight: '160%',
   letterSpacing: 0,
-  color: '#3F526F',
+  color: 'var(--color-prime-700)',
   whiteSpace: 'nowrap',
 };
 
@@ -56,7 +56,7 @@ const copyrightStyle: React.CSSProperties = {
   fontWeight: 500,
   lineHeight: '120%',
   letterSpacing: '-0.18px',
-  color: '#1A222E',
+  color: 'var(--color-prime-900)',
 };
 
 export function AboutFooter() {

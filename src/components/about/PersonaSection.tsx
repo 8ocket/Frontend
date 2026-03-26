@@ -57,7 +57,7 @@ export function PersonaSection() {
             fontWeight: 600,
             lineHeight: '130%',
             letterSpacing: '-0.015em',
-            color: '#1A222E',
+            color: 'var(--color-prime-900)',
           }}
         >
           여러분의 마음을 지켜줄게요
@@ -65,8 +65,7 @@ export function PersonaSection() {
 
         {/* Body — 16px Regular #3F527E */}
         <p
-          className="body-1 whitespace-pre-line text-center"
-          style={{ color: '#3F527E' }}
+          className="body-1 whitespace-pre-line text-center text-prime-700"
         >
           {'여러분이 느끼는 감정은 그 자체로 소중합니다. \n마인드 로그는 그 감정을 안전하게 꺼내놓고, 스스로 이해할 수 있도록 함께합니다.\n판단도, 진단도 없이. 오직 여러분의 마음에 집중합니다.'}
         </p>
@@ -76,7 +75,7 @@ export function PersonaSection() {
           className="caption-1"
           style={{
             fontWeight: 500,
-            color: '#697AA9',
+            color: 'var(--color-prime-500)',
           }}
         >
           (추후에 더 많은 타입의 페르소나를 만나볼 수 있어요.)
@@ -114,7 +113,7 @@ export function PersonaSection() {
                   fontWeight: 600,
                   lineHeight: '130%',
                   letterSpacing: '-0.015em',
-                  color: '#1A222E',
+                  color: 'var(--color-prime-900)',
                 }}
               >
                 {persona.name}
@@ -122,8 +121,7 @@ export function PersonaSection() {
 
               {/* 설명 — 16px Regular #3F527E */}
               <p
-                className="body-1"
-                style={{ color: '#3F527E' }}
+                className="body-1 text-prime-700"
               >
                 {persona.description}
               </p>

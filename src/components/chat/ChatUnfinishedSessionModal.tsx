@@ -28,7 +28,7 @@ const TITLE_STYLE = {
   fontSize: '24px',
   fontWeight: 600,
   lineHeight: '31.2px',
-  color: '#C57F08',
+  color: 'var(--color-warning-600)',
 } as const;
 
 const BODY_STYLE = {
@@ -36,7 +36,7 @@ const BODY_STYLE = {
   fontSize: '16px',
   fontWeight: 400,
   lineHeight: '25.6px',
-  color: '#3F526F',
+  color: 'var(--color-prime-700)',
 } as const;
 
 const BTN_STYLE = {
@@ -79,14 +79,14 @@ export function ChatUnfinishedSessionModal({
                 {/* 세션 제목 — Pretendard 12px/500, lh 14.4px, #945F06, CENTER */}
                 <span
                   className="text-center"
-                  style={{ ...FONT_BASE, fontSize: '12px', fontWeight: 500, lineHeight: '14.4px', color: '#945F06' }}
+                  style={{ ...FONT_BASE, fontSize: '12px', fontWeight: 500, lineHeight: '14.4px', color: 'var(--color-warning-700)' }}
                 >
                   [{sessionTitle}]
                 </span>
                 {/* 날짜 — Pretendard 12px/500, lh 14.4px, #6983AA, CENTER */}
                 <span
                   className="text-center"
-                  style={{ ...FONT_BASE, fontSize: '12px', fontWeight: 500, lineHeight: '14.4px', color: '#6983AA' }}
+                  style={{ ...FONT_BASE, fontSize: '12px', fontWeight: 500, lineHeight: '14.4px', color: 'var(--color-prime-500)' }}
                 >
                   {sessionDate}
                 </span>
@@ -101,7 +101,7 @@ export function ChatUnfinishedSessionModal({
               type="button"
               onClick={onIgnore}
               className="flex items-center justify-center gap-2.5 rounded-lg border px-6 py-3.5 transition-colors"
-              style={{ ...BTN_STYLE, borderColor: '#945F06', color: '#945F06' }}
+              style={{ ...BTN_STYLE, borderColor: 'var(--color-warning-700)', color: 'var(--color-warning-700)' }}
             >
               무시한다
             </button>

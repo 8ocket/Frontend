@@ -26,7 +26,7 @@ const TITLE_STYLE = {
   fontWeight: 600,
   lineHeight: '31.2px',
   letterSpacing: '-0.36px',
-  color: '#C57F08',
+  color: 'var(--color-warning-600)',
 } as const;
 
 // Figma: Pretendard Regular 16px, lh 25.6px, #3F526F
@@ -35,7 +35,7 @@ const BODY_STYLE = {
   fontSize: '16px',
   fontWeight: 400,
   lineHeight: '25.6px',
-  color: '#3F526F',
+  color: 'var(--color-prime-700)',
 } as const;
 
 // Figma: Pretendard Medium 16px, lh 16px
@@ -86,7 +86,7 @@ export function ChatPersonaConfirmModal({
               type="button"
               onClick={onReselect}
               className="flex items-center justify-center gap-2.5 rounded-lg border px-6 py-3.5 transition-colors"
-              style={{ ...BTN_STYLE, borderColor: '#945F06', color: '#945F06' }}
+              style={{ ...BTN_STYLE, borderColor: 'var(--color-warning-700)', color: 'var(--color-warning-700)' }}
             >
               다시 선택
             </button>

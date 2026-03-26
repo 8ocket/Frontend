@@ -60,7 +60,7 @@ export function ChatSelectOptions({ title, options, onSelect }: ChatSelectOption
               fontSize: '16px',
               fontWeight: 500,
               lineHeight: '100%',
-              color: '#3f526f',
+              color: 'var(--color-prime-700)',
             }}
           >
             {option.label}
