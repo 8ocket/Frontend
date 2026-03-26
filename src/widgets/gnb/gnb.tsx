@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X, User, LogOut, Coins } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useAuthStore } from '@/entities/user/store';
 import { cn } from '@/shared/lib/utils';
 import { UserProfileModal } from '@/shared/ui/UserProfileModal';
@@ -31,6 +32,7 @@ export function GNB() {
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, user, logout } = useAuthStore();
+  const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
@@ -42,6 +44,14 @@ export function GNB() {
     setPrevPathname(pathname);
     setMobileMenuOpen(false);
   }
+
+  // 스크롤 감지 — 80px 이상 시 glass 헤더 (너무 낮으면 살짝 스크롤에 바로 반응)
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 80);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -55,14 +65,8 @@ export function GNB() {
 
   // 모바일 메뉴 열림 시 스크롤 방지
   useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
+    document.body.style.overflow = mobileMenuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
   }, [mobileMenuOpen]);
 
   const handleLogout = () => {
@@ -71,9 +75,16 @@ export function GNB() {
   };
 
   return (
-    <header className="text-prime-900 fixed top-0 right-0 left-0 z-50 w-full border-b border-white/60 bg-white/80 backdrop-blur-md">
-      <nav className="layout-container flex h-16 items-center justify-between px-10">
-        {/* 로고 — Figma: 32px 원형 + 텍스트 18px */}
+    <header
+      className={cn(
+        'text-prime-900 fixed top-0 right-0 left-0 z-50 w-full transition-all duration-500 ease-in-out',
+        scrolled
+          ? 'bg-white/60 shadow-[0_4px_30px_rgba(0,0,0,0.03)] backdrop-blur-xl'
+          : 'bg-transparent'
+      )}
+    >
+      <nav className="layout-container flex items-center justify-between px-10 py-3">
+        {/* 로고 */}
         <Link href="/" className="flex shrink-0 items-center gap-2">
           <div className="relative size-8 overflow-hidden rounded-full">
             <Image
@@ -89,35 +100,39 @@ export function GNB() {
         </Link>
 
         {/* 데스크톱 메뉴 */}
-        <div className="hidden items-center gap-6 lg:flex">
+        <div className="hidden items-center gap-1 lg:flex">
           {(isAuthenticated ? MEMBER_NAV_ITEMS : GUEST_NAV_ITEMS).map(({ label, href }) => (
             <NavItem key={href} label={label} href={href} active={pathname === href} />
           ))}
         </div>
 
-        {/* 우측 영역 */}
-        <div className="hidden items-center gap-6 lg:flex">
+        {/* 우측 유틸리티 영역 */}
+        <div className="hidden lg:flex">
           {isAuthenticated ? (
-            <>
+            // 크레딧 + 프로필 — 하나의 그룹으로 묶어 시각 분리
+            <div className="flex items-center gap-3 rounded-full border border-slate-200/70 bg-white/30 px-4 py-1.5">
               {/* 크레딧 */}
               <Link
                 href="/shop"
-                className="text-prime-600 hover:text-prime-900 flex items-center gap-2 text-sm font-medium transition-colors"
+                className="text-prime-600 hover:text-prime-900 flex items-center gap-1.5 text-sm font-medium transition-colors"
               >
-                <div className="flex size-7 items-center justify-center rounded-full bg-blue-50">
-                  <Coins size={14} strokeWidth={2} className="text-main-blue" />
+                <div className="flex size-6 items-center justify-center rounded-full bg-blue-50">
+                  <Coins size={13} strokeWidth={2} className="text-main-blue" />
                 </div>
                 {user?.creditBalance ?? 0} 크레딧
               </Link>
 
-              {/* 프로필 버튼 (아이콘 + 이름) + 드롭다운 */}
+              {/* 구분선 */}
+              <div className="h-4 w-px bg-slate-200/80" />
+
+              {/* 프로필 버튼 + 드롭다운 */}
               <div ref={dropdownRef} className="relative">
                 <button
                   type="button"
                   onClick={() => setProfileDropdownOpen((v) => !v)}
                   className="flex items-center gap-2 transition-opacity hover:opacity-70"
                 >
-                  <div className="border-cta-300 relative size-8 shrink-0 overflow-hidden rounded-full border bg-blue-50">
+                  <div className="border-cta-300 relative size-7 shrink-0 overflow-hidden rounded-full border bg-blue-50">
                     <Image
                       src={user?.profileImage ?? '/images/icons/profile-default.svg'}
                       alt="프로필"
@@ -153,12 +168,7 @@ export function GNB() {
                   />
                 )}
               </div>
-
-              <UserProfileModal
-                isOpen={profileModalOpen}
-                onClose={() => setProfileModalOpen(false)}
-              />
-            </>
+            </div>
           ) : (
             <Link
               href="/login"
@@ -169,20 +179,25 @@ export function GNB() {
           )}
         </div>
 
+        <UserProfileModal
+          isOpen={profileModalOpen}
+          onClose={() => setProfileModalOpen(false)}
+        />
+
         {/* 모바일 햄버거 버튼 */}
         <button
           type="button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="flex h-10 w-10 items-center justify-center rounded-lg transition-colors hover:bg-neutral-200 lg:hidden"
+          className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-neutral-200 lg:hidden"
           aria-label={mobileMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
         >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </nav>
 
       {/* 모바일 메뉴 오버레이 */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 top-16 z-50 flex flex-col overflow-y-auto bg-white lg:hidden">
+        <div className="fixed inset-0 top-13 z-50 flex flex-col overflow-y-auto bg-white lg:hidden">
           <div className="flex flex-col gap-1 px-4 py-4">
             {(isAuthenticated ? MEMBER_NAV_ITEMS : GUEST_NAV_ITEMS).map(({ label, href }) => (
               <MobileNavItem key={href} label={label} href={href} active={pathname === href} />
@@ -217,20 +232,36 @@ export function GNB() {
   );
 }
 
-// NavItem — Figma: 98×44, active = 하단 언더라인 바
+// NavItem — framer-motion 알약 hover 배경
 function NavItem({ label, href, active }: { label: string; href: string; active: boolean }) {
+  const [hovered, setHovered] = useState(false);
+
   return (
     <Link
       href={href}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       className={cn(
-        'flex flex-col items-center gap-0.5 text-sm font-medium tracking-[-0.21px] transition-colors',
+        'relative flex flex-col items-center gap-0.5 rounded-full px-3 py-1.5 text-sm font-medium tracking-[-0.21px] transition-colors',
         active ? 'text-prime-900' : 'text-prime-900/70 hover:text-prime-900'
       )}
     >
-      {label}
+      <AnimatePresence>
+        {hovered && (
+          <motion.div
+            layoutId="nav-hover-pill"
+            className="absolute inset-0 rounded-full bg-slate-100"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ type: 'spring', bounce: 0.2, duration: 0.35 }}
+          />
+        )}
+      </AnimatePresence>
+      <span className="relative z-10">{label}</span>
       <span
         className={cn(
-          'block h-0.5 rounded-full bg-current transition-all duration-200',
+          'relative z-10 block h-0.5 rounded-full bg-current transition-all duration-200',
           active ? 'w-full' : 'w-0'
         )}
       />
@@ -274,7 +305,7 @@ function ProfileDropdown({
     !userProfileImage || userProfileImage === '/images/icons/profile-default.svg';
 
   return (
-    <div className="absolute top-full right-0 z-50 mt-2 w-[238px] overflow-hidden rounded-2xl border border-white/60 bg-white/80 shadow-[0px_8px_32px_0px_rgba(0,0,0,0.12)] backdrop-blur-md">
+    <div className="absolute top-full right-0 z-50 mt-2 w-59.5 overflow-hidden rounded-2xl border border-white/60 bg-white/80 shadow-[0px_8px_32px_0px_rgba(0,0,0,0.12)] backdrop-blur-md">
       {/* 헤더: 아바타 + 이름 + 이메일 */}
       <button
         type="button"
@@ -290,10 +321,10 @@ function ProfileDropdown({
           />
         </div>
         <div className="flex min-w-0 flex-col">
-          <span className="text-prime-900 truncate text-sm leading-[1.5] font-medium tracking-[-0.21px]">
+          <span className="text-prime-900 truncate text-sm leading-normal font-medium tracking-[-0.21px]">
             {userName}
           </span>
-          <span className="text-prime-500 truncate text-xs leading-[1.5] tracking-[-0.18px]">
+          <span className="text-prime-500 truncate text-xs leading-normal tracking-[-0.18px]">
             {userEmail}
           </span>
         </div>
@@ -301,7 +332,6 @@ function ProfileDropdown({
 
       {/* 메뉴 항목 */}
       <div className="py-2">
-        {/* 마이페이지 */}
         <button
           type="button"
           onClick={onMypage}
@@ -313,10 +343,8 @@ function ProfileDropdown({
           마이페이지
         </button>
 
-        {/* 구분선 */}
         <div className="mx-3 my-1 h-px bg-white/60" />
 
-        {/* 로그아웃 */}
         <button
           type="button"
           onClick={onLogout}
