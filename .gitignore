@@ -15,7 +15,11 @@
 
 # next.js
 /.next/
+/frontend/.next/
 /out/
+
+# frontend subdirectory
+/frontend/node_modules/
 
 # production
 /build
