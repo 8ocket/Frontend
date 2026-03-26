@@ -1,42 +1,37 @@
 'use client';
 
-// Figma 2194:11570 — 브랜드 소개 페이지
-// 페이지 배경: #F8FAFC (fills r:0.9725 g:0.9804 b:0.9882)
-// 콘텐츠 컨테이너: 1077px centered, VERTICAL, gap:320
+// Figma 2194:11570 — 브랜드 소개 페이지 최적화 버전
+// 페이지 배경: #F8FAFC
+// 구조: 각 섹션 컴포넌트가 스스로의 배경(Full Width)과 콘텐츠(1077px)를 관리하도록 변경
 
 import { IntroSection } from '@/components/about/IntroSection';
 import { ChatDemoSection } from '@/components/about/ChatDemoSection';
-import { PersonaSection } from '@/components/about/PersonaSection';
 import { SmallCardsSection } from '@/components/about/SmallCardsSection';
 import { LargeCardSection } from '@/components/about/LargeCardSection';
-import { CtaSection } from '@/components/about/CtaSection';
-import { AboutFooter } from '@/components/about/AboutFooter';
+import { FooterCTASection } from '@/components/about/FooterCTASection';
 
 export default function AboutPage() {
   return (
+    // 1. 가로 스크롤 방지를 위해 overflow-x-hidden을 추가합니다.
     <div
-      className="-mt-16 md:-mt-20"
-      style={{
-        backgroundColor: '#F8FAFC',
-        backgroundImage: "url('/images/backgrounds/unsplash_1DwI4LgorCc.png')",
-        backgroundSize: '100% 90vh',
-        backgroundPosition: 'top center',
-        backgroundRepeat: 'no-repeat',
-      }}
+      className="relative -mt-16 min-h-screen overflow-x-hidden md:-mt-20"
+      style={{ backgroundColor: '#F8FAFC' }}
     >
-      {/* 메인 콘텐츠 — 2515:11312, 1077px, VERTICAL gap:320, counterAlign:CENTER */}
-      <main
-        className="mx-auto flex flex-col items-center"
-        style={{ width: 1077, gap: 320, paddingTop: 80, paddingBottom: 80 }}
-      >
+      {/* 기존의 'absolute' 배경 레이어들을 모두 삭제했습니다. 
+         이제 IntroSection과 FooterCTASection 내부에서 개별적으로 배경을 렌더링합니다. 
+      */}
+
+      {/* 2. main의 고정 너비(1077px)를 제거하고 w-full로 설정하여 섹션들이 너비를 꽉 채울 수 있게 합니다. */}
+      <main className="flex w-full flex-col items-center" style={{ gap: 320, paddingBottom: 160 }}>
+        {/* IntroSection: 내부에 꽉 찬 배경 이미지와 펄스 애니메이션이 포함됨 */}
         <IntroSection />
+
+        {/* 나머지 섹션들: 각각 내부에서 max-w-[1077px] mx-auto 구조를 가져야 합니다. */}
         <ChatDemoSection />
-        <PersonaSection />
         <SmallCardsSection />
         <LargeCardSection />
-        <CtaSection />
+        <FooterCTASection />
       </main>
-      <AboutFooter />
     </div>
   );
 }
