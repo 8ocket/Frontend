@@ -386,7 +386,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="layout-container relative flex overflow-hidden bg-[#F8FAFF]" style={{ height: 'calc(100dvh - var(--gnb-height))' }}>
+    <div className="layout-container relative flex overflow-hidden bg-secondary-100" style={{ height: 'calc(100dvh - var(--gnb-height))' }}>
       {/* 모바일 사이드바 토글 버튼 */}
       <button
         type="button"

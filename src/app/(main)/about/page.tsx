@@ -14,8 +14,7 @@ export default function AboutPage() {
   return (
     // 1. 가로 스크롤 방지를 위해 overflow-x-hidden을 추가합니다.
     <div
-      className="relative -mt-16 min-h-screen overflow-x-hidden md:-mt-20"
-      style={{ backgroundColor: '#F8FAFC' }}
+      className="relative -mt-16 min-h-screen overflow-x-hidden bg-secondary-100 md:-mt-20"
     >
       {/* 기존의 'absolute' 배경 레이어들을 모두 삭제했습니다. 
          이제 IntroSection과 FooterCTASection 내부에서 개별적으로 배경을 렌더링합니다. 

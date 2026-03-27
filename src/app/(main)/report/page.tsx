@@ -126,7 +126,7 @@ export default function ReportPage() {
       {/* 메인 콘텐츠 */}
       <div className="flex-1 overflow-y-auto">
         {viewState === 'idle' && (
-          <div className="relative flex min-h-full items-center justify-center bg-[#F8FAFF] px-6 py-12 sm:px-12">
+          <div className="relative flex min-h-full items-center justify-center bg-secondary-100 px-6 py-12 sm:px-12">
             {/* 배경 로고 — 채팅창과 동일한 브랜드 패턴 */}
             <div
               className="pointer-events-none absolute inset-0 flex items-center justify-center"

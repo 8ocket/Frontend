@@ -1,10 +1,20 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import { cn } from '@/shared/lib/utils';
 import { EMOTION_META } from './constants';
 import { EmotionBrush } from './EmotionBrush';
 import { EmotionCardLabel } from './EmotionCardLabel';
 import type { EmotionCardBackProps } from './types';
+
+function sectionMotion(i: number, animated: boolean) {
+  if (!animated) return {};
+  return {
+    initial: { opacity: 0, y: 10 },
+    animate: { opacity: 1, y: 0 },
+    transition: { delay: 0.35 + i * 0.09, duration: 0.3, ease: 'easeOut' as const },
+  };
+}
 
 /**
  * 감정 카드 뒷면
@@ -26,6 +36,7 @@ export function EmotionCardBack({
   width,
   height,
   className,
+  animated = false,
 }: EmotionCardBackProps) {
   const primaryLayer = layers.find((l) => l.role === 'primary');
   const primaryMeta = primaryLayer ? EMOTION_META[primaryLayer.type] : null;
@@ -48,7 +59,7 @@ export function EmotionCardBack({
   const labelClass = width < 200 ? 'card-03' : width < 380 ? 'card-02' : 'card-01';
 
   // 글래스 패널 내부 패딩
-  const panelPadding = 8;
+  const panelPadding = 14;
   const panelWidth = width - panelPadding * 2;
 
   return (
@@ -85,53 +96,63 @@ export function EmotionCardBack({
 
       {/* ─── 글래스모피즘 정보 패널 ─── */}
       <div
-        className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col gap-6 rounded-2xl p-4 backdrop-blur-md"
+        className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col gap-6 rounded-2xl px-5 py-6 backdrop-blur-md"
         style={{
           width: panelWidth,
-          backgroundColor: 'rgba(255, 255, 255, 0.88)',
+          backgroundColor: 'rgba(252, 251, 249, 0.95)',
         }}
       >
-        <div className="flex w-full flex-col gap-4">
+        <div className="flex w-full flex-col gap-6">
           {/* 상담 요약 헤더 */}
-          <SummaryHeader
-            title={data.summary.title}
-            description={data.summary.description}
-            userName={data.userName}
-          />
+          <motion.div {...sectionMotion(0, animated)}>
+            <SummaryHeader
+              title={data.summary.title}
+              description={data.summary.description}
+              userName={data.userName}
+            />
+          </motion.div>
 
           {/* 마음 키워드 */}
           {data.keywords.length > 0 && (
-            <Section title="마음 키워드">
-              <div className="flex flex-wrap gap-1">
-                {data.keywords.map((kw, i) => (
-                  <span key={i} className="caption-1 text-prime-700">
-                    #{kw.keyword}
-                    {kw.percentage != null && `[${kw.percentage}%]`}
-                  </span>
-                ))}
-              </div>
-            </Section>
+            <motion.div {...sectionMotion(1, animated)}>
+              <Section title="마음 키워드">
+                <div className="flex flex-wrap gap-1">
+                  {data.keywords.map((kw, i) => (
+                    <span key={i} className="caption-1 text-prime-700">
+                      #{kw.keyword}
+                      {kw.percentage != null && `[${kw.percentage}%]`}
+                    </span>
+                  ))}
+                </div>
+              </Section>
+            </motion.div>
           )}
 
           {/* 사건 */}
           {data.fact && (
-            <Section title="사건">
-              <p className="body-2 text-prime-500 leading-relaxed">{data.fact}</p>
-            </Section>
+            <motion.div {...sectionMotion(2, animated)}>
+              <Section title="사건">
+                <p className="body-2 text-prime-500 leading-relaxed">{data.fact}</p>
+              </Section>
+            </motion.div>
           )}
 
           {/* 느꼈던 감정 */}
           {data.emotion && (
-            <Section title="느꼈던 감정">
-              <p className="body-2 text-prime-500 leading-relaxed">{data.emotion}</p>
-            </Section>
+            <motion.div {...sectionMotion(3, animated)}>
+              <Section title="느꼈던 감정">
+                <p className="body-2 text-prime-500 leading-relaxed">{data.emotion}</p>
+              </Section>
+            </motion.div>
           )}
 
           {/* AI 인사이트 */}
           {data.insight && (
-            <Section title="AI 인사이트">
-              <p className="body-2 text-prime-500 leading-relaxed">{data.insight}</p>
-            </Section>
+            <motion.div {...sectionMotion(4, animated)}>
+              <Section title="AI 인사이트">
+                <p className="body-2 text-prime-500 leading-relaxed">{data.insight}</p>
+              </Section>
+            </motion.div>
           )}
         </div>
 
@@ -164,7 +185,7 @@ function SummaryHeader({
   return (
     <div className="flex flex-col gap-2">
       {/* Figma 1905:7296 — "상담 요약" 섹션 라벨 */}
-      <h4 className="subtitle-1 text-prime-900">상담 요약</h4>
+      <h4 className="subtitle-1 text-prime-900 font-semibold">상담 요약</h4>
       {/* Figma 1905:7297 — 요약 내용 (Input 오버라이드) */}
       <p className="body-2 text-prime-500 whitespace-pre-line leading-relaxed">{title}</p>
       {description && (
@@ -188,7 +209,7 @@ function SummaryHeader({
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-2">
-      <h4 className="subtitle-1 text-prime-900">{title}</h4>
+      <h4 className="subtitle-1 text-prime-900 font-semibold">{title}</h4>
       {children}
     </div>
   );
