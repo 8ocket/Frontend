@@ -54,6 +54,8 @@ export interface EmotionCardBackProps {
   height: number;
   /** 추가 클래스 */
   className?: string;
+  /** 섹션 스태거 애니메이션 활성화 (컬렉션 오버레이용) */
+  animated?: boolean;
 }
 
 /** EmotionBrush (브러시 SVG) Props */
