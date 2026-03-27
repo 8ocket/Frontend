@@ -1,19 +1,21 @@
 // ─── /v1/sessions (GET) - 세션 목록 조회 ───
 
-export type SessionStatus = 'active' | 'saved' | 'abandoned';
+export type SessionStatus = 'ACTIVE' | 'COMPLETED' | 'EXPIRED' | 'SAVED';
 
 export interface SessionListQuery {
-  status?: SessionStatus;
   page?: number;
   size?: number;
+  start_date?: string;
+  end_date?: string;
+  persona_ids?: string[];
 }
 
 export interface SessionListItem {
-  session_id: string;
-  persona_image_url: string;
+  sessionId: string;
+  personaImageUrl: string;
   title: string;
   status: SessionStatus;
-  started_at: string;
+  startedAt: string;
 }
 
 export interface Pagination {
@@ -26,6 +28,34 @@ export interface Pagination {
 export interface SessionListResponse {
   sessions: SessionListItem[];
   pagination: Pagination;
+}
+
+// ─── /v1/sessions/active (GET) - 미완료 세션 확인 ───
+
+export interface ActiveSessionResponse {
+  session_id: string;
+  title: string;
+  started_at: string;
+}
+
+// ─── /v1/sessions (POST) - 세션 생성 ───
+
+export interface CreateSessionRequest {
+  persona_id: string;
+  first_content: string;
+}
+
+export interface CreateSessionResponse {
+  session_id: string;
+  persona_id: string;
+  status: string;
+  title: string;
+  started_at: string;
+  first_message: {
+    message_id: string;
+    content: string;
+    created_at: string;
+  };
 }
 
 // ─── /v1/sessions/{session_id} (POST) - 상담 메시지 전송 ───
@@ -77,6 +107,48 @@ export interface SessionSummaries {
   created_at: Date | null; // 생성일시 / TIMESTAMP
   updated_at: Date | null; // 수정일시 / TIMESTAMP
 }
+// ─── /v1/sessions/{session_id}/finalize (POST) - 세션 종료 ───
+
+export interface FinalizeStatusEvent {
+  step: 'analyzing' | 'summarizing' | 'creating_card';
+  message: string;
+}
+
+export interface FinalizeEmotionItem {
+  intensity: number;
+  source_keyword: string;
+  emotion_type: string;
+}
+
+export interface FinalizeCompleteEvent {
+  emotions: FinalizeEmotionItem[];
+  card_image_url: string;
+  summary: {
+    fact: string;
+    emotion: string;
+    insight: string;
+  };
+}
+
+// ─── /v1/sessions/{session_id} (GET) - 세션 상세 조회 ───
+
+export interface SessionDetailMessage {
+  message_id: string;
+  role: 'assistant' | 'user';
+  content: string;
+  sequence_num: number;
+  created_at: string;
+}
+
+export interface SessionDetailResponse {
+  session_id: string;
+  persona_image_url: string;
+  persona_name: string;
+  status: string;
+  messages: SessionDetailMessage[];
+  has_summary: boolean;
+}
+
 export interface SessionCheckpointMapping {
   mapping_id: string; // PK / UUID
   session_id: string; // FK / 세션_ID / UUID

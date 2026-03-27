@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/entities/user/store';
 import { useChatModals } from '@/features/select-persona';
@@ -16,6 +16,9 @@ import {
   ChatUnfinishedSessionModal,
 } from '@/components/chat';
 import { Menu } from 'lucide-react';
+import { getActiveSessionApi, getSessionsApi, getSessionDetailApi, finalizeSessionStream } from '@/entities/session/api';
+import { getCookie } from '@/shared/lib/utils/cookie';
+import type { ActiveSessionResponse, SessionListItem, SessionDetailResponse } from '@/entities/session';
 
 // ── 모달 상태 타입 ──────────────────────────────────────────────
 export type ChatModalType =
@@ -246,34 +249,83 @@ export default function ChatPage() {
   const remainingCredits = useAuthStore((s) => s.user?.creditBalance ?? 0);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeSessionId, setActiveSessionId] = useState<string>('1');
+  const [activeSessionId, setActiveSessionId] = useState<string | undefined>(undefined);
+  const [unfinishedSession, setUnfinishedSession] = useState<ActiveSessionResponse | null>(null);
+  const [sessionList, setSessionList] = useState<SessionListItem[]>([]);
   /** 현재 채팅 세션 활성 여부 — false면 입력창 비활성화 */
   const [isSessionActive, setIsSessionActive] = useState(false);
   /** 채팅창에 외부에서 append할 메시지 */
   const [appendMessage, setAppendMessage] = useState<ChatBubbleProps | null>(null);
+  const [sessionDetail, setSessionDetail] = useState<SessionDetailResponse | null>(null);
 
-  const activeMessages = MOCK_SESSIONS.find((s) => s.id === activeSessionId)?.messages ?? [];
-
-  // ── 진입 시 분기 로직 ────────────────────────────────────────────
-  // TODO: API 연동 시 실제 미완성 상담 여부로 교체
-  const hasUnfinishedSession = false; // mock
-
+  // activeSessionId 변경 시 세션 상세 조회 (새 세션 생성 시에만 — 이어가기/사이드바는 핸들러에서 pre-fetch)
   useEffect(() => {
-    if (hasUnfinishedSession) {
-      // 미완성 상담 있음 → [마무리 안된 상담] 모달 (블러 배경)
-      openModal('unfinished-session');
+    if (!activeSessionId) {
+      setSessionDetail(null);
+      return;
     }
-    // 미완성 상담 없음 → 입력창 비활성 상태 유지 (모달 없음)
+    // 이미 해당 세션 detail이 로드된 경우 중복 fetch 방지
+    if (sessionDetail?.session_id === activeSessionId) return;
+    getSessionDetailApi(activeSessionId)
+      .then(setSessionDetail)
+      .catch(() => setSessionDetail(null));
+  }, [activeSessionId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 세션 상세 → ChatBubbleProps[] 변환 (API는 최신→과거 순, 표시는 과거→최신)
+  const activeMessages = useMemo((): ChatBubbleProps[] => {
+    if (!sessionDetail) return [];
+    return [...sessionDetail.messages].reverse().map((m) => ({
+      variant: m.role === 'assistant' ? 'ai' : 'user',
+      senderName: m.role === 'assistant' ? sessionDetail.persona_name : '나',
+      content: m.content,
+      avatarSrc: m.role === 'assistant' ? sessionDetail.persona_image_url : undefined,
+    }));
+  }, [sessionDetail]);
+
+  const activeAiName = sessionDetail?.persona_name;
+  const activeAiAvatarSrc = sessionDetail?.persona_image_url;
+
+  // API 세션 목록 → 사이드바용 그룹 데이터로 변환
+  const sessionGroups = useMemo((): ChatSessionGroup[] => {
+    const groupMap = new Map<string, ChatSessionGroup>();
+    for (const s of sessionList) {
+      const date = new Date(s.startedAt).toLocaleDateString('ko-KR', {
+        year: 'numeric', month: 'long', day: 'numeric',
+      });
+      if (!groupMap.has(date)) groupMap.set(date, { date, sessions: [] });
+      groupMap.get(date)!.sessions.push({
+        id: s.sessionId,
+        title: s.title || '제목 없음',
+        avatarSrc: s.personaImageUrl,
+      });
+    }
+    return Array.from(groupMap.values());
+  }, [sessionList]);
+
+  // ── 진입 시 미완료 세션 확인 + 세션 목록 조회 ──────────────────
+  useEffect(() => {
+    getActiveSessionApi()
+      .then((session) => {
+        if (session) {
+          setUnfinishedSession(session);
+          openModal('unfinished-session');
+        }
+      })
+      .catch(() => {});
+
+    getSessionsApi()
+      .then((res) => setSessionList(res.sessions))
+      .catch(() => {});
   }, []);
 
   // ── 핸들러 ───────────────────────────────────────────────────────
 
-  /** 사이드바 [새로운 상담] 버튼 → 세션 시작, 입력창 활성화 */
+  /** 사이드바 [새로운 상담] 버튼 → 세션 초기화, 입력창 활성화 */
   const handleNewCounsel = () => {
     setSidebarOpen(false);
     closeModal();
+    setActiveSessionId(undefined); // 새 세션 준비 (첫 메시지 전송 시 생성)
     setIsSessionActive(true);
-    // TODO: 세션 생성 API 호출
   };
 
   /** 비활성 입력창/전송 버튼 탭 → [새로운 상담] 안내 모달 (블러 없음) */
@@ -282,10 +334,23 @@ export default function ChatPage() {
   };
 
   /** [마무리 안된 상담] → 진행한다: 기존 세션 이어가기 */
-  const handleUnfinishedResume = () => {
+  const handleUnfinishedResume = async () => {
     closeModal();
     setIsSessionActive(true);
-    // TODO: 기존 세션 복귀 API 호출
+    if (unfinishedSession) {
+      // detail 먼저 fetch → sessionDetail 세팅 후 activeSessionId 세팅 (React 18 배칭)
+      const detail = await getSessionDetailApi(unfinishedSession.session_id).catch(() => null);
+      setSessionDetail(detail);
+      setActiveSessionId(unfinishedSession.session_id);
+    }
+  };
+
+  /** 사이드바 세션 선택: detail 먼저 fetch 후 세션 전환 */
+  const handleSelectSession = async (id: string) => {
+    const detail = await getSessionDetailApi(id).catch(() => null);
+    setSessionDetail(detail);
+    setActiveSessionId(id);
+    setSidebarOpen(false);
   };
 
   /** [마무리 안된 상담] → 무시하기: 모달 닫고 입력창 비활성 유지 */
@@ -296,12 +361,28 @@ export default function ChatPage() {
 
   const handleEndChat = () => openModal('end-confirm');
 
-  /** 종료 확인 → "마음 기록 제작 중" 메시지 전송 후 세션 비활성화 */
-  const handleEndConfirmed = () => {
-    setAppendMessage({ variant: 'ai', senderName: '마음 기록', content: '마음 기록을 생성 중입니다.' });
-    setIsSessionActive(false);
+  /** 종료 확인 → finalize SSE 호출 → 완료 메시지 */
+  const handleEndConfirmed = async () => {
     closeModal();
-    // TODO: 마음 기록 생성 API 호출
+    setIsSessionActive(false);
+    setAppendMessage({ variant: 'ai', senderName: '마음 기록', content: '마음 기록을 생성 중입니다.' });
+
+    if (!activeSessionId) return;
+    const token = getCookie('accessToken') ?? '';
+
+    try {
+      await finalizeSessionStream(
+        activeSessionId,
+        token,
+        () => {}, // status 이벤트 무시 (고정 메시지 유지)
+        () => {}, // ai_complete 데이터 (추후 활용)
+        () => {
+          setAppendMessage({ variant: 'ai', senderName: '마음 기록', content: '마음 기록이 완성되었습니다.' });
+        }
+      );
+    } catch (err) {
+      console.error('Finalize error:', err);
+    }
   };
 
   return (
@@ -331,8 +412,8 @@ export default function ChatPage() {
         <ChatSidebar
           onNewCounsel={handleNewCounsel}
           activeSessionId={activeSessionId}
-          onSelectSession={(id) => { setActiveSessionId(id); setSidebarOpen(false); }}
-          sessionGroups={MOCK_SESSION_GROUPS}
+          onSelectSession={handleSelectSession}
+          sessionGroups={sessionGroups}
         />
       </div>
 
@@ -346,6 +427,11 @@ export default function ChatPage() {
           isSessionActive={isSessionActive}
           onDisabledInputClick={handleDisabledInputClick}
           appendMessage={appendMessage}
+          sessionId={activeSessionId}
+          personaId="019d0b99-584b-710a-93d0-f1b64d56ddb4"
+          onSessionCreated={(id) => setActiveSessionId(id)}
+          aiName={activeAiName}
+          aiAvatarSrc={activeAiAvatarSrc}
         />
       </div>
 
@@ -370,8 +456,8 @@ export default function ChatPage() {
       <ChatUnfinishedSessionModal
         isOpen={activeModal === 'unfinished-session'}
         onClose={closeModal}
-        sessionTitle="설날 기간 친척들과의 불편한 이야기"
-        sessionDate="2026. 02. 17"
+        sessionTitle={unfinishedSession?.title ?? ''}
+        sessionDate={unfinishedSession ? new Date(unfinishedSession.started_at).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\. /g, '. ') : ''}
         onIgnore={handleUnfinishedIgnore}
         onResume={handleUnfinishedResume}
         overlayBlur

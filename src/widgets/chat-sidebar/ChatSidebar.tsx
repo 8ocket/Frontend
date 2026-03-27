@@ -39,7 +39,12 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, se
   }, [filterOpen]);
   const [scrollRatio, setScrollRatio] = useState(0);
   const [thumbRatio, setThumbRatio] = useState(0.2);
-  const [visibleCount, setVisibleCount] = useState(sessionGroups.length);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  // sessionGroups가 비동기로 로드될 때 visibleCount 동기화
+  useEffect(() => {
+    setVisibleCount((prev) => Math.max(prev, sessionGroups.length));
+  }, [sessionGroups.length]);
 
   const visibleGroups = sessionGroups.slice(0, visibleCount);
   const hasMore = visibleCount < sessionGroups.length;

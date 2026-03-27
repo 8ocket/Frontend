@@ -1,11 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import { ChatBubble, ChatBubbleProps } from './ChatBubble';
 import { ChatInputBar } from '@/features/send-message';
+import { sendMessageStream } from '@/features/send-message/sendMessageStream';
+import { createSessionApi } from '@/entities/session/api';
 import { ChatLogo } from './ChatLogo';
 import { type PersonaOption } from './ChatSelectOptions';
+import { getCookie } from '@/shared/lib/utils/cookie';
 
 // Figma 1357:3355 — Frame 1597881480
 // 1074×884, fill cta-300, radius 24
@@ -25,6 +28,16 @@ export interface ChatMainAreaProps {
   onDisabledInputClick?: () => void;
   /** 외부에서 채팅에 추가할 메시지 — 변경될 때마다 목록에 append */
   appendMessage?: ChatBubbleProps | null;
+  /** 현재 세션 ID — 메시지 전송 시 사용. undefined면 첫 메시지 시 세션 생성 */
+  sessionId?: string;
+  /** 세션 생성에 사용할 페르소나 ID */
+  personaId?: string;
+  /** 세션 생성 완료 시 호출 — 페이지에서 activeSessionId 업데이트 용도 */
+  onSessionCreated?: (sessionId: string) => void;
+  /** AI 상담사 표시 이름 */
+  aiName?: string;
+  /** AI 상담사 아바타 이미지 URL */
+  aiAvatarSrc?: string;
 }
 
 const PERSONA_OPTIONS: PersonaOption[] = [
@@ -33,15 +46,52 @@ const PERSONA_OPTIONS: PersonaOption[] = [
   { id: 'coaching', label: '코칭 심리 상담사' },
 ];
 
-export function ChatMainArea({ onEndChat, onCreditShortage, onUnfinishedSession, initialMessages = [], isSessionActive = true, onDisabledInputClick, appendMessage }: ChatMainAreaProps = {}) {
+export function ChatMainArea({
+  onEndChat,
+  onCreditShortage,
+  onUnfinishedSession,
+  initialMessages = [],
+  isSessionActive = true,
+  onDisabledInputClick,
+  appendMessage,
+  sessionId,
+  personaId,
+  onSessionCreated,
+  aiName = 'AI 상담사',
+  aiAvatarSrc,
+}: ChatMainAreaProps = {}) {
   const [messages, setMessages] = useState<ChatBubbleProps[]>(initialMessages);
   const [inputValue, setInputValue] = useState('');
   const [showSelectOptions, setShowSelectOptions] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamingText, setStreamingText] = useState('');
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const prevSessionIdRef = useRef<string | undefined>(sessionId);
+  // handleSend에서 세션을 직접 생성한 경우 true → sessionId 변경 시 메시지 유지
+  const justCreatedSessionRef = useRef(false);
 
-  // 세션 변경 시 메시지 교체
+  // 세션 전환 시 메시지 교체 (sessionId 기준으로 판단)
   useEffect(() => {
+    const prevId = prevSessionIdRef.current;
+    prevSessionIdRef.current = sessionId;
+
+    if (prevId === sessionId) return;
+
+    if (sessionId === undefined) {
+      // 새 세션 시작 준비 → 메시지 초기화
+      setMessages([]);
+      return;
+    }
+
+    if (justCreatedSessionRef.current) {
+      // 방금 이 컴포넌트에서 세션을 생성한 경우 → 기존 메시지 유지
+      justCreatedSessionRef.current = false;
+      return;
+    }
+
+    // 이어가기 / 사이드바 세션 선택 → initialMessages 로드
     setMessages(initialMessages);
-  }, [initialMessages]);
+  }, [sessionId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 외부에서 메시지 추가 (예: 종료 시 "마음 기록 제작 중")
   useEffect(() => {
@@ -50,13 +100,81 @@ export function ChatMainArea({ onEndChat, onCreditShortage, onUnfinishedSession,
     }
   }, [appendMessage]);
 
-  function handleSend() {
-    if (!inputValue.trim()) return;
+  // 메시지 추가 또는 스트리밍 업데이트 시 스크롤 하단으로
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, streamingText]);
+
+  async function handleSend() {
+    if (!inputValue.trim() || isStreaming) return;
+
+    const content = inputValue.trim();
+    setInputValue('');
+
     setMessages((prev) => [
       ...prev,
-      { variant: 'user', senderName: 'User Name', content: inputValue.trim() },
+      { variant: 'user', senderName: 'User Name', content },
     ]);
-    setInputValue('');
+
+    const token = getCookie('accessToken') ?? '';
+
+    // 세션 없음 → 첫 메시지: 세션 생성 API 호출
+    if (!sessionId) {
+      setIsStreaming(true);
+      try {
+        const result = await createSessionApi({
+          persona_id: personaId ?? 'default',
+          first_content: content,
+        });
+        setMessages((prev) => [
+          ...prev,
+          { variant: 'ai', senderName: aiName, content: result.first_message.content, avatarSrc: aiAvatarSrc },
+        ]);
+        justCreatedSessionRef.current = true;
+        onSessionCreated?.(result.session_id);
+      } catch (err) {
+        console.error('Session create error:', err);
+      } finally {
+        setIsStreaming(false);
+      }
+      return;
+    }
+
+    // 세션 있음 → 이후 메시지: SSE 스트리밍
+    setIsStreaming(true);
+    setStreamingText('');
+
+    let accumulated = '';
+
+    try {
+      await sendMessageStream(
+        sessionId,
+        content,
+        token,
+        (chunk) => {
+          accumulated += chunk;
+          setStreamingText(accumulated);
+        },
+        (msg) => {
+          // TODO: 위기 감지 모달 연결
+          console.warn('Crisis detected:', msg);
+        },
+        () => {
+          setMessages((prev) => [
+            ...prev,
+            { variant: 'ai', senderName: aiName, content: accumulated, avatarSrc: aiAvatarSrc },
+          ]);
+          setStreamingText('');
+          setIsStreaming(false);
+        }
+      );
+    } catch (err) {
+      console.error('Stream error:', err);
+      setIsStreaming(false);
+      setStreamingText('');
+    }
   }
 
   return (
@@ -71,10 +189,19 @@ export function ChatMainArea({ onEndChat, onCreditShortage, onUnfinishedSession,
       </div>
 
       {/* Message scroll area */}
-      <div className="relative flex flex-1 flex-col gap-4 overflow-y-auto p-6">
+      <div ref={scrollRef} className="relative flex flex-1 flex-col gap-4 overflow-y-auto p-6">
         {messages.map((msg, i) => (
           <ChatBubble key={i} {...msg} />
         ))}
+        {isStreaming && (
+          <ChatBubble
+            variant="ai"
+            senderName={aiName}
+            content={streamingText}
+            avatarSrc={aiAvatarSrc}
+            isLoading={!streamingText}
+          />
+        )}
       </div>
 
       {/* Input bar — Figma 1512:3708 */}
@@ -85,7 +212,7 @@ export function ChatMainArea({ onEndChat, onCreditShortage, onUnfinishedSession,
           onChange={setInputValue}
           onSend={handleSend}
           onEndChat={onEndChat}
-          disabled={!isSessionActive}
+          disabled={!isSessionActive || isStreaming}
           onDisabledClick={onDisabledInputClick}
         />
       </div>
