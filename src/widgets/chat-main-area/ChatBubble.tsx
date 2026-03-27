@@ -11,6 +11,7 @@ export type ChatBubbleProps = {
   content: string;
   avatarSrc?: string;
   userAvatarSrc?: string;
+  isLoading?: boolean;
 };
 
 // User Profile Photo — 21×21 흰 원 + 사용자 실루엣 벡터 (fill=#2b4764)
@@ -31,7 +32,7 @@ function UserProfilePhoto() {
   );
 }
 
-export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatarSrc }: ChatBubbleProps) {
+export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatarSrc, isLoading }: ChatBubbleProps) {
   const isAi = variant === 'ai';
 
   return (
@@ -78,18 +79,30 @@ export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatar
       {/* Bubble body */}
       <div
         className={[
-          'w-full rounded-2xl px-5 py-4 shadow-sm',
+          'w-fit rounded-2xl px-5 py-2.5 shadow-sm',
           isAi
             ? 'bg-white'
             : 'bg-[#4A90E2] text-white',
         ].join(' ')}
       >
-        <p
-          className={['whitespace-pre-wrap text-[15px] leading-[185%]', isAi ? 'text-prime-900' : 'text-white'].join(' ')}
-          style={{ fontFamily: 'var(--font-pretendard)' }}
-        >
-          {content}
-        </p>
+        {isLoading ? (
+          <div className="flex items-center gap-1.5 py-0.5">
+            {[0, 1, 2].map((i) => (
+              <span
+                key={i}
+                className="h-2 w-2 rounded-full bg-prime-300 animate-bounce"
+                style={{ animationDelay: `${i * 0.15}s` }}
+              />
+            ))}
+          </div>
+        ) : (
+          <p
+            className={['whitespace-pre-wrap text-[15px] leading-[185%]', isAi ? 'text-prime-900' : 'text-white'].join(' ')}
+            style={{ fontFamily: 'var(--font-pretendard)' }}
+          >
+            {content}
+          </p>
+        )}
       </div>
     </div>
   );
