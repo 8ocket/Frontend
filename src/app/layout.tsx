@@ -33,7 +33,6 @@ export default function RootLayout({
     <html lang="ko" suppressHydrationWarning>
       <body
         className={`${pretendard.variable} ${cormorantGaramond.variable} antialiased`}
-        style={{ fontFamily: 'var(--font-pretendard)' }}
       >
         <ThemeProvider>
           <QueryProvider>

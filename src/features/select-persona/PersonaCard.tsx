@@ -38,12 +38,12 @@ export function PersonaCard({ persona, onUnlock, className }: PersonaCardProps) 
               {persona.name}
             </h3>
             {!persona.isUnlocked && (
-              <span className="bg-warning-500 text-inverse text-xs leading-[1.2] font-medium tracking-[-0.18px] rounded-md px-2 py-2 shrink-0">
+              <span className="bg-warning-500 text-inverse text-xs leading-[1.2] font-medium tracking-[-0.18px] rounded-lg px-2 py-2 shrink-0">
                 해금 필요
               </span>
             )}
             {persona.isUnlocked && (
-              <span className="bg-success-500 text-inverse text-xs leading-[1.2] font-medium tracking-[-0.18px] rounded-md px-2 py-2 shrink-0">
+              <span className="bg-success-500 text-inverse text-xs leading-[1.2] font-medium tracking-[-0.18px] rounded-lg px-2 py-2 shrink-0">
                 해금 완료
               </span>
             )}
