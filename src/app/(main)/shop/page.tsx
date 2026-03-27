@@ -4,12 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CreditProductCard } from '@/features/purchase-credit';
 import { PurchaseConfirmDialog } from '@/features/purchase-credit';
-import { PersonaCard } from '@/features/select-persona';
-import { UnlockConfirmDialog } from '@/features/select-persona';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
 import type { CreditProduct } from '@/types/credit';
-import type { PersonaProduct } from '@/types/persona';
-import { ANIMAL_PERSONAS } from '@/mocks/persona';
 
 // ── Figma: 크레딧 상품 데이터 (node 1738:3773) ─────────────────
 const CREDIT_PRODUCTS: CreditProduct[] = [
@@ -65,25 +61,31 @@ export default function ShopPage() {
   };
 
   return (
+    // [UX] 배경색은 요청에 따라 완전한 화이트(bg-white)를 유지
     <div className="min-h-screen bg-white">
-      <main className="flex flex-col items-center px-4 py-12">
+      {/* [UX] GNB는 이미 구현되어 있으므로 코드를 추가하지 않음 */}
+
+      {/* [8배수] 전체 섹션 상하 여백 py-16 (64px) 적용 */}
+      <main className="layout-container px-gutter flex flex-col items-center py-16">
         {/* Radix Tabs — Figma: 탭 네비게이션 */}
         <Tabs defaultValue="credit" className="flex w-full flex-col items-center">
-          <TabsList className="mt-6 mb-10">
+          {/* [8배수] 탭 리스트 마진 mb-12 (48px) 조정 */}
+          <TabsList className="mb-12">
             <TabsTrigger value="credit">크레딧 구매하기</TabsTrigger>
             <TabsTrigger value="event">이벤트</TabsTrigger>
           </TabsList>
 
           {/* ── 크레딧 구매 탭 ─────────────────────────────────── */}
           <TabsContent value="credit" className="w-full">
-            <div className="flex flex-col items-center gap-10">
-              {/* 제목 — Figma: Heading 01 (32px SemiBold) */}
-              <h2 className="text-prime-900 text-[32px] leading-[1.3] font-semibold tracking-[-0.48px]">
+            {/* [8배수] 요소 간 수직 간격 gap-16 (64px) 적용 */}
+            <div className="flex flex-col items-center gap-16">
+              {/* 제목 — Figma: Heading 01 (32px SemiBold)
+              <h1 className="text-prime-950 display-01 text-center font-semibold tracking-[-1.5px]">
                 크레딧 구매하기
-              </h2>
+              </h1> */}
 
-              {/* 상품 카드 3열 — Figma: 카드 간 gap 160px */}
-              <div className="mx-auto grid w-full max-w-213.5 grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-10">
+              {/* 상품 카드 3열 — Figma: 카드 간 gap 40px (8*5) 적용 */}
+              <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 gap-10 md:grid-cols-3">
                 {CREDIT_PRODUCTS.map((product) => (
                   <CreditProductCard
                     key={product.id}
@@ -98,10 +100,10 @@ export default function ShopPage() {
           {/* ── 이벤트 탭 ──────────────────────────────────────── */}
           <TabsContent value="event" className="w-full">
             <div className="flex flex-col items-center gap-10 py-12">
-              <h2 className="text-prime-900 text-[32px] leading-[1.3] font-semibold tracking-[-1.5px]">
-                이벤트
-              </h2>
-              <p className="text-prime-600 text-center text-lg">진행 중인 이벤트가 없습니다.</p>
+              <h2 className="heading-01 text-prime-900 font-semibold tracking-[-1.5px]">이벤트</h2>
+              <p className="body-1 text-muted-foreground text-center">
+                진행 중인 이벤트가 없습니다.
+              </p>
             </div>
           </TabsContent>
         </Tabs>
