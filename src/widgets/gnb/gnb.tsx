@@ -119,7 +119,7 @@ export function GNB() {
             <div className="flex items-center gap-3 rounded-full border border-neutral-300/70 bg-white/30 px-4 py-1.5">
               {/* 크레딧 */}
               <Link
-                href="/shop"
+                href="/shop?tab=credit"
                 className="text-prime-600 hover:text-prime-900 flex items-center gap-1.5 text-sm font-medium transition-colors"
               >
                 <div className="flex size-6 items-center justify-center rounded-full bg-cta-100">
