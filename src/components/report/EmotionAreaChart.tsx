@@ -33,6 +33,9 @@ interface CustomTooltipInternalProps {
 function CustomTooltip({ active, payload, label }: CustomTooltipInternalProps) {
   if (!active || !payload?.length) return null;
   const score = payload[0].value;
+
+  // 감정 구간 판별
+  const zone = score >= 30 ? '긍정' : score <= -30 ? '부정' : '중립';
   return (
     <div
       className="border-prime-100 rounded-2xl border bg-white px-4 py-3 shadow-lg"
@@ -45,6 +48,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipInternalProps) {
       >
         {score > 0 ? `+${score}` : score}점
       </p>
+      <p className="text-prime-500 text-xs">{zone}구간</p>
       <p className="text-prime-500 text-xs">{payload[0].payload.emotion}</p>
     </div>
   );

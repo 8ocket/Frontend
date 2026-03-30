@@ -13,6 +13,7 @@ import {
   type ReportType,
 } from '@/components/report';
 import { useToast } from '@/shared/ui/toast';
+import { start } from 'repl';
 
 const MOCK_REPORTS: Report[] = [
   {
@@ -85,9 +86,11 @@ export default function ReportPage() {
     }
   };
 
-  const handleCreateReport = (_type: ReportType, _start: string, _end: string) => {
-    setViewState('creating');
-  };
+  const handleCreateReport = async ( type, start, end) => {
+    // API: GET /users/credits -> 잔여 크레딧 확인
+    // 부족 시: 크레딧 부족 모달 노출
+    // 충분 시: setViewState('creating') -> createReportApi 호출
+  }
 
   // ReportPolling 완료 콜백 — 실제 API 결과에 따라 success/failed 분기
   const handlePollingComplete = () => {

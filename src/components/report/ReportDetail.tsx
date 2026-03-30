@@ -43,7 +43,7 @@ function buildChartData(report: Report): EmotionDataPoint[] {
   if (report.reportType === 'weekly') {
     return WEEKLY_SCORES.map((d, i) => ({
       ...d,
-      label: format(addDays(start, i), 'MM.dd'),
+      label: `${i + 1}회차`,
     }));
   }
   // 월간: 매주 시작일 기준 4개 데이터 포인트
@@ -135,7 +135,6 @@ export function ReportDetail({ report }: ReportDetailProps) {
               <span className="text-sm font-medium">생성일: {report.date}</span>
             </div>
           </div>
-
         </div>
       </div>
 
@@ -174,7 +173,11 @@ export function ReportDetail({ report }: ReportDetailProps) {
             </div>
           ))}
         </div>
-
+        {/* 키워드 배지 아래에 추가 */}
+        {/* TODO [API]: GET /reports/:id/keywords 응답의 topicSummary 필드로 교체 */}
+        <p className="text-prime-600 mt-6 text-sm leading-relaxed">
+          이번 기간 동안 반복적으로 등장한 주제는 ...
+        </p>
       </div>
 
       {/* ── 사용자 상태 요약 ── */}
