@@ -81,6 +81,22 @@ export interface GoogleLoginError {
   message: string;
 }
 
+// --- 기본 프로필 응답 타입
+export interface BaseProfileResponse {
+  user_id: string;
+  profile_image_url?: string;
+  nickname: string;
+  updated_at: string;
+}
+
+// --- /v1/users/me/profile (GET) : 사용자 개인정보 조회
+export interface UserProfileResponse extends BaseProfileResponse {
+  nickname_change_count: number;
+}
+
+// --- /v1/users/me/profile (PATCH) : 프로필 이미지 및 닉네임 수정
+export type UpdateMyProfileResponse = BaseProfileResponse;
+
 // ─── DB 스키마 ───
 
 export interface Users {

@@ -5,7 +5,13 @@
 export * from './persona';
 
 import { User, AuthResponse } from '@/entities/user';
-import { RefreshTokenResponse, KakaoLoginResponse, GoogleLoginResponse } from '@/entities/user/model';
+import {
+  RefreshTokenResponse,
+  KakaoLoginResponse,
+  GoogleLoginResponse,
+  UserProfileResponse,
+  UpdateMyProfileResponse,
+} from '@/entities/user/model';
 
 // 감정카드 mock
 export * from './emotion';
@@ -67,6 +73,31 @@ export const mockRefreshToken = (): RefreshTokenResponse => ({
   access_token: `mock_access_token_${Date.now()}`,
   refresh_token: `mock_refresh_token_${Date.now()}`,
   is_new_user: null,
+});
+
+/**
+ * Mock 프로필 조회 (GET /v1/users/me/profile)
+ */
+export const mockGetMyProfile = (): UserProfileResponse => ({
+  user_id: '1',
+  profile_image_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=test',
+  nickname: '테스트 사용자',
+  nickname_change_count: 0,
+});
+
+/**
+ * Mock 프로필 수정 (PATCH /v1/users/me/profile)
+ */
+export const mockUpdateMyProfile = (
+  nickName?: string,
+  profileImage?: File
+): UpdateMyProfileResponse => ({
+  user_id: '1',
+  profile_image_url: profileImage
+    ? URL.createObjectURL(profileImage)
+    : 'https://api.dicebear.com/7.x/avataaars/svg?seed=test',
+  nickname: nickName || '테스트 사용자',
+  updated_at: new Date().toISOString(),
 });
 
 /**
