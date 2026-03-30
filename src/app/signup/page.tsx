@@ -265,7 +265,7 @@ export default function SignupPage() {
             onAgree={() => handleAgree(selectedTerm)}
             isAgreed={agreements[selectedTerm]}
           >
-            <p>{TERMS_CONTENT[selectedTerm]}</p>
+            {TERMS_CONTENT[selectedTerm]}
           </TermsDetailPanel>
         </div>
       )}
