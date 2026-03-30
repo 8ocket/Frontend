@@ -1,7 +1,7 @@
 'use client';
 
 import { addDays, format } from 'date-fns';
-import { Calendar, Download, Sparkles, Target, CheckCircle } from 'lucide-react';
+import { Calendar, Sparkles, Target } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { EmotionAreaChart } from './EmotionAreaChart';
 import type { EmotionDataPoint } from './EmotionAreaChart';
@@ -9,7 +9,6 @@ import type { Report } from './types';
 
 interface ReportDetailProps {
   report: Report;
-  onPdfDownload?: () => void;
 }
 
 // '2026.03.17 - 2026.03.23' 형식에서 시작일 파싱
@@ -56,7 +55,6 @@ function buildChartData(report: Report): EmotionDataPoint[] {
 
 interface Keyword {
   text: string;
-  count: number;
   isTop?: boolean;
 }
 
@@ -64,19 +62,19 @@ interface Keyword {
 //             GET /reports/:id/keywords 응답으로 교체
 //             응답 형식 예시: { keywords: Keyword[], totalCount: number, positiveRatio: number, negativeRatio: number }
 const KEYWORDS: Keyword[] = [
-  { text: '집중력', count: 28, isTop: true },
-  { text: '불안', count: 22 },
-  { text: '긍정', count: 18 },
-  { text: '스트레스', count: 15 },
-  { text: '자기효능감', count: 12 },
+  { text: '집중력', isTop: true },
+  { text: '불안' },
+  { text: '긍정' },
+  { text: '스트레스' },
+  { text: '자기효능감' },
 ];
 
 const KEYWORD_STYLES = [
-  { badge: 'bg-(--main-blue)/10 text-main-blue', count: 'bg-main-blue/20 text-main-blue' },
-  { badge: 'bg-error-400/10 text-error-500', count: 'bg-error-400/20 text-error-500' },
-  { badge: 'bg-success-700/10 text-success-700', count: 'bg-success-700/20 text-success-700' },
-  { badge: 'bg-warning-500/10 text-warning-600', count: 'bg-warning-500/20 text-warning-600' },
-  { badge: 'bg-prime-200/60 text-prime-600', count: 'bg-prime-300/40 text-prime-600' },
+  'bg-(--main-blue)/10 text-main-blue',
+  'bg-error-400/10 text-error-500',
+  'bg-success-700/10 text-success-700',
+  'bg-warning-500/10 text-warning-600',
+  'bg-prime-200/60 text-prime-600',
 ];
 
 // TODO [API]: ACTIONS를 GET /reports/:id/actions 응답으로 교체
@@ -85,18 +83,16 @@ const ACTIONS = [
   {
     title: '꾸준한 루틴 유지',
     desc: '일정한 수면 패턴과 식사 시간을 지키는 것이 감정 안정에 도움이 됩니다.',
-    duration: '매일 10분',
   },
   {
     title: '감정 표현 연습',
     desc: '일기 쓰기나 신뢰하는 사람과의 대화를 통해 감정을 외부로 표현해보세요.',
-    duration: '주 3회 이상',
   },
 ];
 
 const CARD = 'rounded-[24px] border border-prime-100 bg-white p-10 shadow-sm';
 
-export function ReportDetail({ report, onPdfDownload }: ReportDetailProps) {
+export function ReportDetail({ report }: ReportDetailProps) {
   // TODO [API]: buildChartData(report) → GET /reports/:id/chart-data 훅으로 교체
   const emotionData = buildChartData(report);
 
@@ -140,14 +136,6 @@ export function ReportDetail({ report, onPdfDownload }: ReportDetailProps) {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onPdfDownload}
-            className="border-prime-200 text-prime-700 hover:bg-prime-100/50 flex h-14 shrink-0 items-center gap-2 rounded-3xl border bg-white px-8 text-sm font-bold shadow-sm transition-colors"
-          >
-            <Download className="size-4.5" />
-            PDF 다운로드
-          </button>
         </div>
       </div>
 
@@ -174,38 +162,19 @@ export function ReportDetail({ report, onPdfDownload }: ReportDetailProps) {
         </div>
 
         <div className="flex flex-wrap gap-3">
-          {KEYWORDS.map((kw, i) => {
-            const style = KEYWORD_STYLES[i % KEYWORD_STYLES.length];
-            return (
-              <div
-                key={kw.text}
-                className={cn(
-                  'flex items-center gap-3 rounded-3xl px-5 py-3.5 transition-all',
-                  style.badge
-                )}
-              >
-                <span className="text-[15px] font-bold">#{kw.text}</span>
-                <span className={cn('rounded-xl px-2.5 py-1 text-[13px] font-bold', style.count)}>
-                  {kw.count}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* TODO [API]: 아래 통계 수치(95개, 32%, 68%)를 GET /reports/:id/keywords 응답값으로 교체 */}
-        <div className="border-prime-100 mt-8 grid grid-cols-3 gap-6 border-t pt-8">
-          {[
-            { label: '총 키워드 수', value: '95개', color: 'text-prime-700' },
-            { label: '긍정 키워드', value: '32%', color: 'text-success-700' },
-            { label: '부정 키워드', value: '68%', color: 'text-error-500' },
-          ].map(({ label, value, color }) => (
-            <div key={label}>
-              <p className="text-prime-500 mb-2 text-[13px]">{label}</p>
-              <p className={cn('text-2xl font-bold tracking-tight', color)}>{value}</p>
+          {KEYWORDS.map((kw, i) => (
+            <div
+              key={kw.text}
+              className={cn(
+                'flex items-center gap-3 rounded-3xl px-5 py-3.5 transition-all',
+                KEYWORD_STYLES[i % KEYWORD_STYLES.length]
+              )}
+            >
+              <span className="text-[15px] font-bold">#{kw.text}</span>
             </div>
           ))}
         </div>
+
       </div>
 
       {/* ── 사용자 상태 요약 ── */}
@@ -311,20 +280,9 @@ export function ReportDetail({ report, onPdfDownload }: ReportDetailProps) {
                   <span className="text-lg font-bold text-white">{i + 1}</span>
                 </div>
                 <div className="flex-1">
-                  <div className="mb-3 flex items-start justify-between gap-4">
-                    <h4 className="text-[17px] font-bold text-white">{action.title}</h4>
-                    <span className="shrink-0 rounded-xl bg-white/10 px-3.5 py-2 text-xs font-medium text-white/70">
-                      {action.duration}
-                    </span>
-                  </div>
+                  <h4 className="mb-3 text-[17px] font-bold text-white">{action.title}</h4>
                   <p className="text-sm leading-relaxed text-white/90">{action.desc}</p>
                 </div>
-                <button
-                  type="button"
-                  className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white/10 transition-all hover:bg-white/20"
-                >
-                  <CheckCircle className="size-5.5 text-white" />
-                </button>
               </div>
             </div>
           ))}

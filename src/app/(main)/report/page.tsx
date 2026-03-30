@@ -105,10 +105,6 @@ export default function ReportPage() {
   const handleRetry = () => setViewState('idle');
   const handleCreateNew = () => setViewState('idle');
 
-  const handlePdfDownload = () => {
-    toast('PDF 다운로드 기능은 준비 중이에요.', 'info');
-  };
-
   return (
     <div
       className="layout-container bg-bg-light flex overflow-hidden"
@@ -175,7 +171,7 @@ export default function ReportPage() {
               <ReportDetailSkeleton />
             ) : (
               selectedReport && (
-                <ReportDetail report={selectedReport} onPdfDownload={handlePdfDownload} />
+                <ReportDetail report={selectedReport} />
               )
             )}
           </div>
