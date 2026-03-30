@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Gift } from 'lucide-react';
 import { CreditProductCard } from '@/features/purchase-credit';
 import { PurchaseConfirmDialog } from '@/features/purchase-credit';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
@@ -12,40 +13,36 @@ const CREDIT_PRODUCTS: CreditProduct[] = [
   {
     id: '01',
     name: '소형 상품',
-    credits: 300,
-    price: 3300,
-    priceFormatted: '3,300',
+    credits: 200,
+    price: 2200,
+    priceFormatted: '2,200',
     paymentType: '건당 결제',
-    benefits: ['추가 상담권 4번 구매 가능(280크레딧)', '디자인 1종 해금(200크레딧)'],
+    benefits: ['상담사 1종 해금 가능(200크레딧)'],
   },
   {
     id: '02',
     name: '중형 상품',
-    credits: 1000,
-    price: 9900,
-    priceFormatted: '9,900',
+    credits: 500,
+    price: 4900,
+    priceFormatted: '4,900',
     paymentType: '건당 결제',
-    discount: '소형 상품보다 10% 혜택',
     benefits: [
-      '추가 상담권 14번 구매 가능(980크레딧)',
-      '디자인 5종 해금(1000크레딧)',
-      '주간 리포트 2번 발행(1000크레딧)',
-      '월간 리포트 1번 발행(800크레딧)',
+      '추가 상담 7회 이용 가능(490크레딧)',
+      '주간 리포트 3회 생성(450크레딧)',
+      '페르소나 2종 해금(400크레딧)',
     ],
   },
   {
     id: '03',
     name: '대형 상품',
-    credits: 3000,
-    price: 27000,
-    priceFormatted: '27,000',
+    credits: 1200,
+    price: 10900,
+    priceFormatted: '10,900',
     paymentType: '건당 결제',
-    discount: '소형 상품보다 18.18% 혜택',
     benefits: [
-      '추가 상담권 42번 구매 가능(2940크레딧)',
-      '디자인 15종 해금(3000크레딧)',
-      '주간 리포트 6번 발행(3000크레딧)',
-      '월간 리포트 3번 발행(2400크레딧)',
+      '추가 상담 17회 이용 가능(1,190크레딧)',
+      '월간 리포트 2회(1,000크레딧) + 추가 상담 2회 이용(140크레딧)',
+      '페르소나 최대 6종 해금(1,200크레딧)',
     ],
   },
 ];
@@ -101,11 +98,11 @@ export default function ShopPage() {
 
           {/* ── 이벤트 탭 ──────────────────────────────────────── */}
           <TabsContent value="event" className="w-full">
-            <div className="flex flex-col items-center gap-10 py-12">
-              <h2 className="heading-01 text-prime-900 font-semibold tracking-[-1.5px]">이벤트</h2>
-              <p className="body-1 text-muted-foreground text-center">
-                진행 중인 이벤트가 없습니다.
-              </p>
+            <div className="flex flex-col items-center gap-4 py-24">
+              <div className="flex size-16 items-center justify-center rounded-full bg-secondary-100">
+                <Gift size={28} strokeWidth={1.5} className="text-prime-400" />
+              </div>
+              <p className="text-prime-400 text-base">진행 중인 이벤트가 없습니다.</p>
             </div>
           </TabsContent>
         </Tabs>
