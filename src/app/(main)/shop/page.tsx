@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Gift } from 'lucide-react';
 import { CreditProductCard } from '@/features/purchase-credit';
@@ -47,7 +47,7 @@ const CREDIT_PRODUCTS: CreditProduct[] = [
   },
 ];
 
-export default function ShopPage() {
+function ShopPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') ?? 'credit');
@@ -127,5 +127,13 @@ export default function ShopPage() {
         }}
       />
     </div>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense>
+      <ShopPageContent />
+    </Suspense>
   );
 }

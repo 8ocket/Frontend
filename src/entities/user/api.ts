@@ -56,7 +56,7 @@ export const kakaoLoginApi = async (code: string): Promise<KakaoLoginResponse> =
     });
   }
 
-  const response = await api.get<KakaoLoginResponse>(`/auth/kakao/login?code=${code}`);
+  const response = await api.get<KakaoLoginResponse>(`/auth/kakao/callback?code=${code}`);
   return response.data;
 };
 

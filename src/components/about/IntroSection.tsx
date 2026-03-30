@@ -55,7 +55,7 @@ export function IntroSection() {
         <div
           className="absolute inset-0 opacity-90 transition-opacity duration-1000"
           style={{
-            backgroundImage: "url('/images/backgrounds/brandinfo-bg.png')",
+            backgroundImage: "url('/images/backgrounds/brandInfo-bg.png')",
             backgroundSize: 'cover',
             backgroundPosition: 'bottom center',
           }}
