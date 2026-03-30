@@ -54,7 +54,7 @@ function CallbackContent() {
         router.push(result.isNewUser ? '/signup' : '/');
       } catch (error) {
         console.error('❌ Kakao login error:', error);
-        router.push('/login');
+        router.push('/login?error=카카오 로그인에 실패했습니다. 다시 시도해 주세요.');
       }
     };
 

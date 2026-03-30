@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/entities/user/store';
-import { googleLoginApi } from '@/shared/api';
+import { googleLoginApi, getMyProfileApi } from '@/shared/api';
 
 function GoogleCallbackContent() {
   const router = useRouter();
@@ -29,17 +29,29 @@ function GoogleCallbackContent() {
         const result = await googleLoginApi(resolvedCode!);
 
 
-        const login = useAuthStore.getState().login;
+        const { login, setUser } = useAuthStore.getState();
+
+        // 토큰 쿠키 저장
         login(
-          { id: Date.now(), email: 'user@example.com', name: 'User', creditBalance: 0 },
+          { id: 0, email: '', name: '', creditBalance: 0 },
           result.accessToken,
           result.refreshToken
         );
 
+        // 실제 프로필 조회 후 유저 상태 업데이트
+        const profile = await getMyProfileApi();
+        setUser({
+          id: parseInt(profile.user_id) || 0,
+          email: '',
+          name: profile.nickname,
+          profileImage: profile.profile_image_url,
+          creditBalance: 0,
+        });
+
         router.push(result.isNewUser ? '/signup' : '/');
       } catch (error) {
         console.error('❌ Google login error:', error);
-        router.push('/login');
+        router.push('/login?error=구글 로그인에 실패했습니다. 다시 시도해 주세요.');
       }
     };
 
