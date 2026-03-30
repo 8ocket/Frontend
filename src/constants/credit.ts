@@ -9,6 +9,7 @@ interface CreditProduct {
   benefits: string[];
 }
 
+// 구매 가능한 크레딧 상품 목록
 export const CREDIT_PRODUCTS: CreditProduct[] = [
   {
     id: '01',
@@ -50,3 +51,9 @@ export const CREDIT_PRODUCTS: CreditProduct[] = [
     ],
   },
 ];
+
+// 리포트 유형별 크레딧 비용
+export const REPORT_CREDIT_COST = {
+  weekly: 150,
+  monthly: 500,
+} as const;

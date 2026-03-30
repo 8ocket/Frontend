@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import {
   ReportSidebar,
   ReportCreationForm,
@@ -13,6 +13,8 @@ import {
   type ReportType,
 } from '@/components/report';
 import { useToast } from '@/shared/ui/toast';
+import { CanGenerate } from '@/entities/reports/model';
+import { createReportApi, getReportDetailApi, getReportListApi } from '@/entities/reports/api';
 
 const MOCK_REPORTS: Report[] = [
   {
@@ -59,19 +61,54 @@ export default function ReportPage() {
   const [viewState, setViewState] = useState<ReportStatus>('idle');
   const [selectedId, setSelectedId] = useState(MOCK_REPORTS[0].id);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
+  const [creatingReportId, setCreatingReportId] = useState<string | null>(null);
+  const [canGenerate, setCanGenerate] = useState<CanGenerate | null>(null);
+
+  // 목록 로딩
+  useEffect(() => {
+    getReportListApi()
+      .then((data) => {
+        // TODO: ReportListItem → Report 변환 함수 작성 후 적용
+        // setReports(data.reports.map(mapToReport));
+        setCanGenerate(data.can_generate);
+      })
+      .catch(() => {
+        toast('리포트 목록을 불러오는 데 실패했어요.', 'error');
+      });
+  }, []);
+
+  // 3초 간격 폴링 — creating 상태일 때 실행
+  useEffect(() => {
+    if (viewState !== 'creating' || !creatingReportId) return;
+
+    const poll = async () => {
+      try {
+        const data = await getReportDetailApi(creatingReportId);
+        if (!('status' in data)) {
+          setViewState('success');
+          setIsLoadingDetail(true);
+          setTimeout(() => setIsLoadingDetail(false), SKELETON_MS);
+          toast('리포트가 완성됐어요!', 'success');
+        }
+      } catch {
+        setViewState('failed');
+      }
+    };
+
+    const interval = setInterval(poll, 3000);
+    return () => clearInterval(interval);
+  }, [viewState, creatingReportId]);
 
   // 상담 횟수 — 실제 API 연동 시 교체
-  const consultationCount = 5;
+  const consultationCount = canGenerate?.saved_session_count ?? 0;
 
   const selectedReport = reports.find((r) => r.id === selectedId);
 
   const showDetail = useCallback((id: string) => {
     setIsLoadingDetail(true);
     setTimeout(() => setIsLoadingDetail(false), SKELETON_MS);
-    // NEW 배지 제거
-    setReports((prev) =>
-      prev.map((r) => (r.id === id && r.isNew ? { ...r, isNew: false } : r))
-    );
+    // NEW 배지 제거 — 실제 API 연동 시 isNew 플래그 제거
+    setReports((prev) => prev.map((r) => (r.id === id && r.isNew ? { ...r, isNew: false } : r)));
   }, []);
 
   const handleSelect = (id: string) => {
@@ -85,29 +122,26 @@ export default function ReportPage() {
     }
   };
 
-  const handleCreateReport = (_type: ReportType, _start: string, _end: string) => {
-    setViewState('creating');
-  };
-
-  // ReportPolling 완료 콜백 — 실제 API 결과에 따라 success/failed 분기
-  const handlePollingComplete = () => {
-    const succeeded = Math.random() > 0.2;
-    if (succeeded) {
-      setViewState('success');
-      setIsLoadingDetail(true);
-      setTimeout(() => setIsLoadingDetail(false), SKELETON_MS);
-      toast('리포트가 완성됐어요!', 'success');
-    } else {
-      setViewState('failed');
+  const handleCreateReport = async (type: ReportType, start: string, end: string) => {
+    try {
+      const { report_id } = await createReportApi({
+        report_type: type,
+        period_start: start,
+        period_end: end,
+      });
+      setCreatingReportId(report_id);
+      setViewState('creating');
+    } catch (e) {
+      // TODO: 크레딧 부족 에러 코드 백엔드 확인 후 분기 처리
+      toast('리포트 생성 요청에 실패했어요.', 'error');
     }
   };
 
-  const handleRetry = () => setViewState('idle');
-  const handleCreateNew = () => setViewState('idle');
-
-  const handlePdfDownload = () => {
-    toast('PDF 다운로드 기능은 준비 중이에요.', 'info');
+  const handleRetry = () => {
+    setCreatingReportId(null);
+    setViewState('idle');
   };
+  const handleCreateNew = () => setViewState('idle');
 
   return (
     <div
@@ -126,7 +160,7 @@ export default function ReportPage() {
       {/* 메인 콘텐츠 */}
       <div className="flex-1 overflow-y-auto">
         {viewState === 'idle' && (
-          <div className="relative flex min-h-full items-center justify-center bg-secondary-100 px-6 py-12 sm:px-12">
+          <div className="bg-secondary-100 relative flex min-h-full items-center justify-center px-6 py-12 sm:px-12">
             {/* 배경 로고 — 채팅창과 동일한 브랜드 패턴 */}
             <div
               className="pointer-events-none absolute inset-0 flex items-center justify-center"
@@ -161,7 +195,7 @@ export default function ReportPage() {
         )}
 
         {/* creating: 폴링 */}
-        {viewState === 'creating' && <ReportPolling onComplete={handlePollingComplete} />}
+        {viewState === 'creating' && <ReportPolling onComplete={() => {}} />}
 
         {/* failed: 에러 */}
         {viewState === 'failed' && (
@@ -174,9 +208,7 @@ export default function ReportPage() {
             {isLoadingDetail ? (
               <ReportDetailSkeleton />
             ) : (
-              selectedReport && (
-                <ReportDetail report={selectedReport} onPdfDownload={handlePdfDownload} />
-              )
+              selectedReport && <ReportDetail report={selectedReport} />
             )}
           </div>
         )}
