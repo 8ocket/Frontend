@@ -1,3 +1,4 @@
+import { ApiError } from './model';
 import { api } from '@/shared/api/axios';
 import {
   AuthResponse,
@@ -5,11 +6,20 @@ import {
   RefreshTokenResponse,
   KakaoLoginResponse,
   GoogleLoginResponse,
+  UserProfileResponse,
+  UpdateMyProfileResponse,
   OccupationType,
   AgeGroup,
   Gender,
 } from '@/entities/user/model';
-import { mockLogin, mockRefreshToken, mockKakaoLogin, mockGoogleLogin } from '@/mocks';
+import {
+  mockLogin,
+  mockRefreshToken,
+  mockKakaoLogin,
+  mockGoogleLogin,
+  mockGetMyProfile,
+  mockUpdateMyProfile,
+} from '@/mocks';
 
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
 
@@ -63,6 +73,59 @@ export const googleLoginApi = async (code: string): Promise<GoogleLoginResponse>
 
   const response = await api.get<GoogleLoginResponse>(`/auth/google/callback?code=${code}`);
   return response.data;
+};
+
+/**
+ * 내 프로필 조회 Api
+ * GET /v1/users/me/profile
+ */
+export const getMyProfileApi = async (): Promise<UserProfileResponse> => {
+  if (USE_MOCK) {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(mockGetMyProfile()), 500);
+    });
+  }
+
+  const response = await api.get<ApiResponse<UserProfileResponse>>('/users/me/profile');
+  if (response.data.success && response.data.data) {
+    return response.data.data;
+  }
+  throw new Error(response.data.error?.message || '프로필 조회 실패');
+};
+
+/**
+ * 프로필 이미지 및 닉네임 수정
+ * PATCH /v1/users/me/profile
+ */
+export const updateMyProfileApi = async (
+  nickName?: string,
+  profileImage?: File
+): Promise<UpdateMyProfileResponse> => {
+  if (USE_MOCK) {
+    return mockUpdateMyProfile(nickName, profileImage);
+  }
+
+  const formData = new FormData();
+
+  if (profileImage) formData.append('profile_image', profileImage);
+  const contentsBlob = new Blob([JSON.stringify({ nickname: nickName })], {
+    type: 'application/json',
+  });
+  formData.append('contents', contentsBlob);
+
+  const response = await api.patch<ApiResponse<UpdateMyProfileResponse>>(
+    '/users/me/profile',
+    formData,
+    {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }
+  );
+
+  if (response.data.success && response.data.data) {
+    return response.data.data;
+  }
+
+  throw new Error(response.data.error?.message || '프로필 수정 실패');
 };
 
 // API 함수 모음
