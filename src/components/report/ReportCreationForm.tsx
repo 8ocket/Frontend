@@ -9,6 +9,7 @@ import { Calendar } from '@/shared/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { cn } from '@/shared/lib/utils';
 import type { ReportType } from './types';
+import { REPORT_CREDIT_COST } from '@/constants/credit';
 
 interface ReportCreationFormProps {
   onCreateReport: (type: ReportType, startDate: string, endDate: string) => void;
@@ -97,7 +98,7 @@ export function ReportCreationForm({ onCreateReport, consultationCount }: Report
                   isSelected ? 'bg-main-blue/15 text-main-blue' : 'bg-prime-100 text-prime-400'
                 )}
               >
-                {type === 'weekly' ? '150C' : '500C'}
+                {REPORT_CREDIT_COST[type]}C
               </span>
             </button>
           );

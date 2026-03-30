@@ -64,19 +64,19 @@ interface Keyword {
 //             GET /reports/:id/keywords 응답으로 교체
 //             응답 형식 예시: { keywords: Keyword[], totalCount: number, positiveRatio: number, negativeRatio: number }
 const KEYWORDS: Keyword[] = [
-  { text: '집중력',     count: 28, isTop: true },
-  { text: '불안',       count: 22 },
-  { text: '긍정',       count: 18 },
-  { text: '스트레스',   count: 15 },
+  { text: '집중력', count: 28, isTop: true },
+  { text: '불안', count: 22 },
+  { text: '긍정', count: 18 },
+  { text: '스트레스', count: 15 },
   { text: '자기효능감', count: 12 },
 ];
 
 const KEYWORD_STYLES = [
-  { badge: 'bg-(--main-blue)/10 text-main-blue',   count: 'bg-main-blue/20 text-main-blue'   },
-  { badge: 'bg-error-400/10 text-error-500',        count: 'bg-error-400/20 text-error-500'   },
-  { badge: 'bg-success-700/10 text-success-700',    count: 'bg-success-700/20 text-success-700'},
-  { badge: 'bg-warning-500/10 text-warning-600',    count: 'bg-warning-500/20 text-warning-600'},
-  { badge: 'bg-prime-200/60 text-prime-600',        count: 'bg-prime-300/40 text-prime-600'   },
+  { badge: 'bg-(--main-blue)/10 text-main-blue', count: 'bg-main-blue/20 text-main-blue' },
+  { badge: 'bg-error-400/10 text-error-500', count: 'bg-error-400/20 text-error-500' },
+  { badge: 'bg-success-700/10 text-success-700', count: 'bg-success-700/20 text-success-700' },
+  { badge: 'bg-warning-500/10 text-warning-600', count: 'bg-warning-500/20 text-warning-600' },
+  { badge: 'bg-prime-200/60 text-prime-600', count: 'bg-prime-300/40 text-prime-600' },
 ];
 
 // TODO [API]: ACTIONS를 GET /reports/:id/actions 응답으로 교체
@@ -103,7 +103,10 @@ export function ReportDetail({ report, onPdfDownload }: ReportDetailProps) {
   return (
     <div className="space-y-8">
       {/* ── 리포트 헤더 ── */}
-      <div className="animate-in fade-in-0 slide-in-from-bottom-4 mb-8" style={{ animationDuration: '400ms' }}>
+      <div
+        className="animate-in fade-in-0 slide-in-from-bottom-4 mb-8"
+        style={{ animationDuration: '400ms' }}
+      >
         <div className="mb-4 flex items-start justify-between gap-6">
           <div>
             <div className="mb-4 flex items-center gap-3">
@@ -149,17 +152,25 @@ export function ReportDetail({ report, onPdfDownload }: ReportDetailProps) {
       </div>
 
       {/* ── 감정 변화 그래프 (섹션 헤더 포함) ── */}
-      <div className="animate-in fade-in-0 slide-in-from-bottom-4" style={{ animationDuration: '400ms', animationDelay: '80ms', animationFillMode: 'both' }}>
+      <div
+        className="animate-in fade-in-0 slide-in-from-bottom-4"
+        style={{ animationDuration: '400ms', animationDelay: '80ms', animationFillMode: 'both' }}
+      >
         <EmotionAreaChart data={emotionData} type={report.reportType ?? 'weekly'} />
       </div>
 
       {/* ── 주요 고민 키워드 ── */}
-      <div className={`${CARD} animate-in fade-in-0 slide-in-from-bottom-4`} style={{ animationDuration: '400ms', animationDelay: '160ms', animationFillMode: 'both' }}>
+      <div
+        className={`${CARD} animate-in fade-in-0 slide-in-from-bottom-4`}
+        style={{ animationDuration: '400ms', animationDelay: '160ms', animationFillMode: 'both' }}
+      >
         <div className="mb-8">
           <h3 className="text-prime-700 mb-3 text-2xl font-bold tracking-tight">
-            주요 고민 키워드
+            주요 고민 주제 및 키워드 분석
           </h3>
-          <p className="text-prime-500 text-[15px]">가장 빈번하게 언급된 감정 및 상황 키워드</p>
+          <p className="text-prime-500 text-[15px]">
+            반복적으로 등장한 고민 주제와 핵심 키워드를 분석했어요
+          </p>
         </div>
 
         <div className="flex flex-wrap gap-3">
@@ -168,7 +179,10 @@ export function ReportDetail({ report, onPdfDownload }: ReportDetailProps) {
             return (
               <div
                 key={kw.text}
-                className={cn('flex items-center gap-3 rounded-3xl px-5 py-3.5 transition-all', style.badge)}
+                className={cn(
+                  'flex items-center gap-3 rounded-3xl px-5 py-3.5 transition-all',
+                  style.badge
+                )}
               >
                 <span className="text-[15px] font-bold">#{kw.text}</span>
                 <span className={cn('rounded-xl px-2.5 py-1 text-[13px] font-bold', style.count)}>
@@ -195,7 +209,10 @@ export function ReportDetail({ report, onPdfDownload }: ReportDetailProps) {
       </div>
 
       {/* ── 사용자 상태 요약 ── */}
-      <div className={`${CARD} animate-in fade-in-0 slide-in-from-bottom-4`} style={{ animationDuration: '400ms', animationDelay: '240ms', animationFillMode: 'both' }}>
+      <div
+        className={`${CARD} animate-in fade-in-0 slide-in-from-bottom-4`}
+        style={{ animationDuration: '400ms', animationDelay: '240ms', animationFillMode: 'both' }}
+      >
         <div className="mb-8">
           <h3 className="text-prime-700 mb-3 text-2xl font-bold tracking-tight">
             사용자 상태 요약
@@ -267,7 +284,10 @@ export function ReportDetail({ report, onPdfDownload }: ReportDetailProps) {
       </div>
 
       {/* ── 맞춤 행동 제언 ── */}
-      <div className="bg-main-blue animate-in fade-in-0 slide-in-from-bottom-4 rounded-[24px] p-12 shadow-sm" style={{ animationDuration: '400ms', animationDelay: '320ms', animationFillMode: 'both' }}>
+      <div
+        className="bg-main-blue animate-in fade-in-0 slide-in-from-bottom-4 rounded-[24px] p-12 shadow-sm"
+        style={{ animationDuration: '400ms', animationDelay: '320ms', animationFillMode: 'both' }}
+      >
         <div className="mb-10 text-center">
           <div className="mb-5 inline-flex size-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
             <Target className="size-8 text-white" />
@@ -312,7 +332,10 @@ export function ReportDetail({ report, onPdfDownload }: ReportDetailProps) {
       </div>
 
       {/* ── 면책 고지 ── */}
-      <div className="border-prime-100 animate-in fade-in-0 border-t pt-8" style={{ animationDuration: '400ms', animationDelay: '400ms', animationFillMode: 'both' }}>
+      <div
+        className="border-prime-100 animate-in fade-in-0 border-t pt-8"
+        style={{ animationDuration: '400ms', animationDelay: '400ms', animationFillMode: 'both' }}
+      >
         <div className="bg-prime-100/40 rounded-[24px] p-7">
           <p className="text-prime-500 text-[13px] leading-relaxed">
             💡 이 리포트는 AI 분석을 기반으로 자동 생성되었습니다. 심리적 어려움이 지속되거나 심화될

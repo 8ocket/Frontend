@@ -13,21 +13,19 @@ export function ReportError({ onRetry, onDismiss }: ReportErrorProps) {
     <div className="flex min-h-[600px] items-center justify-center px-4">
       <div className="w-full max-w-[520px] text-center">
         {/* 아이콘 */}
-        <div className="mb-8 inline-flex size-20 items-center justify-center rounded-full bg-error-400/10">
-          <AlertTriangle className="size-10 text-error-400" />
+        <div className="bg-error-400/10 mb-8 inline-flex size-20 items-center justify-center rounded-full">
+          <AlertTriangle className="text-error-400 size-10" />
         </div>
 
-        <h2 className="mb-4 text-2xl font-semibold tracking-tight text-prime-700">
+        <h2 className="text-prime-700 mb-4 text-2xl font-semibold tracking-tight">
           리포트 생성 실패
         </h2>
-        <p className="mb-10 text-[15px] leading-relaxed text-prime-500">
-          일시적인 오류로 리포트 생성에 실패했습니다.
-          <br />
-          사용된 크레딧은 자동으로 복구되었으니 안심하세요.
+        <p className="text-prime-500 mb-10 text-[15px] leading-relaxed">
+          리포트 생성에 실패하여 크레딧이 자동으로 복구되었습니다.
         </p>
 
         {/* 오류 상세 카드 */}
-        <div className="mb-8 rounded-2xl border border-error-300/40 bg-white p-8 shadow-sm">
+        <div className="border-error-300/40 mb-8 rounded-2xl border bg-white p-8 shadow-sm">
           <div className="space-y-4 text-left">
             {[
               {
@@ -49,8 +47,8 @@ export function ReportError({ onRetry, onDismiss }: ReportErrorProps) {
               <div key={item.title} className="flex items-start gap-3">
                 <div className={`mt-2 size-1.5 shrink-0 rounded-full ${item.color}`} />
                 <div>
-                  <p className="text-sm font-semibold text-prime-800">{item.title}</p>
-                  <p className="mt-0.5 text-[13px] text-prime-500">{item.desc}</p>
+                  <p className="text-prime-800 text-sm font-semibold">{item.title}</p>
+                  <p className="text-prime-500 mt-0.5 text-[13px]">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -59,16 +57,12 @@ export function ReportError({ onRetry, onDismiss }: ReportErrorProps) {
 
         {/* 버튼 */}
         <div className="flex gap-3">
-          <Button onClick={onRetry} className="flex-1 gap-2">
-            <RefreshCcw className="size-4" />
-            다시 시도하기
-          </Button>
           <Button onClick={onDismiss} variant="secondary" className="flex-1">
             확인
           </Button>
         </div>
 
-        <p className="mt-6 text-xs text-prime-400">문제가 계속되면 고객센터로 문의해주세요</p>
+        <p className="text-prime-400 mt-6 text-xs">문제가 계속되면 고객센터로 문의해주세요</p>
       </div>
     </div>
   );
