@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button';
 import type { CreditProduct } from '@/types/credit';
@@ -67,9 +66,7 @@ export function CreditProductCard({ product, onPurchase, className }: CreditProd
           </Button>
 
           <p className="text-warning-600 text-center text-[11px] leading-normal opacity-90">
-            본 혜택은 단일 업무 반복 수행 시의 측정 결과값이며,
-            <br />
-            전체 서비스 혜택이 아님을 유념해 주시기 바랍니다.
+            혜택의 수치는 평균 사용패턴 기준이며, 개인 이용 방식에 따라 달라질 수 있습니다.
           </p>
         </div>
       </div>
