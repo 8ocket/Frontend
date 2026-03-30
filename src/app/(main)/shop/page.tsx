@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { CreditProductCard } from '@/features/purchase-credit';
 import { PurchaseConfirmDialog } from '@/features/purchase-credit';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
@@ -52,6 +52,8 @@ const CREDIT_PRODUCTS: CreditProduct[] = [
 
 export default function ShopPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') ?? 'credit');
   const [selectedProduct, setSelectedProduct] = useState<CreditProduct | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -68,7 +70,7 @@ export default function ShopPage() {
       {/* [8배수] 전체 섹션 상하 여백 py-16 (64px) 적용 */}
       <main className="layout-container px-gutter flex flex-col items-center py-16">
         {/* Radix Tabs — Figma: 탭 네비게이션 */}
-        <Tabs defaultValue="credit" className="flex w-full flex-col items-center">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex w-full flex-col items-center">
           {/* [8배수] 탭 리스트 마진 mb-12 (48px) 조정 */}
           <TabsList className="mb-12">
             <TabsTrigger value="credit">크레딧 구매하기</TabsTrigger>

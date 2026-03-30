@@ -4,8 +4,17 @@
 // 비회원 및 회원 모두에게 안정감을 주는 클린 엔딩 구조입니다.
 
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/entities/user/store';
 
 export function FooterCTASection() {
+  const router = useRouter();
+  const { isAuthenticated } = useAuthStore();
+
+  const handleCTA = () => {
+    router.push(isAuthenticated ? '/chat' : '/login');
+  };
+
   return (
     // min-h-screen을 사용하여 아랫 공간을 충분히 확보합니다.
     <section className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden pt-40 pb-20">
@@ -39,6 +48,7 @@ export function FooterCTASection() {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.98 }}
+          onClick={handleCTA}
           className="mb-[25vh] rounded-full bg-[#82C8FF] px-16 py-5 text-[18px] font-semibold text-white shadow-xl shadow-blue-100/50"
         >
           AI 상담 시작하기

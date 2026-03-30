@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/entities/user/store';
-import { kakaoLoginApi } from '@/shared/api';
+import { kakaoLoginApi, getMyProfileApi } from '@/shared/api';
 
 function CallbackContent() {
   const router = useRouter();
@@ -31,12 +31,24 @@ function CallbackContent() {
         const result = await kakaoLoginApi(resolvedCode!);
 
 
-        const login = useAuthStore.getState().login;
+        const { login, setUser } = useAuthStore.getState();
+
+        // 토큰 쿠키 저장
         login(
-          { id: Date.now(), email: 'user@example.com', name: 'User', creditBalance: 0 },
+          { id: 0, email: '', name: '', creditBalance: 0 },
           result.accessToken,
           result.refreshToken
         );
+
+        // 실제 프로필 조회 후 유저 상태 업데이트
+        const profile = await getMyProfileApi();
+        setUser({
+          id: parseInt(profile.user_id) || 0,
+          email: '',
+          name: profile.nickname,
+          profileImage: profile.profile_image_url,
+          creditBalance: 0,
+        });
 
         // 신규 사용자면 회원가입, 기존 사용자면 홈으로
         router.push(result.isNewUser ? '/signup' : '/');

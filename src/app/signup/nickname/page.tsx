@@ -49,7 +49,15 @@ export default function NicknamePage() {
       );
       const { user, login } = useAuthStore.getState();
       const token = getCookie('accessToken') || '';
-      login({ ...(user ?? { id: 0, email: '' }), name: nickname, creditBalance: 0, profileImage: profileImage ?? '/images/icons/profile-default.svg' }, token);
+      login(
+        {
+          ...(user ?? { id: 0, email: '' }),
+          name: nickname,
+          creditBalance: 0,
+          profileImage: profileImage ?? '/images/icons/profile-default.svg',
+        },
+        token
+      );
       setShowSuccessModal(true);
     } catch (error) {
       console.error('회원가입 실패:', error);
@@ -60,7 +68,7 @@ export default function NicknamePage() {
 
   const handleSuccessModalClick = () => {
     useAuthStore.getState().addCredit(150);
-    router.push('/');
+    router.push('/chat');
   };
 
   const generateRandomNickname = () => {
@@ -74,7 +82,7 @@ export default function NicknamePage() {
         <div className="relative w-full max-w-142 rounded-2xl border border-white/40 bg-white/70 px-6 py-8 shadow-[0px_8px_32px_0px_rgba(0,0,0,0.08)] md:px-10 md:py-10">
           {/* ── 헤더: 제목 + 뒤로가기 ── */}
           <div className="flex items-center justify-between">
-            <h1 className="text-prime-900 text-2xl font-semibold leading-[1.3] tracking-[-0.36px]">
+            <h1 className="text-prime-900 text-2xl leading-[1.3] font-semibold tracking-[-0.36px]">
               개인정보 설정하기
             </h1>
             <button
@@ -121,7 +129,7 @@ export default function NicknamePage() {
             <div className="flex flex-col gap-6">
               {/* 닉네임 설정 */}
               <div className="flex flex-col gap-2">
-                <p className="text-prime-900 text-base font-medium leading-6 tracking-[-0.24px]">
+                <p className="text-prime-900 text-base leading-6 font-medium tracking-[-0.24px]">
                   닉네임 설정하기
                 </p>
                 <div className="flex flex-col gap-3">
