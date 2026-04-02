@@ -1,4 +1,3 @@
-import { ApiError } from './model';
 import { api } from '@/shared/api/axios';
 import {
   AuthResponse,
@@ -98,7 +97,7 @@ export const getMyProfileApi = async (): Promise<UserProfileResponse> => {
  * PATCH /v1/users/me/profile
  */
 export const updateMyProfileApi = async (
-  nickName?: string,
+  nickName: string,
   profileImage?: File
 ): Promise<UpdateMyProfileResponse> => {
   if (USE_MOCK) {

@@ -33,7 +33,7 @@ function GoogleCallbackContent() {
 
         // 토큰 쿠키 저장
         login(
-          { id: 0, email: '', name: '', creditBalance: 0 },
+          { id: '', email: '', name: '', creditBalance: 0 },
           result.accessToken,
           result.refreshToken
         );
@@ -41,7 +41,7 @@ function GoogleCallbackContent() {
         // 실제 프로필 조회 후 유저 상태 업데이트
         const profile = await getMyProfileApi();
         setUser({
-          id: parseInt(profile.user_id) || 0,
+          id: profile.user_id,
           email: '',
           name: profile.nickname,
           profileImage: profile.profile_image_url,

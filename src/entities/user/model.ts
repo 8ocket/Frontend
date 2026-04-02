@@ -86,7 +86,6 @@ export interface BaseProfileResponse {
   user_id: string;
   profile_image_url?: string;
   nickname: string;
-  updated_at: string;
 }
 
 // --- /v1/users/me/profile (GET) : 사용자 개인정보 조회
@@ -95,7 +94,9 @@ export interface UserProfileResponse extends BaseProfileResponse {
 }
 
 // --- /v1/users/me/profile (PATCH) : 프로필 이미지 및 닉네임 수정
-export type UpdateMyProfileResponse = BaseProfileResponse;
+export interface UpdateMyProfileResponse extends BaseProfileResponse {
+  updated_at: string;
+}
 
 // ─── DB 스키마 ───
 

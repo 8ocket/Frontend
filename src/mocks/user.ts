@@ -57,10 +57,9 @@ export const mockRefreshToken = (): RefreshTokenResponse => ({
 
 /** GET /v1/users/me/profile */
 export const mockGetMyProfile = (): UserProfileResponse => ({
-  user_id: '1',
+  user_id: '550e8400-e29b-41d4-a716-446655440000',
   profile_image_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=test',
   nickname: '테스트 사용자',
-  updated_at: new Date().toISOString(),
   nickname_change_count: 0,
 });
 

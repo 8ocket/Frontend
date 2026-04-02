@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import { setCookie, deleteCookie } from '@/shared/lib/utils/cookie';
 
 interface User {
-  id: number;
+  id: string;
   email: string;
   name: string;
   profileImage?: string;

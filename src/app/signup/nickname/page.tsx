@@ -51,7 +51,7 @@ export default function NicknamePage() {
       const token = getCookie('accessToken') || '';
       login(
         {
-          ...(user ?? { id: 0, email: '' }),
+          ...(user ?? { id: '', email: '' }),
           name: nickname,
           creditBalance: 0,
           profileImage: profileImage ?? '/images/icons/profile-default.svg',
