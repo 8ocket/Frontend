@@ -11,9 +11,9 @@ const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
 export const getCreditProductsApi = async (): Promise<CreditProductResponse[]> => {
   if (USE_MOCK) {
     return [
-      { name: '소량 크레딧', creditAmount: 100, price: 1000 },
-      { name: '중간 크레딧', creditAmount: 500, price: 4500 },
-      { name: '대량 크레딧', creditAmount: 1000, price: 8000 },
+      { name: '소형', creditAmount: 200, price: 2200 },
+      { name: '중형', creditAmount: 500, price: 4900 },
+      { name: '대형', creditAmount: 1200, price: 10900 },
     ];
   }
 
