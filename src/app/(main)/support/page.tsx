@@ -10,12 +10,16 @@ export default function SupportPage() {
   const toggle = (id: number) =>
     setOpenIds((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
       return next;
     });
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50/50 to-white">
+    <div className="min-h-main-safe bg-linear-to-b from-slate-50/50 to-white">
       <main className="mx-auto max-w-6xl px-5 pt-20 pb-32 sm:px-6 sm:pt-28">
         <div className="mb-14 sm:mb-20">
           <h1 className="mb-3 text-[28px] leading-tight font-bold tracking-tight text-[#0F172A] sm:text-[36px]">
@@ -44,7 +48,7 @@ export default function SupportPage() {
           <p className="mb-5 text-[14px] text-[#64748B] sm:text-[15px]">
             원하시는 답변을 찾지 못하셨나요?
           </p>
-          <button className="rounded-full border-2 border-slate-200 bg-white px-7 py-3 text-[14px] font-semibold text-[#334155] shadow-sm transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:outline-none active:translate-y-0 sm:text-[15px]">
+          <button className="rounded-full border-2 border-slate-200 bg-white px-7 py-3 text-[14px] font-semibold text-neutral-800 shadow-sm transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:outline-none active:translate-y-0 sm:text-[15px]">
             1:1 문의하기
           </button>
         </div>

@@ -12,8 +12,6 @@ import { MOCK_COLLECTION_CARDS } from '@/mocks/emotion';
 import type { EmotionCardData } from '@/entities/emotion';
 import { useAuthStore } from '@/entities/user/store';
 
-// ── Figma: 대시보드(홈) — 1518:3948 ─────────────────────────────────────────
-
 const _today = new Date();
 const TODAY_DATE = getDate(_today);
 const DAYS_IN_MONTH = getDaysInMonth(_today);
@@ -59,10 +57,7 @@ function KeywordSkeleton() {
     <div className="flex h-38.5 flex-col items-center justify-center gap-3 rounded-xl bg-white">
       <div className="flex flex-wrap justify-center gap-2 px-4">
         {['감정', '스트레스', '관계', '업무'].map((kw) => (
-          <span
-            key={kw}
-            className="rounded-full bg-slate-200 px-3 py-1 text-xs text-slate-300"
-          >
+          <span key={kw} className="rounded-full bg-slate-200 px-3 py-1 text-xs text-slate-300">
             {kw}
           </span>
         ))}
@@ -94,8 +89,8 @@ export default function Home() {
 
   if (authLoading || !isAuthenticated) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-cta-300" />
+      <div className="flex min-h-main-safe items-center justify-center">
+        <div className="border-cta-300 h-8 w-8 animate-spin rounded-full border-b-2" />
       </div>
     );
   }
@@ -131,12 +126,11 @@ export default function Home() {
   const { cardWidth, cardHeight, visibleCount } = getCardDimensions(cardContainerWidth);
 
   return (
-    <div className="min-h-screen bg-secondary-100">
+    <div className="bg-secondary-100 min-h-main-safe">
       <div className="mx-auto max-w-360 px-4 sm:px-8 lg:px-10">
-
         {/* ── Section 1: 인사말 + 출석체크 ──────────────────────────────────── */}
-        <section className="pb-8 pt-6">
-          <h1 className="mb-6 text-[28px] font-semibold leading-[1.3] tracking-[-0.42px] text-[#1a222e] sm:text-[32px]">
+        <section className="pt-6 pb-8">
+          <h1 className="mb-6 text-[28px] leading-[1.3] font-semibold tracking-[-0.42px] text-[#1a222e] sm:text-[32px]">
             <span className="text-cta-300 underline">{userName}</span>
             <span>님, 오늘 하루는 어떠셨나요?</span>
           </h1>
@@ -144,7 +138,7 @@ export default function Home() {
           <div className="flex flex-col gap-4">
             <div className="flex items-start justify-between gap-4">
               <div className="flex min-w-0 flex-1 flex-col gap-2">
-                <div className="flex items-center gap-4 text-[12px] font-medium leading-[1.2] tracking-[-0.18px] text-prime-700">
+                <div className="text-prime-700 flex items-center gap-4 text-[12px] leading-[1.2] font-medium tracking-[-0.18px]">
                   <span>Today :</span>
                   <span>{TODAY_LABEL}</span>
                 </div>
@@ -161,12 +155,12 @@ export default function Home() {
                         key={day}
                         title={isAttended ? `${day}일 출석 완료` : `${day}일`}
                         className={cn(
-                          'relative flex size-6 shrink-0 items-center justify-center rounded-full text-[16px] font-medium leading-none',
+                          'relative flex size-6 shrink-0 items-center justify-center rounded-full text-[16px] leading-none font-medium',
                           isToday && 'bg-cta-300 text-[#f8fafc]',
                           !isToday && isAttended && 'bg-interactive-glass-blue-50 text-prime-700',
-                          !isToday && !isAttended && isPast && 'opacity-50 text-prime-700',
-                          isNearFuture && 'opacity-50 text-prime-700',
-                          isFarFuture && 'opacity-10 text-prime-700',
+                          !isToday && !isAttended && isPast && 'text-prime-700 opacity-50',
+                          isNearFuture && 'text-prime-700 opacity-50',
+                          isFarFuture && 'text-prime-700 opacity-10'
                         )}
                       >
                         {day}
@@ -178,13 +172,13 @@ export default function Home() {
 
               {MOCK_ATTENDED.has(TODAY_DATE) ? (
                 <div className="flex shrink-0 items-center gap-1.5 rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-400">
-                  <Check className="h-4 w-4 text-cta-300" aria-hidden="true" />
+                  <Check className="text-cta-300 h-4 w-4" aria-hidden="true" />
                   오늘 출석 완료
                 </div>
               ) : (
                 <button
                   type="button"
-                  className="shrink-0 rounded-lg bg-cta-300 px-6 py-3.5 text-base font-medium text-[#1a222e] transition-opacity hover:opacity-90"
+                  className="bg-cta-300 shrink-0 rounded-lg px-6 py-3.5 text-base font-medium text-[#1a222e] transition-opacity hover:opacity-90"
                 >
                   출석체크 하기
                 </button>
@@ -206,7 +200,7 @@ export default function Home() {
 
         {/* ── Section 2: 이벤트 배너 ────────────────────────────────────────── */}
         <section className="relative mb-10 h-100 overflow-hidden rounded-3xl bg-[rgba(130,201,255,0.1)]">
-          <div className="absolute left-10 top-10 flex items-center" style={{ height: 300 }}>
+          <div className="absolute top-10 left-10 flex items-center" style={{ height: 300 }}>
             {MOCK_COLLECTION_CARDS.slice(0, 8).map((card, idx) => {
               const emotionLabel = getPrimaryEmotionLabel(card);
               return (
@@ -215,36 +209,41 @@ export default function Home() {
                   className="shrink-0"
                   style={{ position: 'relative', zIndex: idx, marginRight: idx < 7 ? -110 : 0 }}
                 >
-                  <EmotionCardFront layers={card.layers} emotionLabel={emotionLabel} width={175} height={300} />
+                  <EmotionCardFront
+                    layers={card.layers}
+                    emotionLabel={emotionLabel}
+                    width={175}
+                    height={300}
+                  />
                 </div>
               );
             })}
           </div>
 
-          <div className="absolute bottom-0 right-10 top-0 hidden w-109.5 flex-col items-end justify-center gap-10 lg:flex">
+          <div className="absolute top-0 right-10 bottom-0 hidden w-109.5 flex-col items-end justify-center gap-10 lg:flex">
             <div className="flex w-full flex-col items-end gap-6">
               <div className="flex w-full flex-col items-end gap-2">
-                <p className="w-full text-right text-[14px] font-medium tracking-[-0.21px] text-warning-500">
+                <p className="text-warning-500 w-full text-right text-[14px] font-medium tracking-[-0.21px]">
                   EVENT
                 </p>
-                <p className="w-full text-right text-[24px] font-semibold leading-[1.3] tracking-[-0.36px] text-prime-800">
+                <p className="text-prime-800 w-full text-right text-[24px] leading-[1.3] font-semibold tracking-[-0.36px]">
                   2026 감정카드 세트를 실제 카드로 만나보세요.
                 </p>
               </div>
-              <div className="w-99.75 text-right text-[16px] font-normal leading-[1.6] text-prime-600">
+              <div className="text-prime-600 w-99.75 text-right text-[16px] leading-[1.6] font-normal">
                 <p>나만의 감정 카드는 어쩌면 나의 정체성 그 자체일지도 모릅니다.</p>
                 <p>그러한 카드를 가상의 카드가 아닌 실물로 소유해 보세요.</p>
                 <p>신한, 국민, 우체국, 하나, 농협 등 시중은행에서 발급 가능합니다.</p>
                 <p>한정판 이벤트로 조기에 마감될 수도 있습니다.</p>
               </div>
-              <p className="w-99.75 text-right text-[12px] leading-[1.2] tracking-[-0.18px] text-error-300">
+              <p className="text-error-300 w-99.75 text-right text-[12px] leading-[1.2] tracking-[-0.18px]">
                 자세한 이벤트는 상세페이지에서 확인 부탁드립니다.
               </p>
             </div>
             <button
               type="button"
               onClick={() => router.push('/shop')}
-              className="overflow-hidden rounded-lg bg-cta-300 px-6 py-3.5 text-base font-medium text-[#1a222e] transition-opacity hover:opacity-90"
+              className="bg-cta-300 overflow-hidden rounded-lg px-6 py-3.5 text-base font-medium text-[#1a222e] transition-opacity hover:opacity-90"
             >
               이벤트 보러 가기
             </button>
@@ -260,20 +259,23 @@ export default function Home() {
         {/* ── Section 3: 감정카드 ────────────────────────────────────────────── */}
         <section className="mb-10">
           <div className="mb-6 flex flex-col items-start">
-            <h2 className="text-[24px] font-semibold leading-[1.3] tracking-[-0.36px] text-[#1a222e]">
+            <h2 className="text-[24px] leading-[1.3] font-semibold tracking-[-0.36px] text-[#1a222e]">
               감정카드
             </h2>
-            <p className="text-[12px] font-normal leading-[1.2] tracking-[-0.18px] text-prime-700">
+            <p className="text-prime-700 text-[12px] leading-[1.2] font-normal tracking-[-0.18px]">
               최근 7건의 상담결과를 반영한 카드를 보여드립니다.
             </p>
           </div>
 
           <div className="relative">
             <div
-              className="pointer-events-none absolute right-0 top-0 z-10 h-full w-16 bg-linear-to-l from-secondary-100 to-transparent"
+              className="from-secondary-100 pointer-events-none absolute top-0 right-0 z-10 h-full w-16 bg-linear-to-l to-transparent"
               aria-hidden="true"
             />
-            <div ref={cardContainerRef} className="no-scrollbar flex items-end gap-6 overflow-x-auto pb-4 pr-8">
+            <div
+              ref={cardContainerRef}
+              className="no-scrollbar flex items-end gap-6 overflow-x-auto pr-8 pb-4"
+            >
               {MOCK_COLLECTION_CARDS.slice(0, visibleCount).map((card) => {
                 const emotionLabel = getPrimaryEmotionLabel(card);
                 return (
@@ -300,10 +302,10 @@ export default function Home() {
         {/* ── Section 4: 심화 리포트 ────────────────────────────────────────── */}
         <section className="mb-10">
           <div className="mb-4 flex flex-col items-end gap-2">
-            <h2 className="text-right text-[24px] font-semibold leading-[1.3] tracking-[-0.36px] text-[#1a222e]">
+            <h2 className="text-right text-[24px] leading-[1.3] font-semibold tracking-[-0.36px] text-[#1a222e]">
               심화 리포트
             </h2>
-            <p className="max-w-90.75 text-right text-[12px] font-normal leading-[1.2] tracking-[-0.18px] text-prime-700">
+            <p className="text-prime-700 max-w-90.75 text-right text-[12px] leading-[1.2] font-normal tracking-[-0.18px]">
               사용자분의 장기적인 상담 내역을 분석하여 자세한 정보를 드리는 컨텐츠입니다.
             </p>
           </div>
@@ -311,7 +313,7 @@ export default function Home() {
           <div className="flex w-full flex-col gap-8 lg:flex-row">
             <div className="w-full shrink-0 overflow-hidden rounded-3xl bg-[rgba(130,201,255,0.1)] p-4 backdrop-blur-[25px] lg:w-[52%]">
               <div className="mb-4 flex items-start justify-between">
-                <p className="text-[32px] font-semibold leading-[1.3] tracking-[-0.48px] text-[#1a222e]">
+                <p className="text-[32px] leading-[1.3] font-semibold tracking-[-0.48px] text-[#1a222e]">
                   심화 리포트
                 </p>
                 <div className="flex flex-col items-end gap-2 text-[12px] leading-[1.2] text-[#1a222e]">
@@ -322,13 +324,13 @@ export default function Home() {
 
               <div className="flex flex-col gap-4 sm:flex-row">
                 <div className="flex-1">
-                  <p className="mb-2 text-[16px] font-semibold leading-[1.3] tracking-[-0.24px] text-prime-800">
+                  <p className="text-prime-800 mb-2 text-[16px] leading-[1.3] font-semibold tracking-[-0.24px]">
                     1. 월간 감정 그래프
                   </p>
                   <ChartSkeleton label="감정 그래프" />
                 </div>
                 <div className="flex-1">
-                  <p className="mb-2 text-[16px] font-semibold leading-[1.3] tracking-[-0.24px] text-prime-800">
+                  <p className="text-prime-800 mb-2 text-[16px] leading-[1.3] font-semibold tracking-[-0.24px]">
                     2. 주요 고민 주제 및 키워드 분석
                   </p>
                   <KeywordSkeleton />
@@ -336,42 +338,43 @@ export default function Home() {
               </div>
 
               <div className="mt-4">
-                <p className="mb-2 text-[16px] font-semibold leading-[1.3] tracking-[-0.24px] text-prime-800">
+                <p className="text-prime-800 mb-2 text-[16px] leading-[1.3] font-semibold tracking-[-0.24px]">
                   3. 상담 기반 사용자 성향 분석
                 </p>
                 <div className="h-60 overflow-hidden">
-                  <p className="text-[14px] leading-[1.6] text-prime-500">
-                    AI 분석을 통해 사용자분의 감정 패턴과 심리적 성향을 분석합니다. 지속적인 상담을 통해 더욱 정확한 분석이 가능합니다.
-                    매일 꾸준한 기록을 권장드립니다. 상담 데이터가 쌓일수록 더 세밀한 성향 분석을 제공해드릴 수 있습니다.
+                  <p className="text-prime-500 text-[14px] leading-[1.6]">
+                    AI 분석을 통해 사용자분의 감정 패턴과 심리적 성향을 분석합니다. 지속적인 상담을
+                    통해 더욱 정확한 분석이 가능합니다. 매일 꾸준한 기록을 권장드립니다. 상담
+                    데이터가 쌓일수록 더 세밀한 성향 분석을 제공해드릴 수 있습니다.
                   </p>
                 </div>
               </div>
 
               <div className="mt-4">
-                <p className="mb-2 text-[14px] font-semibold leading-[1.3] tracking-[-0.21px] text-[#1a222e]">
+                <p className="mb-2 text-[14px] leading-[1.3] font-semibold tracking-[-0.21px] text-[#1a222e]">
                   4. AI 맞춤형 행동 제언
                 </p>
                 <div className="h-42.25 overflow-hidden">
-                  <p className="text-[14px] leading-[1.6] text-prime-500">
-                    사용자분의 상담 데이터를 바탕으로 AI가 분석한 맞춤형 행동 제언입니다. 지속적인 상담을 통해 더 정확한 분석이 가능합니다.
-                    매일 꾸준한 기록을 권장드립니다.
+                  <p className="text-prime-500 text-[14px] leading-[1.6]">
+                    사용자분의 상담 데이터를 바탕으로 AI가 분석한 맞춤형 행동 제언입니다. 지속적인
+                    상담을 통해 더 정확한 분석이 가능합니다. 매일 꾸준한 기록을 권장드립니다.
                   </p>
                 </div>
               </div>
             </div>
 
             <div className="flex flex-1 flex-col gap-4 lg:pl-2">
-              <p className="whitespace-pre-line text-right text-[16px] font-normal leading-[1.6] text-prime-500">
+              <p className="text-prime-500 text-right text-[16px] leading-[1.6] font-normal whitespace-pre-line">
                 {REPORT_DESCRIPTION}
               </p>
-              <p className="text-right text-[12px] leading-[1.2] tracking-[-0.18px] text-error-400">
+              <p className="text-error-400 text-right text-[12px] leading-[1.2] tracking-[-0.18px]">
                 전문 리포트는 유료 서비스로 결제가 필요한 서비스입니다.
               </p>
               <div className="flex justify-end">
                 <button
                   type="button"
                   onClick={() => router.push('/report')}
-                  className="overflow-hidden rounded-lg bg-cta-300 px-6 py-3.5 text-base font-medium text-[#1a222e] transition-opacity hover:opacity-90"
+                  className="bg-cta-300 overflow-hidden rounded-lg px-6 py-3.5 text-base font-medium text-[#1a222e] transition-opacity hover:opacity-90"
                 >
                   전문 리포트 보러가기
                 </button>
@@ -379,18 +382,17 @@ export default function Home() {
             </div>
           </div>
         </section>
-
       </div>
 
       {/* ── Floating AI 상담 버튼 ─────────────────────────────────────────────── */}
       <button
         type="button"
         onClick={() => router.push('/chat')}
-        className="fixed bottom-6 right-6 z-50 flex flex-col items-center justify-center gap-1 overflow-hidden rounded-full bg-cta-300 shadow-lg transition-transform hover:scale-105 active:scale-95 sm:bottom-8 sm:right-8"
+        className="bg-cta-300 fixed right-6 bottom-6 z-50 flex flex-col items-center justify-center gap-1 overflow-hidden rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 sm:right-8 sm:bottom-8"
         style={{ width: 110, height: 110 }}
         aria-label="AI 상담 받으러 가기"
       >
-        <span className="whitespace-pre-line text-center text-[14px] font-medium leading-none text-prime-700">
+        <span className="text-prime-700 text-center text-[14px] leading-none font-medium whitespace-pre-line">
           {'AI 상담\n받으러 가기'}
         </span>
         <MessageCircle className="mt-1 h-12 w-12 text-[#1a222e]" aria-hidden="true" />

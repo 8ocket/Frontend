@@ -31,8 +31,8 @@ export default function FaqItem({ question, answer, isOpen, onToggle, isLast }: 
         <motion.div
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
-          className={`flex-shrink-0 transition-colors ${
-            isOpen ? 'text-[#475569]' : 'text-[#94A3B8] group-hover:text-[#64748B]'
+          className={`shrink-0 transition-colors ${
+            isOpen ? 'text-neutral-700' : 'text-[#94A3B8] group-hover:text-[#64748B]'
           }`}
         >
           <ChevronDown size={20} strokeWidth={2.5} />
