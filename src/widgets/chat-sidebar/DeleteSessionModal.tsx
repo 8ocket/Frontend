@@ -59,7 +59,7 @@ export function DeleteSessionModal({ isOpen, onClose, onConfirm }: DeleteSession
             className="text-prime-700 w-full text-center text-base font-normal leading-[1.6]"
             style={{ wordBreak: 'keep-all', fontFamily: 'var(--font-pretendard)' }}
           >
-            본 대화를 삭제할 경우 복구가 불가능하며 심화 리포트와 감정 카드도 함께 삭제됩니다.
+            본 대화를 삭제할 경우 복구가 불가능하며<br />심화 리포트와 감정 카드도 함께 삭제됩니다.
             <br />그래도 삭제하시겠습니까?
           </DialogDescription>
 

@@ -75,7 +75,7 @@ function ChatSessionItem({ session, isActive, onSelect, onDelete }: ChatSessionI
         <PopoverTrigger asChild>
           <div
             className={[
-              'flex h-10 w-9 shrink-0 items-center justify-center rounded-md opacity-0 transition-opacity group-hover:opacity-100 group-[.is-active]:opacity-100',
+              'flex h-10 w-9 shrink-0 items-center justify-center rounded-md opacity-0 transition-opacity group-hover:opacity-100 group-[.is-active]:opacity-100 outline-none',
               open ? 'opacity-100' : '',
             ].join(' ')}
             onClick={(e) => e.stopPropagation()}
@@ -86,10 +86,10 @@ function ChatSessionItem({ session, isActive, onSelect, onDelete }: ChatSessionI
         <PopoverContent
           align="end"
           sideOffset={4}
-          className="w-fit overflow-hidden rounded-xl border border-prime-100 bg-white p-1"
+          className="w-fit overflow-hidden rounded-xl border border-prime-100 bg-white"
         >
           <button
-            className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-prime-700 transition-colors hover:bg-error-100/60 hover:text-error-500"
+            className="flex w-full items-center gap-2.5 px-3 py-2 text-sm font-medium text-prime-700 transition-colors hover:bg-error-100/60 hover:text-error-500"
             style={{ fontFamily: 'var(--font-pretendard)' }}
             onClick={(e) => {
               e.stopPropagation();
