@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Bell, ChevronRight, Coins, LogOut, MoreVertical, Trash2, X } from 'lucide-react';
 import { useAuthStore } from '@/entities/user/store';
+import { useCreditStore } from '@/entities/credits/store';
 import { UserProfileModal } from '@/shared/ui/UserProfileModal';
 import { Switch } from '@/shared/ui/switch';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
@@ -31,6 +32,7 @@ const CREDIT_HISTORY = [
 export default function MyPage() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
+  const { paidCredit, freeCredit } = useCreditStore();
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [notificationEnabled, setNotificationEnabled] = useState(true);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
@@ -106,7 +108,7 @@ export default function MyPage() {
                   <div className="flex flex-col gap-0.5">
                     <span className="text-xs tracking-[-0.18px] text-slate-400">보유 크레딧</span>
                     <span className="text-xl font-bold tracking-tight text-main-blue">
-                      {(user?.creditBalance ?? 0).toLocaleString()} 크레딧
+                      {(paidCredit + freeCredit).toLocaleString()} 크레딧
                     </span>
                   </div>
                 </div>

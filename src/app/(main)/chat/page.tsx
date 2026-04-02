@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/entities/user/store';
+import { useCreditStore } from '@/entities/credits/store';
 import { useChatModals } from '@/features/select-persona';
 import type { ChatBubbleProps } from '@/widgets/chat-main-area';
 import type { ChatSessionGroup } from '@/widgets/chat-sidebar';
@@ -246,7 +247,8 @@ const MOCK_SESSION_GROUPS: ChatSessionGroup[] = [
 export default function ChatPage() {
   const router = useRouter();
   const { activeModal, openModal, closeModal } = useChatModals();
-  const remainingCredits = useAuthStore((s) => s.user?.creditBalance ?? 0);
+  const { paidCredit, freeCredit } = useCreditStore();
+  const remainingCredits = paidCredit + freeCredit;
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSessionId, setActiveSessionId] = useState<string | undefined>(undefined);

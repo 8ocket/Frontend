@@ -2,8 +2,17 @@ export interface CreditApiResponse<T> {
   code: string;
   message: string;
   data: T;
-  timestamp: string;
 }
 
-// TODO: 명세서 확정 후 크레딧 잔액 응답 타입 추가
-// export interface CreditBalanceResponse { ... }
+// 백엔드 응답 타입
+export interface CreditProductResponse {
+  name: string;
+  creditAmount: number;
+  price: number;
+}
+
+// 유료/무료 잔액
+export interface CreditBalanceResponse {
+  paidCredit: number;
+  freeCredit: number;
+}

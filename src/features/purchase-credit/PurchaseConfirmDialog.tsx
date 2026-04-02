@@ -7,7 +7,7 @@ import { Dialog } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
 import { StatusModal } from '@/shared/ui/status-modal';
 import type { CreditProduct } from '@/types/credit';
-import { useAuthStore } from '@/entities/user/store';
+import { useCreditStore } from '@/entities/credits/store';
 
 // ── 구매 확인 다이얼로그 ────────────────────────────────────────
 // Figma Shop MODAL 01 ~ 04, MODAL 16 구현
@@ -56,7 +56,7 @@ export function PurchaseConfirmDialog({
   onContactSupport,
   skipRefundPolicy = false,
 }: PurchaseConfirmDialogProps) {
-  const { addCredit } = useAuthStore();
+  const { addPaidCredit } = useCreditStore();
   const initialStep: PurchaseStep = skipRefundPolicy ? 'confirm' : 'refund-policy';
   const [step, setStep] = useState<PurchaseStep>(initialStep);
 
@@ -77,13 +77,13 @@ export function PurchaseConfirmDialog({
         if (result === false) {
           setStep('error');
         } else {
-          addCredit(product.credits);
+          addPaidCredit(product.credits);
           setStep('success');
         }
       } else {
         // TODO: 실제 결제 API 연동
         await new Promise((resolve) => setTimeout(resolve, 1500));
-        addCredit(product.credits);
+        addPaidCredit(product.credits);
         setStep('success');
       }
     } catch (err) {

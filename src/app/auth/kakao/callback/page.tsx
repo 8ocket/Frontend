@@ -35,7 +35,7 @@ function CallbackContent() {
 
         // 토큰 쿠키 저장
         login(
-          { id: '', email: '', name: '', creditBalance: 0 },
+          { id: '', email: '', name: '' },
           result.accessToken,
           result.refreshToken
         );
@@ -47,7 +47,6 @@ function CallbackContent() {
           email: '',
           name: profile.nickname,
           profileImage: profile.profile_image_url,
-          creditBalance: 0,
         });
 
         // 신규 사용자면 회원가입, 기존 사용자면 홈으로
