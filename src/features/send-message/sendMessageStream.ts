@@ -1,5 +1,6 @@
 import type { SSEEventType } from '@/entities/session';
 import { mockSendMessageStream } from '@/mocks/session';
+import { createHttpStatusError } from '@/shared/lib/utils/error';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/v1';
 
@@ -24,7 +25,7 @@ export const sendMessageStream = async (
     body: JSON.stringify({ content }),
   });
 
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  if (!response.ok) throw createHttpStatusError(response.status);
 
   const reader = response.body?.getReader();
   if (!reader) return;
