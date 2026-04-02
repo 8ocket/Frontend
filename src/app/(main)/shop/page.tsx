@@ -61,7 +61,7 @@ function ShopPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div>
       <main className="layout-container px-gutter flex flex-col items-center py-16">
         <Tabs
           value={activeTab}
@@ -112,8 +112,6 @@ function ShopPageContent() {
             </div>
           </TabsContent>
         </Tabs>
-
-
       </main>
 
       {/* 크레딧 구매 확인 다이얼로그 */}

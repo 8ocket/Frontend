@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
-
     const { code } = await req.json();
 
     if (!code) {
@@ -12,7 +11,6 @@ export async function POST(req: NextRequest) {
     const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
 
     if (USE_MOCK) {
-      // Mock 응답 (백엔드 준비 전)
       await new Promise((resolve) => setTimeout(resolve, 500)); // 네트워크 지연 시뮬레이션
 
       const mockResponse = {

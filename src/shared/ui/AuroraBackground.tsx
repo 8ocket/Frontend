@@ -25,7 +25,7 @@ export default function AuroraBackground({ children, className = '' }: AuroraBac
 
   return (
     <main
-      className={`relative flex min-h-screen w-full items-center justify-center overflow-hidden px-4 py-8 bg-white ${className}`}
+      className={`relative flex min-h-screen-safe w-full items-center justify-center overflow-hidden bg-white px-4 py-8 box-border ${className}`}
       onMouseMove={handleMouseMove}
     >
       {/* 오로라 1 — 블루 */}

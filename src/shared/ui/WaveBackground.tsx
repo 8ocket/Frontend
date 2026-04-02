@@ -52,10 +52,8 @@ const ARC_DARK: RGB = { r: 44, g: 62, b: 88 }; // #2C3E58 — dark mode arc colo
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-const DARK_MODE_KEY = 'theme-dark';
-
 export default function WaveBackground({ initialDark = false, children }: WaveBackgroundProps) {
-  const [isDark, setIsDark] = useState<boolean>(initialDark);
+  const [isDark] = useState<boolean>(initialDark);
 
   // useEffect(() => {
   //   const stored = localStorage.getItem(DARK_MODE_KEY);

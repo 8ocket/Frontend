@@ -13,7 +13,7 @@ import { cn } from '@/shared/lib/utils';
 // ─────────────────────────────────────────────────────────────────────
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap text-base leading-none font-medium transition-all' +
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap text-base leading-none font-medium transition-all cursor-pointer' +
     ' disabled:pointer-events-none disabled:cursor-not-allowed' +
     " [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none",
   {

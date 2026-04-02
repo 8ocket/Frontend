@@ -4,15 +4,11 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/shared/lib/utils';
-import {
-  EmotionCardFront,
-  EmotionCardBack,
-  getEmotionDisplayName,
-} from '@/widgets/emotion-card';
+import { EmotionCardFront, EmotionCardBack, getEmotionDisplayName } from '@/widgets/emotion-card';
 import type { EmotionCardData } from '@/entities/emotion';
 import { MOCK_COLLECTION_CARDS } from '@/mocks/emotion';
 
-/** 날짜를 Figma 형식으로 포맷 (YYYY.MM.DD) */
+/** 날짜 형식: YYYY.MM.DD */
 function formatDate(date: Date): string {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -23,9 +19,7 @@ function formatDate(date: Date): string {
 /** 주감정 영문 라벨 추출 */
 function getEmotionLabel(data: EmotionCardData): string {
   const primaryLayer = data.layers.find((l) => l.role === 'primary');
-  return primaryLayer
-    ? getEmotionDisplayName(primaryLayer.type, null).toUpperCase()
-    : 'EMOTION';
+  return primaryLayer ? getEmotionDisplayName(primaryLayer.type, null).toUpperCase() : 'EMOTION';
 }
 
 // ─── 그리드 카드 (기본 상태: 그라데이션 뒷면) ───
@@ -56,9 +50,9 @@ function GridCard({
         layoutId={`card-${data.cardId}`}
         onClick={onClick}
         className={cn(
-          'cursor-pointer select-none rounded-3xl overflow-hidden',
+          'cursor-pointer overflow-hidden rounded-3xl select-none',
           'shadow-md ring-1 ring-black/5',
-          isActive && 'invisible',
+          isActive && 'invisible'
         )}
         style={{ width: 350, height: 600 }}
         whileHover={{ scale: 1.02, boxShadow: '0 12px 32px rgba(0,0,0,0.12)' }}
@@ -77,13 +71,7 @@ function GridCard({
 
 // ─── 확장 오버레이 ───
 
-function CardOverlay({
-  data,
-  onClose,
-}: {
-  data: EmotionCardData;
-  onClose: () => void;
-}) {
+function CardOverlay({ data, onClose }: { data: EmotionCardData; onClose: () => void }) {
   const emotionLabel = getEmotionLabel(data);
   const W = 400;
   const H = 686;
@@ -171,7 +159,7 @@ function CardOverlay({
               'flex items-center justify-center rounded-lg border px-6 py-3.5',
               'border-cta-300 bg-secondary-100 text-prime-600',
               'hover:bg-neutral-100 active:bg-neutral-200',
-              'text-base font-medium transition-colors',
+              'text-base font-medium transition-colors'
             )}
             style={{ width: W }}
           >
@@ -195,7 +183,7 @@ export default function CollectionPage() {
   const activeCard = sortedCards.find((c) => c.cardId === activeCardId) ?? null;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-main-safe">
       <div className="mx-auto max-w-360 px-4 py-12 sm:px-8">
         {/* 헤더 */}
         <div className="mb-10 flex flex-col items-center gap-4">
@@ -213,16 +201,16 @@ export default function CollectionPage() {
             WebkitMaskImage: 'linear-gradient(to bottom, black 70%, transparent 100%)',
           }}
         >
-        <div className="grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-          {sortedCards.map((card) => (
-            <GridCard
-              key={card.cardId}
-              data={card}
-              isActive={activeCardId === card.cardId}
-              onClick={() => setActiveCardId(card.cardId)}
-            />
-          ))}
-        </div>
+          <div className="grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {sortedCards.map((card) => (
+              <GridCard
+                key={card.cardId}
+                data={card}
+                isActive={activeCardId === card.cardId}
+                onClick={() => setActiveCardId(card.cardId)}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
