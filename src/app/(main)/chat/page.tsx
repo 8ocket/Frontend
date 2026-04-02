@@ -706,8 +706,8 @@ export default function ChatPage() {
     }));
   }, [sessionDetail]);
 
-  const activeAiName = sessionDetail?.persona_name;
-  const activeAiAvatarSrc = sessionDetail?.persona_image_url;
+  const activeAiName = sessionDetail?.persona_name ?? '마음이';
+  const activeAiAvatarSrc = sessionDetail?.persona_image_url ?? '/images/personas/mental.png';
 
   // API 세션 목록 → 사이드바용 그룹 데이터로 변환
   const sessionGroups = useMemo((): ChatSessionGroup[] => {

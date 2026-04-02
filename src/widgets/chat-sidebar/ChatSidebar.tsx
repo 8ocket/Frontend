@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 
 import { Search, PlusCircle } from 'lucide-react';
 
+import { DeleteSessionModal } from './DeleteSessionModal';
 import { ChatFilterPanel } from './ChatFilterPanel';
 import { ChatScrollbar } from './ChatScrollbar';
 import { type ChatSessionGroup, ChatSessionList } from './ChatSessionList';
@@ -13,18 +14,15 @@ export interface ChatSidebarProps {
   onNewCounsel?: () => void;
   activeSessionId?: string;
   onSelectSession?: (id: string) => void;
+  onDeleteSession?: (id: string) => void;
   sessionGroups?: ChatSessionGroup[];
 }
 
 const PAGE_SIZE = 5;
 
-export function ChatSidebar({
-  onNewCounsel,
-  activeSessionId,
-  onSelectSession,
-  sessionGroups = [],
-}: ChatSidebarProps = {}) {
+export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, onDeleteSession, sessionGroups = [] }: ChatSidebarProps = {}) {
   const [filterOpen, setFilterOpen] = useState(false);
+  const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
   const filterRef = useRef<HTMLDivElement>(null);
   const filterBtnRef = useRef<HTMLButtonElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -141,6 +139,7 @@ export function ChatSidebar({
           groups={visibleGroups}
           activeSessionId={activeSessionId}
           onSelectSession={onSelectSession}
+          onDeleteSession={(id) => setSessionToDelete(id)}
           scrollRef={scrollRef}
           onScroll={handleScroll}
         />
@@ -152,6 +151,15 @@ export function ChatSidebar({
           />
         )}
       </div>
+      {/* 세션 삭제 확인 모달 */}
+      <DeleteSessionModal
+        isOpen={sessionToDelete !== null}
+        onClose={() => setSessionToDelete(null)}
+        onConfirm={() => {
+          if (sessionToDelete) onDeleteSession?.(sessionToDelete);
+          setSessionToDelete(null);
+        }}
+      />
     </aside>
   );
 }
