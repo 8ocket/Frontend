@@ -32,7 +32,7 @@ const CREDIT_HISTORY = [
 export default function MyPage() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
-  const { paidCredit, freeCredit } = useCreditStore();
+  const { totalCredit } = useCreditStore();
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [notificationEnabled, setNotificationEnabled] = useState(true);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
@@ -108,7 +108,7 @@ export default function MyPage() {
                   <div className="flex flex-col gap-0.5">
                     <span className="text-xs tracking-[-0.18px] text-slate-400">보유 크레딧</span>
                     <span className="text-xl font-bold tracking-tight text-main-blue">
-                      {(paidCredit + freeCredit).toLocaleString()} 크레딧
+                      {totalCredit.toLocaleString()} 크레딧
                     </span>
                   </div>
                 </div>

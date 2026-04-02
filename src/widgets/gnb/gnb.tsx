@@ -33,7 +33,7 @@ export function GNB() {
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, user, logout } = useAuthStore();
-  const { paidCredit, freeCredit } = useCreditStore();
+  const { totalCredit } = useCreditStore();
   const [scrollRatio, setScrollRatio] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -133,7 +133,7 @@ export function GNB() {
                 <div className="bg-cta-100 flex size-6 items-center justify-center rounded-full">
                   <Coins size={13} strokeWidth={2} className="text-main-blue" />
                 </div>
-                {(paidCredit + freeCredit).toLocaleString()} 크레딧
+                {totalCredit.toLocaleString()} 크레딧
               </Link>
 
               {/* 구분선 */}

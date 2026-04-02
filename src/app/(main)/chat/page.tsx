@@ -247,8 +247,8 @@ const MOCK_SESSION_GROUPS: ChatSessionGroup[] = [
 export default function ChatPage() {
   const router = useRouter();
   const { activeModal, openModal, closeModal } = useChatModals();
-  const { paidCredit, freeCredit } = useCreditStore();
-  const remainingCredits = paidCredit + freeCredit;
+  const { totalCredit } = useCreditStore();
+  const remainingCredits = totalCredit;
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSessionId, setActiveSessionId] = useState<string | undefined>(undefined);
