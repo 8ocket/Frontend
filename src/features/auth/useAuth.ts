@@ -33,7 +33,7 @@ export const useAuth = () => {
           throw new Error('로그인 응답 데이터가 불완전합니다.');
         }
         login(response.user, response.accessToken, response.refreshToken || '');
-        router.push('/signup');
+        router.push(response.isNewUser ? '/signup' : '/');
       }
     } catch (err: unknown) {
       setError(getErrorMessage(err, '로그인에 실패했습니다.'));

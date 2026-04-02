@@ -44,7 +44,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipInternalProps) {
       <p className="text-prime-400 mb-1 text-xs font-semibold">{label}</p>
       <p
         className="text-lg font-bold"
-        style={{ color: score >= 0 ? 'var(--main-blue)' : '#f43f5e' }}
+        style={{ color: score >= 0 ? 'var(--main-blue)' : 'var(--color-score-low)' }}
       >
         {score > 0 ? `+${score}` : score}점
       </p>
@@ -90,14 +90,23 @@ export function EmotionAreaChart({ data, type }: EmotionAreaChartProps) {
         <ResponsiveContainer width="100%" height="100%">
           {type === 'weekly' ? (
             <LineChart data={data} margin={{ top: 20, right: 20, left: -10, bottom: 10 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="var(--color-neutral-300)"
+                vertical={false}
+              />
               <XAxis dataKey="label" {...commonAxisProps} />
               <YAxis
                 domain={[-100, 100]}
                 ticks={[-65, 0, 65]}
                 tickFormatter={(v) => (v === 65 ? '긍정' : v === 0 ? '중립' : '부정')}
               />
-              <ReferenceLine y={0} stroke="#cbd5e1" strokeDasharray="4 4" strokeWidth={1.5} />
+              <ReferenceLine
+                y={0}
+                stroke="var(--color-neutral-400)"
+                strokeDasharray="4 4"
+                strokeWidth={1.5}
+              />
               <ReferenceLine
                 y={30}
                 stroke="var(--main-blue)"
@@ -107,7 +116,7 @@ export function EmotionAreaChart({ data, type }: EmotionAreaChartProps) {
               />
               <ReferenceLine
                 y={-30}
-                stroke="#f43f5e"
+                stroke="var(--color-score-low)"
                 strokeDasharray="3 5"
                 strokeWidth={1}
                 strokeOpacity={0.4}
@@ -121,7 +130,7 @@ export function EmotionAreaChart({ data, type }: EmotionAreaChartProps) {
                 dataKey="score"
                 stroke="var(--main-blue)"
                 strokeWidth={3}
-                dot={{ fill: 'var(--main-blue)', r: 6, strokeWidth: 2, stroke: '#ffffff' }}
+                dot={{ fill: 'var(--main-blue)', r: 6, strokeWidth: 2, stroke: 'var(--white)' }}
                 activeDot={{ r: 8, strokeWidth: 3, fill: 'var(--main-blue)' }}
                 name="감정 점수"
               />
@@ -134,14 +143,23 @@ export function EmotionAreaChart({ data, type }: EmotionAreaChartProps) {
                   <stop offset="95%" stopColor="var(--main-blue)" stopOpacity={0.05} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="var(--color-neutral-300)"
+                vertical={false}
+              />
               <XAxis dataKey="label" {...commonAxisProps} />
               <YAxis
                 domain={[-100, 100]}
                 ticks={[-65, 0, 65]}
                 tickFormatter={(v) => (v === 65 ? '긍정' : v === 0 ? '중립' : '부정')}
               />
-              <ReferenceLine y={0} stroke="#cbd5e1" strokeDasharray="4 4" strokeWidth={1.5} />
+              <ReferenceLine
+                y={0}
+                stroke="var(--color-neutral-400)"
+                strokeDasharray="4 4"
+                strokeWidth={1.5}
+              />
               <ReferenceLine
                 y={30}
                 stroke="var(--main-blue)"
@@ -151,7 +169,7 @@ export function EmotionAreaChart({ data, type }: EmotionAreaChartProps) {
               />
               <ReferenceLine
                 y={-30}
-                stroke="#f43f5e"
+                stroke="var(--color-score-low)"
                 strokeDasharray="3 5"
                 strokeWidth={1}
                 strokeOpacity={0.4}

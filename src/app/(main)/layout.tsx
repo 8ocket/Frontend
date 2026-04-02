@@ -1,12 +1,12 @@
 import { GNB } from '@/widgets/gnb';
-// import { FooterWrapper } from './FooterWrapper';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <GNB />
-      <main className="pt-16 md:pt-20">{children}</main>
-      {/* <FooterWrapper /> */}
+      <main className="bg-secondary-100 min-h-screen-safe pt-16 box-border md:pt-20">
+        {children}
+      </main>
     </>
   );
 }

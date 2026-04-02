@@ -136,7 +136,13 @@ export function UnlockConfirmDialog({
           {
             label: '홈 화면으로',
             variant: 'secondary',
-            onClick: () => { onGoHome ? onGoHome() : handleClose(); },
+            onClick: () => {
+              if (onGoHome) {
+                onGoHome();
+              } else {
+                handleClose();
+              }
+            },
           },
           {
             label: '계속 둘러보기',
@@ -168,7 +174,13 @@ export function UnlockConfirmDialog({
           label: '고객지원 확인하기',
           variant: 'secondary',
           semantic: 'red',
-          onClick: () => { onContactSupport ? onContactSupport() : handleClose(); },
+          onClick: () => {
+            if (onContactSupport) {
+              onContactSupport();
+            } else {
+              handleClose();
+            }
+          },
         },
         {
           label: '다시 시도하기',

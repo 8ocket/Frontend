@@ -12,8 +12,8 @@ export function CreditProductCard({ product, onPurchase, className }: CreditProd
   return (
     <div
       className={cn(
-        'bg-secondary-100 flex w-full flex-col overflow-clip rounded-2xl p-8',
-        'hover:border-prime-200 border border-transparent transition-colors',
+        'border-prime-100 flex w-full flex-col overflow-clip rounded-2xl border bg-white p-8 shadow-sm transition-colors',
+        'hover:border-prime-200 hover:bg-secondary-50 *:transition-colors',
         className
       )}
     >
@@ -24,7 +24,7 @@ export function CreditProductCard({ product, onPurchase, className }: CreditProd
             <h3 className="text-prime-600 text-xl font-semibold tracking-tight">
               {product.name} 상품
             </h3>
-            <div className="bg-prime-200 h-[1px] w-full" /> {/* 시각적 구분선 추가 */}
+            <div className="bg-prime-200 h-px w-full" /> {/* 시각적 구분선 추가 */}
           </div>
 
           <div className="flex flex-col gap-2">
@@ -67,7 +67,7 @@ export function CreditProductCard({ product, onPurchase, className }: CreditProd
             구매하기
           </Button>
 
-          <p className="text-warning-500 text-center text-[12px] leading-normal whitespace-nowrap opacity-90">
+          <p className="text-warning-500 text-center text-[11px] leading-normal opacity-90">
             혜택의 수치는 평균 사용패턴 기준이며, <br />
             개인 이용 방식에 따라 달라질 수 있습니다.
           </p>

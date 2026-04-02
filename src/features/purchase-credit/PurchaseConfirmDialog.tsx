@@ -145,12 +145,24 @@ export function PurchaseConfirmDialog({
           {
             label: '결제내역 보기',
             variant: 'secondary',
-            onClick: () => { onViewHistory ? onViewHistory() : handleClose(); },
+            onClick: () => {
+              if (onViewHistory) {
+                onViewHistory();
+              } else {
+                handleClose();
+              }
+            },
           },
           {
             label: '홈 화면에 가기',
             variant: 'primary',
-            onClick: () => { onGoHome ? onGoHome() : handleClose(); },
+            onClick: () => {
+              if (onGoHome) {
+                onGoHome();
+              } else {
+                handleClose();
+              }
+            },
           },
         ]}
       />
@@ -205,7 +217,13 @@ export function PurchaseConfirmDialog({
           label: '고객지원 확인하기',
           variant: 'secondary',
           semantic: 'red',
-          onClick: () => { onContactSupport ? onContactSupport() : handleClose(); },
+          onClick: () => {
+            if (onContactSupport) {
+              onContactSupport();
+            } else {
+              handleClose();
+            }
+          },
         },
         {
           label: '돌아가기',

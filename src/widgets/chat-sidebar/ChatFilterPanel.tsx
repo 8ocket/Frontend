@@ -59,7 +59,7 @@ function CustomSelect({
       <button
         type="button"
         onClick={() => setIsOpen((o) => !o)}
-        className="flex h-7 items-center gap-1 rounded-md border border-[#E2E8F0] bg-white px-2 transition-colors hover:border-[#82C9FF]"
+        className="border-neutral-300 hover:border-cta-300 flex h-7 items-center gap-1 rounded-md border bg-white px-2 transition-colors"
         aria-label={placeholder + ' 선택'}
       >
         <span
@@ -67,18 +67,18 @@ function CustomSelect({
             fontFamily: 'var(--font-pretendard)',
             fontSize: '13px',
             fontWeight: 500,
-            color: value ? '#1A222E' : '#94A3B8',
+            color: value ? 'var(--color-prime-900)' : 'var(--color-neutral-500)',
             lineHeight: '100%',
           }}
         >
           {value || placeholder}
         </span>
-        <span style={{ fontSize: '8px', color: '#3F526F', lineHeight: 1 }}>▼</span>
+        <span style={{ fontSize: '8px', color: 'var(--color-prime-700)', lineHeight: 1 }}>▼</span>
       </button>
 
       {isOpen && (
         <div
-          className="absolute top-8 left-0 z-50 overflow-y-auto rounded-md border border-[#E2E8F0] bg-white shadow-md"
+          className="border-neutral-300 absolute top-8 left-0 z-50 overflow-y-auto rounded-md border bg-white shadow-md"
           style={{ width: dropdownWidth, maxHeight: '160px' }}
         >
           {options.map((opt) => {
@@ -93,17 +93,18 @@ function CustomSelect({
                   fontFamily: 'var(--font-pretendard)',
                   fontSize: '13px',
                   fontWeight: isSelected ? 600 : 400,
-                  color: isSelected ? '#ffffff' : '#1A222E',
-                  backgroundColor: isSelected ? '#82C9FF' : '#ffffff',
+                  color: isSelected ? 'var(--white)' : 'var(--color-prime-900)',
+                  backgroundColor: isSelected ? 'var(--main-blue)' : 'var(--white)',
                 }}
                 onMouseEnter={(e) => {
                   if (!isSelected) {
-                    (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F8FAFF';
+                    (e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                      'var(--color-bg-light)';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!isSelected) {
-                    (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#ffffff';
+                    (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--white)';
                   }
                 }}
               >
@@ -137,7 +138,7 @@ function DateBlock({
           fontFamily: 'var(--font-pretendard)',
           fontSize: '12px',
           fontWeight: 400,
-          color: '#3F526F',
+          color: 'var(--color-prime-700)',
           lineHeight: '160%',
         }}
       >
@@ -174,7 +175,7 @@ export function ChatFilterPanel({
               fontFamily: 'var(--font-pretendard)',
               fontSize: '13px',
               fontWeight: 600,
-              color: '#1A222E',
+              color: 'var(--color-prime-900)',
               lineHeight: '130%',
               letterSpacing: '-0.01em',
             }}
@@ -198,7 +199,7 @@ export function ChatFilterPanel({
               fontFamily: 'var(--font-pretendard)',
               fontSize: '12px',
               fontWeight: 600,
-              color: '#3F526F',
+              color: 'var(--color-prime-700)',
               lineHeight: '130%',
             }}
           >
@@ -229,7 +230,7 @@ export function ChatFilterPanel({
               fontFamily: 'var(--font-pretendard)',
               fontSize: '12px',
               fontWeight: 600,
-              color: '#3F526F',
+              color: 'var(--color-prime-700)',
               lineHeight: '130%',
             }}
           >
@@ -240,12 +241,12 @@ export function ChatFilterPanel({
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             placeholder="검색어를 입력하세요"
-            className="h-9 w-full rounded-lg border border-[#E2E8F0] bg-white px-3 outline-none transition-colors placeholder:text-slate-300 focus:border-[#82C9FF]"
+            className="border-neutral-300 focus:border-cta-300 h-9 w-full rounded-lg border bg-white px-3 outline-none transition-colors placeholder:text-slate-300"
             style={{
               fontFamily: 'var(--font-pretendard)',
               fontSize: '13px',
               fontWeight: 400,
-              color: '#1A222E',
+              color: 'var(--color-prime-900)',
             }}
           />
         </div>

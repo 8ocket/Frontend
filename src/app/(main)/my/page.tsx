@@ -8,6 +8,7 @@ import { Bell, ChevronRight, Coins, LogOut, MoreVertical, Trash2, X } from 'luci
 import { useAuthStore } from '@/entities/user/store';
 import { useCreditStore } from '@/entities/credits/store';
 import { UserProfileModal } from '@/shared/ui/UserProfileModal';
+import { Button } from '@/shared/ui/button';
 import { Switch } from '@/shared/ui/switch';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
 import { DialogRoot, DialogPortal, DialogOverlay, DialogTitle } from '@/shared/ui';
@@ -59,22 +60,19 @@ export default function MyPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-secondary-100">
-      <div className="layout-container px-8">
-        <main className="mx-auto max-w-6xl pb-20 pt-24">
-
-          <h1 className="mb-6 text-2xl font-semibold tracking-[-0.36px] text-prime-900">
+    <div className="min-h-main-safe bg-secondary-100">
+      <div className="layout-container px-gutter">
+        <main className="mx-auto max-w-6xl pt-24 pb-20">
+          <h1 className="text-prime-900 mb-6 text-2xl font-semibold tracking-[-0.36px]">
             마이페이지
           </h1>
 
           <div className="flex flex-col gap-4">
-
             {/* ── 카드 1: 내 정보 ── */}
-            <section className="overflow-hidden rounded-2xl border border-prime-100 bg-white shadow-md">
-
+            <section className="border-prime-100 overflow-hidden rounded-2xl border bg-white shadow-sm">
               {/* 프로필 */}
               <div className="flex items-center gap-4 px-6 py-4">
-                <div className="relative size-14 shrink-0 overflow-hidden rounded-full border-2 border-cta-300 bg-secondary-100">
+                <div className="border-cta-300 bg-secondary-100 relative size-14 shrink-0 overflow-hidden rounded-full border-2">
                   <Image
                     src={user?.profileImage ?? '/images/icons/profile-default.svg'}
                     alt="프로필"
@@ -83,61 +81,60 @@ export default function MyPage() {
                   />
                 </div>
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <span className="truncate text-base font-semibold tracking-[-0.24px] text-prime-900">
+                  <span className="text-prime-900 truncate text-base font-semibold tracking-[-0.24px]">
                     {user?.name ?? '사용자'}
                   </span>
-                  <span className="truncate text-sm tracking-[-0.21px] text-prime-500">
+                  <span className="text-prime-500 truncate text-sm tracking-[-0.21px]">
                     {user?.email ?? ''}
                   </span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setProfileModalOpen(true)}
-                  className="shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-prime-700 transition-colors hover:bg-slate-50"
+                  className="border-prime-100 text-prime-700 hover:bg-secondary-50 shrink-0 rounded-lg border bg-white px-3 py-1.5 text-xs font-medium transition-colors"
                 >
                   프로필 수정
                 </button>
               </div>
 
               {/* 크레딧 */}
-              <div className="flex items-center justify-between border-t border-slate-50 px-6 py-4">
+              <div className="border-prime-100 flex items-center justify-between border-t px-6 py-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex size-9 items-center justify-center rounded-xl bg-blue-50">
-                    <Coins size={16} strokeWidth={2} className="text-main-blue" />
+                  <div className="bg-interactive-glass-blue-50 flex size-9 items-center justify-center rounded-xl">
+                    <Coins size={16} strokeWidth={2} className="text-cta-300" />
                   </div>
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-xs tracking-[-0.18px] text-slate-400">보유 크레딧</span>
-                    <span className="text-xl font-bold tracking-tight text-main-blue">
+                    <span className="text-prime-400 text-xs tracking-[-0.18px]">보유 크레딧</span>
+                    <span className="text-cta-300 text-xl font-bold tracking-tight">
                       {totalCredit.toLocaleString()} 크레딧
                     </span>
                   </div>
                 </div>
-                <Link
-                  href="/shop"
-                  className="flex items-center gap-1 rounded-lg bg-cta-300 px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-80"
-                >
-                  충전하기
-                  <ChevronRight size={14} />
-                </Link>
+                <Button asChild variant="primary" size="default" className="gap-1 px-4 text-sm">
+                  <Link href="/shop">
+                    충전하기
+                    <ChevronRight size={14} />
+                  </Link>
+                </Button>
               </div>
             </section>
 
             {/* ── 카드 2: 활동 내역 ── */}
-            <section className="overflow-hidden rounded-2xl border border-prime-100 bg-white shadow-md">
-              <p className="px-6 pt-5 text-xs font-medium text-slate-400">활동 내역</p>
+            <section className="border-prime-100 overflow-hidden rounded-2xl border bg-white shadow-sm">
+              <p className="text-prime-400 px-6 pt-5 text-xs font-medium">활동 내역</p>
 
               <Tabs defaultValue="payment" className="mt-3">
                 <div className="px-6 pb-4">
-                  <TabsList className="h-auto w-full gap-1 rounded-xl border-0 bg-slate-100/80 px-1 py-1">
+                  <TabsList className="bg-secondary-100 h-auto w-full gap-1 rounded-xl border-0 px-1 py-1">
                     <TabsTrigger
                       value="payment"
-                      className="flex-1 rounded-lg py-2 text-sm text-slate-400 data-[state=active]:bg-white data-[state=active]:font-semibold data-[state=active]:text-main-blue data-[state=active]:shadow-sm sm:w-auto"
+                      className="text-prime-400 data-[state=active]:text-prime-700 flex-1 rounded-lg py-2 text-sm data-[state=active]:bg-white data-[state=active]:font-semibold data-[state=active]:shadow-sm sm:w-auto"
                     >
                       결제 내역
                     </TabsTrigger>
                     <TabsTrigger
                       value="credit"
-                      className="flex-1 rounded-lg py-2 text-sm text-slate-400 data-[state=active]:bg-white data-[state=active]:font-semibold data-[state=active]:text-main-blue data-[state=active]:shadow-sm sm:w-auto"
+                      className="text-prime-400 data-[state=active]:text-prime-700 flex-1 rounded-lg py-2 text-sm data-[state=active]:bg-white data-[state=active]:font-semibold data-[state=active]:shadow-sm sm:w-auto"
                     >
                       크레딧 사용 내역
                     </TabsTrigger>
@@ -149,29 +146,40 @@ export default function MyPage() {
                   {PAYMENT_HISTORY.length === 0 ? (
                     <EmptyHistory message="결제 내역이 없습니다." />
                   ) : (
-                    <ul className="divide-y divide-slate-50 px-4 pb-2" ref={dropdownRef}>
+                    <ul className="divide-y divide-prime-100 px-4 pb-2" ref={dropdownRef}>
                       {PAYMENT_HISTORY.map((item) => (
-                        <li key={item.id} className="relative flex items-center justify-between rounded-xl px-3 py-4 transition-colors hover:bg-slate-50">
+                        <li
+                          key={item.id}
+                          className="hover:bg-secondary-50 relative flex items-center justify-between rounded-xl px-3 py-4 transition-colors"
+                        >
                           {/* 좌측: 상품명 + 날짜 */}
                           <div className="flex flex-col gap-1">
-                            <span className={`text-sm font-medium tracking-[-0.21px] ${item.status === '환불완료' ? 'text-slate-400' : 'text-prime-900'}`}>
+                            <span
+                              className={`text-sm font-medium tracking-[-0.21px] ${item.status === '환불완료' ? 'text-prime-400' : 'text-prime-900'}`}
+                            >
                               {item.label}
                             </span>
-                            <span className="text-xs tracking-[-0.18px] text-slate-400">{item.date}</span>
+                            <span className="text-prime-400 text-xs tracking-[-0.18px]">
+                              {item.date}
+                            </span>
                           </div>
 
                           {/* 우측: 금액 + 상태 + 더보기 */}
                           <div className="flex items-center gap-2">
                             <div className="flex flex-col items-end gap-1">
-                              <span className={`text-sm font-bold tracking-[-0.21px] ${item.status === '환불완료' ? 'text-slate-400 line-through' : 'text-prime-900'}`}>
+                              <span
+                                className={`text-sm font-bold tracking-[-0.21px] ${item.status === '환불완료' ? 'text-prime-400 line-through' : 'text-prime-900'}`}
+                              >
                                 {item.amount.toLocaleString()}원
                               </span>
                               {item.status === '환불완료' ? (
-                                <span className="rounded-md bg-error-100 px-1.5 py-0.5 text-[10px] font-semibold text-error-500">
+                                <span className="bg-error-100 text-error-500 rounded-md px-1.5 py-0.5 text-[10px] font-semibold">
                                   환불완료
                                 </span>
                               ) : (
-                                <span className="text-xs font-medium text-emerald-500">결제완료</span>
+                                <span className="text-success-800 text-xs font-medium">
+                                  결제완료
+                                </span>
                               )}
                             </div>
 
@@ -181,13 +189,15 @@ export default function MyPage() {
                                 <>
                                   <button
                                     type="button"
-                                    onClick={() => setOpenDropdownId(openDropdownId === item.id ? null : item.id)}
-                                    className="flex size-7 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100"
+                                    onClick={() =>
+                                      setOpenDropdownId(openDropdownId === item.id ? null : item.id)
+                                    }
+                                    className="text-prime-400 hover:bg-secondary-100 flex size-7 items-center justify-center rounded-lg transition-colors"
                                   >
                                     <MoreVertical size={15} />
                                   </button>
                                   {openDropdownId === item.id && (
-                                    <div className="absolute right-0 top-full z-20 mt-1 w-36 overflow-hidden rounded-xl border border-slate-100 bg-white shadow-lg">
+                                    <div className="border-prime-100 absolute top-full right-0 z-20 mt-1 w-36 overflow-hidden rounded-xl border bg-white shadow-sm">
                                       <button
                                         type="button"
                                         onClick={() => {
@@ -195,7 +205,7 @@ export default function MyPage() {
                                           setOpenDropdownId(null);
                                           setRefundModalOpen(true);
                                         }}
-                                        className="flex w-full items-center px-4 py-3 text-sm font-medium text-error-500 transition-colors hover:bg-error-100/50"
+                                        className="text-error-500 hover:bg-error-100/50 flex w-full items-center px-4 py-3 text-sm font-medium transition-colors"
                                       >
                                         환불 요청하기
                                       </button>
@@ -216,18 +226,30 @@ export default function MyPage() {
                   {CREDIT_HISTORY.length === 0 ? (
                     <EmptyHistory message="크레딧 사용 내역이 없습니다." />
                   ) : (
-                    <ul className="divide-y divide-slate-50 px-4 pb-2">
+                    <ul className="divide-y divide-prime-100 px-4 pb-2">
                       {CREDIT_HISTORY.map((item) => (
-                        <li key={item.id} className="flex items-center justify-between rounded-xl px-3 py-4 transition-colors hover:bg-slate-50">
+                        <li
+                          key={item.id}
+                          className="hover:bg-secondary-50 flex items-center justify-between rounded-xl px-3 py-4 transition-colors"
+                        >
                           <div className="flex flex-col gap-1">
-                            <span className="text-sm font-medium tracking-[-0.21px] text-prime-900">{item.label}</span>
-                            <span className="text-xs tracking-[-0.18px] text-slate-400">{item.date}</span>
+                            <span className="text-prime-900 text-sm font-medium tracking-[-0.21px]">
+                              {item.label}
+                            </span>
+                            <span className="text-prime-400 text-xs tracking-[-0.18px]">
+                              {item.date}
+                            </span>
                           </div>
                           <div className="flex flex-col items-end gap-1">
-                            <span className={`text-sm font-bold tracking-[-0.21px] ${item.delta > 0 ? 'text-main-blue' : 'text-prime-900'}`}>
-                              {item.delta > 0 ? '+' : ''}{item.delta.toLocaleString()} 크레딧
+                            <span
+                              className={`text-sm font-bold tracking-[-0.21px] ${item.delta > 0 ? 'text-cta-300' : 'text-prime-900'}`}
+                            >
+                              {item.delta > 0 ? '+' : ''}
+                              {item.delta.toLocaleString()} 크레딧
                             </span>
-                            <span className="text-xs tracking-[-0.18px] text-slate-400">잔액 {item.balance.toLocaleString()}</span>
+                            <span className="text-prime-400 text-xs tracking-[-0.18px]">
+                              잔액 {item.balance.toLocaleString()}
+                            </span>
                           </div>
                         </li>
                       ))}
@@ -238,38 +260,39 @@ export default function MyPage() {
             </section>
 
             {/* ── 카드 3: 설정 ── */}
-            <section className="overflow-hidden rounded-2xl border border-prime-100 bg-white shadow-md">
-              <p className="px-6 pt-5 text-xs font-medium text-slate-400">설정</p>
+            <section className="border-prime-100 overflow-hidden rounded-2xl border bg-white shadow-sm">
+              <p className="text-prime-400 px-6 pt-5 text-xs font-medium">설정</p>
 
               <div className="flex items-center justify-between px-6 py-3.5">
                 <div className="flex items-center gap-3">
-                  <div className="flex size-9 items-center justify-center rounded-xl bg-blue-50">
-                    <Bell size={16} className="text-main-blue" />
+                  <div className="bg-interactive-glass-blue-50 flex size-9 items-center justify-center rounded-xl">
+                    <Bell size={16} className="text-cta-300" />
                   </div>
-                  <span className="text-sm font-medium tracking-[-0.21px] text-prime-900">알림</span>
+                  <span className="text-prime-900 text-sm font-medium tracking-[-0.21px]">
+                    알림
+                  </span>
                 </div>
                 <Switch checked={notificationEnabled} onCheckedChange={setNotificationEnabled} />
               </div>
 
-              <div className="mx-6 h-px bg-slate-50" />
+              <div className="bg-prime-100 mx-6 h-px" />
 
               <MenuRow
                 icon={<LogOut size={16} className="text-error-500" />}
                 label="로그아웃"
                 labelClassName="text-error-500"
-                iconBg="bg-red-50"
+                iconBg="bg-error-100"
                 onClick={handleLogout}
               />
-              <div className="mx-6 h-px bg-slate-50" />
+              <div className="bg-prime-100 mx-6 h-px" />
               <MenuRow
                 icon={<Trash2 size={16} className="text-error-500" />}
                 label="회원탈퇴"
                 labelClassName="text-error-500"
-                iconBg="bg-red-50"
+                iconBg="bg-error-100"
                 onClick={() => {}}
               />
             </section>
-
           </div>
         </main>
       </div>
@@ -304,52 +327,54 @@ function RefundModal({
     <DialogRoot open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogPortal>
         <DialogOverlay />
-        <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-[480px] -translate-x-1/2 -translate-y-1/2 focus:outline-none">
+        <DialogPrimitive.Content className="fixed top-1/2 left-1/2 z-50 w-full max-w-120 -translate-x-1/2 -translate-y-1/2 focus:outline-none">
           <DialogTitle className="sr-only">환불 안내</DialogTitle>
-          <div className="overflow-hidden rounded-2xl border border-white/60 bg-white shadow-[0px_8px_32px_0px_rgba(0,0,0,0.12)]">
-
+          <div className="border-prime-100 overflow-hidden rounded-2xl border bg-white shadow-sm">
             {/* 헤더 */}
-            <div className="flex items-center justify-between border-b border-slate-100 px-7 py-5">
-              <span className="text-base font-semibold tracking-[-0.24px] text-prime-900">
+            <div className="border-prime-100 flex items-center justify-between border-b px-7 py-5">
+              <span className="text-prime-900 text-base font-semibold tracking-[-0.24px]">
                 환불 신청 전 확인해 주세요
               </span>
               <button
                 type="button"
                 onClick={onClose}
-                className="flex size-7 items-center justify-center rounded-full transition-colors hover:bg-slate-100"
+                className="hover:bg-secondary-100 flex size-7 items-center justify-center rounded-full transition-colors"
               >
-                <X size={16} className="text-slate-400" />
+                <X size={16} className="text-prime-400" />
               </button>
             </div>
 
             {/* 바디 */}
             <div className="flex flex-col gap-5 px-7 py-6">
-
               {/* 환불 대상 항목 */}
               {item && (
-                <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3.5">
+                <div className="bg-secondary-100 flex items-center justify-between rounded-xl px-4 py-3.5">
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-sm font-medium text-prime-900">{item.label}</span>
-                    <span className="text-xs text-slate-400">{item.date}</span>
+                    <span className="text-prime-900 text-sm font-medium">{item.label}</span>
+                    <span className="text-prime-400 text-xs">{item.date}</span>
                   </div>
-                  <span className="text-sm font-bold text-prime-900">{item.amount.toLocaleString()}원</span>
+                  <span className="text-prime-900 text-sm font-bold">
+                    {item.amount.toLocaleString()}원
+                  </span>
                 </div>
               )}
 
               {/* 환불 규정 */}
               <div className="flex flex-col gap-3">
-                <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">환불 규정</p>
-                <div className="flex flex-col gap-2.5 rounded-xl border border-slate-100 p-4">
+                <p className="text-prime-400 text-xs font-semibold tracking-widest uppercase">
+                  환불 규정
+                </p>
+                <div className="border-prime-100 flex flex-col gap-2.5 rounded-xl border p-4">
                   <PolicyItem
                     title="결제 후 7일 이내"
                     desc="크레딧을 사용하지 않은 경우 전액 환불이 가능합니다."
                   />
-                  <div className="h-px bg-slate-50" />
+                  <div className="bg-prime-100 h-px" />
                   <PolicyItem
                     title="크레딧 일부 사용 시"
                     desc="사용한 크레딧을 제외한 잔여 크레딧에 대해 부분 환불이 가능합니다."
                   />
-                  <div className="h-px bg-slate-50" />
+                  <div className="bg-prime-100 h-px" />
                   <PolicyItem
                     title="결제 후 7일 초과"
                     desc="환불이 불가합니다. 단, 서비스 장애로 인한 경우는 고객 지원으로 문의해 주세요."
@@ -358,16 +383,19 @@ function RefundModal({
               </div>
 
               {/* 주의사항 */}
-              <div className="rounded-xl bg-error-100/60 px-4 py-3.5">
-                <p className="text-xs font-semibold text-error-500">주의사항</p>
+              <div className="bg-error-100/60 rounded-xl px-4 py-3.5">
+                <p className="text-error-500 text-xs font-semibold">주의사항</p>
                 <ul className="mt-2 flex flex-col gap-1.5">
                   {[
                     '환불 처리까지 영업일 기준 3~5일이 소요됩니다.',
                     '환불 완료 후 크레딧은 즉시 회수되며 복구되지 않습니다.',
                     '이벤트·프로모션으로 지급된 무료 크레딧은 환불 대상에서 제외됩니다.',
                   ].map((text) => (
-                    <li key={text} className="flex items-start gap-1.5 text-xs leading-relaxed text-error-500/80">
-                      <span className="mt-1 size-1 shrink-0 rounded-full bg-error-400" />
+                    <li
+                      key={text}
+                      className="text-error-500/80 flex items-start gap-1.5 text-xs leading-relaxed"
+                    >
+                      <span className="bg-error-400 mt-1 size-1 shrink-0 rounded-full" />
                       {text}
                     </li>
                   ))}
@@ -376,20 +404,18 @@ function RefundModal({
 
               {/* 버튼 */}
               <div className="flex gap-2.5">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="flex-1 rounded-xl border border-slate-200 py-3 text-sm font-medium text-slate-500 transition-colors hover:bg-slate-50"
-                >
+                <Button type="button" variant="secondary" onClick={onClose} className="flex-1 rounded-xl">
                   취소
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="primary"
+                  semantic="red"
                   onClick={onClose}
-                  className="flex-1 rounded-xl bg-error-500 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  className="flex-1 rounded-xl"
                 >
                   환불 요청하기
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -402,15 +428,15 @@ function RefundModal({
 function PolicyItem({ title, desc }: { title: string; desc: string }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="text-xs font-semibold tracking-[-0.18px] text-prime-900">{title}</span>
-      <span className="text-xs leading-relaxed tracking-[-0.18px] text-prime-500">{desc}</span>
+      <span className="text-prime-900 text-xs font-semibold tracking-[-0.18px]">{title}</span>
+      <span className="text-prime-500 text-xs leading-relaxed tracking-[-0.18px]">{desc}</span>
     </div>
   );
 }
 
 function EmptyHistory({ message }: { message: string }) {
   return (
-    <div className="flex flex-col items-center gap-2 py-12 text-slate-400">
+    <div className="text-prime-400 flex flex-col items-center gap-2 py-12">
       <span className="text-sm">{message}</span>
     </div>
   );
@@ -420,7 +446,7 @@ function MenuRow({
   icon,
   label,
   labelClassName,
-  iconBg = 'bg-blue-50',
+  iconBg = 'bg-interactive-glass-blue-50',
   onClick,
 }: {
   icon: React.ReactNode;
@@ -433,15 +459,17 @@ function MenuRow({
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center gap-3 px-6 py-3.5 transition-colors hover:bg-slate-50"
+      className="hover:bg-secondary-50 flex w-full items-center gap-3 px-6 py-3.5 transition-colors"
     >
       <div className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${iconBg}`}>
         {icon}
       </div>
-      <span className={`flex-1 text-left text-sm font-medium tracking-[-0.21px] text-prime-900 ${labelClassName ?? ''}`}>
+      <span
+        className={`text-prime-900 flex-1 text-left text-sm font-medium tracking-[-0.21px] ${labelClassName ?? ''}`}
+      >
         {label}
       </span>
-      <ChevronRight size={16} className="shrink-0 text-slate-300" />
+      <ChevronRight size={16} className="text-prime-300 shrink-0" />
     </button>
   );
 }

@@ -29,7 +29,7 @@ const TITLE_STYLE = {
   fontWeight: 600,
   lineHeight: '31.2px',
   letterSpacing: '-0.36px',
-  color: '#1A222E',
+  color: 'var(--color-prime-900)',
 } as const;
 
 // Pretendard Regular 16px, lh 25.6px, #3F526F (VariableID:575:5015 = prime-700)
@@ -38,7 +38,7 @@ const BODY_STYLE = {
   fontSize: '16px',
   fontWeight: 400,
   lineHeight: '25.6px',
-  color: '#3F526F',
+  color: 'var(--color-prime-700)',
 } as const;
 
 
@@ -90,7 +90,7 @@ export function ChatNewSessionModal({ isOpen, onClose, onConfirm, overlayBlur = 
 
             {/* 부가 안내 — Pretendard Regular 16px, lh 25.6px, #8A9BA8, CENTER */}
             {/* VariableID:575:5008 = tertiary-400, style: Body 01 */}
-            <p className="w-full text-center" style={{ ...BODY_STYLE, color: '#8A9BA8' }}>
+            <p className="w-full text-center" style={{ ...BODY_STYLE, color: 'var(--color-tertiary-400)' }}>
               (하루 1회씩 무료로 상담 가능합니다.)
             </p>
           </div>

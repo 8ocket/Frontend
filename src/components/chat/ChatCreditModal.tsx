@@ -31,7 +31,7 @@ const TITLE_STYLE = {
   fontWeight: 600,
   lineHeight: '31.2px',
   letterSpacing: '-0.36px',
-  color: '#1A222E',
+  color: 'var(--color-prime-900)',
 } as const;
 
 // Pretendard Regular 16px, lh 25.6px, #3F526F (VariableID:575:5015 = prime-700)
@@ -40,7 +40,7 @@ const BODY_STYLE = {
   fontSize: '16px',
   fontWeight: 400,
   lineHeight: '25.6px',
-  color: '#3F526F',
+  color: 'var(--color-prime-700)',
 } as const;
 
 // Vector (icon): 28×36 inside 48×48 Frame, fill VariableID:576:5128 = #BD1010 (error-500)
@@ -95,10 +95,12 @@ export function ChatCreditModal({
               <div className="flex flex-row items-center justify-center gap-2">
                 {/* 잔여 크레딧 라벨 — Pretendard Regular 16px, lh 25.6px, #8A9BA8 */}
                 {/* VariableID:575:5008 = tertiary-400 */}
-                <span style={{ ...BODY_STYLE, color: '#8A9BA8' }}>잔여 크레딧 :</span>
+                <span style={{ ...BODY_STYLE, color: 'var(--color-tertiary-400)' }}>
+                  잔여 크레딧 :
+                </span>
                 {/* 크레딧 값 — Pretendard Regular 16px, lh 25.6px, #0B63F3 */}
                 {/* VariableID:576:5138 = info-600 */}
-                <span style={{ ...BODY_STYLE, color: '#0B63F3' }}>
+                <span style={{ ...BODY_STYLE, color: 'var(--color-info-600)' }}>
                   {remainingCredits.toLocaleString()}
                 </span>
               </div>

@@ -77,7 +77,7 @@ export default function NicknamePage() {
 
   return (
     <AuroraBackground>
-      <div className="flex min-h-screen items-center justify-center p-4 py-8">
+      <div className="box-border flex min-h-screen-safe items-center justify-center p-4 py-8">
         {/* 카드 — Figma: 568px, white glass, rounded-2xl, px-10 */}
         <div className="relative w-full max-w-142 rounded-2xl border border-white/40 bg-white/70 px-6 py-8 shadow-[0px_8px_32px_0px_rgba(0,0,0,0.08)] md:px-10 md:py-10">
           {/* ── 헤더: 제목 + 뒤로가기 ── */}

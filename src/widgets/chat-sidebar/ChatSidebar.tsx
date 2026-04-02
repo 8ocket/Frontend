@@ -31,8 +31,10 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, on
     function handleClickOutside(e: MouseEvent) {
       if (
         filterOpen &&
-        filterRef.current && !filterRef.current.contains(e.target as Node) &&
-        filterBtnRef.current && !filterBtnRef.current.contains(e.target as Node)
+        filterRef.current &&
+        !filterRef.current.contains(e.target as Node) &&
+        filterBtnRef.current &&
+        !filterBtnRef.current.contains(e.target as Node)
       ) {
         setFilterOpen(false);
       }
@@ -44,12 +46,7 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, on
   const [thumbRatio, setThumbRatio] = useState(0.2);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-  // sessionGroups가 비동기로 로드될 때 visibleCount 동기화
-  useEffect(() => {
-    setVisibleCount((prev) => Math.max(prev, sessionGroups.length));
-  }, [sessionGroups.length]);
-
-  const visibleGroups = sessionGroups.slice(0, visibleCount);
+  const visibleGroups = sessionGroups.slice(0, Math.min(visibleCount, sessionGroups.length));
   const hasMore = visibleCount < sessionGroups.length;
 
   const handleScroll = useCallback(() => {
@@ -83,10 +80,10 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, on
   }, [visibleCount]);
 
   return (
-    <aside className="relative flex w-full shrink-0 flex-col bg-white lg:w-80.75 lg:border-r lg:border-prime-100" style={{ height: 'calc(100dvh - var(--gnb-height))' }}>
+    <aside className="lg:border-prime-100 relative flex h-full w-full shrink-0 flex-col bg-white lg:w-80.75 lg:border-r lg:border-l">
       {/* 헤더 영역 */}
-      <div className="border-b border-prime-100 px-5 py-4">
-        <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-prime-400">
+      <div className="border-prime-100 border-b px-5 py-4">
+        <p className="text-prime-400 mb-4 text-[11px] font-semibold tracking-widest uppercase">
           Consultation History
         </p>
 
@@ -94,7 +91,7 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, on
         <button
           type="button"
           onClick={onNewCounsel}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-prime-200 py-2.5 text-sm font-semibold text-prime-500 transition-all hover:border-main-blue hover:text-main-blue active:opacity-80"
+          className="border-prime-200 text-prime-500 hover:border-main-blue hover:text-main-blue flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed py-2.5 text-sm font-semibold transition-all active:opacity-80"
           style={{ fontFamily: 'var(--font-pretendard)' }}
         >
           <PlusCircle size={16} strokeWidth={2} className="text-main-blue" />
@@ -103,13 +100,13 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, on
       </div>
 
       {/* 검색 + 필터 영역 */}
-      <div className="flex items-center gap-2 border-b border-prime-100 px-5 py-3">
-        <div className="flex flex-1 items-center gap-2 rounded-lg border border-prime-100 bg-[#F8FAFF] px-3 py-2">
-          <Search className="shrink-0 text-main-blue" size={15} strokeWidth={2} />
+      <div className="border-prime-100 flex items-center gap-2 border-b px-5 py-3">
+        <div className="border-prime-100 flex flex-1 items-center gap-2 rounded-lg border bg-[#F8FAFF] px-3 py-2">
+          <Search className="text-main-blue shrink-0" size={15} strokeWidth={2} />
           <input
             type="text"
             placeholder="검색"
-            className="w-full bg-transparent text-[13px] text-prime-900 outline-none placeholder:text-prime-400"
+            className="text-prime-900 placeholder:text-prime-400 w-full bg-transparent text-[13px] outline-none"
             style={{ fontFamily: 'var(--font-pretendard)' }}
           />
         </div>
@@ -117,7 +114,7 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, on
           ref={filterBtnRef}
           type="button"
           onClick={() => setFilterOpen((prev) => !prev)}
-          className="rounded-lg border border-prime-100 bg-[#F8FAFF] px-3 py-2 text-[13px] font-medium text-prime-500 transition-colors hover:border-main-blue hover:text-main-blue"
+          className="border-prime-100 text-prime-500 hover:border-main-blue hover:text-main-blue rounded-lg border bg-[#F8FAFF] px-3 py-2 text-[13px] font-medium transition-colors"
           style={{ fontFamily: 'var(--font-pretendard)' }}
         >
           필터

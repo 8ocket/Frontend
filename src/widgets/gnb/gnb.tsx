@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useAuthStore } from '@/entities/user/store';
 import { cn } from '@/shared/lib/utils';
 import { UserProfileModal } from '@/shared/ui/UserProfileModal';
+import { Button } from '@/shared/ui/button';
 import { useCreditStore } from '@/entities/credits/store';
 
 // Figma: GNB (1738:4600)
@@ -97,7 +98,7 @@ export function GNB() {
             }
       }
     >
-      <nav className="layout-container flex h-16 items-center justify-between px-8 md:h-20">
+      <nav className="layout-container px-gutter flex h-16 items-center justify-between md:h-20">
         {/* 로고 */}
         <Link href="/" className="flex shrink-0 items-center gap-2">
           <div className="relative size-8 overflow-hidden rounded-full">
@@ -124,20 +125,20 @@ export function GNB() {
         <div className="hidden lg:flex">
           {isAuthenticated ? (
             // 크레딧 + 프로필 — 하나의 그룹으로 묶어 시각 분리
-            <div className="flex items-center gap-3 rounded-full border border-neutral-300/70 bg-white/30 px-4 py-1.5">
+            <div className="border-prime-100 flex items-center gap-3 rounded-full border bg-white/70 px-4 py-1.5">
               {/* 크레딧 */}
               <Link
                 href="/shop?tab=credit"
                 className="text-prime-600 hover:text-prime-900 flex items-center gap-1.5 text-sm font-medium transition-colors"
               >
-                <div className="bg-cta-100 flex size-6 items-center justify-center rounded-full">
-                  <Coins size={13} strokeWidth={2} className="text-main-blue" />
+                <div className="bg-interactive-glass-blue-50 flex size-6 items-center justify-center rounded-full">
+                  <Coins size={13} strokeWidth={2} className="text-cta-300" />
                 </div>
                 {totalCredit.toLocaleString()} 크레딧
               </Link>
 
               {/* 구분선 */}
-              <div className="h-4 w-px bg-slate-200/80" />
+              <div className="bg-prime-100 h-4 w-px" />
 
               {/* 프로필 버튼 + 드롭다운 */}
               <div ref={dropdownRef} className="relative">
@@ -199,7 +200,7 @@ export function GNB() {
         <button
           type="button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-neutral-200 lg:hidden"
+          className="hover:bg-secondary-100 flex h-9 w-9 items-center justify-center rounded-lg transition-colors lg:hidden"
           aria-label={mobileMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
           aria-expanded={mobileMenuOpen}
         >
@@ -209,7 +210,7 @@ export function GNB() {
 
       {/* 모바일 메뉴 오버레이 */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 top-13 z-40 flex flex-col overflow-y-auto bg-white lg:hidden">
+        <div className="fixed inset-x-0 bottom-0 top-16 z-40 flex flex-col overflow-y-auto bg-white lg:hidden md:top-20">
           <div className="flex flex-col gap-1 px-4 py-4">
             {(isAuthenticated ? MEMBER_NAV_ITEMS : GUEST_NAV_ITEMS).map(({ label, href }) => (
               <MobileNavItem key={href} label={label} href={href} active={pathname === href} />
@@ -218,7 +219,7 @@ export function GNB() {
             {isAuthenticated ? (
               <>
                 <MobileNavItem label="마이페이지" href="/my" active={pathname === '/my'} />
-                <div className="my-2 border-t border-neutral-200" />
+                <div className="border-prime-100 my-2 border-t" />
                 <button
                   onClick={handleLogout}
                   className="text-error-500 hover:bg-error-100 w-full rounded-xl px-4 py-3 text-left text-base font-medium transition-all"
@@ -228,13 +229,10 @@ export function GNB() {
               </>
             ) : (
               <>
-                <div className="my-2 border-t border-neutral-200" />
-                <Link
-                  href="/login"
-                  className="bg-cta-300 text-secondary-100 hover:bg-cta-400 active:bg-cta-700 rounded-xl px-4 py-3 text-center text-base font-medium transition-all"
-                >
-                  로그인
-                </Link>
+                <div className="border-prime-100 my-2 border-t" />
+                <Button asChild variant="primary" size="default" className="rounded-xl text-base">
+                  <Link href="/login">로그인</Link>
+                </Button>
               </>
             )}
           </div>
@@ -254,15 +252,15 @@ function NavItem({ label, href, active }: { label: string; href: string; active:
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       className={cn(
-        'relative flex flex-col items-center gap-0.5 rounded-full px-3 py-1.5 text-sm font-medium tracking-[-0.21px] transition-colors',
-        active ? 'text-prime-900' : 'text-prime-900/70 hover:text-prime-900'
+        'relative flex flex-col items-center gap-1 rounded-full px-3.5 py-2 text-sm font-medium tracking-[-0.21px] transition-colors',
+        active ? 'text-prime-900' : 'text-prime-700 hover:text-prime-900'
       )}
     >
       <AnimatePresence>
-        {hovered && (
+        {hovered && !active && (
           <motion.div
             layoutId={`nav-hover-${href}`}
-            className="absolute inset-0 rounded-full bg-neutral-200"
+            className="absolute inset-0 rounded-full"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -273,8 +271,8 @@ function NavItem({ label, href, active }: { label: string; href: string; active:
       <span className="relative z-10">{label}</span>
       <span
         className={cn(
-          'relative z-10 block h-0.5 rounded-full bg-current transition-all duration-200',
-          active ? 'w-full' : 'w-0'
+          'relative z-10 block h-0.5 rounded-full transition-all duration-200',
+          active ? 'bg-cta-300 w-full' : 'bg-prime-300 w-0'
         )}
       />
     </Link>
@@ -286,13 +284,17 @@ function MobileNavItem({ label, href, active }: { label: string; href: string; a
     <Link
       href={href}
       className={cn(
-        'rounded-xl px-4 py-3 text-base font-medium transition-all',
-        active
-          ? 'bg-prime-900 text-secondary-100'
-          : 'text-prime-700 hover:text-prime-900 hover:bg-neutral-100'
+        'flex items-center justify-between rounded-xl px-4 py-3 text-base font-medium transition-all',
+        active ? 'text-prime-900' : 'text-prime-700 hover:text-prime-900'
       )}
     >
       {label}
+      <span
+        className={cn(
+          'h-2 w-2 rounded-full transition-all',
+          active ? 'bg-cta-300 opacity-100' : 'bg-prime-200 opacity-0'
+        )}
+      />
     </Link>
   );
 }
@@ -317,12 +319,12 @@ function ProfileDropdown({
     !userProfileImage || userProfileImage === '/images/icons/profile-default.svg';
 
   return (
-    <div className="absolute top-full right-0 z-50 mt-2 w-59.5 overflow-hidden rounded-2xl border border-white/60 bg-white/80 shadow-[0px_8px_32px_0px_rgba(0,0,0,0.12)] backdrop-blur-md">
+    <div className="border-prime-100 absolute top-full right-0 z-50 mt-2 w-59.5 overflow-hidden rounded-2xl border bg-white/90 shadow-sm backdrop-blur-md">
       {/* 헤더: 아바타 + 이름 + 이메일 */}
       <button
         type="button"
         onClick={onProfileHeader}
-        className="flex w-full items-center gap-3 border-b border-white/60 px-5 py-4 transition-colors hover:bg-black/5"
+        className="border-prime-100 hover:bg-secondary-50 flex w-full items-center gap-3 border-b px-5 py-4 transition-colors"
       >
         <div className="border-cta-300 bg-cta-100 relative size-10 shrink-0 overflow-hidden rounded-full border">
           <Image
@@ -347,22 +349,22 @@ function ProfileDropdown({
         <button
           type="button"
           onClick={onMypage}
-          className="text-prime-900 flex w-full items-center gap-3 px-5 py-3 text-sm font-medium tracking-[-0.21px] transition-colors hover:bg-black/5"
+          className="text-prime-900 hover:bg-secondary-50 flex w-full items-center gap-3 px-5 py-3 text-sm font-medium tracking-[-0.21px] transition-colors"
         >
-          <div className="bg-cta-100 flex size-8 shrink-0 items-center justify-center rounded-xl">
-            <User size={15} className="text-main-blue" />
+          <div className="bg-interactive-glass-blue-50 flex size-8 shrink-0 items-center justify-center rounded-xl">
+            <User size={15} className="text-cta-300" />
           </div>
           마이페이지
         </button>
 
-        <div className="mx-3 my-1 h-px bg-white/60" />
+        <div className="bg-prime-100 mx-3 my-1 h-px" />
 
         <button
           type="button"
           onClick={onLogout}
-          className="text-error-500 flex w-full items-center gap-3 px-5 py-3 text-sm font-medium tracking-[-0.21px] transition-colors hover:bg-black/5"
+          className="text-error-500 hover:bg-error-100 flex w-full items-center gap-3 px-5 py-3 text-sm font-medium tracking-[-0.21px] transition-colors"
         >
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-red-50">
+          <div className="bg-error-100 flex size-8 shrink-0 items-center justify-center rounded-xl">
             <LogOut size={15} className="text-error-500" />
           </div>
           로그아웃
