@@ -21,8 +21,11 @@ export function ReportCreationForm({ onCreateReport, consultationCount }: Report
   const [baseDate, setBaseDate] = useState<Date | undefined>(undefined);
   const [agreed, setAgreed] = useState(false);
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = useMemo(() => {
+    const next = new Date();
+    next.setHours(0, 0, 0, 0);
+    return next;
+  }, []);
 
   // 기준 날짜로부터 종료일 자동 계산 (오늘 이후 불가)
   const autoEndDate = useMemo(() => {

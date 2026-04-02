@@ -75,7 +75,7 @@ export default function ReportPage() {
       .catch(() => {
         toast('리포트 목록을 불러오는 데 실패했어요.', 'error');
       });
-  }, []);
+  }, [toast]);
 
   // 3초 간격 폴링 — creating 상태일 때 실행
   useEffect(() => {
@@ -97,7 +97,7 @@ export default function ReportPage() {
 
     const interval = setInterval(poll, 3000);
     return () => clearInterval(interval);
-  }, [viewState, creatingReportId]);
+  }, [creatingReportId, toast, viewState]);
 
   // 상담 횟수 — 실제 API 연동 시 교체
   const consultationCount = canGenerate?.saved_session_count ?? 0;
@@ -131,7 +131,7 @@ export default function ReportPage() {
       });
       setCreatingReportId(report_id);
       setViewState('creating');
-    } catch (error) {
+    } catch {
       // TODO: 크레딧 부족 에러 코드 백엔드 확인 후 분기 처리
       toast('리포트 생성 요청에 실패했어요.');
     }

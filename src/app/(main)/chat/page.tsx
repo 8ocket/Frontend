@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/entities/user/store';
 import { useCreditStore } from '@/entities/credits/store';
 import { useChatModals } from '@/features/select-persona';
 import type { ChatBubbleProps } from '@/widgets/chat-main-area';
@@ -44,7 +43,7 @@ type MockSession = {
   messages: ChatBubbleProps[];
 };
 
-const MOCK_SESSIONS: MockSession[] = [
+const _MOCK_SESSIONS: MockSession[] = [
   {
     id: '1',
     messages: [
@@ -581,7 +580,7 @@ const MOCK_SESSIONS: MockSession[] = [
   },
 ];
 
-const MOCK_SESSION_GROUPS: ChatSessionGroup[] = [
+const _MOCK_SESSION_GROUPS = [
   {
     date: '2026년 2월 17일',
     sessions: [
@@ -743,7 +742,7 @@ export default function ChatPage() {
     getSessionsApi()
       .then((res) => setSessionList(res.sessions))
       .catch(() => {});
-  }, []);
+  }, [openModal]);
 
   // ── 핸들러 ───────────────────────────────────────────────────────
 

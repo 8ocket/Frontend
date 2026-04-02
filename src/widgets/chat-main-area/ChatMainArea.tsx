@@ -7,7 +7,6 @@ import { ChatInputBar } from '@/features/send-message';
 import { sendMessageStream } from '@/features/send-message/sendMessageStream';
 import { createSessionApi } from '@/entities/session/api';
 import { ChatLogo } from './ChatLogo';
-import { type PersonaOption } from './ChatSelectOptions';
 import { getCookie } from '@/shared/lib/utils/cookie';
 
 // Figma 1357:3355 — Frame 1597881480
@@ -40,16 +39,10 @@ export interface ChatMainAreaProps {
   aiAvatarSrc?: string;
 }
 
-const PERSONA_OPTIONS: PersonaOption[] = [
-  { id: 'mental', label: '정신건강 상담사' },
-  { id: 'career', label: '직업 및 진로 상담사' },
-  { id: 'coaching', label: '코칭 심리 상담사' },
-];
-
 export function ChatMainArea({
   onEndChat,
-  onCreditShortage,
-  onUnfinishedSession,
+  onCreditShortage: _onCreditShortage,
+  onUnfinishedSession: _onUnfinishedSession,
   initialMessages = [],
   isSessionActive = true,
   onDisabledInputClick,
@@ -62,7 +55,6 @@ export function ChatMainArea({
 }: ChatMainAreaProps = {}) {
   const [messages, setMessages] = useState<ChatBubbleProps[]>(initialMessages);
   const [inputValue, setInputValue] = useState('');
-  const [showSelectOptions, setShowSelectOptions] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);

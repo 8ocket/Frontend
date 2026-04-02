@@ -60,6 +60,10 @@ export function ReportError({ onRetry, onDismiss }: ReportErrorProps) {
           <Button onClick={onDismiss} variant="secondary" className="flex-1">
             확인
           </Button>
+          <Button onClick={onRetry} variant="primary" className="flex-1">
+            <RefreshCcw className="size-4" />
+            다시 시도
+          </Button>
         </div>
 
         <p className="text-prime-400 mt-6 text-xs">문제가 계속되면 고객센터로 문의해주세요</p>

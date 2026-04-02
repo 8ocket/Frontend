@@ -48,12 +48,7 @@ export function ChatSidebar({
   const [thumbRatio, setThumbRatio] = useState(0.2);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-  // sessionGroups가 비동기로 로드될 때 visibleCount 동기화
-  useEffect(() => {
-    setVisibleCount((prev) => Math.max(prev, sessionGroups.length));
-  }, [sessionGroups.length]);
-
-  const visibleGroups = sessionGroups.slice(0, visibleCount);
+  const visibleGroups = sessionGroups.slice(0, Math.min(visibleCount, sessionGroups.length));
   const hasMore = visibleCount < sessionGroups.length;
 
   const handleScroll = useCallback(() => {
