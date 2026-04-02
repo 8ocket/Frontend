@@ -9,28 +9,25 @@ import {
 
 export const MOCK_USERS: Array<User & { password: string }> = [
   {
-    id: 1,
+    id: '550e8400-e29b-41d4-a716-446655440001',
     email: 'test@mindlog.com',
     password: 'password123',
     name: '테스트 사용자',
     profileImage: 'https://api.dicebear.com/7.x/avataaars/svg?seed=test',
-    creditBalance: 0,
   },
   {
-    id: 2,
+    id: '550e8400-e29b-41d4-a716-446655440002',
     email: 'demo@mindlog.com',
     password: 'demo123',
     name: '데모 사용자',
     profileImage: 'https://api.dicebear.com/7.x/avataaars/svg?seed=demo',
-    creditBalance: 0,
   },
   {
-    id: 3,
+    id: '550e8400-e29b-41d4-a716-446655440003',
     email: 'user@mindlog.com',
     password: 'user123',
     name: '일반 사용자',
     profileImage: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user',
-    creditBalance: 0,
   },
 ];
 
@@ -65,10 +62,10 @@ export const mockGetMyProfile = (): UserProfileResponse => ({
 
 /** PATCH /v1/users/me/profile */
 export const mockUpdateMyProfile = (
-  nickName?: string,
+  nickName: string,
   profileImage?: File
 ): UpdateMyProfileResponse => ({
-  user_id: '1',
+  user_id: '550e8400-e29b-41d4-a716-446655440000',
   profile_image_url: profileImage
     ? URL.createObjectURL(profileImage)
     : 'https://api.dicebear.com/7.x/avataaars/svg?seed=test',
@@ -76,7 +73,7 @@ export const mockUpdateMyProfile = (
   updated_at: new Date().toISOString(),
 });
 
-export const generateMockTokens = (userId: number) => {
+export const generateMockTokens = (userId: string) => {
   const timestamp = Date.now();
   return {
     accessToken: `mock_access_token_${userId}_${timestamp}`,

@@ -23,7 +23,6 @@ export const useAuth = () => {
           id: `temp_${Date.now()}`,
           email: `temp_user_${Date.now()}@mindlog.local`,
           name: `Temp User ${Math.floor(Math.random() * 1000)}`,
-          creditBalance: 0,
         };
         const tempToken = `temp_token_${Date.now()}`;
         login(tempUser, tempToken, tempToken);
@@ -33,8 +32,7 @@ export const useAuth = () => {
         if (!response || !response.user || !response.accessToken) {
           throw new Error('로그인 응답 데이터가 불완전합니다.');
         }
-        const user = { ...response.user, id: String(response.user.id) };
-        login(user, response.accessToken, response.refreshToken || '');
+        login(response.user, response.accessToken, response.refreshToken || '');
         router.push('/signup');
       }
     } catch (err: unknown) {
