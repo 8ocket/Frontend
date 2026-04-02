@@ -7,7 +7,7 @@ import {
   ReportApiResponse,
   ReportType,
 } from './model';
-import { mockCreateReport } from '@/mocks';
+import { mockCreateReport, mockGetReportDetail, mockGetReportList } from '@/mocks';
 
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
 
@@ -32,6 +32,9 @@ export const createReportApi = async (req: CreateReportRequest): Promise<CreateR
  * GET /v1/reports?report_type=weekly|monthly
  */
 export const getReportListApi = async (reportType?: ReportType): Promise<GetReportListResponse> => {
+  // mock 모드에서도 리포트 페이지가 초기 로딩/목록 조회 단계부터 끊기지 않도록 동일한 진입점을 제공합니다.
+  if (USE_MOCK) return mockGetReportList();
+
   const params = reportType ? { report_type: reportType } : {};
   const response = await api.get<ReportApiResponse<GetReportListResponse>>('/reports', { params });
 
@@ -47,6 +50,9 @@ export const getReportListApi = async (reportType?: ReportType): Promise<GetRepo
  * GET /v1/reports/{report_id}
  */
 export const getReportDetailApi = async (reportId: string): Promise<ReportDetailResponse> => {
+  // 생성 후 폴링되는 상세 조회도 mock 응답을 지원해야 generating -> completed 흐름을 재현할 수 있습니다.
+  if (USE_MOCK) return mockGetReportDetail(reportId);
+
   const response = await api.get<ReportApiResponse<ReportDetailResponse>>(`/reports/${reportId}`);
 
   if (response.data.code === 'ok' && response.data.data) {

@@ -31,32 +31,42 @@ export const sendMessageStream = async (
 
   let currentEvent = '' as SSEEventType;
   const decoder = new TextDecoder();
+  // SSE는 이벤트가 chunk 경계에서 잘릴 수 있으므로, 완성되지 않은 마지막 조각을 버퍼에 보관합니다.
+  let buffer = '';
 
   while (true) {
     const { done, value } = await reader.read();
-    if (done) break;
+    if (done) {
+      buffer += decoder.decode();
+      break;
+    }
 
-    const text = decoder.decode(value, { stream: true });
-    const lines = text.split('\n');
+    buffer += decoder.decode(value, { stream: true });
+    const events = buffer.split('\n\n');
+    buffer = events.pop() ?? '';
 
-    for (const line of lines) {
-      if (line.startsWith('event:')) {
-        currentEvent = line.replace('event:', '').trim() as SSEEventType;
-      }
-      if (line.startsWith('data:')) {
-        const raw = line.replace('data:', '').trim();
-        if (!raw) continue;
-        try {
-          const data = JSON.parse(raw);
-          if (currentEvent === 'ai_chunk') onChunk(data.content);
-          if (currentEvent === 'crisis_check') onCrisis(data.content);
-          if (currentEvent === 'done') {
-            onDone();
-            reader.cancel();
-            return;
+    for (const eventBlock of events) {
+      const lines = eventBlock.split('\n');
+
+      for (const line of lines) {
+        if (line.startsWith('event:')) {
+          currentEvent = line.replace('event:', '').trim() as SSEEventType;
+        }
+        if (line.startsWith('data:')) {
+          const raw = line.replace('data:', '').trim();
+          if (!raw) continue;
+          try {
+            const data = JSON.parse(raw);
+            if (currentEvent === 'ai_chunk') onChunk(data.content);
+            if (currentEvent === 'crisis_check') onCrisis(data.content);
+            if (currentEvent === 'done') {
+              onDone();
+              reader.cancel();
+              return;
+            }
+          } catch {
+            // malformed JSON 무시
           }
-        } catch {
-          // malformed JSON 무시
         }
       }
     }

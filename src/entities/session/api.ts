@@ -110,32 +110,42 @@ export const finalizeSessionStream = async (
 
   let currentEvent = '';
   const decoder = new TextDecoder();
+  // finalize SSE도 chunk 단위로 끊어질 수 있어, 이벤트 종료 구분자(\n\n) 기준으로 누적 파싱합니다.
+  let buffer = '';
 
   while (true) {
     const { done, value } = await reader.read();
-    if (done) break;
+    if (done) {
+      buffer += decoder.decode();
+      break;
+    }
 
-    const text = decoder.decode(value, { stream: true });
-    const lines = text.split('\n');
+    buffer += decoder.decode(value, { stream: true });
+    const events = buffer.split('\n\n');
+    buffer = events.pop() ?? '';
 
-    for (const line of lines) {
-      if (line.startsWith('event:')) {
-        currentEvent = line.replace('event:', '').trim();
-      }
-      if (line.startsWith('data:')) {
-        const raw = line.replace('data:', '').trim();
-        if (!raw) continue;
-        try {
-          const data = JSON.parse(raw);
-          if (currentEvent === 'status') onStatus(data.step, data.message);
-          if (currentEvent === 'ai_complete') onComplete(data);
-          if (currentEvent === 'done') {
-            onDone();
-            reader.cancel();
-            return;
+    for (const eventBlock of events) {
+      const lines = eventBlock.split('\n');
+
+      for (const line of lines) {
+        if (line.startsWith('event:')) {
+          currentEvent = line.replace('event:', '').trim();
+        }
+        if (line.startsWith('data:')) {
+          const raw = line.replace('data:', '').trim();
+          if (!raw) continue;
+          try {
+            const data = JSON.parse(raw);
+            if (currentEvent === 'status') onStatus(data.step, data.message);
+            if (currentEvent === 'ai_complete') onComplete(data);
+            if (currentEvent === 'done') {
+              onDone();
+              reader.cancel();
+              return;
+            }
+          } catch {
+            // malformed JSON 무시
           }
-        } catch {
-          // malformed JSON 무시
         }
       }
     }
