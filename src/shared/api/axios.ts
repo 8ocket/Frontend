@@ -35,7 +35,7 @@ api.interceptors.response.use(
         const refreshToken = getCookie('refreshToken');
         if (!refreshToken) throw new Error('No refresh token');
 
-        const { data } = await axios.get(`${API_BASE_URL}/auth/refresh`, {
+        const { data } = await api.get('/auth/refresh', {
           params: { refreshToken },
         });
 
@@ -43,7 +43,8 @@ api.interceptors.response.use(
         if (!newAccessToken) throw new Error('No access token in response');
 
         setCookie('accessToken', newAccessToken, 60 * 60);
-        if (data.refresh_token) setCookie('refreshToken', data.refresh_token, 30 * 24 * 60 * 60);
+        if (data.data?.refresh_token)
+          setCookie('refreshToken', data.data.refresh_token, 30 * 24 * 60 * 60);
         return api(originalRequest);
       } catch {
         deleteCookie('accessToken');

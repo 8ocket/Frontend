@@ -9,6 +9,7 @@ export interface User {
 }
 
 export interface AuthResponse {
+  isNewUser: any;
   accessToken: string;
   refreshToken?: string;
   user: User;
