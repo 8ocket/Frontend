@@ -4,7 +4,6 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --breakpoint-3xl: 1920px;
   --spacing-gutter: 24px;
 
   /* Prime - 메인 네이비 */
@@ -187,7 +186,6 @@
   --white: #ffffff;
 
   /* Layout */
-  --layout-full-width: 1920px;
   --layout-container-width: 1440px;
   --layout-columns: 12;
   --layout-column-width: 98px;
@@ -280,10 +278,6 @@
 
   /* 모바일 안전 영역 (노치, 홈 인디케이터) */
   :root {
-    --safe-area-top: env(safe-area-inset-top, 0px);
-    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
-    --safe-area-left: env(safe-area-inset-left, 0px);
-    --safe-area-right: env(safe-area-inset-right, 0px);
   }
 
   /* 모바일 dvh 지원 */
@@ -291,16 +285,28 @@
     .h-screen-safe {
       height: 100dvh;
     }
+    .h-main-safe {
+      height: calc(100dvh - var(--gnb-height));
+    }
     .min-h-screen-safe {
       min-height: 100dvh;
+    }
+    .min-h-main-safe {
+      min-height: calc(100dvh - var(--gnb-height));
     }
   }
   @supports not (height: 100dvh) {
     .h-screen-safe {
       height: 100vh;
     }
+    .h-main-safe {
+      height: calc(100vh - var(--gnb-height));
+    }
     .min-h-screen-safe {
       min-height: 100vh;
+    }
+    .min-h-main-safe {
+      min-height: calc(100vh - var(--gnb-height));
     }
   }
 }
