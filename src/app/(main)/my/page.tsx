@@ -61,20 +61,17 @@ export default function MyPage() {
   return (
     <div className="min-h-main-safe bg-secondary-100">
       <div className="layout-container px-8">
-        <main className="mx-auto max-w-6xl pb-20 pt-24">
-
-          <h1 className="mb-6 text-2xl font-semibold tracking-[-0.36px] text-prime-900">
+        <main className="mx-auto max-w-6xl pt-24 pb-20">
+          <h1 className="text-prime-900 mb-6 text-2xl font-semibold tracking-[-0.36px]">
             마이페이지
           </h1>
 
           <div className="flex flex-col gap-4">
-
             {/* ── 카드 1: 내 정보 ── */}
-            <section className="overflow-hidden rounded-2xl border border-prime-100 bg-white shadow-md">
-
+            <section className="border-prime-100 overflow-hidden rounded-2xl border bg-white shadow-md">
               {/* 프로필 */}
               <div className="flex items-center gap-4 px-6 py-4">
-                <div className="relative size-14 shrink-0 overflow-hidden rounded-full border-2 border-cta-300 bg-secondary-100">
+                <div className="border-cta-300 bg-secondary-100 relative size-14 shrink-0 overflow-hidden rounded-full border-2">
                   <Image
                     src={user?.profileImage ?? '/images/icons/profile-default.svg'}
                     alt="프로필"
@@ -83,17 +80,17 @@ export default function MyPage() {
                   />
                 </div>
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <span className="truncate text-base font-semibold tracking-[-0.24px] text-prime-900">
+                  <span className="text-prime-900 truncate text-base font-semibold tracking-[-0.24px]">
                     {user?.name ?? '사용자'}
                   </span>
-                  <span className="truncate text-sm tracking-[-0.21px] text-prime-500">
+                  <span className="text-prime-500 truncate text-sm tracking-[-0.21px]">
                     {user?.email ?? ''}
                   </span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setProfileModalOpen(true)}
-                  className="shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-prime-700 transition-colors hover:bg-slate-50"
+                  className="text-prime-700 shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium transition-colors hover:bg-slate-50"
                 >
                   프로필 수정
                 </button>
@@ -107,14 +104,14 @@ export default function MyPage() {
                   </div>
                   <div className="flex flex-col gap-0.5">
                     <span className="text-xs tracking-[-0.18px] text-slate-400">보유 크레딧</span>
-                    <span className="text-xl font-bold tracking-tight text-main-blue">
+                    <span className="text-main-blue text-xl font-bold tracking-tight">
                       {totalCredit.toLocaleString()} 크레딧
                     </span>
                   </div>
                 </div>
                 <Link
                   href="/shop"
-                  className="flex items-center gap-1 rounded-lg bg-cta-300 px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-80"
+                  className="bg-cta-300 flex items-center gap-1 rounded-lg px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-80"
                 >
                   충전하기
                   <ChevronRight size={14} />
@@ -123,7 +120,7 @@ export default function MyPage() {
             </section>
 
             {/* ── 카드 2: 활동 내역 ── */}
-            <section className="overflow-hidden rounded-2xl border border-prime-100 bg-white shadow-md">
+            <section className="border-prime-100 overflow-hidden rounded-2xl border bg-white shadow-md">
               <p className="px-6 pt-5 text-xs font-medium text-slate-400">활동 내역</p>
 
               <Tabs defaultValue="payment" className="mt-3">
@@ -131,13 +128,13 @@ export default function MyPage() {
                   <TabsList className="h-auto w-full gap-1 rounded-xl border-0 bg-slate-100/80 px-1 py-1">
                     <TabsTrigger
                       value="payment"
-                      className="flex-1 rounded-lg py-2 text-sm text-slate-400 data-[state=active]:bg-white data-[state=active]:font-semibold data-[state=active]:text-main-blue data-[state=active]:shadow-sm sm:w-auto"
+                      className="data-[state=active]:text-main-blue flex-1 rounded-lg py-2 text-sm text-slate-400 data-[state=active]:bg-white data-[state=active]:font-semibold data-[state=active]:shadow-sm sm:w-auto"
                     >
                       결제 내역
                     </TabsTrigger>
                     <TabsTrigger
                       value="credit"
-                      className="flex-1 rounded-lg py-2 text-sm text-slate-400 data-[state=active]:bg-white data-[state=active]:font-semibold data-[state=active]:text-main-blue data-[state=active]:shadow-sm sm:w-auto"
+                      className="data-[state=active]:text-main-blue flex-1 rounded-lg py-2 text-sm text-slate-400 data-[state=active]:bg-white data-[state=active]:font-semibold data-[state=active]:shadow-sm sm:w-auto"
                     >
                       크레딧 사용 내역
                     </TabsTrigger>
@@ -151,27 +148,38 @@ export default function MyPage() {
                   ) : (
                     <ul className="divide-y divide-slate-50 px-4 pb-2" ref={dropdownRef}>
                       {PAYMENT_HISTORY.map((item) => (
-                        <li key={item.id} className="relative flex items-center justify-between rounded-xl px-3 py-4 transition-colors hover:bg-slate-50">
+                        <li
+                          key={item.id}
+                          className="relative flex items-center justify-between rounded-xl px-3 py-4 transition-colors hover:bg-slate-50"
+                        >
                           {/* 좌측: 상품명 + 날짜 */}
                           <div className="flex flex-col gap-1">
-                            <span className={`text-sm font-medium tracking-[-0.21px] ${item.status === '환불완료' ? 'text-slate-400' : 'text-prime-900'}`}>
+                            <span
+                              className={`text-sm font-medium tracking-[-0.21px] ${item.status === '환불완료' ? 'text-slate-400' : 'text-prime-900'}`}
+                            >
                               {item.label}
                             </span>
-                            <span className="text-xs tracking-[-0.18px] text-slate-400">{item.date}</span>
+                            <span className="text-xs tracking-[-0.18px] text-slate-400">
+                              {item.date}
+                            </span>
                           </div>
 
                           {/* 우측: 금액 + 상태 + 더보기 */}
                           <div className="flex items-center gap-2">
                             <div className="flex flex-col items-end gap-1">
-                              <span className={`text-sm font-bold tracking-[-0.21px] ${item.status === '환불완료' ? 'text-slate-400 line-through' : 'text-prime-900'}`}>
+                              <span
+                                className={`text-sm font-bold tracking-[-0.21px] ${item.status === '환불완료' ? 'text-slate-400 line-through' : 'text-prime-900'}`}
+                              >
                                 {item.amount.toLocaleString()}원
                               </span>
                               {item.status === '환불완료' ? (
-                                <span className="rounded-md bg-error-100 px-1.5 py-0.5 text-[10px] font-semibold text-error-500">
+                                <span className="bg-error-100 text-error-500 rounded-md px-1.5 py-0.5 text-[10px] font-semibold">
                                   환불완료
                                 </span>
                               ) : (
-                                <span className="text-xs font-medium text-emerald-500">결제완료</span>
+                                <span className="text-xs font-medium text-emerald-500">
+                                  결제완료
+                                </span>
                               )}
                             </div>
 
@@ -181,13 +189,15 @@ export default function MyPage() {
                                 <>
                                   <button
                                     type="button"
-                                    onClick={() => setOpenDropdownId(openDropdownId === item.id ? null : item.id)}
+                                    onClick={() =>
+                                      setOpenDropdownId(openDropdownId === item.id ? null : item.id)
+                                    }
                                     className="flex size-7 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100"
                                   >
                                     <MoreVertical size={15} />
                                   </button>
                                   {openDropdownId === item.id && (
-                                    <div className="absolute right-0 top-full z-20 mt-1 w-36 overflow-hidden rounded-xl border border-slate-100 bg-white shadow-lg">
+                                    <div className="absolute top-full right-0 z-20 mt-1 w-36 overflow-hidden rounded-xl border border-slate-100 bg-white shadow-lg">
                                       <button
                                         type="button"
                                         onClick={() => {
@@ -195,7 +205,7 @@ export default function MyPage() {
                                           setOpenDropdownId(null);
                                           setRefundModalOpen(true);
                                         }}
-                                        className="flex w-full items-center px-4 py-3 text-sm font-medium text-error-500 transition-colors hover:bg-error-100/50"
+                                        className="text-error-500 hover:bg-error-100/50 flex w-full items-center px-4 py-3 text-sm font-medium transition-colors"
                                       >
                                         환불 요청하기
                                       </button>
@@ -218,16 +228,28 @@ export default function MyPage() {
                   ) : (
                     <ul className="divide-y divide-slate-50 px-4 pb-2">
                       {CREDIT_HISTORY.map((item) => (
-                        <li key={item.id} className="flex items-center justify-between rounded-xl px-3 py-4 transition-colors hover:bg-slate-50">
+                        <li
+                          key={item.id}
+                          className="flex items-center justify-between rounded-xl px-3 py-4 transition-colors hover:bg-slate-50"
+                        >
                           <div className="flex flex-col gap-1">
-                            <span className="text-sm font-medium tracking-[-0.21px] text-prime-900">{item.label}</span>
-                            <span className="text-xs tracking-[-0.18px] text-slate-400">{item.date}</span>
+                            <span className="text-prime-900 text-sm font-medium tracking-[-0.21px]">
+                              {item.label}
+                            </span>
+                            <span className="text-xs tracking-[-0.18px] text-slate-400">
+                              {item.date}
+                            </span>
                           </div>
                           <div className="flex flex-col items-end gap-1">
-                            <span className={`text-sm font-bold tracking-[-0.21px] ${item.delta > 0 ? 'text-main-blue' : 'text-prime-900'}`}>
-                              {item.delta > 0 ? '+' : ''}{item.delta.toLocaleString()} 크레딧
+                            <span
+                              className={`text-sm font-bold tracking-[-0.21px] ${item.delta > 0 ? 'text-main-blue' : 'text-prime-900'}`}
+                            >
+                              {item.delta > 0 ? '+' : ''}
+                              {item.delta.toLocaleString()} 크레딧
                             </span>
-                            <span className="text-xs tracking-[-0.18px] text-slate-400">잔액 {item.balance.toLocaleString()}</span>
+                            <span className="text-xs tracking-[-0.18px] text-slate-400">
+                              잔액 {item.balance.toLocaleString()}
+                            </span>
                           </div>
                         </li>
                       ))}
@@ -238,7 +260,7 @@ export default function MyPage() {
             </section>
 
             {/* ── 카드 3: 설정 ── */}
-            <section className="overflow-hidden rounded-2xl border border-prime-100 bg-white shadow-md">
+            <section className="border-prime-100 overflow-hidden rounded-2xl border bg-white shadow-md">
               <p className="px-6 pt-5 text-xs font-medium text-slate-400">설정</p>
 
               <div className="flex items-center justify-between px-6 py-3.5">
@@ -246,7 +268,9 @@ export default function MyPage() {
                   <div className="flex size-9 items-center justify-center rounded-xl bg-blue-50">
                     <Bell size={16} className="text-main-blue" />
                   </div>
-                  <span className="text-sm font-medium tracking-[-0.21px] text-prime-900">알림</span>
+                  <span className="text-prime-900 text-sm font-medium tracking-[-0.21px]">
+                    알림
+                  </span>
                 </div>
                 <Switch checked={notificationEnabled} onCheckedChange={setNotificationEnabled} />
               </div>
@@ -269,7 +293,6 @@ export default function MyPage() {
                 onClick={() => {}}
               />
             </section>
-
           </div>
         </main>
       </div>
@@ -304,13 +327,12 @@ function RefundModal({
     <DialogRoot open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogPortal>
         <DialogOverlay />
-        <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-[480px] -translate-x-1/2 -translate-y-1/2 focus:outline-none">
+        <DialogPrimitive.Content className="fixed top-1/2 left-1/2 z-50 w-full max-w-120 -translate-x-1/2 -translate-y-1/2 focus:outline-none">
           <DialogTitle className="sr-only">환불 안내</DialogTitle>
           <div className="overflow-hidden rounded-2xl border border-white/60 bg-white shadow-[0px_8px_32px_0px_rgba(0,0,0,0.12)]">
-
             {/* 헤더 */}
             <div className="flex items-center justify-between border-b border-slate-100 px-7 py-5">
-              <span className="text-base font-semibold tracking-[-0.24px] text-prime-900">
+              <span className="text-prime-900 text-base font-semibold tracking-[-0.24px]">
                 환불 신청 전 확인해 주세요
               </span>
               <button
@@ -324,21 +346,24 @@ function RefundModal({
 
             {/* 바디 */}
             <div className="flex flex-col gap-5 px-7 py-6">
-
               {/* 환불 대상 항목 */}
               {item && (
                 <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3.5">
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-sm font-medium text-prime-900">{item.label}</span>
+                    <span className="text-prime-900 text-sm font-medium">{item.label}</span>
                     <span className="text-xs text-slate-400">{item.date}</span>
                   </div>
-                  <span className="text-sm font-bold text-prime-900">{item.amount.toLocaleString()}원</span>
+                  <span className="text-prime-900 text-sm font-bold">
+                    {item.amount.toLocaleString()}원
+                  </span>
                 </div>
               )}
 
               {/* 환불 규정 */}
               <div className="flex flex-col gap-3">
-                <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">환불 규정</p>
+                <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase">
+                  환불 규정
+                </p>
                 <div className="flex flex-col gap-2.5 rounded-xl border border-slate-100 p-4">
                   <PolicyItem
                     title="결제 후 7일 이내"
@@ -358,16 +383,19 @@ function RefundModal({
               </div>
 
               {/* 주의사항 */}
-              <div className="rounded-xl bg-error-100/60 px-4 py-3.5">
-                <p className="text-xs font-semibold text-error-500">주의사항</p>
+              <div className="bg-error-100/60 rounded-xl px-4 py-3.5">
+                <p className="text-error-500 text-xs font-semibold">주의사항</p>
                 <ul className="mt-2 flex flex-col gap-1.5">
                   {[
                     '환불 처리까지 영업일 기준 3~5일이 소요됩니다.',
                     '환불 완료 후 크레딧은 즉시 회수되며 복구되지 않습니다.',
                     '이벤트·프로모션으로 지급된 무료 크레딧은 환불 대상에서 제외됩니다.',
                   ].map((text) => (
-                    <li key={text} className="flex items-start gap-1.5 text-xs leading-relaxed text-error-500/80">
-                      <span className="mt-1 size-1 shrink-0 rounded-full bg-error-400" />
+                    <li
+                      key={text}
+                      className="text-error-500/80 flex items-start gap-1.5 text-xs leading-relaxed"
+                    >
+                      <span className="bg-error-400 mt-1 size-1 shrink-0 rounded-full" />
                       {text}
                     </li>
                   ))}
@@ -386,7 +414,7 @@ function RefundModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 rounded-xl bg-error-500 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  className="bg-error-500 flex-1 rounded-xl py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
                 >
                   환불 요청하기
                 </button>
@@ -402,8 +430,8 @@ function RefundModal({
 function PolicyItem({ title, desc }: { title: string; desc: string }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="text-xs font-semibold tracking-[-0.18px] text-prime-900">{title}</span>
-      <span className="text-xs leading-relaxed tracking-[-0.18px] text-prime-500">{desc}</span>
+      <span className="text-prime-900 text-xs font-semibold tracking-[-0.18px]">{title}</span>
+      <span className="text-prime-500 text-xs leading-relaxed tracking-[-0.18px]">{desc}</span>
     </div>
   );
 }
@@ -438,7 +466,9 @@ function MenuRow({
       <div className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${iconBg}`}>
         {icon}
       </div>
-      <span className={`flex-1 text-left text-sm font-medium tracking-[-0.21px] text-prime-900 ${labelClassName ?? ''}`}>
+      <span
+        className={`text-prime-900 flex-1 text-left text-sm font-medium tracking-[-0.21px] ${labelClassName ?? ''}`}
+      >
         {label}
       </span>
       <ChevronRight size={16} className="shrink-0 text-slate-300" />

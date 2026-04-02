@@ -24,7 +24,7 @@ export function CreditProductCard({ product, onPurchase, className }: CreditProd
             <h3 className="text-prime-600 text-xl font-semibold tracking-tight">
               {product.name} 상품
             </h3>
-            <div className="bg-prime-200 h-[1px] w-full" /> {/* 시각적 구분선 추가 */}
+            <div className="bg-prime-200 h-px w-full" /> {/* 시각적 구분선 추가 */}
           </div>
 
           <div className="flex flex-col gap-2">
