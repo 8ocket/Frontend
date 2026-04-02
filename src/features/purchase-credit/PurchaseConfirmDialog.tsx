@@ -1,34 +1,23 @@
 'use client';
 
 import React, { useState } from 'react';
-import Image from 'next/image';
 
-import { Dialog } from '@/shared/ui/dialog';
-import { Button } from '@/shared/ui/button';
 import { StatusModal } from '@/shared/ui/status-modal';
 import type { CreditProduct } from '@/types/credit';
 import { useCreditStore } from '@/entities/credits/store';
+import { getMyCreditApi } from '@/entities/credits/api';
 
 // ── 구매 확인 다이얼로그 ────────────────────────────────────────
-// Figma Shop MODAL 01 ~ 04, MODAL 16 구현
+// Flow: confirm → processing → success / error / product-updated
 //
-// Flow: refund-policy → confirm → processing → success / error / product-updated
-//
-// refund-policy   — MODAL 16 (환불 정책 사전 고지, Red + Checkbox)
-// confirm         — 고유 레이아웃 (Dialog 래퍼)
-// processing      — MODAL 3  (결제 진행중, Blue + Spinner)
-// success         — MODAL 01 (결제 완료, Green)
-// error           — MODAL 2  (결제 중단, Red)
-// product-updated — MODAL 4  (상품 정보 갱신, Yellow)
+// confirm         — 상품 확인 + 환불 동의 체크박스
+// processing      — 결제 진행중
+// success         — 결제 완료
+// error           — 결제 중단
+// product-updated — 상품 정보 갱신
 // ─────────────────────────────────────────────────────────────────
 
-type PurchaseStep =
-  | 'refund-policy'
-  | 'confirm'
-  | 'processing'
-  | 'success'
-  | 'error'
-  | 'product-updated';
+type PurchaseStep = 'confirm' | 'processing' | 'success' | 'error' | 'product-updated';
 
 interface PurchaseConfirmDialogProps {
   isOpen: boolean;
@@ -42,8 +31,6 @@ interface PurchaseConfirmDialogProps {
   onGoHome?: () => void;
   /** 결제 중단 시 "고객지원 확인하기" 콜백 */
   onContactSupport?: () => void;
-  /** 환불 정책 단계를 건너뛸지 여부 (이미 확인한 경우) */
-  skipRefundPolicy?: boolean;
 }
 
 export function PurchaseConfirmDialog({
@@ -54,16 +41,14 @@ export function PurchaseConfirmDialog({
   onViewHistory,
   onGoHome,
   onContactSupport,
-  skipRefundPolicy = false,
 }: PurchaseConfirmDialogProps) {
-  const { addPaidCredit } = useCreditStore();
-  const initialStep: PurchaseStep = skipRefundPolicy ? 'confirm' : 'refund-policy';
-  const [step, setStep] = useState<PurchaseStep>(initialStep);
+  const { addPaidCredit, setTotalCredit } = useCreditStore();
+  const [step, setStep] = useState<PurchaseStep>('confirm');
 
   if (!product) return null;
 
   const handleClose = () => {
-    setStep(initialStep);
+    setStep('confirm');
     onClose();
   };
 
@@ -73,21 +58,23 @@ export function PurchaseConfirmDialog({
     try {
       if (onConfirmPurchase) {
         const result = await onConfirmPurchase(product);
-        // result가 'product-updated' 문자열이면 상품 갱신 상태로
         if (result === false) {
           setStep('error');
         } else {
           addPaidCredit(product.credits);
+          const credit = await getMyCreditApi();
+          setTotalCredit(credit.totalCredit);
           setStep('success');
         }
       } else {
         // TODO: 실제 결제 API 연동
         await new Promise((resolve) => setTimeout(resolve, 1500));
         addPaidCredit(product.credits);
+        const credit = await getMyCreditApi();
+        setTotalCredit(credit.totalCredit);
         setStep('success');
       }
     } catch (err) {
-      // 상품 정보 갱신 에러 구분
       if (err instanceof Error && err.message === 'PRODUCT_UPDATED') {
         setStep('product-updated');
       } else {
@@ -96,8 +83,8 @@ export function PurchaseConfirmDialog({
     }
   };
 
-  /* ── 환불 정책 확인 단계: MODAL 16 ──────────────────────────── */
-  if (step === 'refund-policy') {
+  /* ── 확인 단계 ──────────────────────────────────────────────── */
+  if (step === 'confirm') {
     return (
       <StatusModal
         isOpen={isOpen}
@@ -121,79 +108,12 @@ export function PurchaseConfirmDialog({
             onClick: handleClose,
           },
           {
-            label: '구매하기',
+            label: '결제하기',
             variant: 'primary',
-            onClick: () => setStep('confirm'),
+            onClick: handleConfirm,
           },
         ]}
       />
-    );
-  }
-
-  /* ── 확인 단계: 고유 레이아웃 ──────────────────────────────── */
-  if (step === 'confirm') {
-    return (
-      <Dialog isOpen={isOpen} onClose={handleClose} maxWidth="max-w-[440px]" accessibleTitle={`${product.name} 구매 확인`}>
-        <div className="flex flex-col items-center gap-6">
-          {/* 상품 요약 */}
-          <div className="flex flex-col items-center gap-3 text-center">
-            <div className="bg-cta-100 flex h-16 w-16 items-center justify-center rounded-full">
-              <Image
-                src="/images/icons/credit.svg"
-                alt="credit"
-                width={40}
-                height={40}
-                className="h-10 w-10"
-              />
-            </div>
-            <h2 className="text-prime-900 text-xl leading-[1.3] font-semibold tracking-[-0.3px]">
-              {product.name} 구매
-            </h2>
-            <p className="text-prime-600 text-base leading-[1.4] font-medium">
-              {product.credits.toLocaleString()} 크레딧 ·{' '}
-              <span className="text-prime-900 font-semibold">{product.priceFormatted}₩</span>
-            </p>
-          </div>
-
-          {/* 혜택 미리보기 */}
-          <div className="bg-cta-100/30 w-full rounded-lg p-4">
-            <p className="text-prime-700 mb-2 text-sm font-semibold">포함 혜택</p>
-            <ul className="text-prime-500 flex flex-col gap-1.5 text-xs leading-[1.4] font-medium">
-              {product.benefits.slice(0, 3).map((benefit, idx) => (
-                <li key={idx} className="flex items-start gap-1.5">
-                  <span className="text-cta-300 mt-0.5">•</span>
-                  <span>{benefit}</span>
-                </li>
-              ))}
-              {product.benefits.length > 3 && (
-                <li className="text-prime-400 text-xs">
-                  외 {product.benefits.length - 3}개 혜택
-                </li>
-              )}
-            </ul>
-          </div>
-
-          {/* 버튼 */}
-          <div className="flex w-full gap-3">
-            <Button
-              variant="secondary"
-              size="default"
-              onClick={handleClose}
-              className="flex-1"
-            >
-              취소
-            </Button>
-            <Button
-              variant="primary"
-              size="default"
-              onClick={handleConfirm}
-              className="flex-1"
-            >
-              결제하기
-            </Button>
-          </div>
-        </div>
-      </Dialog>
     );
   }
 
@@ -211,7 +131,7 @@ export function PurchaseConfirmDialog({
     );
   }
 
-  /* ── 결제 완료: MODAL 01 ─────────────────────────────────────── */
+  /* ── 결제 완료 ───────────────────────────────────────────────── */
   if (step === 'success') {
     return (
       <StatusModal
@@ -237,7 +157,7 @@ export function PurchaseConfirmDialog({
     );
   }
 
-  /* ── 상품 정보 갱신: MODAL 4 ───────────────────────────────── */
+  /* ── 상품 정보 갱신 ──────────────────────────────────────────── */
   if (step === 'product-updated') {
     return (
       <StatusModal
@@ -257,14 +177,14 @@ export function PurchaseConfirmDialog({
             label: '다시 시작하기',
             variant: 'secondary',
             semantic: 'yellow',
-            onClick: () => setStep(initialStep),
+            onClick: () => setStep('confirm'),
           },
         ]}
       />
     );
   }
 
-  /* ── 결제 중단: MODAL 2 ────────────────────────────────────── */
+  /* ── 결제 중단 ───────────────────────────────────────────────── */
   return (
     <StatusModal
       isOpen={isOpen}
@@ -290,7 +210,7 @@ export function PurchaseConfirmDialog({
         {
           label: '돌아가기',
           variant: 'primary',
-          onClick: handleConfirm,
+          onClick: () => setStep('confirm'),
         },
       ]}
     />
