@@ -131,9 +131,9 @@ export default function ReportPage() {
       });
       setCreatingReportId(report_id);
       setViewState('creating');
-    } catch (e) {
+    } catch (error) {
       // TODO: 크레딧 부족 에러 코드 백엔드 확인 후 분기 처리
-      toast('리포트 생성 요청에 실패했어요.', 'error');
+      toast('리포트 생성 요청에 실패했어요.');
     }
   };
 
@@ -144,10 +144,7 @@ export default function ReportPage() {
   const handleCreateNew = () => setViewState('idle');
 
   return (
-    <div
-      className="layout-container bg-bg-light flex overflow-hidden"
-      style={{ height: 'calc(100dvh - var(--gnb-height))' }}
-    >
+    <div className="layout-container bg-bg-light relative -mt-16 flex h-screen-safe min-h-0 overflow-hidden pt-16 box-border md:-mt-20 md:pt-20">
       {/* 사이드바 */}
       <ReportSidebar
         reports={reports}
@@ -158,10 +155,9 @@ export default function ReportPage() {
       />
 
       {/* 메인 콘텐츠 */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
         {viewState === 'idle' && (
-          <div className="bg-secondary-100 relative flex min-h-full items-center justify-center px-6 py-12 sm:px-12">
-            {/* 배경 로고 — 채팅창과 동일한 브랜드 패턴 */}
+          <div className="relative flex min-h-full items-center justify-center border-r border-black/5 px-6 py-12 sm:px-12">
             <div
               className="pointer-events-none absolute inset-0 flex items-center justify-center"
               aria-hidden="true"

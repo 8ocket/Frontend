@@ -113,10 +113,7 @@ export function ChatMainArea({
     const content = inputValue.trim();
     setInputValue('');
 
-    setMessages((prev) => [
-      ...prev,
-      { variant: 'user', senderName: 'User Name', content },
-    ]);
+    setMessages((prev) => [...prev, { variant: 'user', senderName: 'User Name', content }]);
 
     const token = getCookie('accessToken') ?? '';
 
@@ -130,7 +127,12 @@ export function ChatMainArea({
         });
         setMessages((prev) => [
           ...prev,
-          { variant: 'ai', senderName: aiName, content: result.first_message.content, avatarSrc: aiAvatarSrc },
+          {
+            variant: 'ai',
+            senderName: aiName,
+            content: result.first_message.content,
+            avatarSrc: aiAvatarSrc,
+          },
         ]);
         justCreatedSessionRef.current = true;
         onSessionCreated?.(result.session_id);
@@ -178,7 +180,7 @@ export function ChatMainArea({
   }
 
   return (
-    <div className="relative flex flex-1 flex-col overflow-hidden rounded-3xl bg-[#F8FAFF]">
+    <div className="relative flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-3xl">
       {/* Background logo */}
       <div
         className="pointer-events-none absolute inset-0 hidden items-center justify-center lg:flex"
@@ -189,7 +191,10 @@ export function ChatMainArea({
       </div>
 
       {/* Message scroll area */}
-      <div ref={scrollRef} className="relative flex flex-1 flex-col gap-4 overflow-y-auto p-6">
+      <div
+        ref={scrollRef}
+        className="relative flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-6 pb-28"
+      >
         {messages.map((msg, i) => (
           <ChatBubble key={i} {...msg} />
         ))}
@@ -205,7 +210,7 @@ export function ChatMainArea({
       </div>
 
       {/* Input bar — Figma 1512:3708 */}
-      <div className="relative px-3 pb-3">
+      <div className="sticky right-0 bottom-0 left-0 z-10 shrink-0 bg-linear-to-t from-[#F8FAFF] via-[#F8FAFF]/95 to-transparent px-3 pt-4 pb-3">
         {/* Select Options popover — AI 교체 버튼 클릭 시 표시, 입력바 좌측 상단에 위치 */}
         <ChatInputBar
           value={inputValue}
@@ -216,7 +221,6 @@ export function ChatMainArea({
           onDisabledClick={onDisabledInputClick}
         />
       </div>
-
     </div>
   );
 }
