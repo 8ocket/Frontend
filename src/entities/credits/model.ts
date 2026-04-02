@@ -16,3 +16,7 @@ export interface CreditBalanceResponse {
   paidCredit: number;
   freeCredit: number;
 }
+
+export interface MyCreditResponse {
+  totalCredit: number;
+}
