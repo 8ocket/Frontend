@@ -89,5 +89,6 @@ export const mockLogin = (email: string, password: string): AuthResponse | null 
   return {
     ...generateMockTokens(user.id),
     user: userWithoutPassword,
+    isNewUser: false,
   };
 };
