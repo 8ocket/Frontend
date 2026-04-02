@@ -7,6 +7,7 @@ import AuroraBackground from '@/shared/ui/AuroraBackground';
 import { Button, Input, ToggleGroup } from '@/shared/ui';
 import { SignupCreditModal } from '@/features/auth';
 import { useAuthStore } from '@/entities/user/store';
+import { useCreditStore } from '@/entities/credits/store';
 import { getCookie } from '@/shared/lib/utils/cookie';
 import { generatePositiveNickname } from '@/shared/lib/utils/nickname';
 import { signupApi } from '@/shared/api';
@@ -51,9 +52,8 @@ export default function NicknamePage() {
       const token = getCookie('accessToken') || '';
       login(
         {
-          ...(user ?? { id: 0, email: '' }),
+          ...(user ?? { id: '', email: '' }),
           name: nickname,
-          creditBalance: 0,
           profileImage: profileImage ?? '/images/icons/profile-default.svg',
         },
         token
@@ -67,7 +67,7 @@ export default function NicknamePage() {
   };
 
   const handleSuccessModalClick = () => {
-    useAuthStore.getState().addCredit(150);
+    useCreditStore.getState().addFreeCredit(150);
     router.push('/chat');
   };
 

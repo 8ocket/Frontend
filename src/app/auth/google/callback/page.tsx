@@ -4,6 +4,8 @@ import { Suspense } from 'react';
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/entities/user/store';
+import { useCreditStore } from '@/entities/credits/store';
+import { getMyCreditApi } from '@/entities/credits/api';
 import { googleLoginApi, getMyProfileApi } from '@/shared/api';
 
 function GoogleCallbackContent() {
@@ -33,20 +35,20 @@ function GoogleCallbackContent() {
 
         // 토큰 쿠키 저장
         login(
-          { id: 0, email: '', name: '', creditBalance: 0 },
+          { id: '', email: '', name: '' },
           result.accessToken,
           result.refreshToken
         );
 
         // 실제 프로필 조회 후 유저 상태 업데이트
-        const profile = await getMyProfileApi();
+        const [profile, credit] = await Promise.all([getMyProfileApi(), getMyCreditApi()]);
         setUser({
-          id: parseInt(profile.user_id) || 0,
+          id: profile.user_id,
           email: '',
           name: profile.nickname,
           profileImage: profile.profile_image_url,
-          creditBalance: 0,
         });
+        useCreditStore.getState().setTotalCredit(credit.totalCredit);
 
         router.push(result.isNewUser ? '/signup' : '/');
       } catch (error) {

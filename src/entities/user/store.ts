@@ -3,11 +3,10 @@ import { persist } from 'zustand/middleware';
 import { setCookie, deleteCookie } from '@/shared/lib/utils/cookie';
 
 interface User {
-  id: number;
+  id: string;
   email: string;
   name: string;
   profileImage?: string;
-  creditBalance: number;
 }
 
 interface AuthState {
@@ -20,9 +19,6 @@ interface AuthState {
   login: (user: User, accessToken: string, refreshToken?: string) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
-  setCreditBalance: (balance: number) => void;
-  addCredit: (amount: number) => void;
-  useCredit: (amount: number) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -49,15 +45,6 @@ export const useAuthStore = create<AuthState>()(
       },
 
       setLoading: (isLoading) => set({ isLoading }),
-
-      setCreditBalance: (balance) =>
-        set((state) => state.user ? { user: { ...state.user, creditBalance: balance } } : {}),
-
-      addCredit: (amount) =>
-        set((state) => state.user ? { user: { ...state.user, creditBalance: state.user.creditBalance + amount } } : {}),
-
-      useCredit: (amount) =>
-        set((state) => state.user ? { user: { ...state.user, creditBalance: Math.max(0, state.user.creditBalance - amount) } } : {}),
     }),
     {
       name: 'auth-storage',

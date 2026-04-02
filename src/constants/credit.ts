@@ -18,7 +18,7 @@ export const CREDIT_PRODUCTS: CreditProduct[] = [
     price: 2200,
     priceFormatted: '2,200',
     paymentType: '건당 결제',
-    benefits: ['상담사 1종 해금 가능(200크레딧)'],
+    benefits: ['추가 상담권 2번 구매 가능(140크레딧)', '주간 리포트 1번 발행(150크레딧)'],
   },
   {
     id: '02',
@@ -30,7 +30,7 @@ export const CREDIT_PRODUCTS: CreditProduct[] = [
     benefits: [
       '추가 상담 7회 이용 가능(490크레딧)',
       '주간 리포트 3회 생성(450크레딧)',
-      '페르소나 2종 해금(400크레딧)',
+      '월간 리포트 1번 발행(500크레딧)',
     ],
   },
   {
@@ -42,8 +42,8 @@ export const CREDIT_PRODUCTS: CreditProduct[] = [
     paymentType: '건당 결제',
     benefits: [
       '추가 상담 17회 이용 가능(1,190크레딧)',
-      '월간 리포트 2회(1,000크레딧) + 추가 상담 2회 이용(140크레딧)',
-      '페르소나 최대 6종 해금(1,200크레딧)',
+      '주간 리포트 8번 발행(1,200크레딧)',
+      '월간 리포트 2번 발행(1,000크레딧)',
     ],
   },
 ];

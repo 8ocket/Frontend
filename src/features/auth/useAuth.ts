@@ -20,10 +20,9 @@ export const useAuth = () => {
 
       if (provider === 'temp') {
         const tempUser = {
-          id: Math.floor(Math.random() * 10000),
+          id: `temp_${Date.now()}`,
           email: `temp_user_${Date.now()}@mindlog.local`,
           name: `Temp User ${Math.floor(Math.random() * 1000)}`,
-          creditBalance: 0,
         };
         const tempToken = `temp_token_${Date.now()}`;
         login(tempUser, tempToken, tempToken);

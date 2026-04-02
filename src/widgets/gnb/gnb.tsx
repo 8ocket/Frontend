@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useTransition } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useAuthStore } from '@/entities/user/store';
 import { cn } from '@/shared/lib/utils';
 import { UserProfileModal } from '@/shared/ui/UserProfileModal';
+import { useCreditStore } from '@/entities/credits/store';
 
 // Figma: GNB (1738:4600)
 // 1440x80
@@ -32,15 +33,19 @@ export function GNB() {
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, user, logout } = useAuthStore();
+  const { totalCredit } = useCreditStore();
   const [scrollRatio, setScrollRatio] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [, startTransition] = useTransition();
 
   // 경로 변경 시 모바일 메뉴 닫기
   useEffect(() => {
-    setMobileMenuOpen(false);
+    startTransition(() => {
+      setMobileMenuOpen(false);
+    });
   }, [pathname]);
 
   // 스크롤 감지 — 0~80px 구간을 0~1로 정규화
@@ -64,7 +69,9 @@ export function GNB() {
   // 모바일 메뉴 열림 시 스크롤 방지
   useEffect(() => {
     document.body.style.overflow = mobileMenuOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [mobileMenuOpen]);
 
   const handleLogout = () => {
@@ -83,9 +90,10 @@ export function GNB() {
             }
           : {
               backgroundColor: `rgba(255,255,255,${0.6 + scrollRatio * 0.3})`,
-              boxShadow: scrollRatio > 0
-                ? `0 4px 30px rgba(0,0,0,${scrollRatio * 0.08})`
-                : '0 1px 0 rgba(0,0,0,0.06)',
+              boxShadow:
+                scrollRatio > 0
+                  ? `0 4px 30px rgba(0,0,0,${scrollRatio * 0.08})`
+                  : '0 1px 0 rgba(0,0,0,0.06)',
             }
       }
     >
@@ -122,10 +130,10 @@ export function GNB() {
                 href="/shop?tab=credit"
                 className="text-prime-600 hover:text-prime-900 flex items-center gap-1.5 text-sm font-medium transition-colors"
               >
-                <div className="flex size-6 items-center justify-center rounded-full bg-cta-100">
+                <div className="bg-cta-100 flex size-6 items-center justify-center rounded-full">
                   <Coins size={13} strokeWidth={2} className="text-main-blue" />
                 </div>
-                {user?.creditBalance ?? '—'} 크레딧
+                {totalCredit.toLocaleString()} 크레딧
               </Link>
 
               {/* 구분선 */}
@@ -138,7 +146,7 @@ export function GNB() {
                   onClick={() => setProfileDropdownOpen((v) => !v)}
                   className="flex items-center gap-2 transition-opacity hover:opacity-70"
                 >
-                  <div className="border-cta-300 relative size-7 shrink-0 overflow-hidden rounded-full border bg-cta-100">
+                  <div className="border-cta-300 bg-cta-100 relative size-7 shrink-0 overflow-hidden rounded-full border">
                     <Image
                       src={user?.profileImage ?? '/images/icons/profile-default.svg'}
                       alt="프로필"
@@ -185,10 +193,7 @@ export function GNB() {
           )}
         </div>
 
-        <UserProfileModal
-          isOpen={profileModalOpen}
-          onClose={() => setProfileModalOpen(false)}
-        />
+        <UserProfileModal isOpen={profileModalOpen} onClose={() => setProfileModalOpen(false)} />
 
         {/* 모바일 햄버거 버튼 */}
         <button
@@ -226,7 +231,7 @@ export function GNB() {
                 <div className="my-2 border-t border-neutral-200" />
                 <Link
                   href="/login"
-                  className="bg-cta-300 text-secondary-100 rounded-xl px-4 py-3 text-center text-base font-medium transition-all hover:bg-cta-400 active:bg-cta-700"
+                  className="bg-cta-300 text-secondary-100 hover:bg-cta-400 active:bg-cta-700 rounded-xl px-4 py-3 text-center text-base font-medium transition-all"
                 >
                   로그인
                 </Link>
@@ -319,7 +324,7 @@ function ProfileDropdown({
         onClick={onProfileHeader}
         className="flex w-full items-center gap-3 border-b border-white/60 px-5 py-4 transition-colors hover:bg-black/5"
       >
-        <div className="border-cta-300 relative size-10 shrink-0 overflow-hidden rounded-full border bg-cta-100">
+        <div className="border-cta-300 bg-cta-100 relative size-10 shrink-0 overflow-hidden rounded-full border">
           <Image
             src={userProfileImage ?? '/images/icons/profile-default.svg'}
             alt="프로필"
@@ -344,7 +349,7 @@ function ProfileDropdown({
           onClick={onMypage}
           className="text-prime-900 flex w-full items-center gap-3 px-5 py-3 text-sm font-medium tracking-[-0.21px] transition-colors hover:bg-black/5"
         >
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-cta-100">
+          <div className="bg-cta-100 flex size-8 shrink-0 items-center justify-center rounded-xl">
             <User size={15} className="text-main-blue" />
           </div>
           마이페이지
