@@ -17,8 +17,8 @@ export function EmotionCardLabel({ label, position, className }: EmotionCardLabe
   return (
     <span
       className={cn(
-        'absolute text-prime-900 select-none pointer-events-none',
-        isBottomRight ? 'bottom-4 right-4 rotate-180' : 'top-4 left-4',
+        'absolute text-prime-900 select-none pointer-events-none font-semibold',
+        isBottomRight ? 'bottom-4 right-4 rotate-180' : 'top-4 left-1/2 -translate-x-1/2',
         className ?? 'card-01',
       )}
       aria-hidden={isBottomRight}

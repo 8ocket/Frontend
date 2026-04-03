@@ -57,7 +57,7 @@ export function EmotionCardFront({
 
   return (
     <div
-      className={cn('relative overflow-hidden rounded-3xl', className)}
+      className={cn('relative overflow-hidden rounded-3xl ring-1 ring-white/20', className)}
       style={{
         width,
         height,

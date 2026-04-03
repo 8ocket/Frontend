@@ -81,13 +81,12 @@ export const mockCreateReport = (req: CreateReportRequest): CreateReportResponse
 });
 
 /** GET /v1/reports */
-export const mockGetReportList = (): GetReportListResponse => ({
-  reports: MOCK_REPORTS,
-  can_generate: {
-    eligible: true,
-    saved_session_count: 12,
-    required_session_count: 3,
-  },
+export const mockGetReportList = (reportType?: 'weekly' | 'monthly'): GetReportListResponse => ({
+  reports: MOCK_REPORTS.filter((r) => !reportType || r.report_type === reportType),
+  can_generate:
+    reportType === 'weekly'
+      ? { eligible: false, saved_session_count: 1, required_session_count: 3 }
+      : { eligible: true, saved_session_count: 12, required_session_count: 3 },
 });
 
 /** GET /v1/reports/{report_id} */

@@ -32,7 +32,7 @@ export const createReportApi = async (req: CreateReportRequest): Promise<CreateR
  */
 export const getReportListApi = async (reportType?: ReportType): Promise<GetReportListResponse> => {
   // mock 모드에서도 리포트 페이지가 초기 로딩/목록 조회 단계부터 끊기지 않도록 동일한 진입점을 제공합니다.
-  if (USE_MOCK) return mockGetReportList();
+  if (USE_MOCK) return mockGetReportList(reportType);
 
   const params = reportType ? { report_type: reportType } : {};
   const response = await api.get<ReportApiResponse<GetReportListResponse>>('/reports', { params });
