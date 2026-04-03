@@ -16,7 +16,10 @@ const protectedRoutes = [
 // 로그인 페이지들 (인증된 사용자는 접근 불가)
 const authRoutes = ['/login'];
 
+const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
+
 const isTokenValid = (token: string): boolean => {
+  if (USE_MOCK) return true;
   try {
     const { exp } = decodeJwt(token);
     return exp ? exp * 1000 > Date.now() : false;
