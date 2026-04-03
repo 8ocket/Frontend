@@ -77,33 +77,6 @@ export interface UpdateMyProfileResponse extends BaseProfileResponse {
   updated_at: string;
 }
 
-// ─── DB 스키마 ───
-
-export interface Users {
-  user_id: string; // PK / UUID
-  email: string; // 이메일 / VARCHAR(255)
-  password_hash: string | null; // 암호화된_비밀번호 / VARCHAR(255)
-  nickname: string | null; // 닉네임 / VARCHAR(50)
-  profile_image_url: string | null; // 프로필_이미지_URL / VARCHAR(500)
-  created_at: Date | null; // 가입일시 / TIMESTAMP
-  last_login_at: Date | null; // 마지막_접속 / TIMESTAMP
-  is_active: boolean | null; // 활성_상태_여부 / BOOLEAN
-  occupation: string | null; // 직업군 / VARCHAR(30)
-  gender: string | null; // 성별 / VARCHAR(10)
-  age: number | null; // 나이 / INTEGER
-  role: string; // 권한 / VARCHAR(20)
-  login_type: string | null; // 로그인_유형 / VARCHAR(20)
-  nickname_change_count: number; // 닉네임_변경_횟수 / INTEGER
-}
-
-export interface UserItems {
-  user_item_id: string; // PK / UUID
-  user_id: string; // FK / 사용자_ID / UUID
-  item_id: string; // FK / 아이템_ID / UUID
-  is_equipped: boolean | null; // 적용_여부 / BOOLEAN
-  acquired_at: Date | null; // 획득_일시 / TIMESTAMP
-}
-
 // ─── 온보딩 ───
 export type OccupationType = 'STUDENT' | 'JOB_SEEKER' | 'EMPLOYEE' | 'CAREER_SWITCHER';
 export type AgeGroup = 20 | 30 | 40;
