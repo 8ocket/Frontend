@@ -166,7 +166,6 @@ export function GNB() {
                 {profileDropdownOpen && (
                   <ProfileDropdown
                     userName={user?.name ?? ''}
-                    userEmail={user?.email ?? ''}
                     userProfileImage={user?.profileImage}
                     onLogout={() => {
                       setProfileDropdownOpen(false);
@@ -302,14 +301,12 @@ function MobileNavItem({ label, href, active }: { label: string; href: string; a
 // ── ProfileDropdown — Figma node 18:368 ─────────────────────────────────────
 function ProfileDropdown({
   userName,
-  userEmail,
   userProfileImage,
   onLogout,
   onMypage,
   onProfileHeader,
 }: {
   userName: string;
-  userEmail: string;
   userProfileImage?: string;
   onLogout: () => void;
   onMypage: () => void;
@@ -337,9 +334,6 @@ function ProfileDropdown({
         <div className="flex min-w-0 flex-col">
           <span className="text-prime-900 truncate text-sm leading-normal font-medium tracking-[-0.21px]">
             {userName}
-          </span>
-          <span className="text-prime-500 truncate text-xs leading-normal tracking-[-0.18px]">
-            {userEmail}
           </span>
         </div>
       </button>

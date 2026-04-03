@@ -84,9 +84,6 @@ export default function MyPage() {
                   <span className="text-prime-900 truncate text-base font-semibold tracking-[-0.24px]">
                     {user?.name ?? '사용자'}
                   </span>
-                  <span className="text-prime-500 truncate text-sm tracking-[-0.21px]">
-                    {user?.email ?? ''}
-                  </span>
                 </div>
                 <button
                   type="button"

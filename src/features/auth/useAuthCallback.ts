@@ -49,7 +49,6 @@ export function useOAuthCallback({ loginApi, errorMessage }: UseOAuthCallbackOpt
         const [profile, credit] = await Promise.all([getMyProfileApi(), getMyCreditApi()]);
         setUser({
           id: profile.user_id,
-          email: '',
           name: profile.nickname,
           profileImage: profile.profile_image_url,
         });
