@@ -18,7 +18,7 @@ export function LoginContent({
   isLoading: externalLoading,
   error: externalError,
 }: LoginContentProps) {
-  const [loadingProvider, setLoadingProvider] = useState<LoginProvider | null>(null);
+  const [loadingProvider, setLoadingProvider] = useState<LoginProvider | 'temp' | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (provider: LoginProvider) => {
@@ -109,7 +109,7 @@ export function LoginContent({
           {USE_MOCK && (
             <button
               onClick={async () => {
-                setLoadingProvider('kakao');
+                setLoadingProvider('temp');
                 try {
                   await onLogin?.('temp');
                 } catch (err) {
@@ -121,7 +121,7 @@ export function LoginContent({
               disabled={isLoading}
               className="rounded-xl bg-gray-400 px-4 py-3 font-semibold text-white transition-colors hover:bg-gray-500 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loadingProvider === 'kakao' ? '로그인 중...' : '임시 로그인 (개발용)'}
+              {loadingProvider === 'temp' ? '로그인 중...' : '임시 로그인 (개발용)'}
             </button>
           )}
 

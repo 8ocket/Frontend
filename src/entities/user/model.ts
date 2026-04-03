@@ -38,17 +38,6 @@ export interface RefreshTokenResponse {
   is_new_user: boolean | null;
 }
 
-export interface LoginResponse {
-  accessToken: string;
-  refreshToken: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    provider: LoginProvider;
-  };
-}
-
 export interface LoginError {
   message: string;
   code: string;
@@ -65,20 +54,10 @@ export interface KakaoLoginResponse {
   isNewUser: boolean;
 }
 
-export interface KakaoLoginError {
-  code: 'INVALID_CREDENTIALS';
-  message: string;
-}
-
 export interface GoogleLoginResponse {
   accessToken: string;
   refreshToken: string;
   isNewUser: boolean;
-}
-
-export interface GoogleLoginError {
-  code: 'INVALID_CREDENTIALS';
-  message: string;
 }
 
 // --- 기본 프로필 응답 타입
@@ -133,7 +112,7 @@ export type Gender = 'MALE' | 'FEMALE';
 export const OCCUPATION_MAP: Record<string, OccupationType> = {
   '대학생 / 대학원생': 'STUDENT',
   '취업 준비생': 'JOB_SEEKER',
-  직장인: 'EMPLOYEE',
+  '직장인': 'EMPLOYEE',
   '이직 준비': 'CAREER_SWITCHER',
 };
 
