@@ -16,12 +16,17 @@ export const api = axios.create({
   },
 });
 
+const PUBLIC_ENDPOINTS = ['/auth/kakao/callback', '/auth/google/callback', '/auth/login'];
+
 // Request 인터셉터 - 쿠키에서 토큰 읽어 자동 추가
 api.interceptors.request.use(
   (config) => {
-    const token = getCookie('accessToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const isPublic = PUBLIC_ENDPOINTS.some((endpoint) => config.url?.startsWith(endpoint));
+    if (!isPublic) {
+      const token = getCookie('accessToken');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
