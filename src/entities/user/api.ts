@@ -19,8 +19,7 @@ import {
   mockGetMyProfile,
   mockUpdateMyProfile,
 } from '@/mocks';
-
-const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
+import { USE_MOCK } from '@/shared/lib/env';
 
 /**
  * 토큰 갱신 API

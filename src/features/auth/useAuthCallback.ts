@@ -7,8 +7,7 @@ import { useAuthStore } from '@/entities/user/store';
 import { useCreditStore } from '@/entities/credits/store';
 import { getMyProfileApi } from '@/shared/api';
 import { getMyCreditApi } from '@/entities/credits/api';
-
-const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
+import { USE_MOCK } from '@/shared/lib/env';
 
 interface OAuthLoginResult {
   accessToken: string;

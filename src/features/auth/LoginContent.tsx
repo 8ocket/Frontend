@@ -5,14 +5,13 @@ import { LoginButton, type LoginProvider } from './LoginButton';
 import { LogoSmall } from './LogoSmall';
 import { loginTexts, oauthConfig } from '@/constants/login';
 import { getErrorMessage } from '@/shared/lib/utils/error';
+import { USE_MOCK } from '@/shared/lib/env';
 
 interface LoginContentProps {
   onLogin?: (provider: LoginProvider | 'temp') => Promise<void>;
   isLoading?: boolean;
   error?: string | null;
 }
-
-const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
 
 export function LoginContent({
   onLogin,

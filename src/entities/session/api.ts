@@ -1,12 +1,26 @@
 import { api } from '@/shared/api/axios';
 import { ApiResponse } from '@/entities/user/model';
-import { SessionListQuery, SessionListResponse, CreateSessionRequest, CreateSessionResponse, ActiveSessionResponse, SessionDetailResponse, FinalizeCompleteEvent } from '@/entities/session/model';
-import { mockGetSessions, mockCreateSession, mockGetActiveSession, mockGetSessionDetail, mockFinalizeSession } from '@/mocks';
+import {
+  SessionListQuery,
+  SessionListResponse,
+  CreateSessionRequest,
+  CreateSessionResponse,
+  ActiveSessionResponse,
+  SessionDetailResponse,
+  FinalizeCompleteEvent,
+} from '@/entities/session/model';
+import {
+  mockGetSessions,
+  mockCreateSession,
+  mockGetActiveSession,
+  mockGetSessionDetail,
+  mockFinalizeSession,
+} from '@/mocks';
 import { createHttpStatusError } from '@/shared/lib/utils/error';
+import { USE_MOCK } from '@/shared/lib/env';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/v1';
 
-const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
 /**
  * 세션 목록 조회 API
  * GET /v1/sessions
@@ -58,7 +72,9 @@ export const getActiveSessionApi = async (): Promise<ActiveSessionResponse | nul
  * 세션 생성 API
  * POST /v1/sessions
  */
-export const createSessionApi = async (req: CreateSessionRequest): Promise<CreateSessionResponse> => {
+export const createSessionApi = async (
+  req: CreateSessionRequest
+): Promise<CreateSessionResponse> => {
   if (USE_MOCK) return mockCreateSession(req);
 
   const response = await api.post<ApiResponse<CreateSessionResponse>>('/sessions', req);

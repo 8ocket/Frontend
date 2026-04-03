@@ -8,8 +8,7 @@ import {
   ReportType,
 } from './model';
 import { mockCreateReport, mockGetReportDetail, mockGetReportList } from '@/mocks';
-
-const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
+import { USE_MOCK } from '@/shared/lib/env';
 
 /**
  * 리포트 생성 요청 API

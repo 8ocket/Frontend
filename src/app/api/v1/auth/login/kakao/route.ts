@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { USE_MOCK } from '@/shared/lib/env';
 
 export async function POST(req: NextRequest) {
   try {
@@ -7,8 +8,6 @@ export async function POST(req: NextRequest) {
     if (!code) {
       return NextResponse.json({ error: '인가 코드가 필요합니다' }, { status: 400 });
     }
-
-    const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
 
     if (USE_MOCK) {
       await new Promise((resolve) => setTimeout(resolve, 500)); // 네트워크 지연 시뮬레이션
