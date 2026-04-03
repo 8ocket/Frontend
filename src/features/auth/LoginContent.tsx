@@ -68,9 +68,7 @@ export function LoginContent({
   return (
     <div className="relative flex w-full max-w-142 flex-col items-center">
       {/* 카드 */}
-      <div
-        className="w-full rounded-2xl border border-white/40 bg-white/70 p-12 shadow-[0_8px_32px_rgba(0,0,0,0.08)] backdrop-blur-md"
-      >
+      <div className="w-full rounded-2xl border border-white/40 bg-white/70 p-12 shadow-[0_8px_32px_rgba(0,0,0,0.08)] backdrop-blur-md">
         {/* 로고 — 카드 안 상단 중앙 */}
         <div className="mb-8 flex justify-center">
           <LogoSmall className="h-24 w-24" />
