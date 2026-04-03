@@ -3,6 +3,12 @@ import { getCookie, setCookie, deleteCookie } from '@/shared/lib/utils/cookie';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
+// 토큰 갱신 전용 인스턴스 — 인터셉터 없음
+const refreshApi = axios.create({
+  baseURL: API_BASE_URL,
+  headers: { 'Content-Type': 'application/json' },
+});
+
 export const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -35,7 +41,7 @@ api.interceptors.response.use(
         const refreshToken = getCookie('refreshToken');
         if (!refreshToken) throw new Error('No refresh token');
 
-        const { data } = await api.get('/auth/refresh', {
+        const { data } = await refreshApi.get('/auth/refresh', {
           params: { refreshToken },
         });
 
