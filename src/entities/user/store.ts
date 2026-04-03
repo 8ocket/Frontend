@@ -1,13 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { setCookie, deleteCookie } from '@/shared/lib/utils/cookie';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  profileImage?: string;
-}
+import { User } from '@/entities/user/model';
 
 interface AuthState {
   user: User | null;
