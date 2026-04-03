@@ -17,11 +17,9 @@ type ChatFilterPanelProps = {
   onApply: (filters: {
     startDate: DateSelector;
     endDate: DateSelector;
-    keyword: string;
   }) => void;
   startDate?: DateSelector;
   endDate?: DateSelector;
-  keyword?: string;
 };
 
 const YEAR_OPTIONS = Array.from({ length: 16 }, (_, i) => String(2035 - i));
@@ -158,11 +156,9 @@ export function ChatFilterPanel({
   onApply,
   startDate: initialStartDate = { year: '', month: '', day: '' },
   endDate: initialEndDate = { year: '', month: '', day: '' },
-  keyword: initialKeyword = '',
 }: ChatFilterPanelProps) {
   const [startDate, setStartDate] = useState<DateSelector>(initialStartDate);
   const [endDate, setEndDate] = useState<DateSelector>(initialEndDate);
-  const [keyword, setKeyword] = useState(initialKeyword);
 
   return (
     <div className="w-full border-b border-prime-100 bg-[#F4F8FF] px-5 py-4">
@@ -223,38 +219,10 @@ export function ChatFilterPanel({
           </div>
         </div>
 
-        {/* 키워드 */}
-        <div className="flex flex-col gap-1.5">
-          <span
-            style={{
-              fontFamily: 'var(--font-pretendard)',
-              fontSize: '12px',
-              fontWeight: 600,
-              color: 'var(--color-prime-700)',
-              lineHeight: '130%',
-            }}
-          >
-            키워드
-          </span>
-          <input
-            type="text"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            placeholder="검색어를 입력하세요"
-            className="border-neutral-300 focus:border-cta-300 h-9 w-full rounded-lg border bg-white px-3 outline-none transition-colors placeholder:text-slate-300"
-            style={{
-              fontFamily: 'var(--font-pretendard)',
-              fontSize: '13px',
-              fontWeight: 400,
-              color: 'var(--color-prime-900)',
-            }}
-          />
-        </div>
-
         {/* 적용 버튼 */}
         <Button
           variant="primary"
-          onClick={() => onApply({ startDate, endDate, keyword })}
+          onClick={() => onApply({ startDate, endDate })}
           className="w-full"
         >
           필터 적용

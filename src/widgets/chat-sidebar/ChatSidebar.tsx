@@ -124,7 +124,7 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, on
       {/* Filter Panel — 인라인 아코디언 */}
       <div
         ref={filterRef}
-        className="overflow-hidden transition-all duration-300 ease-in-out"
+        className={`transition-all duration-300 ease-in-out ${filterOpen ? 'overflow-visible' : 'overflow-hidden'}`}
         style={{ maxHeight: filterOpen ? '600px' : '0px', opacity: filterOpen ? 1 : 0 }}
       >
         <ChatFilterPanel
