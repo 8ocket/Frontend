@@ -1,6 +1,7 @@
 import type { SSEEventType } from '@/entities/session';
 import { mockSendMessageStream } from '@/mocks/session';
 import { createHttpStatusError } from '@/shared/lib/utils/error';
+import { USE_MOCK } from '@/shared/lib/env';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/v1';
 
@@ -12,7 +13,7 @@ export const sendMessageStream = async (
   onCrisis: (msg: string) => void,
   onDone: () => void
 ) => {
-  if (process.env.NEXT_PUBLIC_USE_MOCK === 'true') {
+  if (USE_MOCK) {
     return mockSendMessageStream(onChunk, onCrisis, onDone);
   }
 
@@ -20,7 +21,7 @@ export const sendMessageStream = async (
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify({ content }),
   });

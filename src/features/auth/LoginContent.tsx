@@ -5,6 +5,7 @@ import { LoginButton, type LoginProvider } from './LoginButton';
 import { LogoSmall } from './LogoSmall';
 import { loginTexts, oauthConfig } from '@/constants/login';
 import { getErrorMessage } from '@/shared/lib/utils/error';
+import { USE_MOCK } from '@/shared/lib/env';
 
 interface LoginContentProps {
   onLogin?: (provider: LoginProvider | 'temp') => Promise<void>;
@@ -12,14 +13,12 @@ interface LoginContentProps {
   error?: string | null;
 }
 
-const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
-
 export function LoginContent({
   onLogin,
   isLoading: externalLoading,
   error: externalError,
 }: LoginContentProps) {
-  const [loadingProvider, setLoadingProvider] = useState<LoginProvider | null>(null);
+  const [loadingProvider, setLoadingProvider] = useState<LoginProvider | 'temp' | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (provider: LoginProvider) => {
@@ -68,9 +67,7 @@ export function LoginContent({
   return (
     <div className="relative flex w-full max-w-142 flex-col items-center">
       {/* 카드 */}
-      <div
-        className="w-full rounded-2xl border border-white/40 bg-white/70 p-12 shadow-[0_8px_32px_rgba(0,0,0,0.08)] backdrop-blur-md"
-      >
+      <div className="w-full rounded-2xl border border-white/40 bg-white/70 p-12 shadow-[0_8px_32px_rgba(0,0,0,0.08)] backdrop-blur-md">
         {/* 로고 — 카드 안 상단 중앙 */}
         <div className="mb-8 flex justify-center">
           <LogoSmall className="h-24 w-24" />
@@ -112,7 +109,7 @@ export function LoginContent({
           {USE_MOCK && (
             <button
               onClick={async () => {
-                setLoadingProvider('kakao');
+                setLoadingProvider('temp');
                 try {
                   await onLogin?.('temp');
                 } catch (err) {
@@ -124,7 +121,7 @@ export function LoginContent({
               disabled={isLoading}
               className="rounded-xl bg-gray-400 px-4 py-3 font-semibold text-white transition-colors hover:bg-gray-500 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loadingProvider === 'kakao' ? '로그인 중...' : '임시 로그인 (개발용)'}
+              {loadingProvider === 'temp' ? '로그인 중...' : '임시 로그인 (개발용)'}
             </button>
           )}
 

@@ -1,13 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { setCookie, deleteCookie } from '@/shared/lib/utils/cookie';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  profileImage?: string;
-}
+import { User } from '@/entities/user/model';
 
 interface AuthState {
   user: User | null;
@@ -16,6 +10,7 @@ interface AuthState {
 
   // Actions
   setUser: (user: User | null) => void;
+  setTokens: (accessToken: string, refreshToken?: string) => void;
   login: (user: User, accessToken: string, refreshToken?: string) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
@@ -23,18 +18,22 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       isAuthenticated: false,
       isLoading: false,
 
       setUser: (user) => set({ user, isAuthenticated: !!user }),
 
-      login: (user, accessToken, refreshToken) => {
+      setTokens: (accessToken, refreshToken) => {
         setCookie('accessToken', accessToken, 60 * 60); // 1시간
         if (refreshToken) {
           setCookie('refreshToken', refreshToken, 30 * 24 * 60 * 60); // 30일
         }
+      },
+
+      login: (user, accessToken, refreshToken) => {
+        get().setTokens(accessToken, refreshToken);
         set({ user, isAuthenticated: true, isLoading: false });
       },
 

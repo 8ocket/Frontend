@@ -1,7 +1,6 @@
 import { api } from '@/shared/api/axios';
 import { CreditApiResponse, CreditProductResponse, MyCreditResponse } from './model';
-
-const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
+import { USE_MOCK } from '@/shared/lib/env';
 
 /**
  * 크레딧 상품 목록 조회 API
