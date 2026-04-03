@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { decodeJwt } from 'jose';
 
 // 로그인 필요한 페이지들
 const protectedRoutes = [
@@ -15,10 +16,20 @@ const protectedRoutes = [
 // 로그인 페이지들 (인증된 사용자는 접근 불가)
 const authRoutes = ['/login'];
 
+const isTokenValid = (token: string): boolean => {
+  try {
+    const { exp } = decodeJwt(token);
+    return exp ? exp * 1000 > Date.now() : false;
+  } catch {
+    return false;
+  }
+};
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const token = request.cookies.get('accessToken')?.value;
+  const rawToken = request.cookies.get('accessToken')?.value;
+  const token = rawToken && isTokenValid(rawToken) ? rawToken : null;
 
   // 홈('/') + 토큰 없음 → 브랜드 소개로
   if (pathname === '/') {
