@@ -37,9 +37,9 @@ export function useOAuthCallback({ loginApi, errorMessage }: UseOAuthCallbackOpt
 
       try {
         const result = await loginApi(code);
-        const { login, setUser } = useAuthStore.getState();
+        const { setTokens, setUser } = useAuthStore.getState();
 
-        login({ id: '', email: '', name: '' }, result.accessToken, result.refreshToken);
+        setTokens(result.accessToken, result.refreshToken);
 
         const [profile, credit] = await Promise.all([getMyProfileApi(), getMyCreditApi()]);
         setUser({
