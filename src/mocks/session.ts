@@ -1,4 +1,4 @@
-import { SessionListQuery, SessionListResponse, SessionListItem, CreateSessionRequest, CreateSessionResponse, ActiveSessionResponse } from '@/entities/session';
+import { SessionListQuery, SessionListResponse, SessionListItem, CreateSessionRequest, CreateSessionAiCompleteEvent, ActiveSessionResponse } from '@/entities/session';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -52,20 +52,23 @@ export const mockGetActiveSession = async (): Promise<ActiveSessionResponse | nu
   // 없는 경우: return null;
 };
 
-export const mockCreateSession = async (req: CreateSessionRequest): Promise<CreateSessionResponse> => {
-  await delay(500);
-  return {
-    session_id: `mock-session-${Date.now()}`,
-    persona_id: req.persona_id,
-    status: 'ACTIVE',
-    title: '새로운 상담',
-    started_at: new Date().toISOString(),
-    first_message: {
-      message_id: `mock-msg-${Date.now()}`,
-      content: '안녕하세요, 오늘은 어떤 이야기를 나눠볼까요?',
-      created_at: new Date().toISOString(),
-    },
-  };
+export const mockCreateSessionStream = async (
+  onChunk: (chunk: string) => void,
+  onComplete: (data: CreateSessionAiCompleteEvent) => void,
+  onSessionTitle: (title: string) => void,
+  onDone: () => void,
+  _req?: CreateSessionRequest
+): Promise<void> => {
+  const chunks = ['안녕', '하세요,', ' 오늘은 어떤', ' 이야기를 나눠볼까요?'];
+  for (const chunk of chunks) {
+    await delay(300);
+    onChunk(chunk);
+  }
+  const sessionId = `mock-session-${Date.now()}`;
+  onComplete({ session_id: sessionId, status: 'ACTIVE', started_at: new Date().toISOString() });
+  await delay(200);
+  onSessionTitle('새로운 상담');
+  onDone();
 };
 
 export const mockFinalizeSession = async (
