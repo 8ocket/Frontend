@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/shared/lib/utils';
 import { EmotionCardFront, EmotionCardBack, getEmotionDisplayName } from '@/widgets/emotion-card';
 import type { EmotionCardData } from '@/entities/emotion';
-import { MOCK_COLLECTION_CARDS } from '@/mocks/emotion';
+import { useCollectionStore } from '@/entities/emotion';
 
 /** 날짜 형식: YYYY.MM.DD */
 function formatDate(date: Date): string {
@@ -175,8 +175,13 @@ function CardOverlay({ data, onClose }: { data: EmotionCardData; onClose: () => 
 
 export default function CollectionPage() {
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
+  const { cards, fetchCards } = useCollectionStore();
 
-  const sortedCards = [...MOCK_COLLECTION_CARDS]
+  useEffect(() => {
+    fetchCards();
+  }, [fetchCards]);
+
+  const sortedCards = [...cards]
     .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime())
     .slice(0, 7);
 
