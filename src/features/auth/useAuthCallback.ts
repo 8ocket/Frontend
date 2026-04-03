@@ -1,7 +1,7 @@
 // src/features/auth/useOAuthCallback.ts
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/entities/user/store';
 import { useCreditStore } from '@/entities/credits/store';
@@ -24,9 +24,15 @@ export function useOAuthCallback({ loginApi, errorMessage }: UseOAuthCallbackOpt
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialCode = searchParams.get('code');
+  const executed = useRef(false); // 중복 실행 방지
+  const loginApiRef = useRef(loginApi);
+  const errorMessageRef = useRef(errorMessage);
 
   useEffect(() => {
     const handleLogin = async () => {
+      if (executed.current) return;
+      executed.current = true;
+
       // ✅ non-null assertion 없이 타입 가드로 처리
       const code = initialCode ?? (USE_MOCK ? `mock_code_${Date.now()}` : null);
       if (!code) {
@@ -35,7 +41,7 @@ export function useOAuthCallback({ loginApi, errorMessage }: UseOAuthCallbackOpt
       }
 
       try {
-        const result = await loginApi(code);
+        const result = await loginApiRef.current(code);
         const { setTokens, setUser } = useAuthStore.getState();
 
         setTokens(result.accessToken, result.refreshToken);
@@ -52,10 +58,11 @@ export function useOAuthCallback({ loginApi, errorMessage }: UseOAuthCallbackOpt
         router.push(result.isNewUser ? '/signup' : '/');
       } catch (error) {
         console.error(error);
-        router.push(`/login?error=${errorMessage}`);
+        useAuthStore.getState().logout();
+        router.push('/login?error=' + encodeURIComponent(errorMessageRef.current));
       }
     };
 
     handleLogin();
-  }, [initialCode, router, loginApi, errorMessage]);
+  }, [initialCode, router]);
 }
