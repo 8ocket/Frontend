@@ -50,8 +50,8 @@ export function ChatMainArea({
   sessionId,
   personaId,
   onSessionCreated,
-  aiName = 'AI 상담사',
-  aiAvatarSrc,
+  aiName = '나봄이',
+  aiAvatarSrc = '/images/personas/nabomi-44.png',
 }: ChatMainAreaProps = {}) {
   const [messages, setMessages] = useState<ChatBubbleProps[]>(initialMessages);
   const [inputValue, setInputValue] = useState('');

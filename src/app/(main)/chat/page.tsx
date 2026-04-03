@@ -700,14 +700,14 @@ export default function ChatPage() {
     if (!sessionDetail) return [];
     return [...sessionDetail.messages].reverse().map((m) => ({
       variant: m.role === 'assistant' ? 'ai' : 'user',
-      senderName: m.role === 'assistant' ? sessionDetail.persona_name : '나',
+      senderName: m.role === 'assistant' ? '나봄이' : '나',
       content: m.content,
-      avatarSrc: m.role === 'assistant' ? sessionDetail.persona_image_url : undefined,
+      avatarSrc: m.role === 'assistant' ? '/images/personas/nabomi-44.png' : undefined,
     }));
   }, [sessionDetail]);
 
-  const activeAiName = sessionDetail?.persona_name ?? '마음이';
-  const activeAiAvatarSrc = sessionDetail?.persona_image_url ?? '/images/personas/mental.png';
+  const activeAiName = '나봄이';
+  const activeAiAvatarSrc = '/images/personas/nabomi-44.png';
 
   // API 세션 목록 → 사이드바용 그룹 데이터로 변환
   const sessionGroups = useMemo((): ChatSessionGroup[] => {
@@ -722,7 +722,7 @@ export default function ChatPage() {
       groupMap.get(date)!.sessions.push({
         id: s.sessionId,
         title: s.title || '제목 없음',
-        avatarSrc: s.personaImageUrl,
+        avatarSrc: '/images/personas/nabomi-21.png',
       });
     }
     return Array.from(groupMap.values());

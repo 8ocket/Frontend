@@ -74,8 +74,11 @@ export function ChatInputBar({ value, onChange, onSend, onEndChat, disabled = fa
         onClick={disabled ? onDisabledClick : undefined}
         placeholder={disabled ? '새로운 상담을 시작해 주세요.' : '오늘 하루, 어떤 마음이 머물렀나요?'}
         rows={1}
-        disabled={disabled}
-        className="text-prime-900 placeholder:text-slate-400 flex-1 resize-none overflow-hidden bg-transparent text-sm leading-relaxed outline-none disabled:cursor-pointer"
+        readOnly={disabled}
+        className={[
+          'text-prime-900 placeholder:text-slate-400 flex-1 resize-none overflow-hidden bg-transparent text-sm leading-relaxed outline-none',
+          disabled ? 'cursor-pointer' : '',
+        ].join(' ')}
         style={{ fontFamily: 'var(--font-pretendard)', minHeight: '24px', maxHeight: '160px' }}
       />
 
