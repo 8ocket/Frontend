@@ -45,8 +45,22 @@ export default function MyPage() {
     !user?.profileImage || user.profileImage === '/images/icons/profile-default.svg';
 
   const handleLogout = () => {
+    // 1. Store 상태 초기화
     logout();
-    router.push('/');
+
+    // 2. 브라우저 저장소 강제 초기화 (임시 대응 -> API 연동 삭제)
+    localStorage.clear();
+    sessionStorage.clear();
+
+    // 3.모든 쿠키 삭제
+    document.cookie.split(';').forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, '')
+        .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
+    });
+
+    // 4. 메인 이동
+    router.replace('/');
   };
 
   useEffect(() => {
@@ -143,7 +157,7 @@ export default function MyPage() {
                   {PAYMENT_HISTORY.length === 0 ? (
                     <EmptyHistory message="결제 내역이 없습니다." />
                   ) : (
-                    <ul className="divide-y divide-prime-100 px-4 pb-2" ref={dropdownRef}>
+                    <ul className="divide-prime-100 divide-y px-4 pb-2" ref={dropdownRef}>
                       {PAYMENT_HISTORY.map((item) => (
                         <li
                           key={item.id}
@@ -223,7 +237,7 @@ export default function MyPage() {
                   {CREDIT_HISTORY.length === 0 ? (
                     <EmptyHistory message="크레딧 사용 내역이 없습니다." />
                   ) : (
-                    <ul className="divide-y divide-prime-100 px-4 pb-2">
+                    <ul className="divide-prime-100 divide-y px-4 pb-2">
                       {CREDIT_HISTORY.map((item) => (
                         <li
                           key={item.id}
@@ -401,7 +415,12 @@ function RefundModal({
 
               {/* 버튼 */}
               <div className="flex gap-2.5">
-                <Button type="button" variant="secondary" onClick={onClose} className="flex-1 rounded-xl">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={onClose}
+                  className="flex-1 rounded-xl"
+                >
                   취소
                 </Button>
                 <Button

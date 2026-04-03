@@ -75,9 +75,24 @@ export function GNB() {
     };
   }, [mobileMenuOpen]);
 
+  // GNB 컴포넌트 내부
   const handleLogout = () => {
+    // 1. 상태 관리 저장소 비우기 (Zustand 등)
     logout();
-    router.push('/');
+
+    // 2. 브라우저 물리 저장소 강제 초기화 (임시 대응 핵심)
+    localStorage.clear();
+    sessionStorage.clear();
+
+    // 3. 쿠키 삭제 (중요한 세션 쿠키가 있다면 명시적 삭제)
+    document.cookie.split(';').forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, '')
+        .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
+    });
+
+    // 4. 메인으로 리다이렉트 (로그인 상태가 꼬이지 않도록 replace 추천)
+    router.replace('/');
   };
 
   return (
@@ -209,7 +224,7 @@ export function GNB() {
 
       {/* 모바일 메뉴 오버레이 */}
       {mobileMenuOpen && (
-        <div className="fixed inset-x-0 bottom-0 top-16 z-40 flex flex-col overflow-y-auto bg-white lg:hidden md:top-20">
+        <div className="fixed inset-x-0 top-16 bottom-0 z-40 flex flex-col overflow-y-auto bg-white md:top-20 lg:hidden">
           <div className="flex flex-col gap-1 px-4 py-4">
             {(isAuthenticated ? MEMBER_NAV_ITEMS : GUEST_NAV_ITEMS).map(({ label, href }) => (
               <MobileNavItem key={href} label={label} href={href} active={pathname === href} />
