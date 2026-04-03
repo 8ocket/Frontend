@@ -10,21 +10,18 @@ import {
 export const MOCK_USERS: Array<User & { password: string }> = [
   {
     id: '550e8400-e29b-41d4-a716-446655440001',
-    email: 'test@mindlog.com',
     password: 'password123',
     name: '테스트 사용자',
     profileImage: 'https://api.dicebear.com/7.x/avataaars/svg?seed=test',
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440002',
-    email: 'demo@mindlog.com',
     password: 'demo123',
     name: '데모 사용자',
     profileImage: 'https://api.dicebear.com/7.x/avataaars/svg?seed=demo',
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440003',
-    email: 'user@mindlog.com',
     password: 'user123',
     name: '일반 사용자',
     profileImage: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user',
@@ -82,7 +79,7 @@ export const generateMockTokens = (userId: string) => {
 };
 
 export const mockLogin = (email: string, password: string): AuthResponse | null => {
-  const user = MOCK_USERS.find((u) => u.email === email && u.password === password);
+  const user = MOCK_USERS.find((u) => u.password === password);
   if (!user) return null;
 
   const { password: _, ...userWithoutPassword } = user;
