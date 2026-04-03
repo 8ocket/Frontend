@@ -4,14 +4,14 @@ import {
   SessionListQuery,
   SessionListResponse,
   CreateSessionRequest,
-  CreateSessionResponse,
+  CreateSessionAiCompleteEvent,
   ActiveSessionResponse,
   SessionDetailResponse,
   FinalizeCompleteEvent,
 } from '@/entities/session/model';
 import {
   mockGetSessions,
-  mockCreateSession,
+  mockCreateSessionStream,
   mockGetActiveSession,
   mockGetSessionDetail,
   mockFinalizeSession,
@@ -69,21 +69,78 @@ export const getActiveSessionApi = async (): Promise<ActiveSessionResponse | nul
 };
 
 /**
- * 세션 생성 API
+ * 세션 생성 + 첫 AI 응답 스트리밍 (SSE)
  * POST /v1/sessions
+ * 이벤트 순서: [ai_chunk × N] → ai_complete → session_title → done
  */
-export const createSessionApi = async (
-  req: CreateSessionRequest
-): Promise<CreateSessionResponse> => {
-  if (USE_MOCK) return mockCreateSession(req);
+export const createSessionStream = async (
+  req: CreateSessionRequest,
+  token: string,
+  onChunk: (chunk: string) => void,
+  onComplete: (data: CreateSessionAiCompleteEvent) => void,
+  onSessionTitle: (title: string) => void,
+  onDone: () => void,
+  onError?: (message: string) => void
+): Promise<void> => {
+  if (USE_MOCK) return mockCreateSessionStream(onChunk, onComplete, onSessionTitle, onDone);
 
-  const response = await api.post<ApiResponse<CreateSessionResponse>>('/sessions', req);
+  const response = await fetch(`${API_BASE_URL}/sessions`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(req),
+  });
 
-  if (response.data.success && response.data.data) {
-    return response.data.data;
+  if (!response.ok) throw createHttpStatusError(response.status);
+
+  const reader = response.body?.getReader();
+  if (!reader) return;
+
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let currentEvent = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) {
+      buffer += decoder.decode();
+      break;
+    }
+
+    buffer += decoder.decode(value, { stream: true });
+    const events = buffer.split('\n\n');
+    buffer = events.pop() ?? '';
+
+    for (const eventBlock of events) {
+      const lines = eventBlock.split('\n');
+
+      for (const line of lines) {
+        if (line.startsWith('event:')) {
+          currentEvent = line.replace('event:', '').trim();
+        }
+        if (line.startsWith('data:')) {
+          const raw = line.replace('data:', '').trim();
+          if (!raw) continue;
+          try {
+            const data = JSON.parse(raw);
+            if (currentEvent === 'ai_chunk') onChunk(data.content);
+            if (currentEvent === 'ai_complete') onComplete(data);
+            if (currentEvent === 'session_title') onSessionTitle(data.title);
+            if (currentEvent === 'error') onError?.(data.message);
+            if (currentEvent === 'done') {
+              onDone();
+              reader.cancel();
+              return;
+            }
+          } catch {
+            // malformed JSON 무시
+          }
+        }
+      }
+    }
   }
-
-  throw new Error(response.data.error?.message || '세션 생성에 실패했습니다.');
 };
 
 /**

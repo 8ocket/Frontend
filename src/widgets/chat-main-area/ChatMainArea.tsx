@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { ChatBubble, ChatBubbleProps } from './ChatBubble';
 import { ChatInputBar } from '@/features/send-message';
 import { sendMessageStream } from '@/features/send-message/sendMessageStream';
-import { createSessionApi } from '@/entities/session/api';
+import { createSessionStream } from '@/entities/session/api';
 import { ChatLogo } from './ChatLogo';
 import { getCookie } from '@/shared/lib/utils/cookie';
 
@@ -109,29 +109,47 @@ export function ChatMainArea({
 
     const token = getCookie('accessToken') ?? '';
 
-    // 세션 없음 → 첫 메시지: 세션 생성 API 호출
+    // 세션 없음 → 첫 메시지: 세션 생성 SSE
     if (!sessionId) {
       setIsStreaming(true);
+      setStreamingText('');
+      let accumulated = '';
+      let createdSessionId = '';
+
       try {
-        const result = await createSessionApi({
-          persona_id: personaId ?? 'default',
-          first_content: content,
-        });
-        setMessages((prev) => [
-          ...prev,
-          {
-            variant: 'ai',
-            senderName: aiName,
-            content: result.first_message.content,
-            avatarSrc: aiAvatarSrc,
+        await createSessionStream(
+          { first_content: content },
+          token,
+          (chunk) => {
+            accumulated += chunk;
+            setStreamingText(accumulated);
           },
-        ]);
-        justCreatedSessionRef.current = true;
-        onSessionCreated?.(result.session_id);
+          (data) => {
+            createdSessionId = data.session_id;
+          },
+          (_title) => {
+            // session_title 이벤트 — 필요 시 사이드바 갱신에 활용
+          },
+          () => {
+            setMessages((prev) => [
+              ...prev,
+              { variant: 'ai', senderName: aiName, content: accumulated, avatarSrc: aiAvatarSrc },
+            ]);
+            setStreamingText('');
+            setIsStreaming(false);
+            justCreatedSessionRef.current = true;
+            if (createdSessionId) onSessionCreated?.(createdSessionId);
+          },
+          (errMsg) => {
+            console.error('Session create SSE error:', errMsg);
+            setIsStreaming(false);
+            setStreamingText('');
+          }
+        );
       } catch (err) {
         console.error('Session create error:', err);
-      } finally {
         setIsStreaming(false);
+        setStreamingText('');
       }
       return;
     }

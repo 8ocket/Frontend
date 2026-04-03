@@ -38,24 +38,21 @@ export interface ActiveSessionResponse {
   started_at: string;
 }
 
-// ─── /v1/sessions (POST) - 세션 생성 ───
+// ─── /v1/sessions (POST) - 세션 생성 (SSE) ───
 
 export interface CreateSessionRequest {
-  persona_id: string;
   first_content: string;
 }
 
-export interface CreateSessionResponse {
+// SSE 이벤트 순서: [ai_chunk × N] → ai_complete → session_title → done
+export interface CreateSessionAiCompleteEvent {
   session_id: string;
-  persona_id: string;
   status: string;
-  title: string;
   started_at: string;
-  first_message: {
-    message_id: string;
-    content: string;
-    created_at: string;
-  };
+}
+
+export interface CreateSessionSessionTitleEvent {
+  title: string;
 }
 
 // ─── /v1/sessions/{session_id} (POST) - 상담 메시지 전송 ───
