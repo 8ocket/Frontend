@@ -102,13 +102,13 @@ export function TermsDetailPanel({
     >
       {/* 헤더: 제목 + 닫기 */}
       <div className="relative flex h-11 shrink-0 items-center">
-        <h2 className="text-prime-900 absolute top-px left-0 text-[32px] leading-[1.3] font-semibold tracking-[-0.48px] whitespace-nowrap">
+        <h2 className="text-cta-400 absolute top-px left-0 text-[32px] leading-[1.3] font-semibold tracking-[-0.48px] whitespace-nowrap">
           {title}
         </h2>
         <button
           type="button"
           onClick={onClose}
-          className="text-prime-900 absolute -top-px right-0 flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-black/5"
+          className="text-cta-400 absolute -top-px right-0 flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-black/5"
           aria-label="닫기"
         >
           <svg
@@ -164,7 +164,7 @@ export function TermsDetailPanel({
           <button
             type="button"
             onClick={onDisagree}
-            className="border-prime-900 text-prime-900 h-11 flex-1 rounded-full border bg-transparent text-base leading-[1.3] font-medium transition-colors hover:bg-neutral-100"
+            className="border-cta-400 text-cta-400 h-11 flex-1 rounded-full border bg-transparent text-base leading-[1.3] font-medium transition-colors hover:bg-neutral-100"
           >
             동의 안 함
           </button>
@@ -175,7 +175,7 @@ export function TermsDetailPanel({
             className={cn(
               'h-11 flex-1 rounded-full text-base leading-[1.3] font-medium transition-colors',
               canAgree
-                ? 'bg-prime-900 text-secondary-100 hover:bg-prime-800'
+                ? 'bg-cta-400 text-secondary-100 hover:bg-cta-300'
                 : 'bg-secondary-100 border border-[#cacaca] text-[#cacaca]'
             )}
           >
@@ -190,7 +190,7 @@ export function TermsDetailPanel({
           className={cn(
             'absolute bottom-4 left-1/2 h-11 w-89.75 -translate-x-1/2 rounded-full text-base leading-[1.3] font-medium transition-colors',
             canAgree
-              ? 'bg-secondary-100 border-prime-900 text-prime-900 border hover:bg-neutral-100'
+              ? 'bg-cta-400 text-secondary-100 hover:bg-cta-300'
               : 'bg-secondary-100 border border-[#cacaca] text-[#cacaca]'
           )}
         >
