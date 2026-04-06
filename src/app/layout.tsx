@@ -39,8 +39,10 @@ export default function RootLayout({
             <ToastProvider>
               {/* persisted user와 실제 쿠키 상태가 어긋난 경우를 앱 시작 시 한 번 정리합니다. */}
               <AuthInitializer />
-              {children}
-              <FooterWrapper />
+              <div className="flex min-h-dvh flex-col">
+                {children}
+                <FooterWrapper />
+              </div>
             </ToastProvider>
           </QueryProvider>
         </ThemeProvider>
