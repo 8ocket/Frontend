@@ -14,6 +14,7 @@ import { useCollectionStore } from '@/entities/emotion';
 import { useAuthStore } from '@/entities/user/store';
 import { getReportListApi } from '@/entities/reports/api';
 import type { CanGenerate } from '@/entities/reports/model';
+import { getAttendanceApi } from '@/entities/attendance/api';
 
 // ── 날짜 상수 ────────────────────────────────────────────────────────────────
 const _today = new Date();
@@ -29,8 +30,6 @@ const WEEK_START = TODAY_DATE + _mondayOffset;
 const WEEK_DAYS = Array.from({ length: 7 }, (_, i) => WEEK_START + i);
 const WEEK_LABELS = ['월', '화', '수', '목', '금', '토', '일'] as const;
 
-// ── mock — API 연동 시 교체 ──────────────────────────────────────────────────
-const MOCK_ATTENDED = new Set([1, 2, 3, 5, 7, 9, 11]);
 const BANNER_IMAGES = [
   '/images/banner/banner1.svg',
   '/images/banner/banner2.svg',
@@ -207,17 +206,19 @@ function MonthlyReportWidget({
 
 // ── 서브 위젯: 출석 현황 (이번 주 도장판) ────────────────────────────────────
 function AttendanceWidget() {
-  const [todayDone, setTodayDone] = useState(MOCK_ATTENDED.has(TODAY_DATE));
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [attendedDates, setAttendedDates] = useState<Set<number>>(new Set());
 
-  const handleAttendance = () => {
-    if (todayDone) return;
-    setIsAnimating(true);
-    setTimeout(() => {
-      setTodayDone(true);
-      setIsAnimating(false);
-    }, 400);
-  };
+  useEffect(() => {
+    const yearMonth = format(_today, 'yyyy-MM');
+    getAttendanceApi(yearMonth)
+      .then((res) => {
+        const dates = new Set(res.attendanceDates.map((d) => parseInt(d.split('-')[2], 10)));
+        setAttendedDates(dates);
+      })
+      .catch(() => {});
+  }, []);
+
+  const todayDone = attendedDates.has(TODAY_DATE);
 
   return (
     <div className="flex flex-col gap-5 rounded-2xl bg-white/70 p-5 shadow-sm backdrop-blur-sm">
@@ -235,7 +236,7 @@ function AttendanceWidget() {
         {WEEK_DAYS.map((day, i) => {
           const isToday = day === TODAY_DATE;
           const isValid = day >= 1 && day <= DAYS_IN_MONTH;
-          const isAttended = isValid && (MOCK_ATTENDED.has(day) || (isToday && todayDone));
+          const isAttended = isValid && attendedDates.has(day);
           const isPast = isValid && day < TODAY_DATE;
           const isFuture = !isValid || day > TODAY_DATE;
 
@@ -286,9 +287,7 @@ function AttendanceWidget() {
       <div className="mt-auto flex items-center justify-between gap-3">
         <p className="text-prime-500 text-[12px] leading-snug">
           이번 달{' '}
-          <span className="text-cta-300 font-bold">
-            {todayDone ? MOCK_ATTENDED.size : MOCK_ATTENDED.size}회
-          </span>{' '}
+          <span className="text-cta-300 font-bold">{attendedDates.size}회</span>{' '}
           방문 · 출석 시 3크레딧
         </p>
 
@@ -298,16 +297,9 @@ function AttendanceWidget() {
             오늘 출석 완료
           </div>
         ) : (
-          <button
-            type="button"
-            onClick={handleAttendance}
-            className={cn(
-              'bg-cta-300 shrink-0 rounded-xl px-4 py-2 text-sm font-semibold text-[#1a222e] transition-all hover:opacity-90',
-              isAnimating && 'scale-90 opacity-70'
-            )}
-          >
-            출석체크
-          </button>
+          <div className="text-prime-400 flex shrink-0 items-center gap-1.5 rounded-xl bg-neutral-200 px-3 py-2 text-xs font-semibold">
+            출석 대기 중
+          </div>
         )}
       </div>
     </div>
