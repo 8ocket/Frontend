@@ -17,31 +17,18 @@ import {
 
 export default function SignupPage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [allAgree, setAllAgree] = useState(false);
   const [selectedTerm, setSelectedTerm] = useState<AgreementKey | null>(null);
-  const [agreements, setAgreements] = useState<Record<AgreementKey, boolean>>({
-    age14: false,
-    serviceTerm: false,
-    aiServiceTerm: false,
-    personalInfo: false,
-    sensitiveInfo: false,
-    dataTransfer: false,
-    marketing: false,
-  });
+  const [agreements, setAgreements] = useState<Record<AgreementKey, boolean>>(
+    () => Object.fromEntries(TERMS_LIST.map((t) => [t.key, false])) as Record<AgreementKey, boolean>
+  );
+
+  const allAgree = Object.values(agreements).every(Boolean);
 
   const handleToggleAll = () => {
     const newState = !allAgree;
-    setAllAgree(newState);
-    setAgreements({
-      age14: newState,
-      serviceTerm: newState,
-      aiServiceTerm: newState,
-      personalInfo: newState,
-      sensitiveInfo: newState,
-      dataTransfer: newState,
-      marketing: newState,
-    });
+    setAgreements(
+      Object.fromEntries(TERMS_LIST.map((t) => [t.key, newState])) as Record<AgreementKey, boolean>
+    );
   };
 
   const handleToggleGroup = (group: TermsGroup) => {
@@ -51,14 +38,10 @@ export default function SignupPage() {
       newAgreements[item.key] = !allChecked;
     });
     setAgreements(newAgreements);
-    setAllAgree(Object.values(newAgreements).every(Boolean));
   };
 
   const handleToggleAgreement = (key: AgreementKey) => {
-    const newAgreements = { ...agreements, [key]: !agreements[key] };
-    setAgreements(newAgreements);
-    const allChecked = Object.values(newAgreements).every(Boolean);
-    setAllAgree(allChecked);
+    setAgreements({ ...agreements, [key]: !agreements[key] });
   };
 
   const handleTermClick = (key: AgreementKey) => {
@@ -71,16 +54,12 @@ export default function SignupPage() {
   };
 
   const handleAgree = (key: AgreementKey) => {
-    const newAgreements = { ...agreements, [key]: true };
-    setAgreements(newAgreements);
-    setAllAgree(Object.values(newAgreements).every(Boolean));
+    setAgreements({ ...agreements, [key]: true });
     setSelectedTerm(getNextTerm(key));
   };
 
   const handleDisagree = (key: AgreementKey) => {
-    const newAgreements = { ...agreements, [key]: false };
-    setAgreements(newAgreements);
-    setAllAgree(false);
+    setAgreements({ ...agreements, [key]: false });
     setSelectedTerm(getNextTerm(key));
   };
 
@@ -90,12 +69,7 @@ export default function SignupPage() {
 
   const handleNext = () => {
     if (!isAllRequiredAgree) return;
-    try {
-      setIsLoading(true);
-      router.push('/signup/nickname');
-    } finally {
-      setIsLoading(false);
-    }
+    router.push('/signup/nickname');
   };
 
   return (
@@ -219,11 +193,11 @@ export default function SignupPage() {
           {/* 가입하기 버튼 */}
           <Button
             onClick={handleNext}
-            disabled={!isAllRequiredAgree || isLoading}
+            disabled={!isAllRequiredAgree}
             variant="primary"
             size="cta"
           >
-            {isLoading ? '처리 중...' : '가입하기'}
+            가입하기
           </Button>
         </div>
 
