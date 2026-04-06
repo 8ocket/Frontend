@@ -1,6 +1,6 @@
 export { ReportSidebar } from './ReportSidebar';
 export { ReportCreationForm } from './ReportCreationForm';
-export { ReportPolling } from './ReportLoading';
+export { ReportPolling } from './ReportPolling';
 export { ReportError } from './ReportError';
 export { ReportDetail } from './ReportDetail';
 export { ReportDetailSkeleton } from './ReportDetailSkeleton';

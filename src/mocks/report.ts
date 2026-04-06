@@ -1,6 +1,7 @@
 import type {
   CreateReportRequest,
-  CreateReportResponse,
+  ReportStatusEvent,
+  ReportCompleteEvent,
   GetReportListResponse,
   ReportDetailResponse,
   ReportListItem,
@@ -56,7 +57,8 @@ function createCompletedDetail(reportId: string): ReportDetailResponse {
     },
     tendency_analysis: {
       analysis_id: 'analysis_1',
-      tendency_summary: '전반적으로 회복 탄력성은 안정적이지만, 특정 스트레스 구간에서 감정 기복이 커집니다.',
+      tendency_summary:
+        '전반적으로 회복 탄력성은 안정적이지만, 특정 스트레스 구간에서 감정 기복이 커집니다.',
       resilience_score: 72,
       avg_recovery_hours: 18,
       recovery_change_rate: 12,
@@ -74,11 +76,21 @@ function createCompletedDetail(reportId: string): ReportDetailResponse {
 }
 
 /** POST /v1/reports */
-export const mockCreateReport = (req: CreateReportRequest): CreateReportResponse => ({
-  report_id: `mock_report_${req.report_type}_${Date.now()}`,
-  status: 'generating',
-  estimated_seconds: 10,
-});
+export const mockCreateReport = async (
+  req: CreateReportRequest,
+  onStatus: (event: ReportStatusEvent) => void,
+  onComplete: (event: ReportCompleteEvent) => void
+): Promise<void> => {
+  await new Promise((r) => setTimeout(r, 800));
+  onStatus({ step: 'analyzing', message: '상담 기록을 분석 중입니다 ...' });
+  await new Promise((r) => setTimeout(r, 2000));
+  onStatus({ step: 'generating', message: '리포트를 생성 중입니다 ...' });
+  await new Promise((r) => setTimeout(r, 2000));
+  onComplete({
+    report_id: `mock_report_${req.report_type}_${Date.now()}`,
+    created_at: new Date().toISOString(),
+  });
+};
 
 /** GET /v1/reports */
 export const mockGetReportList = (reportType?: 'weekly' | 'monthly'): GetReportListResponse => ({
