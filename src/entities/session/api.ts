@@ -168,16 +168,25 @@ export const finalizeSessionStream = async (
   token: string,
   onStatus: (step: string, message: string) => void,
   onComplete: (data: FinalizeCompleteEvent) => void,
-  onDone: () => void
+  onDone: () => void,
+  signal?: AbortSignal
 ): Promise<void> => {
   if (USE_MOCK) return mockFinalizeSession(onStatus, onComplete, onDone);
 
   const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}/finalize`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
+    signal,
   });
 
-  if (!response.ok) throw createHttpStatusError(response.status);
+  if (!response.ok) {
+    let code = '';
+    try {
+      const body = await response.json();
+      code = body.code || body.error?.code || '';
+    } catch {}
+    throw new Error(code || String(response.status));
+  }
 
   const reader = response.body?.getReader();
   if (!reader) return;
@@ -200,6 +209,7 @@ export const finalizeSessionStream = async (
 
     for (const eventBlock of events) {
       const lines = eventBlock.split('\n');
+      currentEvent = '';
 
       for (const line of lines) {
         if (line.startsWith('event:')) {
@@ -212,15 +222,17 @@ export const finalizeSessionStream = async (
             const data = JSON.parse(raw);
             if (currentEvent === 'status') onStatus(data.step, data.message);
             if (currentEvent === 'ai_complete') onComplete(data);
-            if (currentEvent === 'done') {
-              onDone();
-              reader.cancel();
-              return;
-            }
           } catch {
             // malformed JSON 무시
           }
         }
+      }
+
+      // done 이벤트는 data 유무/유효성과 무관하게 처리
+      if (currentEvent === 'done') {
+        onDone();
+        reader.cancel();
+        return;
       }
     }
   }
