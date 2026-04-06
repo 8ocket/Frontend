@@ -13,39 +13,24 @@ const STEPS = [
 
 interface ReportPollingProps {
   onComplete: () => void;
+  sseStep?: 'analyzing' | 'generating';
 }
 
-export function ReportPolling({ onComplete }: ReportPollingProps) {
-  const [currentStep, setCurrentStep] = useState(0);
+export function ReportPolling({ onComplete, sseStep }: ReportPollingProps) {
   const [progress, setProgress] = useState(0);
 
+  const currentStep = sseStep === 'generating' ? 3 : sseStep === 'analyzing' ? 1 : 0;
+  const progressTarget = sseStep === 'generating' ? 90 : sseStep === 'analyzing' ? 55 : 15;
+
   useEffect(() => {
-    const stepDuration = 900;
-    const progressTick = 30;
-    const totalDuration = STEPS.length * stepDuration;
-
-    const progressInterval = setInterval(() => {
-      setProgress((p) => Math.min(p + (progressTick / totalDuration) * 100, 99));
-    }, progressTick);
-
-    const stepInterval = setInterval(() => {
-      setCurrentStep((s) => {
-        const next = s + 1;
-        if (next >= STEPS.length) {
-          clearInterval(stepInterval);
-          clearInterval(progressInterval);
-          setProgress(100);
-          setTimeout(onComplete, 600);
-        }
-        return next;
+    const interval = setInterval(() => {
+      setProgress((p) => {
+        if (p >= progressTarget) return p;
+        return Math.min(p + 0.8, progressTarget);
       });
-    }, stepDuration);
-
-    return () => {
-      clearInterval(progressInterval);
-      clearInterval(stepInterval);
-    };
-  }, [onComplete]);
+    }, 50);
+    return () => clearInterval(interval);
+  }, [progressTarget]);
 
   return (
     <div className="flex min-h-[70vh] flex-col items-center justify-center px-4">
@@ -79,10 +64,10 @@ export function ReportPolling({ onComplete }: ReportPollingProps) {
 
         {/* 타이틀 */}
         <div className="mb-8 text-center">
-          <h2 className="text-2xl font-bold tracking-tight text-prime-900">
+          <h2 className="text-prime-900 text-2xl font-bold tracking-tight">
             AI가 분석하고 있습니다
           </h2>
-          <p className="mt-2 text-sm text-prime-500">잠시만 기다려 주세요</p>
+          <p className="text-prime-500 mt-2 text-sm">잠시만 기다려 주세요</p>
         </div>
 
         {/* 단계 목록 */}
@@ -99,14 +84,14 @@ export function ReportPolling({ onComplete }: ReportPollingProps) {
                   isDone
                     ? 'bg-bg-light'
                     : isActive
-                      ? 'bg-(--main-blue)/10 ring-1 ring-main-blue/30'
-                      : 'opacity-40',
+                      ? 'ring-main-blue/30 bg-(--main-blue)/10 ring-1'
+                      : 'opacity-40'
                 )}
               >
                 <div
                   className={cn(
                     'flex size-8 shrink-0 items-center justify-center rounded-full',
-                    isDone ? 'bg-success-700' : isActive ? 'bg-main-blue' : 'bg-prime-200',
+                    isDone ? 'bg-success-700' : isActive ? 'bg-main-blue' : 'bg-prime-200'
                   )}
                 >
                   {isDone ? (
@@ -120,7 +105,11 @@ export function ReportPolling({ onComplete }: ReportPollingProps) {
                 <span
                   className={cn(
                     'text-sm font-medium',
-                    isDone ? 'text-prime-400 line-through' : isActive ? 'text-prime-900' : 'text-prime-400',
+                    isDone
+                      ? 'text-prime-400 line-through'
+                      : isActive
+                        ? 'text-prime-900'
+                        : 'text-prime-400'
                   )}
                 >
                   {step.label}
@@ -130,7 +119,7 @@ export function ReportPolling({ onComplete }: ReportPollingProps) {
                     {[0, 1, 2].map((j) => (
                       <span
                         key={j}
-                        className="size-1.5 animate-bounce rounded-full bg-main-blue"
+                        className="bg-main-blue size-1.5 animate-bounce rounded-full"
                         style={{ animationDelay: `${j * 0.15}s` }}
                       />
                     ))}
@@ -142,9 +131,9 @@ export function ReportPolling({ onComplete }: ReportPollingProps) {
         </div>
 
         {/* 진행 바 */}
-        <div className="mt-6 h-1.5 overflow-hidden rounded-full bg-prime-100">
+        <div className="bg-prime-100 mt-6 h-1.5 overflow-hidden rounded-full">
           <div
-            className="h-full rounded-full bg-main-blue transition-all duration-300"
+            className="bg-main-blue h-full rounded-full transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>

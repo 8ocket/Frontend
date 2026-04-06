@@ -13,55 +13,44 @@ import {
   type ReportType,
 } from '@/components/report';
 import { useToast } from '@/shared/ui/toast';
-import { CanGenerate } from '@/entities/reports/model';
-import { createReportApi, getReportDetailApi, getReportListApi } from '@/entities/reports/api';
+import {
+  CanGenerate,
+  ReportCompleteEvent,
+  ReportListItem,
+  ReportStatusEvent,
+} from '@/entities/reports/model';
+import { createReportApi, getReportListApi } from '@/entities/reports/api';
 
-const MOCK_REPORTS: Report[] = [
-  {
-    id: '1',
-    title: '3월 3주차 감정 분석',
-    date: '2026.03.24',
-    type: '주간 리포트',
-    period: '2026.03.17 - 2026.03.23',
-    reportType: 'weekly',
-    isNew: true,
-  },
-  {
-    id: '2',
-    title: '3월 월간 종합 리포트',
-    date: '2026.03.20',
-    type: '월간 리포트',
-    period: '2026.03.01 - 2026.03.31',
-    reportType: 'monthly',
-  },
-  {
-    id: '3',
-    title: '업무 스트레스 심화 분석',
-    date: '2026.03.15',
-    type: '주간 리포트',
-    period: '2026.03.08 - 2026.03.14',
-    reportType: 'weekly',
-  },
-  {
-    id: '4',
-    title: '2월 감정 트렌드 분석',
-    date: '2026.02.28',
-    type: '월간 리포트',
-    period: '2026.02.01 - 2026.02.28',
-    reportType: 'monthly',
-    isFailed: true,
-  },
-];
+function mapToReport(item: ReportListItem): Report {
+  const month = parseInt(item.period_start.split('-')[1]);
+  const weekNum = Math.ceil(parseInt(item.period_start.split('-')[2]) / 7);
+  const title =
+    item.report_type === 'weekly'
+      ? `${month}월 ${weekNum}주차 감정 분석`
+      : `${month}월 월간 종합 리포트`;
+  const period = `${item.period_start.replace(/-/g, '.')} - ${item.period_end.replace(/-/g, '.')}`;
+  const date = item.created_at.split('T')[0].replace(/-/g, '.');
+
+  return {
+    id: item.report_id,
+    title,
+    date,
+    type: item.report_type === 'weekly' ? '주간 리포트' : '월간 리포트',
+    period,
+    reportType: item.report_type,
+    isFailed: item.status === 'failed',
+  };
+}
 
 const SKELETON_MS = 600;
 
 export default function ReportPage() {
   const { toast } = useToast();
-  const [reports, setReports] = useState<Report[]>(MOCK_REPORTS);
+  const [reports, setReports] = useState<Report[]>([]);
   const [viewState, setViewState] = useState<ReportStatus>('idle');
-  const [selectedId, setSelectedId] = useState(MOCK_REPORTS[0].id);
+  const [selectedId, setSelectedId] = useState('');
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
-  const [creatingReportId, setCreatingReportId] = useState<string | null>(null);
+  const [sseStep, setSseStep] = useState<'analyzing' | 'generating' | undefined>();
   const [canGenerate, setCanGenerate] = useState<CanGenerate | null>(null);
 
   // 리포트 페이지에서는 body 스크롤 방지
@@ -72,40 +61,32 @@ export default function ReportPage() {
     };
   }, []);
 
-  // 목록 로딩
+  const loadReports = useCallback(
+    async (selectId?: string) => {
+      try {
+        const data = await getReportListApi();
+        const mapped = data.reports.map(mapToReport);
+        setReports(mapped);
+        setCanGenerate(data.can_generate);
+        if (selectId) setSelectedId(selectId);
+      } catch {
+        toast('리포트 목록을 불러오는 데 실패했어요.', 'error');
+      }
+    },
+    [toast],
+  );
+
+  // 목록 초기 로딩
   useEffect(() => {
     getReportListApi()
       .then((data) => {
-        // TODO: ReportListItem → Report 변환 함수 작성 후 적용
-        // setReports(data.reports.map(mapToReport));
+        setReports(data.reports.map(mapToReport));
         setCanGenerate(data.can_generate);
       })
       .catch(() => {
         toast('리포트 목록을 불러오는 데 실패했어요.', 'error');
       });
   }, [toast]);
-
-  // 3초 간격 폴링 — creating 상태일 때 실행
-  useEffect(() => {
-    if (viewState !== 'creating' || !creatingReportId) return;
-
-    const poll = async () => {
-      try {
-        const data = await getReportDetailApi(creatingReportId);
-        if (!('status' in data)) {
-          setViewState('success');
-          setIsLoadingDetail(true);
-          setTimeout(() => setIsLoadingDetail(false), SKELETON_MS);
-          toast('리포트가 완성됐어요!', 'success');
-        }
-      } catch {
-        setViewState('failed');
-      }
-    };
-
-    const interval = setInterval(poll, 3000);
-    return () => clearInterval(interval);
-  }, [creatingReportId, toast, viewState]);
 
   // 상담 횟수 — 실제 API 연동 시 교체
   const consultationCount = canGenerate?.saved_session_count ?? 0;
@@ -131,22 +112,39 @@ export default function ReportPage() {
   };
 
   const handleCreateReport = async (type: ReportType, start: string, end: string) => {
+    setViewState('creating');
+    setSseStep(undefined);
+
     try {
-      const { report_id } = await createReportApi({
-        report_type: type,
-        period_start: start,
-        period_end: end,
-      });
-      setCreatingReportId(report_id);
-      setViewState('creating');
-    } catch {
-      // TODO: 크레딧 부족 에러 코드 백엔드 확인 후 분기 처리
-      toast('리포트 생성 요청에 실패했어요.');
+      await createReportApi(
+        { report_type: type, period_start: start, period_end: end },
+        (event: ReportStatusEvent) => setSseStep(event.step),
+        async (event: ReportCompleteEvent) => {
+          setViewState('success');
+          setIsLoadingDetail(true);
+          toast('리포트가 완성됐어요!', 'success');
+          await loadReports(event.report_id);
+          setTimeout(() => setIsLoadingDetail(false), SKELETON_MS);
+        },
+        (message: string) => {
+          toast(message || 'AI 분석 중 오류가 발생했어요.', 'error');
+          setViewState('failed');
+        }
+      );
+    } catch (err) {
+      const code = err instanceof Error ? err.message : '';
+      if (code === 'INSUFFICIENT_SESSIONS') {
+        toast('기간 내 상담 기록이 3개 이상이어야 해요.', 'error');
+      } else if (code === 'REPORT_ALREADY_EXISTS') {
+        toast('해당 기간의 리포트가 이미 존재해요.', 'error');
+      } else {
+        toast('리포트 생성 요청에 실패했어요.', 'error');
+      }
+      setViewState('idle');
     }
   };
 
   const handleRetry = () => {
-    setCreatingReportId(null);
     setViewState('idle');
   };
   const handleCreateNew = () => setViewState('idle');
@@ -199,7 +197,7 @@ export default function ReportPage() {
         )}
 
         {/* creating: 폴링 */}
-        {viewState === 'creating' && <ReportPolling onComplete={() => {}} />}
+        {viewState === 'creating' && <ReportPolling onComplete={() => {}} sseStep={sseStep} />}
 
         {/* failed: 에러 */}
         {viewState === 'failed' && (

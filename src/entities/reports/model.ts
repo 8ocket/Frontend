@@ -16,10 +16,15 @@ export interface CreateReportRequest {
   period_end: string; // 'yyyy-MM-dd'
 }
 
-export interface CreateReportResponse {
+// SSE 이벤트 타입
+export interface ReportStatusEvent {
+  step: 'analyzing' | 'generating';
+  message: string;
+}
+
+export interface ReportCompleteEvent {
   report_id: string;
-  status: 'generating';
-  estimated_seconds: number;
+  created_at: string;
 }
 
 // --- GET /v1/reports?report_type=weekly|monthly 리포트 목록 조회
@@ -94,3 +99,9 @@ export interface ReportDetailGenerating {
 }
 
 export type ReportDetailResponse = ReportDetailCompleted | ReportDetailGenerating;
+
+// --- GET /v1/reports/{report_id}/suggestions
+export interface SuggestionItem {
+  title: string;
+  content: string;
+}
