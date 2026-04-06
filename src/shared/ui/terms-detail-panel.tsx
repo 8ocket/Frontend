@@ -108,7 +108,7 @@ export function TermsDetailPanel({
         <button
           type="button"
           onClick={onClose}
-          className="absolute -top-px right-0 flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-black/5 text-prime-900"
+          className="text-prime-900 absolute -top-px right-0 flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-black/5"
           aria-label="닫기"
         >
           <svg
@@ -164,7 +164,7 @@ export function TermsDetailPanel({
           <button
             type="button"
             onClick={onDisagree}
-            className="h-11 flex-1 rounded-full border border-prime-900 bg-transparent text-base leading-[1.3] font-medium text-prime-900 transition-colors hover:bg-neutral-100"
+            className="border-prime-900 text-prime-900 h-11 flex-1 rounded-full border bg-transparent text-base leading-[1.3] font-medium transition-colors hover:bg-neutral-100"
           >
             동의 안 함
           </button>
@@ -176,7 +176,7 @@ export function TermsDetailPanel({
               'h-11 flex-1 rounded-full text-base leading-[1.3] font-medium transition-colors',
               canAgree
                 ? 'bg-prime-900 text-secondary-100 hover:bg-prime-800'
-                : 'border border-[#cacaca] bg-secondary-100 text-[#cacaca]'
+                : 'bg-secondary-100 border border-[#cacaca] text-[#cacaca]'
             )}
           >
             동의하기
@@ -190,7 +190,7 @@ export function TermsDetailPanel({
           className={cn(
             'absolute bottom-4 left-1/2 h-11 w-89.75 -translate-x-1/2 rounded-full text-base leading-[1.3] font-medium transition-colors',
             canAgree
-              ? 'bg-secondary-100 border border-prime-900 text-prime-900 hover:bg-neutral-100'
+              ? 'bg-secondary-100 border-prime-900 text-prime-900 border hover:bg-neutral-100'
               : 'bg-secondary-100 border border-[#cacaca] text-[#cacaca]'
           )}
         >

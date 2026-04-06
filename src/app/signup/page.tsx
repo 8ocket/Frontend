@@ -7,7 +7,13 @@ import { useRouter } from 'next/navigation';
 import AuroraBackground from '@/shared/ui/AuroraBackground';
 import { Button, CheckboxItem, TermsDetailPanel } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
-import { AgreementKey, TERMS_GROUPS, TERMS_LIST, TermsGroup, TERMS_CONTENT } from '@/shared/constants/terms';
+import {
+  AgreementKey,
+  TERMS_GROUPS,
+  TERMS_LIST,
+  TermsGroup,
+  TERMS_CONTENT,
+} from '@/shared/constants/terms';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -41,7 +47,9 @@ export default function SignupPage() {
   const handleToggleGroup = (group: TermsGroup) => {
     const allChecked = group.items.every((item) => agreements[item.key]);
     const newAgreements = { ...agreements };
-    group.items.forEach((item) => { newAgreements[item.key] = !allChecked; });
+    group.items.forEach((item) => {
+      newAgreements[item.key] = !allChecked;
+    });
     setAgreements(newAgreements);
     setAllAgree(Object.values(newAgreements).every(Boolean));
   };
@@ -76,8 +84,7 @@ export default function SignupPage() {
     setSelectedTerm(getNextTerm(key));
   };
 
-  const isAllRequiredAgree = TERMS_GROUPS
-    .filter((g) => g.required)
+  const isAllRequiredAgree = TERMS_GROUPS.filter((g) => g.required)
     .flatMap((g) => g.items)
     .every((item) => agreements[item.key]);
 
@@ -140,7 +147,8 @@ export default function SignupPage() {
               {TERMS_GROUPS.map((group) => {
                 const isMulti = group.items.length > 1;
                 const groupChecked = group.items.every((item) => agreements[item.key]);
-                const groupIndeterminate = !groupChecked && group.items.some((item) => agreements[item.key]);
+                const groupIndeterminate =
+                  !groupChecked && group.items.some((item) => agreements[item.key]);
                 return (
                   <div key={group.label} className="flex flex-col gap-3">
                     {isMulti && (
@@ -149,14 +157,22 @@ export default function SignupPage() {
                         onClick={() => handleToggleGroup(group)}
                         className="flex items-center gap-2"
                       >
-                        <div className={cn(
-                          'flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border border-neutral-300 transition-colors',
-                          groupChecked ? 'bg-cta-300' : 'bg-white'
-                        )}>
-                          {groupChecked && <span className="text-secondary-100 text-[12px]">✓</span>}
-                          {groupIndeterminate && <span className="text-prime-700 text-[12px]">-</span>}
+                        <div
+                          className={cn(
+                            'flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border border-neutral-300 transition-colors',
+                            groupChecked ? 'bg-cta-300' : 'bg-white'
+                          )}
+                        >
+                          {groupChecked && (
+                            <span className="text-secondary-100 text-[12px]">✓</span>
+                          )}
+                          {groupIndeterminate && (
+                            <span className="text-prime-700 text-[12px]">-</span>
+                          )}
                         </div>
-                        <span className="text-prime-900 text-[14px] font-medium">{group.label}</span>
+                        <span className="text-prime-900 text-[14px] font-medium">
+                          {group.label}
+                        </span>
                         <span className="text-cta-300 text-[11px] font-medium">[필수]</span>
                       </button>
                     )}
