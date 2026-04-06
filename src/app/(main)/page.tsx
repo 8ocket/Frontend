@@ -544,7 +544,7 @@ export default function Home() {
       </div>
       {/* ── Floating AI 상담 버튼 ─────────────────────────────────────────────── */}
       <div
-        className="fixed right-6 bottom-6 z-50 sm:right-8 sm:bottom-8"
+        className="fixed right-6 bottom-10 z-50 sm:right-8 sm:bottom-12"
         style={{ width: 110, height: 110 }}
       >
         {/* 글로우 레이어 */}
