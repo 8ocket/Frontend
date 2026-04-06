@@ -1,32 +1,36 @@
-'use client';
-
 import Link from 'next/link';
-import { TERMS_LIST } from '@/shared/constants/terms';
+
+const FOOTER_LINKS = [
+  { label: '개인정보처리방침', href: '/terms/personalInfo' },
+  { label: '이용약관', href: '/terms/serviceTerm' },
+  { label: 'AI 이용 안내', href: '/terms/aiServiceTerm' },
+];
 
 export function Footer() {
   return (
-    <footer className="bg-[rgba(130,201,255,0.1)] text-center">
-      <div className="mx-auto max-w-360 px-12 py-10">
+    <footer className="mt-auto border-t border-[#eee] bg-[#fafafa] pb-10 pt-3">
+      <div className="mx-auto flex max-w-360 flex-col gap-y-2 px-8 sm:px-12 md:flex-row md:items-center md:justify-between">
         {/* 약관 링크 */}
-        <div className="flex flex-wrap justify-center gap-x-5 gap-y-2">
-          {TERMS_LIST.map((term) => (
-            <Link
-              key={term.key}
-              href={`/terms/${term.key}`}
-              className="text-prime-700/60 hover:text-cta-300 text-[12px] font-medium transition-colors"
-            >
-              {term.label}
-            </Link>
+        <nav className="flex flex-wrap items-center gap-y-1">
+          {FOOTER_LINKS.map((link, i) => (
+            <span key={link.href} className="flex items-center">
+              <Link
+                href={link.href}
+                className="px-1.5 py-1 text-[12px] text-[#aaa] transition-colors hover:text-[#555] hover:underline"
+              >
+                {link.label}
+              </Link>
+              {i < FOOTER_LINKS.length - 1 && (
+                <span className="select-none text-[12px] text-[#ccc]" aria-hidden="true">·</span>
+              )}
+            </span>
           ))}
-        </div>
+        </nav>
 
-        {/* 법적 고지 + 저작권 */}
-        <div className="mt-4 flex flex-col gap-1">
-          <p className="text-prime-700/50 text-[12px] leading-[1.5] font-medium">
-            본 서비스의 상담 내용은 암호화되어 안전하게 보호됩니다. © 2026 마인드 로그 (MindLog).
-            All rights reserved.
-          </p>
-        </div>
+        {/* 저작권 */}
+        <p className="pl-1.5 text-[12px] text-[#bbb] md:pl-0">
+          © 2026 마인드 로그 (MindLog). All rights reserved.
+        </p>
       </div>
     </footer>
   );
