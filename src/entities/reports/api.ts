@@ -7,8 +7,9 @@ import {
   ReportDetailResponse,
   ReportApiResponse,
   ReportType,
+  SuggestionItem,
 } from './model';
-import { mockCreateReport, mockGetReportDetail, mockGetReportList } from '@/mocks';
+import { mockCreateReport, mockGetReportDetail, mockGetReportList, mockGetReportSuggestions } from '@/mocks';
 import { USE_MOCK } from '@/shared/lib/env';
 import { getCookie } from '@/shared/lib/utils/cookie';
 
@@ -122,4 +123,22 @@ export const getReportDetailApi = async (reportId: string): Promise<ReportDetail
   }
 
   throw new Error(response.data.message || '리포트 상세 조회 실패');
+};
+
+/**
+ * 맞춤형 행동 제언 조회
+ * GET /v1/reports/{report_id}/suggestions
+ */
+export const getReportSuggestionsApi = async (reportId: string): Promise<SuggestionItem[]> => {
+  if (USE_MOCK) return mockGetReportSuggestions(reportId);
+
+  const response = await api.get<ReportApiResponse<SuggestionItem[]>>(
+    `/reports/${reportId}/suggestions`,
+  );
+
+  if (response.data.code === 'ok' && response.data.data) {
+    return response.data.data;
+  }
+
+  throw new Error(response.data.message || '행동 제언 조회 실패');
 };

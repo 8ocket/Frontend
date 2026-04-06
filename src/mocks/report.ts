@@ -5,6 +5,7 @@ import type {
   GetReportListResponse,
   ReportDetailResponse,
   ReportListItem,
+  SuggestionItem,
 } from '@/entities/reports/model';
 
 const MOCK_REPORTS: ReportListItem[] = [
@@ -124,3 +125,17 @@ export const mockGetReportDetail = (reportId: string): ReportDetailResponse => {
 
   return createCompletedDetail(reportId);
 };
+
+/** GET /v1/reports/{report_id}/suggestions */
+export const mockGetReportSuggestions = (_reportId: string): SuggestionItem[] => [
+  {
+    title: '메모를 통한 감정 조절 연습',
+    content:
+      '날씨나 외부 상황에 따라 기분이 변하는 패턴을 인식한 후, 그날의 기분이 좋을 때와 그렇지 않을 때 각각 어떤 작은 행동이나 생각이 도움이 되었는지 메모해두면, 앞으로 기분이 내려갈 때 참고할 수 있는 자신만의 패턴을 찾을 수 있을 거예요.',
+  },
+  {
+    title: '꾸준한 루틴 유지',
+    content:
+      '일정한 수면 패턴과 식사 시간을 지키는 것이 감정 안정에 도움이 됩니다. 작은 습관부터 시작해 보세요.',
+  },
+];

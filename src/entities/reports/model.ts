@@ -99,3 +99,9 @@ export interface ReportDetailGenerating {
 }
 
 export type ReportDetailResponse = ReportDetailCompleted | ReportDetailGenerating;
+
+// --- GET /v1/reports/{report_id}/suggestions
+export interface SuggestionItem {
+  title: string;
+  content: string;
+}

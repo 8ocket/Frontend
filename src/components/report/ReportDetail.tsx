@@ -2,7 +2,10 @@
 
 import { addDays, format } from 'date-fns';
 import { Calendar, Sparkles, Target } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/shared/lib/utils';
+import { getReportSuggestionsApi } from '@/entities/reports/api';
+import type { SuggestionItem } from '@/entities/reports/model';
 import { EmotionAreaChart } from './EmotionAreaChart';
 import type { EmotionDataPoint } from './EmotionAreaChart';
 import type { Report } from './types';
@@ -77,24 +80,19 @@ const KEYWORD_STYLES = [
   'bg-prime-200/60 text-prime-600',
 ];
 
-// TODO [API]: ACTIONS를 GET /reports/:id/actions 응답으로 교체
-//             응답 형식 예시: [{ title: string, desc: string, duration: string }]
-const ACTIONS = [
-  {
-    title: '꾸준한 루틴 유지',
-    desc: '일정한 수면 패턴과 식사 시간을 지키는 것이 감정 안정에 도움이 됩니다.',
-  },
-  {
-    title: '감정 표현 연습',
-    desc: '일기 쓰기나 신뢰하는 사람과의 대화를 통해 감정을 외부로 표현해보세요.',
-  },
-];
-
 const CARD = 'rounded-[24px] border border-prime-100 bg-white p-10 shadow-sm';
 
 export function ReportDetail({ report }: ReportDetailProps) {
-  // TODO [API]: buildChartData(report) → GET /reports/:id/chart-data 훅으로 교체
   const emotionData = buildChartData(report);
+  const [suggestions, setSuggestions] = useState<SuggestionItem[]>([]);
+  const [isSuggestionsLoading, setIsSuggestionsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsSuggestionsLoading(true);
+    getReportSuggestionsApi(report.id)
+      .then(setSuggestions)
+      .finally(() => setIsSuggestionsLoading(false));
+  }, [report.id]);
 
   return (
     <div className="space-y-8">
@@ -273,22 +271,39 @@ export function ReportDetail({ report }: ReportDetailProps) {
         </div>
 
         <div className="space-y-4">
-          {ACTIONS.map((action, i) => (
-            <div
-              key={action.title}
-              className="rounded-4xl border border-white/20 bg-white/10 p-7 backdrop-blur-sm transition-all hover:bg-white/15"
-            >
-              <div className="flex items-start gap-5">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                  <span className="text-lg font-bold text-white">{i + 1}</span>
+          {isSuggestionsLoading ? (
+            <>
+              {[0, 1].map((i) => (
+                <div key={i} className="rounded-4xl border border-white/20 bg-white/10 p-7">
+                  <div className="flex items-start gap-5">
+                    <div className="size-10 shrink-0 animate-pulse rounded-full bg-white/20" />
+                    <div className="flex-1 space-y-3">
+                      <div className="h-4 w-1/3 animate-pulse rounded bg-white/20" />
+                      <div className="h-3 w-full animate-pulse rounded bg-white/10" />
+                      <div className="h-3 w-4/5 animate-pulse rounded bg-white/10" />
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h4 className="mb-3 text-[17px] font-bold text-white">{action.title}</h4>
-                  <p className="text-sm leading-relaxed text-white/90">{action.desc}</p>
+              ))}
+            </>
+          ) : (
+            suggestions.map((suggestion, i) => (
+              <div
+                key={suggestion.title}
+                className="rounded-4xl border border-white/20 bg-white/10 p-7 backdrop-blur-sm transition-all hover:bg-white/15"
+              >
+                <div className="flex items-start gap-5">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                    <span className="text-lg font-bold text-white">{i + 1}</span>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="mb-3 text-[17px] font-bold text-white">{suggestion.title}</h4>
+                    <p className="text-sm leading-relaxed text-white/90">{suggestion.content}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
