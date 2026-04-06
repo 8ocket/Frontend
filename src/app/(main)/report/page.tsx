@@ -64,6 +64,14 @@ export default function ReportPage() {
   const [creatingReportId, setCreatingReportId] = useState<string | null>(null);
   const [canGenerate, setCanGenerate] = useState<CanGenerate | null>(null);
 
+  // 리포트 페이지에서는 body 스크롤 방지
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   // 목록 로딩
   useEffect(() => {
     getReportListApi()
@@ -144,7 +152,7 @@ export default function ReportPage() {
   const handleCreateNew = () => setViewState('idle');
 
   return (
-    <div className="layout-container bg-bg-light relative -mt-16 flex h-screen-safe min-h-0 overflow-hidden pt-16 box-border md:-mt-20 md:pt-20">
+    <div className="layout-container bg-bg-light relative flex h-[calc(100dvh-4rem)] min-h-0 overflow-hidden md:h-[calc(100dvh-5rem)]">
       {/* 사이드바 */}
       <ReportSidebar
         reports={reports}
