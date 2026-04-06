@@ -1,94 +1,36 @@
-'use client';
-
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { LogoSmall } from '@/features/auth';
 
-const NO_FOOTER_PATHS = ['/chat'];
-
-const FOOTER_NAV = [
-  { label: '홈', href: '/', items: [] },
-  { label: 'AI 상담', href: '/chat', items: [] },
-  { label: '브랜드 소개', href: '/about', items: [] },
-  {
-    label: '마음기록 모음',
-    href: '/collection',
-    items: [{ label: '오로라 감정카드', href: '/collection' }],
-  },
-  {
-    label: '심화 리포트',
-    href: '/report',
-    items: [
-      { label: '주간 리포트', href: '/report' },
-      { label: '월간 리포트', href: '/report' },
-    ],
-  },
-  {
-    label: '상점',
-    href: '/shop',
-    items: [
-      { label: '크레딧 구매', href: '/shop' },
-      { label: '페르소나 구매', href: '/shop' },
-      { label: '이벤트', href: '/shop' },
-    ],
-  },
-  {
-    label: '고객지원',
-    href: '#',
-    items: [
-      { label: '자주 묻는 질문', href: '#' },
-      { label: '결제 관련 문의', href: '#' },
-      { label: 'AI 상담 문의', href: '#' },
-      { label: '기타 오류', href: '#' },
-      { label: '연락처', href: '#' },
-      { label: '회원 탈퇴', href: '#' },
-    ],
-  },
-  { label: '계정관리', href: '/my', items: [] },
+const FOOTER_LINKS = [
+  { label: '개인정보처리방침', href: '/terms/personalInfo' },
+  { label: '이용약관', href: '/terms/serviceTerm' },
+  { label: 'AI 이용 안내', href: '/terms/aiServiceTerm' },
 ];
 
 export function Footer() {
-  const pathname = usePathname();
-  if (NO_FOOTER_PATHS.includes(pathname)) return null;
-
   return (
-    <footer className="mt-37.5 bg-[rgba(130,201,255,0.1)]">
-      <div className="mx-auto max-w-360 px-12 py-8">
-        {/* 로고 + 내비게이션 */}
-        <div className="flex items-start gap-4">
-          <LogoSmall className="h-20 w-20 shrink-0" />
-          <nav className="flex flex-1 justify-between">
-            {FOOTER_NAV.map(({ label, href, items }) => (
-              <div key={label} className="flex flex-col gap-3.75">
-                <Link
-                  href={href}
-                  className="text-[16px] font-semibold leading-[1.3] tracking-[-0.24px] text-[#1a222e] transition-colors hover:text-cta-300"
-                >
-                  {label}
-                </Link>
-                {items.map((sub) => (
-                  <Link
-                    key={sub.label}
-                    href={sub.href}
-                    className="text-[14px] font-normal leading-[1.6] text-prime-700 transition-colors hover:text-cta-300"
-                  >
-                    {sub.label}
-                  </Link>
-                ))}
-              </div>
-            ))}
-          </nav>
-        </div>
+    <footer className="mt-auto border-t border-[#eee] bg-[#fafafa] pb-10 pt-3">
+      <div className="mx-auto flex max-w-360 flex-col gap-y-2 px-8 sm:px-12 md:flex-row md:items-center md:justify-between">
+        {/* 약관 링크 */}
+        <nav className="flex flex-wrap items-center gap-y-1">
+          {FOOTER_LINKS.map((link, i) => (
+            <span key={link.href} className="flex items-center">
+              <Link
+                href={link.href}
+                className="px-1.5 py-1 text-[12px] text-[#aaa] transition-colors hover:text-[#555] hover:underline"
+              >
+                {link.label}
+              </Link>
+              {i < FOOTER_LINKS.length - 1 && (
+                <span className="select-none text-[12px] text-[#ccc]" aria-hidden="true">·</span>
+              )}
+            </span>
+          ))}
+        </nav>
 
-        {/* 법적 고지 + 저작권 */}
-        <div className="mt-10 flex flex-col gap-2">
-          <p className="text-[12px] font-medium leading-[1.2] tracking-[-0.18px] text-[#1a222e]">
-            본 서비스는 전문 심리 상담 이론(인지행동치료 등)을 바탕으로 설계되었습니다. 사용자의 모든 대화는 암호화되어 안전하게 보관됩니다
-          </p>
-          <p className="text-[12px] font-medium leading-[1.2] tracking-[-0.18px] text-[#1a222e]">
-            All rights reserved by 마인드 로그(Mind-Log)©
-          </p>
-        </div>
+        {/* 저작권 */}
+        <p className="pl-1.5 text-[12px] text-[#bbb] md:pl-0">
+          © 2026 마인드 로그 (MindLog). All rights reserved.
+        </p>
       </div>
     </footer>
   );

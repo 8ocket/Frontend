@@ -53,25 +53,6 @@ export function FooterCTASection() {
         >
           AI 상담 시작하기
         </motion.button>
-
-        {/* --- [3번 전략] 최소 보안 및 법적 푸터 --- */}
-        {/* 아주 연한 opacity(20~30%)를 주어 시선을 방해하지 않게 배치합니다. */}
-        <div className="flex flex-col items-center gap-5 text-[#3F527E] opacity-30">
-          <div className="flex gap-8 text-[13px] font-medium">
-            <span className="cursor-pointer hover:text-[#1A222E] hover:underline">
-              개인정보처리방침
-            </span>
-            <span className="cursor-pointer hover:text-[#1A222E] hover:underline">이용약관</span>
-            <span className="cursor-pointer hover:text-[#1A222E] hover:underline">고객지원</span>
-          </div>
-
-          <div className="flex flex-col items-center gap-1 text-[12px]">
-            <p>© 2026 마인드 로그 (MindLog). All rights reserved.</p>
-            <p className="tracking-tight">
-              본 서비스의 상담 내용은 암호화되어 안전하게 보호됩니다.
-            </p>
-          </div>
-        </div>
       </div>
     </section>
   );

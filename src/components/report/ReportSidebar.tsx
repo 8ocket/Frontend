@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { AlertCircle, Calendar, PlusCircle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import type { Report } from './types';
@@ -105,6 +106,29 @@ export function ReportSidebar({
             })}
           </div>
         )}
+      </div>
+
+      {/* 푸터 */}
+      <div className="shrink-0 px-5 pb-5 pt-4">
+        <div className="mb-4 border-t border-prime-100" />
+        <div className="mb-3 flex flex-col gap-1">
+          {[
+            { label: '개인정보처리방침', href: '/terms/personalInfo' },
+            { label: '이용약관', href: '/terms/serviceTerm' },
+            { label: 'AI 이용 안내', href: '/terms/aiServiceTerm' },
+          ].map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="-mx-1 rounded px-1 py-1 text-[11px] font-semibold text-prime-700/70 transition-colors hover:text-cta-300"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+        <p className="text-[10px] leading-relaxed text-prime-700/40">
+          © 2026 마인드 로그 (MindLog).<br />All rights reserved.
+        </p>
       </div>
     </aside>
   );

@@ -5,6 +5,7 @@ import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { AuthInitializer } from '@/shared/ui/AuthInitializer';
 import { ToastProvider } from '@/shared/ui/toast';
+import { FooterWrapper } from '@/widgets/gnb';
 import './globals.css';
 
 const pretendard = localFont({
@@ -38,7 +39,10 @@ export default function RootLayout({
             <ToastProvider>
               {/* persisted user와 실제 쿠키 상태가 어긋난 경우를 앱 시작 시 한 번 정리합니다. */}
               <AuthInitializer />
-              {children}
+              <div className="flex min-h-dvh flex-col">
+                {children}
+                <FooterWrapper />
+              </div>
             </ToastProvider>
           </QueryProvider>
         </ThemeProvider>

@@ -681,6 +681,14 @@ export default function ChatPage() {
   const [appendMessage, setAppendMessage] = useState<ChatBubbleProps | null>(null);
   const [sessionDetail, setSessionDetail] = useState<SessionDetailResponse | null>(null);
 
+  // 채팅 페이지에서는 body 스크롤 방지
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   // activeSessionId 변경 시 세션 상세 조회 (새 세션 생성 시에만 — 이어가기/사이드바는 핸들러에서 pre-fetch)
   useEffect(() => {
     if (!activeSessionId) {
@@ -820,7 +828,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="layout-container relative -mt-16 flex h-screen-safe min-h-0 overflow-hidden pt-16 box-border md:-mt-20 md:pt-20">
+    <div className="layout-container relative box-border flex h-[calc(100dvh-4rem)] min-h-0 overflow-hidden md:h-[calc(100dvh-5rem)]">
       {/* 모바일 사이드바 토글 버튼 */}
       <button
         type="button"
