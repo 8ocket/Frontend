@@ -391,7 +391,9 @@ export default function Home() {
     const el = cardSectionRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setCardsVisible(true); },
+      ([entry]) => {
+        if (entry.isIntersecting) setCardsVisible(true);
+      },
       { threshold: 0.1 }
     );
     observer.observe(el);
@@ -540,15 +542,16 @@ export default function Home() {
           </div>
         </section>
       </div>
-
-      {/* ── 하단 푸터 ─────────────────────────────────────────────────────────── */}
-      <footer className="border-t border-neutral-200 pb-36 pt-4 text-center">
-        <p className="text-[11px] text-neutral-400">© 2026 마인드 로그. All rights reserved.</p>
-      </footer>
       {/* ── Floating AI 상담 버튼 ─────────────────────────────────────────────── */}
-      <div className="fixed right-6 bottom-6 z-50 sm:right-8 sm:bottom-8" style={{ width: 110, height: 110 }}>
+      <div
+        className="fixed right-6 bottom-6 z-50 sm:right-8 sm:bottom-8"
+        style={{ width: 110, height: 110 }}
+      >
         {/* 글로우 레이어 */}
-        <div className="bg-cta-300/50 absolute inset-0 animate-pulse rounded-full blur-xl" aria-hidden="true" />
+        <div
+          className="bg-cta-300/50 absolute inset-0 animate-pulse rounded-full blur-xl"
+          aria-hidden="true"
+        />
         <button
           type="button"
           onClick={() => router.push('/chat')}

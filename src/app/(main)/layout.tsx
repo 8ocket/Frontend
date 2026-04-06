@@ -4,7 +4,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   return (
     <>
       <GNB />
-      <main className="bg-secondary-100 min-h-screen-safe pt-16 box-border md:pt-20">
+      <main className="bg-secondary-100 min-h-screen-safe box-border pt-16 md:pt-20">
         {children}
       </main>
     </>
