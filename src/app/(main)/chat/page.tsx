@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreditStore } from '@/entities/credits/store';
 import { useChatModals } from '@/features/select-persona';
@@ -27,6 +27,7 @@ import type {
   ActiveSessionResponse,
   SessionListItem,
   SessionDetailResponse,
+  FinalizeCompleteEvent,
 } from '@/entities/session';
 
 // ── 모달 상태 타입 ──────────────────────────────────────────────
@@ -680,6 +681,17 @@ export default function ChatPage() {
   /** 채팅창에 외부에서 append할 메시지 */
   const [appendMessage, setAppendMessage] = useState<ChatBubbleProps | null>(null);
   const [sessionDetail, setSessionDetail] = useState<SessionDetailResponse | null>(null);
+  /** finalize 완료 데이터 — 추후 카드 표시 등에 활용 */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_finalizeResult, setFinalizeResult] = useState<FinalizeCompleteEvent | null>(null);
+  /** finalize 스트림 취소용 — 언마운트 시 abort */
+  const finalizeAbortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => {
+      finalizeAbortRef.current?.abort();
+    };
+  }, []);
 
   // 채팅 페이지에서는 body 스크롤 방지
   useEffect(() => {
@@ -806,24 +818,40 @@ export default function ChatPage() {
     });
 
     if (!activeSessionId) return;
+
     const token = getCookie('accessToken') ?? '';
+    if (!token) {
+      router.push('/login');
+      return;
+    }
+
+    const controller = new AbortController();
+    finalizeAbortRef.current = controller;
 
     try {
       await finalizeSessionStream(
         activeSessionId,
         token,
-        () => {}, // status 이벤트 무시 (고정 메시지 유지)
-        () => {}, // ai_complete 데이터 (추후 활용)
+        () => {}, // status 이벤트 — 고정 메시지 유지
+        (data) => setFinalizeResult(data),
         () => {
           setAppendMessage({
             variant: 'ai',
             senderName: '마음 기록',
             content: '마음 기록이 완성되었습니다.',
           });
-        }
+        },
+        controller.signal
       );
     } catch (err) {
-      console.error('Finalize error:', err);
+      if (err instanceof Error && err.name === 'AbortError') return;
+      const code = err instanceof Error ? err.message : '';
+      const message =
+        code === 'SESSION_ALREADY_SAVED' ? '이미 저장된 상담입니다.' :
+        code === 'SESSION_TOO_SHORT' ? '상담이 너무 짧아 기록을 생성할 수 없습니다.' :
+        code === 'SESSION_NOT_FOUND' ? '세션을 찾을 수 없습니다.' :
+        '마음 기록 생성에 실패했습니다.';
+      setAppendMessage({ variant: 'ai', senderName: '마음 기록', content: message });
     }
   };
 
