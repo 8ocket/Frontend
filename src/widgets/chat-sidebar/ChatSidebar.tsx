@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 
+import Link from 'next/link';
 import { Search, PlusCircle } from 'lucide-react';
 
 import { DeleteSessionModal } from './DeleteSessionModal';
@@ -151,6 +152,34 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, on
           />
         )}
       </div>
+      {/* 푸터 */}
+      <div className="shrink-0 px-5 pb-5 pt-4">
+        {/* 구분선 */}
+        <div className="border-prime-100 mb-4 border-t" />
+
+        {/* 약관 링크 */}
+        <div className="mb-3 flex flex-col gap-1">
+          {[
+            { label: '개인정보처리방침', href: '/terms/personalInfo' },
+            { label: '이용약관', href: '/terms/serviceTerm' },
+            { label: 'AI 이용 안내', href: '/terms/aiServiceTerm' },
+          ].map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-prime-700/70 hover:text-cta-300 -mx-1 rounded px-1 py-1 text-[11px] font-semibold transition-colors"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+
+        {/* 저작권 */}
+        <p className="text-prime-700/40 text-[10px] leading-relaxed">
+          © 2026 마인드 로그 (MindLog).<br />All rights reserved.
+        </p>
+      </div>
+
       {/* 세션 삭제 확인 모달 */}
       <DeleteSessionModal
         isOpen={sessionToDelete !== null}
