@@ -13,6 +13,8 @@ export interface TermsDetailPanelProps {
   onClose: () => void;
   /** 동의하기 버튼 클릭 */
   onAgree: () => void;
+  /** 동의 안 함 버튼 클릭 (제공 시 두 버튼 표시) */
+  onDisagree?: () => void;
   /** 이미 동의 완료 여부 */
   isAgreed?: boolean;
   /** 추가 className */
@@ -24,6 +26,7 @@ export function TermsDetailPanel({
   children,
   onClose,
   onAgree,
+  onDisagree,
   isAgreed = false,
   className,
 }: TermsDetailPanelProps) {
@@ -155,20 +158,45 @@ export function TermsDetailPanel({
         )}
       </div>
 
-      {/* 동의하기 버튼 — absolute bottom */}
-      <button
-        type="button"
-        onClick={onAgree}
-        disabled={!canAgree}
-        className={cn(
-          'absolute bottom-4 left-1/2 h-11 w-89.75 -translate-x-1/2 rounded-full text-base leading-[1.3] font-medium transition-colors',
-          canAgree
-            ? 'bg-secondary-100 border border-prime-900 text-prime-900 hover:bg-neutral-100'
-            : 'bg-secondary-100 border border-[#cacaca] text-[#cacaca]'
-        )}
-      >
-        동의하기
-      </button>
+      {/* 동의/미동의 버튼 */}
+      {onDisagree ? (
+        <div className="absolute bottom-4 left-1/2 flex w-89.75 -translate-x-1/2 gap-2">
+          <button
+            type="button"
+            onClick={onDisagree}
+            className="h-11 flex-1 rounded-full border border-prime-900 bg-transparent text-base leading-[1.3] font-medium text-prime-900 transition-colors hover:bg-neutral-100"
+          >
+            동의 안 함
+          </button>
+          <button
+            type="button"
+            onClick={onAgree}
+            disabled={!canAgree}
+            className={cn(
+              'h-11 flex-1 rounded-full text-base leading-[1.3] font-medium transition-colors',
+              canAgree
+                ? 'bg-prime-900 text-secondary-100 hover:bg-prime-800'
+                : 'border border-[#cacaca] bg-secondary-100 text-[#cacaca]'
+            )}
+          >
+            동의하기
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={onAgree}
+          disabled={!canAgree}
+          className={cn(
+            'absolute bottom-4 left-1/2 h-11 w-89.75 -translate-x-1/2 rounded-full text-base leading-[1.3] font-medium transition-colors',
+            canAgree
+              ? 'bg-secondary-100 border border-prime-900 text-prime-900 hover:bg-neutral-100'
+              : 'bg-secondary-100 border border-[#cacaca] text-[#cacaca]'
+          )}
+        >
+          동의하기
+        </button>
+      )}
     </div>
   );
 }
