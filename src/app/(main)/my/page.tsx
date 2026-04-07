@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Bell, ChevronRight, Coins, LogOut, MoreVertical, Trash2, X } from 'lucide-react';
 import { useAuthStore } from '@/entities/user/store';
+import { logoutApi } from '@/entities/user/api';
+import { getCookie } from '@/shared/lib/utils/cookie';
 import { useCreditStore } from '@/entities/credits/store';
 import { UserProfileModal } from '@/shared/ui/UserProfileModal';
 import { Button } from '@/shared/ui/button';
@@ -44,22 +46,22 @@ export default function MyPage() {
   const isDefaultImage =
     !user?.profileImage || user.profileImage === '/images/icons/profile-default.svg';
 
-  const handleLogout = () => {
-    // 1. Store 상태 초기화
+  const handleLogout = async () => {
+    const refreshToken = getCookie('refreshToken');
+
+    // 1. 로그아웃 API 호출 (실패해도 강제 로그아웃)
+    if (refreshToken) {
+      try {
+        await logoutApi(refreshToken);
+      } catch {
+        // 무시
+      }
+    }
+
+    // 2. Store 상태 초기화 (쿠키 포함)
     logout();
 
-    // 2. 브라우저 저장소 강제 초기화 (임시 대응 -> API 연동 삭제)
-    localStorage.clear();
-    sessionStorage.clear();
-
-    // 3.모든 쿠키 삭제
-    document.cookie.split(';').forEach((c) => {
-      document.cookie = c
-        .replace(/^ +/, '')
-        .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
-    });
-
-    // 4. 메인 이동
+    // 3. 메인 이동
     router.replace('/');
   };
 
@@ -274,7 +276,7 @@ export default function MyPage() {
             <section className="border-prime-100 overflow-hidden rounded-2xl border bg-white shadow-sm">
               <p className="text-prime-400 px-6 pt-5 text-xs font-medium">설정</p>
 
-              <div className="flex items-center justify-between px-6 py-3.5">
+              {/* <div className="flex items-center justify-between px-6 py-3.5">
                 <div className="flex items-center gap-3">
                   <div className="bg-interactive-glass-blue-50 flex size-9 items-center justify-center rounded-xl">
                     <Bell size={16} className="text-cta-300" />
@@ -284,9 +286,9 @@ export default function MyPage() {
                   </span>
                 </div>
                 <Switch checked={notificationEnabled} onCheckedChange={setNotificationEnabled} />
-              </div>
+              </div> */}
 
-              <div className="bg-prime-100 mx-6 h-px" />
+              {/* <div className="bg-prime-100 mx-6 h-px" /> */}
 
               <MenuRow
                 icon={<LogOut size={16} className="text-error-500" />}
@@ -295,7 +297,7 @@ export default function MyPage() {
                 iconBg="bg-error-100"
                 onClick={handleLogout}
               />
-              <div className="bg-prime-100 mx-6 h-px" />
+              {/* <div className="bg-prime-100 mx-6 h-px" /> */}
               <MenuRow
                 icon={<Trash2 size={16} className="text-error-500" />}
                 label="회원탈퇴"
