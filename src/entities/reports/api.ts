@@ -142,3 +142,23 @@ export const getReportSuggestionsApi = async (reportId: string): Promise<Suggest
 
   throw new Error(response.data.message || '행동 제언 조회 실패');
 };
+
+/**
+ * TODO [API]: 감정 그래프 데이터 조회
+ * GET /v1/reports/{report_id}/graphs
+ *
+ * 요청 (Header: token)
+ * 응답:
+ * {
+ *   "graph_count": 5,
+ *   "graphs": [
+ *     { "session_id": "...", "avg_score": 24, "recorded_at": "2026-03-20T23:19:44.106419" },
+ *     ...
+ *   ],
+ *   "graph_evaluation": "4월 1주차 동안 감정 점수가 -3에서 +5로 변화했습니다. ..."
+ * }
+ *
+ * export const getReportGraphsApi = async (reportId: string): Promise<GetReportGraphsResponse> => {
+ *   ...
+ * };
+ */
