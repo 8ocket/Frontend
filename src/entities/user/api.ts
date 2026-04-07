@@ -168,6 +168,16 @@ export const loginApi = async (email: string, password: string): Promise<AuthRes
 };
 
 /**
+ * 로그아웃 API
+ * POST /v1/auth/logout
+ */
+export const logoutApi = async (refreshToken: string): Promise<void> => {
+  if (USE_MOCK) return;
+
+  await api.post('/auth/logout', { refreshToken });
+};
+
+/**
  * 소셜 로그인 API
  * @param provider - 소셜 로그인 제공자 (google, kakao, etc)
  */

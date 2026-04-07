@@ -67,6 +67,7 @@ export default function NicknamePage() {
   };
 
   const handleSuccessModalClick = () => {
+    sessionStorage.removeItem('pendingSignup');
     useCreditStore.getState().addFreeCredit(150);
     router.push('/chat');
   };
