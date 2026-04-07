@@ -39,6 +39,7 @@ function mapToReport(item: ReportListItem): Report {
     period,
     reportType: item.report_type,
     isFailed: item.status === 'failed',
+    isGenerating: item.status === 'generating',
   };
 }
 
@@ -73,7 +74,7 @@ export default function ReportPage() {
         toast('리포트 목록을 불러오는 데 실패했어요.', 'error');
       }
     },
-    [toast],
+    [toast]
   );
 
   // 목록 초기 로딩
@@ -88,9 +89,6 @@ export default function ReportPage() {
       });
   }, [toast]);
 
-  // 상담 횟수 — 실제 API 연동 시 교체
-  const consultationCount = canGenerate?.saved_session_count ?? 0;
-
   const selectedReport = reports.find((r) => r.id === selectedId);
 
   const showDetail = useCallback((id: string) => {
@@ -103,7 +101,10 @@ export default function ReportPage() {
   const handleSelect = (id: string) => {
     const report = reports.find((r) => r.id === id);
     setSelectedId(id);
-    if (report?.isFailed) {
+    if (report?.isGenerating) {
+      setSseStep(undefined);
+      setViewState('creating');
+    } else if (report?.isFailed) {
       setViewState('failed');
     } else {
       setViewState('success');
@@ -122,7 +123,6 @@ export default function ReportPage() {
         async (event: ReportCompleteEvent) => {
           setViewState('success');
           setIsLoadingDetail(true);
-          toast('리포트가 완성됐어요!', 'success');
           await loadReports(event.report_id);
           setTimeout(() => setIsLoadingDetail(false), SKELETON_MS);
         },
@@ -188,10 +188,7 @@ export default function ReportPage() {
                   차곡차곡 쌓인 상담 기록으로 내 마음의 흐름을 찾아낼게요.
                 </p>
               </header>
-              <ReportCreationForm
-                onCreateReport={handleCreateReport}
-                consultationCount={consultationCount}
-              />
+              <ReportCreationForm onCreateReport={handleCreateReport} />
             </div>
           </div>
         )}
