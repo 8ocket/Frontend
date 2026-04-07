@@ -17,6 +17,8 @@ export type ChatBubbleProps = {
   isLoading?: boolean;
   /** AI 버블에서 감정 카드를 표시할 때 사용. 설정 시 텍스트 대신 EmotionCard 렌더링. */
   emotionCardData?: EmotionCardData;
+  /** 감정 카드 다운로드 URL (백엔드 생성 이미지) */
+  cardImageUrl?: string;
 };
 
 // User Profile Photo — 21×21 흰 원 + 사용자 실루엣 벡터 (fill=#2b4764)
@@ -37,9 +39,17 @@ function UserProfilePhoto() {
   );
 }
 
-export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatarSrc, isLoading, emotionCardData }: ChatBubbleProps) {
+export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatarSrc, isLoading, emotionCardData, cardImageUrl }: ChatBubbleProps) {
   const isAi = variant === 'ai';
   const resolvedAvatarSrc = isAi ? (avatarSrc ?? '/images/personas/nabomi-44.png') : avatarSrc;
+
+  const handleDownload = () => {
+    if (!cardImageUrl) return;
+    const link = document.createElement('a');
+    link.href = cardImageUrl;
+    link.download = `마음기록-${new Date().toISOString().slice(0, 10)}.jpg`;
+    link.click();
+  };
 
   return (
     <div
@@ -80,7 +90,19 @@ export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatar
 
       {/* Bubble body */}
       {emotionCardData ? (
-        <EmotionCard data={emotionCardData} size="sample" initialFace="front" />
+        <div className="flex flex-row items-end gap-2">
+          <EmotionCard data={emotionCardData} size="sample" initialFace="front" />
+          {cardImageUrl && (
+            <button
+              onClick={(e) => { e.stopPropagation(); handleDownload(); }}
+              className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full shadow-md transition-opacity hover:opacity-90 active:opacity-80"
+              aria-label="마음 기록 카드 다운로드"
+              style={{ background: '#82C9FF', fontFamily: 'Pretendard', fontSize: '16px', fontStyle: 'normal', fontWeight: 500, lineHeight: '100%', color: '#F8FAFC', textAlign: 'center' }}
+            >
+              다운로드
+            </button>
+          )}
+        </div>
       ) : (
         <div
           className={[

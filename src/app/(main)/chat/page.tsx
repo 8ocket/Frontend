@@ -880,7 +880,7 @@ export default function ChatPage() {
           // 텍스트 버블 대신 감정 카드 버블 표시
           if (capturedResult) {
             const cardData = finalizeToEmotionCardData(capturedResult, capturedSessionId);
-            setAppendMessage({ variant: 'ai', senderName: '나봄이', avatarSrc: activeAiAvatarSrc, emotionCardData: cardData });
+            setAppendMessage({ variant: 'ai', senderName: '나봄이', avatarSrc: activeAiAvatarSrc, emotionCardData: cardData, cardImageUrl: capturedResult.card_image_url });
           }
         },
         controller.signal
