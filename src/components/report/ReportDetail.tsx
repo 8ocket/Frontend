@@ -221,9 +221,9 @@ export function ReportDetail({ report }: ReportDetailProps) {
             <h4 className="text-prime-700 mb-3 text-base font-bold">사용자 경향</h4>
             {isTendencyLoading ? (
               <div className="space-y-2">
-                <div className="h-3.5 w-full animate-pulse rounded bg-prime-100" />
-                <div className="h-3.5 w-4/5 animate-pulse rounded bg-prime-100" />
-                <div className="h-3.5 w-3/5 animate-pulse rounded bg-prime-100" />
+                <div className="bg-prime-100 h-3.5 w-full animate-pulse rounded" />
+                <div className="bg-prime-100 h-3.5 w-4/5 animate-pulse rounded" />
+                <div className="bg-prime-100 h-3.5 w-3/5 animate-pulse rounded" />
               </div>
             ) : (
               <p className="text-prime-700 text-sm leading-relaxed">

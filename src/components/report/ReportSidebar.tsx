@@ -73,9 +73,7 @@ export function ReportSidebar({
                       </span>
                     )}
                     {report.isNew && !report.isFailed && !report.isGenerating && (
-                      <span className="bg-main-blue text-prime-900 inline-block rounded px-2 py-0.5 text-[10px] font-bold">
-                        NEW
-                      </span>
+                      <span className="bg-main-blue size-2 inline-block rounded-full" />
                     )}
                     <span className="text-prime-400 text-[10px] font-medium">{report.type}</span>
                     {report.isFailed && <AlertCircle className="text-prime-400 size-3" />}

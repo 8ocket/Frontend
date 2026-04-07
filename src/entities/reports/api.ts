@@ -9,7 +9,12 @@ import {
   ReportType,
   SuggestionItem,
 } from './model';
-import { mockCreateReport, mockGetReportDetail, mockGetReportList, mockGetReportSuggestions } from '@/mocks';
+import {
+  mockCreateReport,
+  mockGetReportDetail,
+  mockGetReportList,
+  mockGetReportSuggestions,
+} from '@/mocks';
 import { USE_MOCK } from '@/shared/lib/env';
 import { getCookie } from '@/shared/lib/utils/cookie';
 
@@ -133,7 +138,7 @@ export const getReportSuggestionsApi = async (reportId: string): Promise<Suggest
   if (USE_MOCK) return mockGetReportSuggestions(reportId);
 
   const response = await api.get<ReportApiResponse<SuggestionItem[]>>(
-    `/reports/${reportId}/suggestions`,
+    `/reports/${reportId}/suggestions`
   );
 
   if (response.data.code === 'ok' && response.data.data) {

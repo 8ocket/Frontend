@@ -1,14 +1,13 @@
 'use client';
 
-import { AlertTriangle, RefreshCcw } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 
 interface ReportErrorProps {
-  onRetry: () => void;
   onDismiss: () => void;
 }
 
-export function ReportError({ onRetry, onDismiss }: ReportErrorProps) {
+export function ReportError({ onDismiss }: ReportErrorProps) {
   return (
     <div className="flex min-h-150 items-center justify-center px-4">
       <div className="w-full max-w-130 text-center">

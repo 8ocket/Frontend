@@ -52,6 +52,7 @@ export default function ReportPage() {
   const [selectedId, setSelectedId] = useState('');
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
   const [sseStep, setSseStep] = useState<'analyzing' | 'generating' | undefined>();
+  // TODO [API]: 기간별 세션 수 연동 시 크레딧/생성 가능 여부 판단에 활용
   const [canGenerate, setCanGenerate] = useState<CanGenerate | null>(null);
 
   // 리포트 페이지에서는 body 스크롤 방지
@@ -144,9 +145,6 @@ export default function ReportPage() {
     }
   };
 
-  const handleRetry = () => {
-    setViewState('idle');
-  };
   const handleCreateNew = () => setViewState('idle');
 
   return (
@@ -198,7 +196,7 @@ export default function ReportPage() {
 
         {/* failed: 에러 */}
         {viewState === 'failed' && (
-          <ReportError onRetry={handleRetry} onDismiss={handleCreateNew} />
+          <ReportError onDismiss={handleCreateNew} />
         )}
 
         {/* success: 스켈레톤 → 리포트 상세 */}
