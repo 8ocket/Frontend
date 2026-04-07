@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreditStore } from '@/entities/credits/store';
+import { useAuthStore } from '@/entities/user/store';
 import { useChatModals } from '@/features/select-persona';
 import type { ChatBubbleProps } from '@/widgets/chat-main-area';
 import type { ChatSessionGroup } from '@/widgets/chat-sidebar';
@@ -14,7 +15,9 @@ import {
   ChatCreditModal,
   ChatNewSessionModal,
   ChatUnfinishedSessionModal,
+  // ChatSatisfactionModal,  // TODO: 만족도 조사 — 우선순위 보류
 } from '@/components/chat';
+import { finalizeToEmotionCardData } from '@/entities/session/utils';
 import { Menu } from 'lucide-react';
 import {
   getActiveSessionApi,
@@ -36,6 +39,7 @@ export type ChatModalType =
   | 'new-session'
   | 'unfinished-session'
   | 'end-confirm'
+  // | 'satisfaction'  // TODO: 만족도 조사 — 우선순위 보류
   | null;
 
 // ── 더미 세션 데이터 (TODO: API 연동 시 제거) ───────────────────
@@ -670,6 +674,7 @@ export default function ChatPage() {
   const router = useRouter();
   const { activeModal, openModal, closeModal } = useChatModals();
   const { totalCredit } = useCreditStore();
+  const { user } = useAuthStore();
   const remainingCredits = totalCredit;
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -681,11 +686,12 @@ export default function ChatPage() {
   /** 채팅창에 외부에서 append할 메시지 */
   const [appendMessage, setAppendMessage] = useState<ChatBubbleProps | null>(null);
   const [sessionDetail, setSessionDetail] = useState<SessionDetailResponse | null>(null);
-  /** finalize 완료 데이터 — 추후 카드 표시 등에 활용 */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_finalizeResult, setFinalizeResult] = useState<FinalizeCompleteEvent | null>(null);
+  /** finalize 완료 데이터 */
+  const [finalizeResult, setFinalizeResult] = useState<FinalizeCompleteEvent | null>(null);
   /** finalize 스트림 취소용 — 언마운트 시 abort */
   const finalizeAbortRef = useRef<AbortController | null>(null);
+  /** 60분 미입력 자동 종료 타이머 */
+  const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return () => {
@@ -700,6 +706,26 @@ export default function ChatPage() {
       document.body.style.overflow = '';
     };
   }, []);
+
+  // 60분 미입력 자동 종료 타이머 — 세션 활성 상태에서만 동작
+  const resetInactivityTimer = useCallback(() => {
+    if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
+    inactivityTimerRef.current = setTimeout(() => {
+      setIsSessionActive(false);
+      finalizeAbortRef.current?.abort();
+    }, 60 * 60 * 1000);
+  }, []);
+
+  useEffect(() => {
+    if (isSessionActive) {
+      resetInactivityTimer();
+    } else {
+      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
+    }
+    return () => {
+      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
+    };
+  }, [isSessionActive, resetInactivityTimer]);
 
   // activeSessionId 변경 시 세션 상세 조회 (새 세션 생성 시에만 — 이어가기/사이드바는 핸들러에서 pre-fetch)
   useEffect(() => {
@@ -720,9 +746,10 @@ export default function ChatPage() {
     if (!sessionDetail) return [];
     return [...sessionDetail.messages].reverse().map((m) => ({
       variant: m.role === 'assistant' ? 'ai' : 'user',
-      senderName: m.role === 'assistant' ? '나봄이' : '나',
+      senderName: m.role === 'assistant' ? '나봄이' : (user?.name ?? '나'),
       content: m.content,
       avatarSrc: m.role === 'assistant' ? '/images/personas/nabomi-44.png' : undefined,
+      userAvatarSrc: m.role === 'user' ? (user?.profileImage ?? undefined) : undefined,
     }));
   }, [sessionDetail]);
 
@@ -807,17 +834,23 @@ export default function ChatPage() {
 
   const handleEndChat = () => openModal('end-confirm');
 
-  /** 종료 확인 → finalize SSE 호출 → 완료 메시지 */
+  /** 종료 확인 → finalize SSE 호출 → 감정 카드 버블 */
   const handleEndConfirmed = async () => {
     closeModal();
     setIsSessionActive(false);
     setAppendMessage({
       variant: 'ai',
-      senderName: '마음 기록',
+      senderName: '나봄이',
+      avatarSrc: activeAiAvatarSrc,
       content: '마음 기록을 생성 중입니다.',
     });
 
     if (!activeSessionId) return;
+
+    // TODO: 만족도 조사 — 우선순위 보류
+    // if ((sessionList.length + 1) % 5 === 0) {
+    //   openModal('satisfaction');
+    // }
 
     const token = getCookie('accessToken') ?? '';
     if (!token) {
@@ -828,30 +861,40 @@ export default function ChatPage() {
     const controller = new AbortController();
     finalizeAbortRef.current = controller;
 
+    // onDone 클로저에서 state 참조가 stale해질 수 있으므로 로컬 변수로 캡처
+    let capturedResult: typeof finalizeResult = null;
+    const capturedSessionId = activeSessionId;
+
     try {
       await finalizeSessionStream(
-        activeSessionId,
+        capturedSessionId,
         token,
         () => {}, // status 이벤트 — 고정 메시지 유지
-        (data) => setFinalizeResult(data),
+        (data) => {
+          setFinalizeResult(data);
+          capturedResult = data;
+        },
         () => {
-          setAppendMessage({
-            variant: 'ai',
-            senderName: '마음 기록',
-            content: '마음 기록이 완성되었습니다.',
-          });
+          // 만족도 팝업이 열려 있으면 닫기
+          closeModal();
+          // 텍스트 버블 대신 감정 카드 버블 표시
+          if (capturedResult) {
+            const cardData = finalizeToEmotionCardData(capturedResult, capturedSessionId);
+            setAppendMessage({ variant: 'ai', senderName: '나봄이', avatarSrc: activeAiAvatarSrc, emotionCardData: cardData, cardImageUrl: capturedResult.card_image_url });
+          }
         },
         controller.signal
       );
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') return;
+      closeModal();
       const code = err instanceof Error ? err.message : '';
       const message =
         code === 'SESSION_ALREADY_SAVED' ? '이미 저장된 상담입니다.' :
         code === 'SESSION_TOO_SHORT' ? '상담이 너무 짧아 기록을 생성할 수 없습니다.' :
         code === 'SESSION_NOT_FOUND' ? '세션을 찾을 수 없습니다.' :
         '마음 기록 생성에 실패했습니다.';
-      setAppendMessage({ variant: 'ai', senderName: '마음 기록', content: message });
+      setAppendMessage({ variant: 'ai', senderName: '나봄이', avatarSrc: activeAiAvatarSrc, content: message });
     }
   };
 
@@ -902,6 +945,9 @@ export default function ChatPage() {
           onSessionCreated={(id) => setActiveSessionId(id)}
           aiName={activeAiName}
           aiAvatarSrc={activeAiAvatarSrc}
+          onUserMessage={resetInactivityTimer}
+          userName={user?.name}
+          userAvatarSrc={user?.profileImage}
         />
       </div>
 
@@ -953,6 +999,14 @@ export default function ChatPage() {
         onWait={closeModal}
         onEnd={handleEndConfirmed}
       />
+
+      {/* TODO: 만족도 조사 — 우선순위 보류 */}
+      {/* <ChatSatisfactionModal
+        isOpen={activeModal === 'satisfaction'}
+        onClose={closeModal}
+        onYes={closeModal}
+        onNo={closeModal}
+      /> */}
     </div>
   );
 }
