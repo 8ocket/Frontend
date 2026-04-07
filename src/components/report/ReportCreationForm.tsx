@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { CalendarIcon, CheckCircle2, Info, ArrowRight } from 'lucide-react';
 import { format, addDays, min } from 'date-fns';
 import { ko } from 'date-fns/locale/ko';
@@ -10,16 +10,18 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { cn } from '@/shared/lib/utils';
 import type { ReportType } from './types';
 import { REPORT_CREDIT_COST } from '@/constants/credit';
+import { getSessionsApi } from '@/entities/session/api';
 
 interface ReportCreationFormProps {
   onCreateReport: (type: ReportType, startDate: string, endDate: string) => void;
-  consultationCount: number;
 }
 
-export function ReportCreationForm({ onCreateReport, consultationCount }: ReportCreationFormProps) {
+export function ReportCreationForm({ onCreateReport }: ReportCreationFormProps) {
   const [selectedType, setSelectedType] = useState<ReportType>('weekly');
   const [baseDate, setBaseDate] = useState<Date | undefined>(undefined);
   const [agreed, setAgreed] = useState(false);
+  const [consultationCount, setConsultationCount] = useState<number | null>(null);
+  const [isLoadingCount, setIsLoadingCount] = useState(false);
 
   const today = useMemo(() => {
     const next = new Date();
@@ -34,8 +36,32 @@ export function ReportCreationForm({ onCreateReport, consultationCount }: Report
     return min([addDays(baseDate, days), today]);
   }, [baseDate, selectedType, today]);
 
+  // baseDate / autoEndDate 변경 시 기간 내 세션 수 조회
+  useEffect(() => {
+    if (!baseDate || !autoEndDate) return;
+
+    (async () => {
+      setIsLoadingCount(true);
+      try {
+        const res = await getSessionsApi({
+          start_date: format(baseDate, 'yyyy-MM-dd'),
+          end_date: format(autoEndDate, 'yyyy-MM-dd'),
+          size: 1,
+        });
+        setConsultationCount(res.pagination.total_count);
+      } catch {
+        setConsultationCount(null);
+      } finally {
+        setIsLoadingCount(false);
+      }
+    })();
+  }, [baseDate, autoEndDate]);
+
+  // 날짜 미선택 시 null로 취급
+  const effectiveCount = baseDate && autoEndDate ? consultationCount : null;
+
   const minRequired = selectedType === 'weekly' ? 2 : 4;
-  const hasEnough = consultationCount >= minRequired;
+  const hasEnough = (effectiveCount ?? 0) >= minRequired;
   const canGenerate = hasEnough && !!baseDate && agreed;
 
   const handleGenerate = () => {
@@ -55,6 +81,7 @@ export function ReportCreationForm({ onCreateReport, consultationCount }: Report
 
   const buttonLabel = () => {
     if (!baseDate) return '날짜를 먼저 선택해주세요';
+    if (isLoadingCount) return '대화 기록 확인 중...';
     if (!hasEnough) return '이 기간엔 대화 기록이 조금 더 필요해요';
     if (!agreed) return '아래 동의 후 시작할 수 있어요';
     return '내 마음 리포트 확인하기';
@@ -167,7 +194,11 @@ export function ReportCreationForm({ onCreateReport, consultationCount }: Report
       <div
         className={cn(
           'flex items-center justify-between rounded-xl p-4',
-          !baseDate ? 'bg-bg-light' : hasEnough ? 'bg-bg-light' : 'bg-error-100/60'
+          !baseDate || isLoadingCount
+            ? 'bg-bg-light'
+            : hasEnough
+              ? 'bg-bg-light'
+              : 'bg-error-100/60'
         )}
       >
         <div className="flex items-center gap-3">
@@ -175,7 +206,11 @@ export function ReportCreationForm({ onCreateReport, consultationCount }: Report
             <CalendarIcon
               className={cn(
                 'size-4',
-                !baseDate ? 'text-prime-300' : hasEnough ? 'text-main-blue' : 'text-error-500'
+                !baseDate || isLoadingCount
+                  ? 'text-prime-300'
+                  : hasEnough
+                    ? 'text-main-blue'
+                    : 'text-error-500'
               )}
             />
           </div>
@@ -183,20 +218,24 @@ export function ReportCreationForm({ onCreateReport, consultationCount }: Report
             <p className="text-prime-900 text-sm font-semibold">
               {!baseDate
                 ? '날짜를 선택하면 확인할 수 있어요'
-                : hasEnough
-                  ? `이 기간에 ${consultationCount}번의 대화가 있었네요 😊`
-                  : `이 기간엔 대화 기록이 조금 더 필요해요`}
+                : isLoadingCount
+                  ? '대화 기록을 확인하는 중이에요...'
+                  : hasEnough
+                    ? `이 기간에 ${effectiveCount}번의 대화가 있었네요 😊`
+                    : `이 기간엔 대화 기록이 조금 더 필요해요`}
             </p>
             <p className="text-prime-500 mt-0.5 text-xs">
               {!baseDate
                 ? '기간을 설정하면 대화 기록 수를 알려드릴게요.'
-                : hasEnough
-                  ? '분석하기 딱 좋은 데이터예요!'
-                  : `${minRequired}번 이상 대화한 기간을 선택해 주세요.`}
+                : isLoadingCount
+                  ? '잠시만 기다려 주세요.'
+                  : hasEnough
+                    ? '분석하기 딱 좋은 데이터예요!'
+                    : `${minRequired}번 이상 대화한 기간을 선택해 주세요.`}
             </p>
           </div>
         </div>
-        {baseDate && (
+        {baseDate && !isLoadingCount && (
           <span
             className={cn('text-sm font-bold', hasEnough ? 'text-main-blue' : 'text-error-500')}
           >
@@ -237,7 +276,7 @@ export function ReportCreationForm({ onCreateReport, consultationCount }: Report
       {/* 생성 버튼 */}
       <Button
         onClick={handleGenerate}
-        disabled={!baseDate || !hasEnough || !agreed}
+        disabled={!baseDate || isLoadingCount || !hasEnough || !agreed}
         size="cta"
         className="h-12 text-base"
       >
@@ -247,10 +286,8 @@ export function ReportCreationForm({ onCreateReport, consultationCount }: Report
       {/* 안내 문구 */}
       <div className="text-prime-400 flex items-center gap-2">
         <Info className="size-3.5 shrink-0" />
-        <p className="text-xs">
-          소중한 대화 기록을 바탕으로 마음의 흐름을 정밀하게 분석하고 있습니다. 잠시만 기다려
-          주세요.
-        </p>
+
+        <p className="text-xs">상담 종료 후 생성된 감정 카드를 기반으로 리포트가 분석됩니다.</p>
       </div>
     </div>
   );
