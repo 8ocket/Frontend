@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/shared/lib/utils';
@@ -34,11 +34,26 @@ function GridCard({
   onClick: () => void;
 }) {
   const emotionLabel = getEmotionLabel(data);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [cardWidth, setCardWidth] = useState(350);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const w = Math.floor(entry.contentRect.width);
+      if (w > 0) setCardWidth(w);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const cardHeight = Math.round(cardWidth * (600 / 350));
 
   return (
-    <div className="flex w-full flex-col gap-2">
+    <div ref={containerRef} className="flex w-full flex-col gap-2">
       {/* 날짜 */}
-      <div className="flex items-center gap-1.75" style={{ width: 350 }}>
+      <div className="flex items-center gap-1.75">
         <span className="subtitle-1 text-prime-600">Date :</span>
         <span className="subtitle-1 text-prime-600">
           {data.createdAt ? formatDate(new Date(data.createdAt)) : '—'}
@@ -54,15 +69,15 @@ function GridCard({
           'shadow-md ring-1 ring-black/5',
           isActive && 'invisible'
         )}
-        style={{ width: 350, height: 600 }}
+        style={{ width: cardWidth, height: cardHeight }}
         whileHover={{ scale: 1.02, boxShadow: '0 12px 32px rgba(0,0,0,0.12)' }}
-        transition={{ duration: 0.2 }}
+        transition={{ duration: 0.2, layout: { duration: 0 } }}
       >
         <EmotionCardFront
           layers={data.layers}
           emotionLabel={emotionLabel}
-          width={350}
-          height={600}
+          width={cardWidth}
+          height={cardHeight}
         />
       </motion.div>
     </div>
@@ -171,25 +186,81 @@ function CardOverlay({ data, onClose }: { data: EmotionCardData; onClose: () => 
   );
 }
 
+const COLS = 7;
+const COL_GAP = 24; // gap-x-6 (1.5rem)
+const ROW_GAP = 40; // gap-y-10 (2.5rem)
+const DATE_ROW_HEIGHT = 32 + 8; // 날짜 라벨 높이 + gap-2(8px)
+const PAGINATION_RESERVE = 160; // 페이지네이션(32) + mt-10(40) + py-12 하단(48) + 여유(40)
+
 // ─── 메인 페이지 ───
 
 export default function CollectionPage() {
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(COLS);
+  const [direction, setDirection] = useState<1 | -1>(1);
+  const gridRef = useRef<HTMLDivElement>(null);
   const { cards, fetchCards } = useCollectionStore();
 
   useEffect(() => {
     fetchCards();
   }, [fetchCards]);
 
-  const sortedCards = [...cards]
-    .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime())
-    .slice(0, 7);
+  // 뷰포트 높이 기준으로 한 페이지에 표시할 카드 수 계산
+  useEffect(() => {
+    function calculate() {
+      const el = gridRef.current;
+      if (!el) return;
 
-  const activeCard = sortedCards.find((c) => c.cardId === activeCardId) ?? null;
+      const containerWidth = el.offsetWidth;
+      if (containerWidth === 0) return;
+
+      const cardWidth = (containerWidth - (COLS - 1) * COL_GAP) / COLS;
+      const cardHeight = Math.round(cardWidth * (600 / 350));
+      const rowHeight = DATE_ROW_HEIGHT + cardHeight;
+
+      const rect = el.getBoundingClientRect();
+      const available = window.innerHeight - rect.top - PAGINATION_RESERVE;
+      const rows = Math.max(1, Math.floor(available / (rowHeight + ROW_GAP)));
+
+      setPageSize(COLS * rows);
+    }
+
+    calculate();
+
+    const observer = new ResizeObserver(calculate);
+    if (gridRef.current) observer.observe(gridRef.current);
+    window.addEventListener('resize', calculate);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', calculate);
+    };
+  }, []);
+
+  const sortedCards = [...cards].sort(
+    (a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
+  );
+
+  const totalPages = Math.max(1, Math.ceil(sortedCards.length / pageSize));
+  const pagedCards = sortedCards.slice((page - 1) * pageSize, page * pageSize);
+  const activeCard = pagedCards.find((c) => c.cardId === activeCardId) ?? null;
+
+  function handlePageChange(next: number) {
+    setDirection(next > page ? 1 : -1);
+    setPage(next);
+    setActiveCardId(null);
+  }
+
+  const slideVariants = {
+    enter: (dir: number) => ({ x: dir * 40, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (dir: number) => ({ x: dir * -40, opacity: 0 }),
+  };
 
   return (
-    <div className="min-h-main-safe">
-      <div className="mx-auto max-w-360 px-4 py-12 sm:px-8">
+    <div className="flex min-h-main-safe flex-col">
+      <div className="mx-auto flex w-full max-w-360 flex-1 flex-col px-4 py-12 sm:px-8">
         {/* 헤더 */}
         <div className="mb-10 flex flex-col items-center gap-4">
           <h1 className="heading-01 text-prime-900 text-center">마음기록 모음</h1>
@@ -198,25 +269,66 @@ export default function CollectionPage() {
           </p>
         </div>
 
-        {/* 카드 그리드 — 3열 */}
-        <div
-          className="relative"
-          style={{
-            maskImage: 'linear-gradient(to bottom, black 70%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, black 70%, transparent 100%)',
-          }}
-        >
-          <div className="grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-            {sortedCards.map((card) => (
-              <GridCard
-                key={card.cardId}
-                data={card}
-                isActive={activeCardId === card.cardId}
-                onClick={() => setActiveCardId(card.cardId)}
-              />
-            ))}
-          </div>
+        {/* 카드 그리드 — 7열 */}
+        <div ref={gridRef} className="relative flex-1 overflow-x-clip">
+          <AnimatePresence mode="popLayout" custom={direction}>
+            <motion.div
+              key={page}
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.35, ease: 'easeInOut' }}
+              className="grid grid-cols-7 gap-x-6 gap-y-10"
+            >
+              {pagedCards.map((card) => (
+                <GridCard
+                  key={card.cardId}
+                  data={card}
+                  isActive={activeCardId === card.cardId}
+                  onClick={() => setActiveCardId(card.cardId)}
+                />
+              ))}
+            </motion.div>
+          </AnimatePresence>
         </div>
+
+        {/* 페이지네이션 */}
+        {totalPages > 1 && (
+          <div className="mt-10 flex items-center justify-center gap-2">
+            <button
+              onClick={() => handlePageChange(page - 1)}
+              disabled={page === 1}
+              className="text-prime-600 flex h-8 w-8 items-center justify-center rounded-full text-sm transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-30"
+            >
+              ‹
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              <button
+                key={p}
+                onClick={() => handlePageChange(p)}
+                className={cn(
+                  'flex h-8 w-8 items-center justify-center rounded-full text-sm transition-colors',
+                  p === page
+                    ? 'text-main-blue bg-blue-50 font-semibold'
+                    : 'text-prime-600 hover:bg-slate-100'
+                )}
+              >
+                {p}
+              </button>
+            ))}
+
+            <button
+              onClick={() => handlePageChange(page + 1)}
+              disabled={page === totalPages}
+              className="text-prime-600 flex h-8 w-8 items-center justify-center rounded-full text-sm transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-30"
+            >
+              ›
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 오버레이 */}
