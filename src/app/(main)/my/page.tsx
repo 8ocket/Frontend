@@ -61,8 +61,8 @@ export default function MyPage() {
     // 2. Store 상태 초기화 (쿠키 포함)
     logout();
 
-    // 3. 메인 이동
-    router.replace('/');
+    // 3. 브랜드 소개 화면으로 이동
+    router.replace('/about');
   };
 
   useEffect(() => {
