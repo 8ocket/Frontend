@@ -54,6 +54,9 @@ export function useOAuthCallback({ loginApi, errorMessage }: UseOAuthCallbackOpt
         });
         useCreditStore.getState().setTotalCredit(credit.totalCredit);
 
+        if (result.isNewUser) {
+          sessionStorage.setItem('pendingSignup', 'true');
+        }
         router.push(result.isNewUser ? '/signup' : '/');
       } catch (error) {
         console.error(error);

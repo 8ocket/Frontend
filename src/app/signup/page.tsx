@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useRouter } from 'next/navigation';
@@ -18,6 +18,12 @@ import {
 export default function SignupPage() {
   const router = useRouter();
   const [selectedTerm, setSelectedTerm] = useState<AgreementKey | null>(null);
+
+  useEffect(() => {
+    if (!sessionStorage.getItem('pendingSignup')) {
+      router.replace('/');
+    }
+  }, [router]);
   const [agreements, setAgreements] = useState<Record<AgreementKey, boolean>>(
     () => Object.fromEntries(TERMS_LIST.map((t) => [t.key, false])) as Record<AgreementKey, boolean>
   );
