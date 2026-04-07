@@ -4,8 +4,8 @@ import { addDays, format } from 'date-fns';
 import { Calendar, Sparkles, Target } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { cn } from '@/shared/lib/utils';
-import { getReportSuggestionsApi } from '@/entities/reports/api';
-import type { SuggestionItem } from '@/entities/reports/model';
+import { getReportDetailApi, getReportSuggestionsApi } from '@/entities/reports/api';
+import type { ReportDetailCompleted, SuggestionItem } from '@/entities/reports/model';
 import { EmotionAreaChart } from './EmotionAreaChart';
 import type { EmotionDataPoint } from './EmotionAreaChart';
 import type { Report } from './types';
@@ -21,9 +21,9 @@ function parsePeriodStart(period: string): Date {
   return new Date(y, m - 1, d);
 }
 
-// TODO [API]: WEEKLY_SCORES, MONTHLY_SCORES 제거하고 buildChartData의 반환값을
-//             GET /reports/:id/chart-data 응답(EmotionDataPoint[])으로 교체
-//             응답 형식 예시: [{ label: '03.17', score: 20, emotion: '평온' }, ...]
+// TODO [API]: GET /v1/reports/{report_id}/graphs 응답으로 그래프 데이터 로드
+//             응답 형식: { graph_count, graphs: [{ session_id, avg_score, recorded_at }], graph_evaluation }
+//             graphs 배열을 EmotionDataPoint[]로 변환하여 표시
 const WEEKLY_SCORES: { score: number; emotion: string }[] = [
   { score: 20, emotion: '평온' },
   { score: -35, emotion: '불안' },
@@ -86,12 +86,23 @@ export function ReportDetail({ report }: ReportDetailProps) {
   const emotionData = buildChartData(report);
   const [suggestions, setSuggestions] = useState<SuggestionItem[]>([]);
   const [isSuggestionsLoading, setIsSuggestionsLoading] = useState(true);
+  const [tendencySummary, setTendencySummary] = useState<string | null>(null);
+  const [isTendencyLoading, setIsTendencyLoading] = useState(true);
 
   useEffect(() => {
-    setIsSuggestionsLoading(true);
     getReportSuggestionsApi(report.id)
       .then(setSuggestions)
       .finally(() => setIsSuggestionsLoading(false));
+  }, [report.id]);
+
+  useEffect(() => {
+    getReportDetailApi(report.id)
+      .then((detail) => {
+        if ('tendency_analysis' in detail) {
+          setTendencySummary((detail as ReportDetailCompleted).tendency_analysis.tendency_summary);
+        }
+      })
+      .finally(() => setIsTendencyLoading(false));
   }, [report.id]);
 
   return (
@@ -137,6 +148,7 @@ export function ReportDetail({ report }: ReportDetailProps) {
       </div>
 
       {/* ── 감정 변화 그래프 (섹션 헤더 포함) ── */}
+      {/* TODO [API]: GET /v1/reports/{report_id}/graphs 응답으로 아래 emotionData 업데이트 필요 */}
       <div
         className="animate-in fade-in-0 slide-in-from-bottom-4"
         style={{ animationDuration: '400ms', animationDelay: '80ms', animationFillMode: 'both' }}
@@ -204,51 +216,20 @@ export function ReportDetail({ report }: ReportDetailProps) {
               경향을 보였습니다.
             </p>
           </div>
-          <div>
-            <h4 className="text-prime-700 mb-3 text-base font-bold">주요 발견사항</h4>
-            <p className="text-prime-700 text-sm leading-relaxed">
-              주말에는 감정 지수가 최고치를 기록하며{' '}
-              <span className="rounded bg-blue-50 px-1.5 py-0.5 font-medium">심리적 안정</span>{' '}
-              상태가 확인되었습니다. 전체적으로 지난 주 대비{' '}
-              <span className="font-bold" style={{ color: 'var(--main-blue)' }}>
-                +12점
-              </span>{' '}
-              향상되었습니다.
-            </p>
-          </div>
-          <div>
-            <h4 className="text-prime-700 mb-3 text-base font-bold">긍정적 변화</h4>
-            <p className="text-prime-700 text-sm leading-relaxed">
-              최근 3일간{' '}
-              <span className="rounded bg-emerald-50 px-1.5 py-0.5 font-medium">
-                자기 돌봄 활동 빈도가 증가
-              </span>
-              하며 전반적인 감정 점수가 상승하는 긍정적 추세를 보이고 있습니다.
-            </p>
-          </div>
-        </div>
 
-        {/* TODO [API]: 스트레스 수준(label: '높음', value: 72)과 회복 탄력성(label: '양호', value: 65)을
-                       GET /reports/:id/summary 응답의 summary.stressLevel / summary.resilience 필드로 교체
-                       value는 0~100 사이 정수, label은 '낮음' | '보통' | '높음' | '양호' 등 */}
-        <div className="border-prime-100 mt-8 grid grid-cols-2 gap-4 border-t pt-8">
-          <div className="bg-bg-light rounded-2xl p-5">
-            <div className="mb-3 flex items-center justify-between">
-              <span className="text-prime-500 text-[13px]">스트레스 수준</span>
-              <span className="text-main-blue text-base font-bold">높음</span>
-            </div>
-            <div className="bg-prime-200 h-2 w-full overflow-hidden rounded-full">
-              <div className="bg-main-blue h-full w-[72%] rounded-full" />
-            </div>
-          </div>
-          <div className="bg-success-700/5 rounded-2xl p-5">
-            <div className="mb-3 flex items-center justify-between">
-              <span className="text-prime-500 text-[13px]">회복 탄력성</span>
-              <span className="text-success-700 text-base font-bold">양호</span>
-            </div>
-            <div className="bg-success-700/20 h-2 w-full overflow-hidden rounded-full">
-              <div className="bg-success-700 h-full w-[65%] rounded-full" />
-            </div>
+          <div>
+            <h4 className="text-prime-700 mb-3 text-base font-bold">사용자 경향</h4>
+            {isTendencyLoading ? (
+              <div className="space-y-2">
+                <div className="bg-prime-100 h-3.5 w-full animate-pulse rounded" />
+                <div className="bg-prime-100 h-3.5 w-4/5 animate-pulse rounded" />
+                <div className="bg-prime-100 h-3.5 w-3/5 animate-pulse rounded" />
+              </div>
+            ) : (
+              <p className="text-prime-700 text-sm leading-relaxed">
+                {tendencySummary ?? '경향 분석 데이터가 없어요.'}
+              </p>
+            )}
           </div>
         </div>
       </div>

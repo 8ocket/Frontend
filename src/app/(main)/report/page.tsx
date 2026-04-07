@@ -39,6 +39,7 @@ function mapToReport(item: ReportListItem): Report {
     period,
     reportType: item.report_type,
     isFailed: item.status === 'failed',
+    isGenerating: item.status === 'generating',
   };
 }
 
@@ -51,6 +52,7 @@ export default function ReportPage() {
   const [selectedId, setSelectedId] = useState('');
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
   const [sseStep, setSseStep] = useState<'analyzing' | 'generating' | undefined>();
+  // TODO [API]: 기간별 세션 수 연동 시 크레딧/생성 가능 여부 판단에 활용
   const [canGenerate, setCanGenerate] = useState<CanGenerate | null>(null);
 
   // 리포트 페이지에서는 body 스크롤 방지
@@ -73,7 +75,7 @@ export default function ReportPage() {
         toast('리포트 목록을 불러오는 데 실패했어요.', 'error');
       }
     },
-    [toast],
+    [toast]
   );
 
   // 목록 초기 로딩
@@ -88,9 +90,6 @@ export default function ReportPage() {
       });
   }, [toast]);
 
-  // 상담 횟수 — 실제 API 연동 시 교체
-  const consultationCount = canGenerate?.saved_session_count ?? 0;
-
   const selectedReport = reports.find((r) => r.id === selectedId);
 
   const showDetail = useCallback((id: string) => {
@@ -103,7 +102,10 @@ export default function ReportPage() {
   const handleSelect = (id: string) => {
     const report = reports.find((r) => r.id === id);
     setSelectedId(id);
-    if (report?.isFailed) {
+    if (report?.isGenerating) {
+      setSseStep(undefined);
+      setViewState('creating');
+    } else if (report?.isFailed) {
       setViewState('failed');
     } else {
       setViewState('success');
@@ -122,7 +124,6 @@ export default function ReportPage() {
         async (event: ReportCompleteEvent) => {
           setViewState('success');
           setIsLoadingDetail(true);
-          toast('리포트가 완성됐어요!', 'success');
           await loadReports(event.report_id);
           setTimeout(() => setIsLoadingDetail(false), SKELETON_MS);
         },
@@ -144,9 +145,6 @@ export default function ReportPage() {
     }
   };
 
-  const handleRetry = () => {
-    setViewState('idle');
-  };
   const handleCreateNew = () => setViewState('idle');
 
   return (
@@ -188,10 +186,7 @@ export default function ReportPage() {
                   차곡차곡 쌓인 상담 기록으로 내 마음의 흐름을 찾아낼게요.
                 </p>
               </header>
-              <ReportCreationForm
-                onCreateReport={handleCreateReport}
-                consultationCount={consultationCount}
-              />
+              <ReportCreationForm onCreateReport={handleCreateReport} />
             </div>
           </div>
         )}
@@ -201,7 +196,7 @@ export default function ReportPage() {
 
         {/* failed: 에러 */}
         {viewState === 'failed' && (
-          <ReportError onRetry={handleRetry} onDismiss={handleCreateNew} />
+          <ReportError onDismiss={handleCreateNew} />
         )}
 
         {/* success: 스켈레톤 → 리포트 상세 */}

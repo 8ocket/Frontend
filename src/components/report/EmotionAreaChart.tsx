@@ -55,10 +55,6 @@ function CustomTooltip({ active, payload, label }: CustomTooltipInternalProps) {
 }
 
 export function EmotionAreaChart({ data, type }: EmotionAreaChartProps) {
-  const avg = Math.round(data.reduce((s, d) => s + d.score, 0) / data.length);
-  const max = Math.max(...data.map((d) => d.score));
-  const min = Math.min(...data.map((d) => d.score));
-
   const commonAxisProps = {
     axisLine: false,
     tickLine: false,
@@ -191,23 +187,7 @@ export function EmotionAreaChart({ data, type }: EmotionAreaChartProps) {
         </ResponsiveContainer>
       </div>
 
-      {/* 통계 — 차트 아래 */}
-      <div className="border-prime-100 mt-8 border-t pt-8">
-        <div className="grid grid-cols-3 gap-6">
-          {[
-            { label: '평균 점수', value: avg, color: 'var(--main-blue)' },
-            { label: '최고 점수', value: max, color: 'var(--color-score-high)' },
-            { label: '최저 점수', value: min, color: 'var(--color-score-low)' },
-          ].map(({ label, value, color }) => (
-            <div key={label}>
-              <p className="text-prime-500 mb-2 text-[13px]">{label}</p>
-              <p className="text-2xl font-bold tracking-tight" style={{ color }}>
-                {value > 0 ? `+${value}` : value}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* TODO [API]: 차트 설명 텍스트 — GET /v1/reports/{id} 응답의 설명 필드로 교체 예정 */}
     </div>
   );
 }

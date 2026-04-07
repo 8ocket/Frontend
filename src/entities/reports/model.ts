@@ -100,6 +100,19 @@ export interface ReportDetailGenerating {
 
 export type ReportDetailResponse = ReportDetailCompleted | ReportDetailGenerating;
 
+// --- GET /v1/reports/{report_id}/graphs 감정 그래프 조회
+export interface ReportGraphDataPoint {
+  session_id: string;
+  avg_score: number;
+  recorded_at: string; // ISO timestamp
+}
+
+export interface GetReportGraphsResponse {
+  graph_count: number;
+  graphs: ReportGraphDataPoint[];
+  graph_evaluation: string;
+}
+
 // --- GET /v1/reports/{report_id}/suggestions
 export interface SuggestionItem {
   title: string;

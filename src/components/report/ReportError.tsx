@@ -1,17 +1,16 @@
 'use client';
 
-import { AlertTriangle, RefreshCcw } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 
 interface ReportErrorProps {
-  onRetry: () => void;
   onDismiss: () => void;
 }
 
-export function ReportError({ onRetry, onDismiss }: ReportErrorProps) {
+export function ReportError({ onDismiss }: ReportErrorProps) {
   return (
-    <div className="flex min-h-[600px] items-center justify-center px-4">
-      <div className="w-full max-w-[520px] text-center">
+    <div className="flex min-h-150 items-center justify-center px-4">
+      <div className="w-full max-w-130 text-center">
         {/* 아이콘 */}
         <div className="bg-error-400/10 mb-8 inline-flex size-20 items-center justify-center rounded-full">
           <AlertTriangle className="text-error-400 size-10" />
@@ -59,10 +58,6 @@ export function ReportError({ onRetry, onDismiss }: ReportErrorProps) {
         <div className="flex gap-3">
           <Button onClick={onDismiss} variant="secondary" className="flex-1">
             확인
-          </Button>
-          <Button onClick={onRetry} variant="primary" className="flex-1">
-            <RefreshCcw className="size-4" />
-            다시 시도
           </Button>
         </div>
 

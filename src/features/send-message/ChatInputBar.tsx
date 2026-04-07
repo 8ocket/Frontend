@@ -15,16 +15,26 @@ type ChatInputBarProps = {
   onDisabledClick?: () => void;
 };
 
-export function ChatInputBar({ value, onChange, onSend, onEndChat, disabled = false, onDisabledClick }: ChatInputBarProps) {
+export function ChatInputBar({
+  value,
+  onChange,
+  onSend,
+  onEndChat,
+  disabled = false,
+  onDisabledClick,
+}: ChatInputBarProps) {
   const canSend = !disabled && value.trim().length > 0;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleInput = useCallback((e: React.FormEvent<HTMLTextAreaElement>) => {
-    const el = e.currentTarget;
-    el.style.height = 'auto';
-    el.style.height = `${el.scrollHeight}px`;
-    onChange(el.value);
-  }, [onChange]);
+  const handleInput = useCallback(
+    (e: React.FormEvent<HTMLTextAreaElement>) => {
+      const el = e.currentTarget;
+      el.style.height = 'auto';
+      el.style.height = `${el.scrollHeight}px`;
+      onChange(el.value);
+    },
+    [onChange]
+  );
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -50,18 +60,13 @@ export function ChatInputBar({ value, onChange, onSend, onEndChat, disabled = fa
         type="button"
         onClick={onEndChat}
         disabled={disabled}
-        className="group flex shrink-0 flex-col items-center justify-center gap-1.5 disabled:opacity-40"
+        className="group flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-50 transition-colors hover:bg-red-50 active:bg-red-100 disabled:opacity-40"
       >
-        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-50 transition-colors group-hover:bg-red-50 group-active:bg-red-100">
-          <X size={12} strokeWidth={1} className="text-slate-400 transition-colors group-hover:text-red-400 group-active:text-red-500" />
-        </div>
-        {/* TODO: 타이포그래피 토큰으로 전환 → 11px는 토큰 미정의, 신규 토큰 추가 필요 */}
-        <span
-          className="text-slate-400"
-          style={{ fontFamily: 'var(--font-pretendard)', fontSize: '11px', fontWeight: 400, lineHeight: '100%' }}
-        >
-          종료
-        </span>
+        <X
+          size={16}
+          strokeWidth={2}
+          className="text-slate-400 transition-colors group-hover:text-red-400 group-active:text-red-500"
+        />
       </button>
 
       {/* 텍스트 입력 영역 — disabled 시 클릭하면 onDisabledClick 호출 */}
@@ -72,11 +77,13 @@ export function ChatInputBar({ value, onChange, onSend, onEndChat, disabled = fa
         onKeyDown={handleKeyDown}
         onChange={(e) => onChange(e.target.value)}
         onClick={disabled ? onDisabledClick : undefined}
-        placeholder={disabled ? '새로운 상담을 시작해 주세요.' : '오늘 하루, 어떤 마음이 머물렀나요?'}
+        placeholder={
+          disabled ? '새로운 상담을 시작해 주세요.' : '오늘 하루, 어떤 마음이 머물렀나요?'
+        }
         rows={1}
         readOnly={disabled}
         className={[
-          'text-prime-900 placeholder:text-slate-400 flex-1 resize-none overflow-hidden bg-transparent text-sm leading-relaxed outline-none',
+          'text-prime-900 flex-1 resize-none overflow-hidden bg-transparent text-sm leading-relaxed outline-none placeholder:text-slate-400',
           disabled ? 'cursor-pointer' : '',
         ].join(' ')}
         style={{ fontFamily: 'var(--font-pretendard)', minHeight: '24px', maxHeight: '160px' }}
@@ -94,11 +101,7 @@ export function ChatInputBar({ value, onChange, onSend, onEndChat, disabled = fa
             : 'cursor-not-allowed bg-slate-50',
         ].join(' ')}
       >
-        <Send
-          size={16}
-          strokeWidth={2}
-          className={canSend ? 'text-main-blue' : 'text-slate-300'}
-        />
+        <Send size={16} strokeWidth={2} className={canSend ? 'text-main-blue' : 'text-slate-300'} />
       </button>
     </div>
   );

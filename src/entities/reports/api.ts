@@ -9,7 +9,12 @@ import {
   ReportType,
   SuggestionItem,
 } from './model';
-import { mockCreateReport, mockGetReportDetail, mockGetReportList, mockGetReportSuggestions } from '@/mocks';
+import {
+  mockCreateReport,
+  mockGetReportDetail,
+  mockGetReportList,
+  mockGetReportSuggestions,
+} from '@/mocks';
 import { USE_MOCK } from '@/shared/lib/env';
 import { getCookie } from '@/shared/lib/utils/cookie';
 
@@ -133,7 +138,7 @@ export const getReportSuggestionsApi = async (reportId: string): Promise<Suggest
   if (USE_MOCK) return mockGetReportSuggestions(reportId);
 
   const response = await api.get<ReportApiResponse<SuggestionItem[]>>(
-    `/reports/${reportId}/suggestions`,
+    `/reports/${reportId}/suggestions`
   );
 
   if (response.data.code === 'ok' && response.data.data) {
@@ -142,3 +147,23 @@ export const getReportSuggestionsApi = async (reportId: string): Promise<Suggest
 
   throw new Error(response.data.message || '행동 제언 조회 실패');
 };
+
+/**
+ * TODO [API]: 감정 그래프 데이터 조회
+ * GET /v1/reports/{report_id}/graphs
+ *
+ * 요청 (Header: token)
+ * 응답:
+ * {
+ *   "graph_count": 5,
+ *   "graphs": [
+ *     { "session_id": "...", "avg_score": 24, "recorded_at": "2026-03-20T23:19:44.106419" },
+ *     ...
+ *   ],
+ *   "graph_evaluation": "4월 1주차 동안 감정 점수가 -3에서 +5로 변화했습니다. ..."
+ * }
+ *
+ * export const getReportGraphsApi = async (reportId: string): Promise<GetReportGraphsResponse> => {
+ *   ...
+ * };
+ */
