@@ -37,6 +37,12 @@ export interface ChatMainAreaProps {
   aiName?: string;
   /** AI 상담사 아바타 이미지 URL */
   aiAvatarSrc?: string;
+  /** 사용자가 메시지를 전송할 때 호출 — 60분 자동 종료 타이머 리셋용 */
+  onUserMessage?: () => void;
+  /** 사용자 닉네임 */
+  userName?: string;
+  /** 사용자 프로필 이미지 URL */
+  userAvatarSrc?: string;
 }
 
 export function ChatMainArea({
@@ -52,6 +58,9 @@ export function ChatMainArea({
   onSessionCreated,
   aiName = '나봄이',
   aiAvatarSrc = '/images/personas/nabomi-44.png',
+  onUserMessage,
+  userName = '나',
+  userAvatarSrc,
 }: ChatMainAreaProps = {}) {
   const [messages, setMessages] = useState<ChatBubbleProps[]>(initialMessages);
   const [inputValue, setInputValue] = useState('');
@@ -104,8 +113,9 @@ export function ChatMainArea({
 
     const content = inputValue.trim();
     setInputValue('');
+    onUserMessage?.();
 
-    setMessages((prev) => [...prev, { variant: 'user', senderName: 'User Name', content }]);
+    setMessages((prev) => [...prev, { variant: 'user', senderName: userName, userAvatarSrc, content }]);
 
     const token = getCookie('accessToken') ?? '';
 

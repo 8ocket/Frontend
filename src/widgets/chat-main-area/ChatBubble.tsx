@@ -3,15 +3,20 @@
 // Figma 1457:2703 (AI Bubble), 1457:2710 (User Bubble)
 // Root: VERTICAL, gap=4, max-w=450px, vSizing=HUG
 
+import { EmotionCard } from '@/widgets/emotion-card';
+import type { EmotionCardData } from '@/entities/emotion';
+
 export type BubbleVariant = 'ai' | 'user';
 
 export type ChatBubbleProps = {
   variant: BubbleVariant;
   senderName: string;
-  content: string;
+  content?: string;
   avatarSrc?: string;
   userAvatarSrc?: string;
   isLoading?: boolean;
+  /** AI 버블에서 감정 카드를 표시할 때 사용. 설정 시 텍스트 대신 EmotionCard 렌더링. */
+  emotionCardData?: EmotionCardData;
 };
 
 // User Profile Photo — 21×21 흰 원 + 사용자 실루엣 벡터 (fill=#2b4764)
@@ -32,8 +37,9 @@ function UserProfilePhoto() {
   );
 }
 
-export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatarSrc, isLoading }: ChatBubbleProps) {
+export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatarSrc, isLoading, emotionCardData }: ChatBubbleProps) {
   const isAi = variant === 'ai';
+  const resolvedAvatarSrc = isAi ? (avatarSrc ?? '/images/personas/nabomi-44.png') : avatarSrc;
 
   return (
     <div
@@ -46,12 +52,8 @@ export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatar
       <div className={['flex flex-row items-center gap-2', isAi ? '' : 'flex-row-reverse'].join(' ')}>
         {isAi ? (
           <div className="h-5.25 w-5.25 shrink-0 overflow-hidden rounded-full">
-            {avatarSrc ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={avatarSrc} alt={senderName} className="h-full w-full object-cover" />
-            ) : (
-              <div className="bg-secondary-300 h-full w-full" />
-            )}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={resolvedAvatarSrc} alt={senderName} className="h-full w-full object-cover" />
           </div>
         ) : userAvatarSrc ? (
           <div className="h-5.25 w-5.25 shrink-0 overflow-hidden rounded-full">
@@ -77,33 +79,37 @@ export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatar
       </div>
 
       {/* Bubble body */}
-      <div
-        className={[
-          'w-fit rounded-2xl px-5 py-2.5 shadow-sm',
-          isAi
-            ? 'bg-white'
-            : 'bg-[#4A90E2] text-white',
-        ].join(' ')}
-      >
-        {isLoading ? (
-          <div className="flex items-center gap-1.5 py-0.5">
-            {[0, 1, 2].map((i) => (
-              <span
-                key={i}
-                className="h-2 w-2 rounded-full bg-prime-300 animate-bounce"
-                style={{ animationDelay: `${i * 0.15}s` }}
-              />
-            ))}
-          </div>
-        ) : (
-          <p
-            className={['whitespace-pre-wrap text-[15px] leading-[185%]', isAi ? 'text-prime-900' : 'text-white'].join(' ')}
-            style={{ fontFamily: 'var(--font-pretendard)' }}
-          >
-            {content}
-          </p>
-        )}
-      </div>
+      {emotionCardData ? (
+        <EmotionCard data={emotionCardData} size="sample" initialFace="front" />
+      ) : (
+        <div
+          className={[
+            'w-fit rounded-2xl px-5 py-2.5 shadow-sm',
+            isAi
+              ? 'bg-white'
+              : 'bg-[#4A90E2] text-white',
+          ].join(' ')}
+        >
+          {isLoading ? (
+            <div className="flex items-center gap-1.5 py-0.5">
+              {[0, 1, 2].map((i) => (
+                <span
+                  key={i}
+                  className="h-2 w-2 rounded-full bg-prime-300 animate-bounce"
+                  style={{ animationDelay: `${i * 0.15}s` }}
+                />
+              ))}
+            </div>
+          ) : (
+            <p
+              className={['whitespace-pre-wrap text-[15px] leading-[185%]', isAi ? 'text-prime-900' : 'text-white'].join(' ')}
+              style={{ fontFamily: 'var(--font-pretendard)' }}
+            >
+              {content}
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
