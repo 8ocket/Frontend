@@ -42,7 +42,7 @@ export default function MyPage() {
   const [paymentLoading, setPaymentLoading] = useState(true);
 
   const isDefaultImage =
-    !user?.profileImage || user.profileImage === '/images/icons/profile-default.svg';
+    !user?.profileImage || user.profileImage === '/images/icons/profile-default.png';
 
   const handleLogout = async () => {
     const refreshToken = getCookie('refreshToken');
@@ -92,7 +92,7 @@ export default function MyPage() {
               <div className="flex items-center gap-4 px-6 py-4">
                 <div className="border-cta-300 bg-secondary-100 relative size-14 shrink-0 overflow-hidden rounded-full border-2">
                   <Image
-                    src={user?.profileImage ?? '/images/icons/profile-default.svg'}
+                    src={user?.profileImage ?? '/images/icons/profile-default.png'}
                     alt="프로필"
                     fill
                     className={isDefaultImage ? 'object-contain p-2' : 'object-cover'}
@@ -207,7 +207,9 @@ export default function MyPage() {
                                   <button
                                     type="button"
                                     onClick={() =>
-                                      setOpenDropdownId(openDropdownId === item.approvedAt ? null : item.approvedAt)
+                                      setOpenDropdownId(
+                                        openDropdownId === item.approvedAt ? null : item.approvedAt
+                                      )
                                     }
                                     className="text-prime-400 hover:bg-secondary-100 flex size-7 items-center justify-center rounded-lg transition-colors"
                                   >
@@ -279,7 +281,6 @@ export default function MyPage() {
             {/* ── 카드 3: 설정 ── */}
             <section className="border-prime-100 overflow-hidden rounded-2xl border bg-white shadow-sm">
               <p className="text-prime-400 px-6 pt-5 text-xs font-medium">설정</p>
-
 
               <MenuRow
                 icon={<LogOut size={16} className="text-error-500" />}
@@ -355,7 +356,9 @@ function RefundModal({
                 <div className="bg-secondary-100 flex items-center justify-between rounded-xl px-4 py-3.5">
                   <div className="flex flex-col gap-0.5">
                     <span className="text-prime-900 text-sm font-medium">{item.orderName}</span>
-                    <span className="text-prime-400 text-xs">{item.approvedAt.slice(0, 10).replace(/-/g, '.')}</span>
+                    <span className="text-prime-400 text-xs">
+                      {item.approvedAt.slice(0, 10).replace(/-/g, '.')}
+                    </span>
                   </div>
                   <span className="text-prime-900 text-sm font-bold">
                     {item.amount.toLocaleString()}원

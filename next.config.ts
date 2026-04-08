@@ -22,11 +22,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'www.figma.com', // Figma 디자인 asset
       },
-      // 필요시 백엔드 이미지 서버 추가
-      // {
-      //   protocol: "https",
-      //   hostname: "api.mindlog.com",
-      // },
+      {
+        protocol: 'https',
+        hostname: '*.s3.ap-northeast-2.amazonaws.com', // S3 프로필/페르소나 이미지
+      },
     ],
   },
 
