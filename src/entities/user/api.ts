@@ -84,11 +84,8 @@ export const getMyProfileApi = async (): Promise<UserProfileResponse> => {
     });
   }
 
-  const response = await api.get<ApiResponse<UserProfileResponse>>('/users/me/profile');
-  if (response.data.success && response.data.data) {
-    return response.data.data;
-  }
-  throw new Error(response.data.error?.message || '프로필 조회 실패');
+  const response = await api.get<UserProfileResponse>('/users/me/profile');
+  return response.data;
 };
 
 /**

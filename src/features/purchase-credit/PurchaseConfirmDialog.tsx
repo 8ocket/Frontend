@@ -5,7 +5,8 @@ import React, { useState } from 'react';
 import { StatusModal } from '@/shared/ui/status-modal';
 import type { CreditProduct } from '@/types/credit';
 import { useCreditStore } from '@/entities/credits/store';
-import { getMyCreditApi } from '@/entities/credits/api';
+import { loadTossPayments } from '@tosspayments/payment-sdk';
+import { getMyCreditApi, createPaymentApi } from '@/entities/credits/api';
 
 // ── 구매 확인 다이얼로그 ────────────────────────────────────────
 // Flow: confirm → processing → success / error / product-updated
@@ -18,6 +19,12 @@ import { getMyCreditApi } from '@/entities/credits/api';
 // ─────────────────────────────────────────────────────────────────
 
 type PurchaseStep = 'confirm' | 'processing' | 'success' | 'error' | 'product-updated';
+
+const PRODUCT_TYPE_MAP: Record<string, 'SMALL' | 'MEDIUM' | 'LARGE'> = {
+  소형: 'SMALL',
+  중형: 'MEDIUM',
+  대형: 'LARGE',
+};
 
 interface PurchaseConfirmDialogProps {
   isOpen: boolean;
@@ -56,30 +63,21 @@ export function PurchaseConfirmDialog({
     setStep('processing');
 
     try {
-      if (onConfirmPurchase) {
-        const result = await onConfirmPurchase(product);
-        if (result === false) {
-          setStep('error');
-        } else {
-          addPaidCredit(product.credits);
-          const credit = await getMyCreditApi();
-          setTotalCredit(credit.totalCredit);
-          setStep('success');
-        }
-      } else {
-        // TODO: 실제 결제 API 연동
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        addPaidCredit(product.credits);
-        const credit = await getMyCreditApi();
-        setTotalCredit(credit.totalCredit);
-        setStep('success');
-      }
-    } catch (err) {
-      if (err instanceof Error && err.message === 'PRODUCT_UPDATED') {
-        setStep('product-updated');
-      } else {
-        setStep('error');
-      }
+      const productType = PRODUCT_TYPE_MAP[product.name];
+      const { orderId, amount } = await createPaymentApi(productType);
+
+      const tossClientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!;
+      const toss = await loadTossPayments(tossClientKey);
+
+      await toss.requestPayment('CARD', {
+        amount,
+        orderId,
+        orderName: product.name,
+        successUrl: `${window.location.origin}/payment/success`,
+        failUrl: `${window.location.origin}/payment/fail`,
+      });
+    } catch {
+      setStep('error');
     }
   };
 
@@ -205,8 +203,7 @@ export function PurchaseConfirmDialog({
       title="결제가 중단되었습니다"
       description={
         <>
-          알 수 없는 원인으로 인하여 거래가 중단되었습니다.
-          인터넷 연결을 먼저 확인해 보시겠습니까?
+          알 수 없는 원인으로 인하여 거래가 중단되었습니다. 인터넷 연결을 먼저 확인해 보시겠습니까?
           <br />
           지속적 문제 발생 시, 고객지원에 문의 바랍니다.
         </>

@@ -4,24 +4,20 @@ import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Bell, ChevronRight, Coins, LogOut, MoreVertical, Trash2, X } from 'lucide-react';
+import { ChevronRight, Coins, LogOut, MoreVertical, Trash2, X } from 'lucide-react';
 import { useAuthStore } from '@/entities/user/store';
 import { logoutApi } from '@/entities/user/api';
 import { getCookie } from '@/shared/lib/utils/cookie';
 import { useCreditStore } from '@/entities/credits/store';
 import { UserProfileModal } from '@/shared/ui/UserProfileModal';
 import { Button } from '@/shared/ui/button';
-import { Switch } from '@/shared/ui/switch';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
 import { DialogRoot, DialogPortal, DialogOverlay, DialogTitle } from '@/shared/ui';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { getPaymentHistoryApi } from '@/entities/credits/api';
+import { PaymentHistoryItem } from '@/entities/credits/model';
 
 // ── 목업 데이터 (API 연동 시 교체) ──────────────────────────────────
-const PAYMENT_HISTORY = [
-  { id: 'p1', date: '2026.03.20', label: '크레딧 중형 상품', amount: 9900, status: '결제완료' },
-  { id: 'p2', date: '2026.02.14', label: '크레딧 소형 상품', amount: 3300, status: '결제완료' },
-  { id: 'p3', date: '2026.01.05', label: '크레딧 대형 상품', amount: 27000, status: '환불완료' },
-];
 
 const CREDIT_HISTORY = [
   { id: 'c1', date: '2026.03.24', label: 'AI 상담 이용', delta: -70, balance: 930 },
@@ -37,11 +33,13 @@ export default function MyPage() {
   const { user, logout } = useAuthStore();
   const { totalCredit } = useCreditStore();
   const [profileModalOpen, setProfileModalOpen] = useState(false);
-  const [notificationEnabled, setNotificationEnabled] = useState(true);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [refundModalOpen, setRefundModalOpen] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState<(typeof PAYMENT_HISTORY)[0] | null>(null);
+  const [selectedPayment, setSelectedPayment] = useState<PaymentHistoryItem | null>(null);
   const dropdownRef = useRef<HTMLUListElement>(null);
+
+  const [paymentHistory, setPaymentHistory] = useState<PaymentHistoryItem[]>([]);
+  const [paymentLoading, setPaymentLoading] = useState(true);
 
   const isDefaultImage =
     !user?.profileImage || user.profileImage === '/images/icons/profile-default.svg';
@@ -66,6 +64,10 @@ export default function MyPage() {
   };
 
   useEffect(() => {
+    getPaymentHistoryApi()
+      .then((res) => setPaymentHistory(res.content))
+      .finally(() => setPaymentLoading(false));
+
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setOpenDropdownId(null);
@@ -156,24 +158,26 @@ export default function MyPage() {
 
                 {/* 결제 내역 탭 */}
                 <TabsContent value="payment" className="mt-0">
-                  {PAYMENT_HISTORY.length === 0 ? (
+                  {paymentLoading ? (
+                    <div className="text-prime-400 py-12 text-center text-sm">불러오는 중...</div>
+                  ) : paymentHistory.length === 0 ? (
                     <EmptyHistory message="결제 내역이 없습니다." />
                   ) : (
                     <ul className="divide-prime-100 divide-y px-4 pb-2" ref={dropdownRef}>
-                      {PAYMENT_HISTORY.map((item) => (
+                      {paymentHistory.map((item) => (
                         <li
-                          key={item.id}
+                          key={item.approvedAt}
                           className="hover:bg-secondary-50 relative flex items-center justify-between rounded-xl px-3 py-4 transition-colors"
                         >
                           {/* 좌측: 상품명 + 날짜 */}
                           <div className="flex flex-col gap-1">
                             <span
-                              className={`text-sm font-medium tracking-[-0.21px] ${item.status === '환불완료' ? 'text-prime-400' : 'text-prime-900'}`}
+                              className={`text-sm font-medium tracking-[-0.21px] ${item.status === 'CANCELED' ? 'text-prime-400' : 'text-prime-900'}`}
                             >
-                              {item.label}
+                              {item.orderName}
                             </span>
                             <span className="text-prime-400 text-xs tracking-[-0.18px]">
-                              {item.date}
+                              {item.approvedAt.slice(0, 10).replace(/-/g, '.')}
                             </span>
                           </div>
 
@@ -181,11 +185,11 @@ export default function MyPage() {
                           <div className="flex items-center gap-2">
                             <div className="flex flex-col items-end gap-1">
                               <span
-                                className={`text-sm font-bold tracking-[-0.21px] ${item.status === '환불완료' ? 'text-prime-400 line-through' : 'text-prime-900'}`}
+                                className={`text-sm font-bold tracking-[-0.21px] ${item.status === 'CANCELED' ? 'text-prime-400 line-through' : 'text-prime-900'}`}
                               >
                                 {item.amount.toLocaleString()}원
                               </span>
-                              {item.status === '환불완료' ? (
+                              {item.status === 'CANCELED' ? (
                                 <span className="bg-error-100 text-error-500 rounded-md px-1.5 py-0.5 text-[10px] font-semibold">
                                   환불완료
                                 </span>
@@ -198,18 +202,18 @@ export default function MyPage() {
 
                             {/* 더보기 버튼 자리 — 항상 동일 너비 확보 */}
                             <div className="relative size-7 shrink-0">
-                              {item.status === '결제완료' && (
+                              {item.status === 'DONE' && (
                                 <>
                                   <button
                                     type="button"
                                     onClick={() =>
-                                      setOpenDropdownId(openDropdownId === item.id ? null : item.id)
+                                      setOpenDropdownId(openDropdownId === item.approvedAt ? null : item.approvedAt)
                                     }
                                     className="text-prime-400 hover:bg-secondary-100 flex size-7 items-center justify-center rounded-lg transition-colors"
                                   >
                                     <MoreVertical size={15} />
                                   </button>
-                                  {openDropdownId === item.id && (
+                                  {openDropdownId === item.approvedAt && (
                                     <div className="border-prime-100 absolute top-full right-0 z-20 mt-1 w-36 overflow-hidden rounded-xl border bg-white shadow-sm">
                                       <button
                                         type="button"
@@ -276,19 +280,6 @@ export default function MyPage() {
             <section className="border-prime-100 overflow-hidden rounded-2xl border bg-white shadow-sm">
               <p className="text-prime-400 px-6 pt-5 text-xs font-medium">설정</p>
 
-              {/* <div className="flex items-center justify-between px-6 py-3.5">
-                <div className="flex items-center gap-3">
-                  <div className="bg-interactive-glass-blue-50 flex size-9 items-center justify-center rounded-xl">
-                    <Bell size={16} className="text-cta-300" />
-                  </div>
-                  <span className="text-prime-900 text-sm font-medium tracking-[-0.21px]">
-                    알림
-                  </span>
-                </div>
-                <Switch checked={notificationEnabled} onCheckedChange={setNotificationEnabled} />
-              </div> */}
-
-              {/* <div className="bg-prime-100 mx-6 h-px" /> */}
 
               <MenuRow
                 icon={<LogOut size={16} className="text-error-500" />}
@@ -334,7 +325,7 @@ function RefundModal({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  item: (typeof PAYMENT_HISTORY)[0] | null;
+  item: PaymentHistoryItem | null;
 }) {
   return (
     <DialogRoot open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -363,8 +354,8 @@ function RefundModal({
               {item && (
                 <div className="bg-secondary-100 flex items-center justify-between rounded-xl px-4 py-3.5">
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-prime-900 text-sm font-medium">{item.label}</span>
-                    <span className="text-prime-400 text-xs">{item.date}</span>
+                    <span className="text-prime-900 text-sm font-medium">{item.orderName}</span>
+                    <span className="text-prime-400 text-xs">{item.approvedAt.slice(0, 10).replace(/-/g, '.')}</span>
                   </div>
                   <span className="text-prime-900 text-sm font-bold">
                     {item.amount.toLocaleString()}원
