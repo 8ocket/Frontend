@@ -177,7 +177,9 @@ export default function MyPage() {
                               {item.orderName}
                             </span>
                             <span className="text-prime-400 text-xs tracking-[-0.18px]">
-                              {item.approvedAt?.slice(0, 10).replace(/-/g, '.') ?? '-'}
+                              {item.approvedAt
+                                ? `${item.approvedAt.slice(0, 10).replace(/-/g, '.')} ${item.approvedAt.slice(11, 19)}`
+                                : '-'}
                             </span>
                             {item.status === 'CANCELED' && (
                               <span className="text-prime-300 text-xs">고객 요청으로 환불 처리됨</span>
