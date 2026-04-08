@@ -479,7 +479,7 @@ export default function Home() {
               sessions={canGenerate?.saved_session_count ?? 0}
               goal={canGenerate?.required_session_count ?? 1}
               progress={
-                canGenerate
+                canGenerate && canGenerate.required_session_count > 0
                   ? Math.round(
                       (canGenerate.saved_session_count / canGenerate.required_session_count) * 100
                     )

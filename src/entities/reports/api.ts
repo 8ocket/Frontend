@@ -112,7 +112,7 @@ export const getReportListApi = async (reportType?: ReportType): Promise<GetRepo
 
   return {
     reports: response.data,
-    can_generate: { eligible: true, saved_session_count: 0, required_session_count: 0 },
+    can_generate: { eligible: false, saved_session_count: 0, required_session_count: 1 },
   };
 };
 
