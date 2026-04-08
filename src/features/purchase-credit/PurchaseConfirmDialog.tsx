@@ -30,9 +30,11 @@ interface PurchaseConfirmDialogProps {
   isOpen: boolean;
   onClose: () => void;
   product: CreditProduct | null;
+  /** 초기 단계 지정 (결제 결과 리다이렉트 시 사용) */
+  initialStep?: PurchaseStep;
   /** 결제 처리 콜백 — 실제 API 연동 시 사용 */
   onConfirmPurchase?: (product: CreditProduct) => Promise<boolean>;
-  /** 결제 완료 후 "결제내역 보기" 콜백 */
+  /** 결제 완료 후 "결제내역 보기 - 마이페이지" 콜백 */
   onViewHistory?: () => void;
   /** 결제 완료 후 "홈 화면에 가기" 콜백 */
   onGoHome?: () => void;
@@ -44,13 +46,18 @@ export function PurchaseConfirmDialog({
   isOpen,
   onClose,
   product,
+  initialStep,
   onConfirmPurchase,
   onViewHistory,
   onGoHome,
   onContactSupport,
 }: PurchaseConfirmDialogProps) {
   const { addPaidCredit, setTotalCredit } = useCreditStore();
-  const [step, setStep] = useState<PurchaseStep>('confirm');
+  const [step, setStep] = useState<PurchaseStep>(initialStep ?? 'confirm');
+
+  React.useEffect(() => {
+    if (initialStep) setStep(initialStep);
+  }, [initialStep]);
 
   if (!product) return null;
 
@@ -69,11 +76,15 @@ export function PurchaseConfirmDialog({
       const tossClientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!;
       const toss = await loadTossPayments(tossClientKey);
 
+      const productParam = encodeURIComponent(
+        JSON.stringify({ name: product.name, credits: product.credits })
+      );
+
       await toss.requestPayment('CARD', {
         amount,
         orderId,
         orderName: product.name,
-        successUrl: `${window.location.origin}/payment/success`,
+        successUrl: `${window.location.origin}/payment/success?product=${productParam}`,
         failUrl: `${window.location.origin}/payment/fail`,
       });
     } catch {

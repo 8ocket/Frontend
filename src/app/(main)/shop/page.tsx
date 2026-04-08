@@ -32,6 +32,9 @@ function ShopPageContent() {
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') ?? 'credit');
   const [selectedProduct, setSelectedProduct] = useState<CreditProduct | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogInitialStep, setDialogInitialStep] = useState<
+    'confirm' | 'success' | 'error' | undefined
+  >(undefined);
   const [products, setProducts] = useState<CreditProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -39,17 +42,34 @@ function ShopPageContent() {
   useEffect(() => {
     getCreditProductsApi()
       .then((data) => {
-        setProducts(
-          data.map((item, index) => ({
-            id: String(index + 1),
-            name: item.name,
-            credits: item.creditAmount,
-            price: item.price,
-            priceFormatted: item.price.toLocaleString(),
-            paymentType: '건당 결제',
-            benefits: BENEFITS_MAP[item.name] ?? [],
-          }))
-        );
+        const loadedProducts = data.map((item, index) => ({
+          id: String(index + 1),
+          name: item.name,
+          credits: item.creditAmount,
+          price: item.price,
+          priceFormatted: item.price.toLocaleString(),
+          paymentType: '건당 결제',
+          benefits: BENEFITS_MAP[item.name] ?? [],
+        }));
+        setProducts(loadedProducts);
+
+        // 결제 결과 리다이렉트 처리
+        const paymentResult = searchParams.get('payment');
+        if (paymentResult === 'success' || paymentResult === 'error') {
+          let pendingProduct: CreditProduct | null = null;
+          try {
+            const productParam = searchParams.get('product');
+            if (productParam) {
+              const parsed = JSON.parse(productParam) as { name: string; credits: number };
+              pendingProduct = loadedProducts.find((p) => p.credits === parsed.credits) ?? null;
+            }
+          } catch { /* ignore parse errors */ }
+          if (!pendingProduct) pendingProduct = loadedProducts[0] ?? null;
+          setSelectedProduct(pendingProduct);
+          setDialogInitialStep(paymentResult);
+          setIsDialogOpen(true);
+          router.replace('/shop', { scroll: false });
+        }
       })
       .catch(() => setIsError(true))
       .finally(() => setIsLoading(false));
@@ -57,6 +77,7 @@ function ShopPageContent() {
 
   const handlePurchase = (product: CreditProduct) => {
     setSelectedProduct(product);
+    setDialogInitialStep(undefined);
     setIsDialogOpen(true);
   };
 
@@ -117,11 +138,15 @@ function ShopPageContent() {
       {/* 크레딧 구매 확인 다이얼로그 */}
       <PurchaseConfirmDialog
         isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
+        onClose={() => {
+          setIsDialogOpen(false);
+          setDialogInitialStep(undefined);
+        }}
         product={selectedProduct}
+        initialStep={dialogInitialStep}
         onViewHistory={() => {
           setIsDialogOpen(false);
-          router.push('/credit');
+          router.push('/my');
         }}
         onGoHome={() => {
           setIsDialogOpen(false);
