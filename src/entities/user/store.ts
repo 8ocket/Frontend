@@ -53,7 +53,7 @@ export const useAuthStore = create<AuthState>()(
       onRehydrateStorage: () => (state) => {
         if (state) {
           state.isAuthenticated = !!state.user;
-          state.isLoading = false;
+          // isLoading은 AuthInitializer가 쿠키 검증 후 false로 설정
         }
       },
     }

@@ -6,10 +6,12 @@ import { getCookie } from '@/shared/lib/utils/cookie';
 
 export function AuthInitializer() {
   useEffect(() => {
+    const { logout, setLoading } = useAuthStore.getState();
     const token = getCookie('accessToken');
     if (!token) {
-      useAuthStore.getState().logout();
+      logout();
     }
+    setLoading(false);
   }, []);
 
   return null;
