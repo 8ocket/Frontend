@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
-import { CalendarIcon, CheckCircle2, Info, ArrowRight } from 'lucide-react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import { CalendarIcon, CheckCircle2, Info } from 'lucide-react';
 import { format, addDays, min } from 'date-fns';
 import { ko } from 'date-fns/locale/ko';
+import type { DateRange } from 'react-day-picker';
 import { Button } from '@/shared/ui/button';
 import { Calendar } from '@/shared/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
@@ -19,6 +20,7 @@ interface ReportCreationFormProps {
 export function ReportCreationForm({ onCreateReport }: ReportCreationFormProps) {
   const [selectedType, setSelectedType] = useState<ReportType>('weekly');
   const [baseDate, setBaseDate] = useState<Date | undefined>(undefined);
+  const [hoverDate, setHoverDate] = useState<Date | undefined>(undefined);
   const [agreed, setAgreed] = useState(false);
   const [consultationCount, setConsultationCount] = useState<number | null>(null);
   const [isLoadingCount, setIsLoadingCount] = useState(false);
@@ -35,6 +37,26 @@ export function ReportCreationForm({ onCreateReport }: ReportCreationFormProps) 
     const days = selectedType === 'weekly' ? 6 : 30;
     return min([addDays(baseDate, days), today]);
   }, [baseDate, selectedType, today]);
+
+  // 달력에 표시할 범위 (호버 미리보기 우선, 그 다음 확정 선택)
+  const displayRange = useMemo<DateRange | undefined>(() => {
+    if (hoverDate) {
+      const days = selectedType === 'weekly' ? 6 : 30;
+      return { from: hoverDate, to: min([addDays(hoverDate, days), today]) };
+    }
+    if (baseDate && autoEndDate) return { from: baseDate, to: autoEndDate };
+    return undefined;
+  }, [baseDate, autoEndDate, hoverDate, selectedType, today]);
+
+  const handleCalendarSelect = useCallback((range: DateRange | undefined) => {
+    if (range?.from) setBaseDate(range.from);
+  }, []);
+
+  // 확정된 선택 날짜 마커 (hover 미리보기 중에도 유지)
+  const confirmedModifiers = useMemo(
+    () => (baseDate ? { confirmed: [baseDate] } : {}),
+    [baseDate]
+  );
 
   // baseDate / autoEndDate 변경 시 기간 내 세션 수 조회
   useEffect(() => {
@@ -151,37 +173,27 @@ export function ReportCreationForm({ onCreateReport }: ReportCreationFormProps) 
               )}
             >
               <span>
-                {baseDate ? format(baseDate, 'yyyy.MM.dd', { locale: ko }) : '분석을 시작할 날짜'}
+                {baseDate && autoEndDate
+                  ? `${format(baseDate, 'yyyy.MM.dd', { locale: ko })} – ${format(autoEndDate, 'yyyy.MM.dd', { locale: ko })}`
+                  : '분석 시작일을 선택해주세요'}
               </span>
               <CalendarIcon className="text-prime-400 size-4" />
             </button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
             <Calendar
-              mode="single"
-              selected={baseDate}
-              onSelect={setBaseDate}
+              mode="range"
+              selected={displayRange}
+              onSelect={handleCalendarSelect}
+              onDayMouseEnter={(day) => setHoverDate(day)}
+              onDayMouseLeave={() => setHoverDate(undefined)}
               disabled={(d) => d > today}
+              modifiers={confirmedModifiers}
+              modifiersClassNames={{ confirmed: 'bg-main-blue text-white rounded-md' }}
               autoFocus
             />
           </PopoverContent>
         </Popover>
-
-        {/* 자동 설정 기간 표시 */}
-        {baseDate && autoEndDate && (
-          <div className="bg-bg-light mt-3 flex items-center gap-2 rounded-xl px-4 py-3">
-            <span className="text-prime-900 text-sm font-semibold">
-              {format(baseDate, 'yyyy.MM.dd', { locale: ko })}
-            </span>
-            <ArrowRight className="text-prime-400 size-3.5 shrink-0" />
-            <span className="text-prime-900 text-sm font-semibold">
-              {format(autoEndDate, 'yyyy.MM.dd', { locale: ko })}
-            </span>
-            <span className="text-prime-400 ml-auto text-xs">
-              {selectedType === 'weekly' ? '7일' : '31일'} 자동 설정
-            </span>
-          </div>
-        )}
 
         <p className="text-prime-400 mt-2 text-xs">
           {selectedType === 'weekly'

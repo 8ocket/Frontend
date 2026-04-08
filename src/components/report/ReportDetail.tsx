@@ -105,7 +105,7 @@ export function ReportDetail({ report }: ReportDetailProps) {
                   'inline-block rounded-full px-3 py-1.5 text-[11px] font-bold tracking-wide',
                   report.reportType === 'weekly'
                     ? 'text-main-blue bg-(--main-blue)/10'
-                    : 'bg-prime-100 text-prime-600'
+                    : 'bg-success-700/10 text-success-700'
                 )}
               >
                 {report.type}
