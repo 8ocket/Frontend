@@ -201,17 +201,6 @@ export const socialLoginApi = async (
   throw new Error(response.data.error?.message || '소셜 로그인 실패');
 };
 
-// 모듈 레벨 캐시 — 최초 1회만 fetch
-let defaultProfileImageCache: Blob | null = null;
-
-const getDefaultProfileImage = async (): Promise<Blob> => {
-  if (!defaultProfileImageCache) {
-    const res = await fetch('/images/icons/profile-default.png');
-    defaultProfileImageCache = await res.blob();
-  }
-  return defaultProfileImageCache;
-};
-
 /**
  * 회원가입 (온보딩 정보 저장) API
  * PATCH /v1/users/signup
@@ -227,8 +216,11 @@ export const signupApi = async (
 
   const formData = new FormData();
 
-  const image = profileImage ?? (await getDefaultProfileImage());
-  formData.append('profile_image', image, profileImage ? profileImage.name : 'profile-default.png');
+  if (profileImage) {
+    formData.append('profile_image', profileImage, profileImage.name);
+  } else {
+    formData.append('profile_image', new Blob(), '');
+  }
 
   const contentsBlob = new Blob([JSON.stringify({ nickname, occupation, age, gender })], {
     type: 'application/json',
