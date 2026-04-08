@@ -1,5 +1,5 @@
 import { api } from '@/shared/api/axios';
-import { CreditApiResponse, CreditProductResponse, MyCreditResponse } from './model';
+import { CreditApiResponse, CreditProductResponse, MyCreditResponse, PaymentHistoryResponse } from './model';
 import { USE_MOCK } from '@/shared/lib/env';
 
 /**
@@ -31,5 +31,50 @@ export const getMyCreditApi = async (): Promise<MyCreditResponse> => {
   }
 
   const response = await api.get<CreditApiResponse<MyCreditResponse>>('/credits/me');
+  return response.data.data;
+};
+
+/**
+ * 크레딧 상품 구매를 위한 결제 준비 APIa
+ * @param productType
+ * @returns 결제 준비를 위한 주문 정보 (orderId, amount, orderName)
+ * @throws API 호출 실패 시 에러 발생
+ */
+export const createPaymentApi = async (productType: 'SMALL' | 'MEDIUM' | 'LARGE') => {
+  const response = await api.post<
+    CreditApiResponse<{ orderId: string; amount: number; orderName: string }>
+  >('/v1/payments', { productType });
+  return response.data.data;
+};
+
+/**
+ * 결제 완료 API
+ * @param paymentKey 결제 키
+ * @param orderId 주문 ID
+ * @param amount 결제 금액
+ * @throws API 호출 실패 시 에러 발생
+ */
+export const confirmPaymentApi = async (paymentKey: string, orderId: string, amount: number) => {
+  await api.post('/v1/payments/confirm', { paymentKey, orderId, amount });
+};
+
+/**
+ * 유료 크레딧 결제 내역 조회 API
+ * @returns 결제 내역 페이지
+ * @throws API 호출 실패 시 에러 발생
+ */
+export const getPaymentHistoryApi = async (): Promise<PaymentHistoryResponse> => {
+  const response = await api.get<CreditApiResponse<PaymentHistoryResponse>>('/v1/payments/history');
+  return response.data.data;
+};
+
+/**
+ * 결제 취소(크레딧 환불) API
+ * @param paymentId 취소할 결제 ID
+ * @returns 취소된 결제 ID
+ * @throws API 호출 실패 시 에러 발생
+ */
+export const cancelPaymentApi = async (paymentId: string): Promise<string> => {
+  const response = await api.post<CreditApiResponse<string>>(`/v1/payments/${paymentId}/cancel`);
   return response.data.data;
 };

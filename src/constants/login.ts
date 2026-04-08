@@ -40,12 +40,13 @@ export const oauthConfig = {
     clientId: process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY || '',
     authUrl: 'https://kauth.kakao.com/oauth/authorize',
     redirectUri:
-      process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI || 'http://localhost:3000/auth/kakao/callback',
+      process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI || 'http://localhost:3000/v1/auth/kakao/callback',
   },
   google: {
     clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
     authUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
     redirectUri:
-      process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback',
+      process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI ||
+      'http://localhost:3000/v1/auth/google/callback',
   },
 } as const;
