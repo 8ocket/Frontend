@@ -14,7 +14,7 @@
     "type-check": "tsc --noEmit",
     "check": "npm run type-check && npm run lint && npm run format:check",
     "clean": "rm -rf .next node_modules/.cache",
-    "dev:all": "cd ../AI && docker compose -f docker-compose.yml -f docker-compose.local.yml up -d && cd ../Backend && set -a && source .env && set +a && ./gradlew bootRun -x test & cd ../Frontend && npm run dev"
+    "dev:all": "cd ../AI && docker compose -f docker-compose.yml -f docker-compose.local.yml up -d && cd ../Backend && set -a && source .env.local && set +a && ./gradlew bootRun -x test & cd ../Frontend && npm run dev"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
