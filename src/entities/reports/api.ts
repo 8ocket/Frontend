@@ -167,3 +167,11 @@ export const getReportKeywordsApi = async (
   const response = await api.get<GetReportKeywordsResponse>(`/reports/${reportId}/keywords`);
   return response.data;
 };
+
+/**
+ * 리포트 삭제
+ * DELETE /v1/reports/{report_id}
+ */
+export const deleteReportApi = async (reportId: string): Promise<void> => {
+  await api.delete(`/reports/${reportId}`);
+};

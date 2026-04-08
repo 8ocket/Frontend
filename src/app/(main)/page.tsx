@@ -286,9 +286,8 @@ function AttendanceWidget() {
       {/* 하단 */}
       <div className="mt-auto flex items-center justify-between gap-3">
         <p className="text-prime-500 text-[12px] leading-snug">
-          이번 달{' '}
-          <span className="text-cta-300 font-bold">{attendedDates.size}회</span>{' '}
-          방문 · 출석 시 3크레딧
+          이번 달 <span className="text-cta-300 font-bold">{attendedDates.size}회</span> 방문 · 출석
+          시 3크레딧
         </p>
 
         {todayDone ? (
