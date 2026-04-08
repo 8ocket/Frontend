@@ -43,7 +43,7 @@ export const getMyCreditApi = async (): Promise<MyCreditResponse> => {
 export const createPaymentApi = async (productType: 'SMALL' | 'MEDIUM' | 'LARGE') => {
   const response = await api.post<
     CreditApiResponse<{ orderId: string; amount: number; orderName: string }>
-  >('/v1/payments', { productType });
+  >('/payments', { productType });
   return response.data.data;
 };
 
@@ -55,7 +55,7 @@ export const createPaymentApi = async (productType: 'SMALL' | 'MEDIUM' | 'LARGE'
  * @throws API 호출 실패 시 에러 발생
  */
 export const confirmPaymentApi = async (paymentKey: string, orderId: string, amount: number) => {
-  await api.post('/v1/payments/confirm', { paymentKey, orderId, amount });
+  await api.post('/payments/confirm', { paymentKey, orderId, amount });
 };
 
 /**
@@ -64,7 +64,7 @@ export const confirmPaymentApi = async (paymentKey: string, orderId: string, amo
  * @throws API 호출 실패 시 에러 발생
  */
 export const getPaymentHistoryApi = async (): Promise<PaymentHistoryResponse> => {
-  const response = await api.get<CreditApiResponse<PaymentHistoryResponse>>('/v1/payments/history');
+  const response = await api.get<CreditApiResponse<PaymentHistoryResponse>>('/payments/history');
   return response.data.data;
 };
 
@@ -75,6 +75,6 @@ export const getPaymentHistoryApi = async (): Promise<PaymentHistoryResponse> =>
  * @throws API 호출 실패 시 에러 발생
  */
 export const cancelPaymentApi = async (paymentId: string): Promise<string> => {
-  const response = await api.post<CreditApiResponse<string>>(`/v1/payments/${paymentId}/cancel`);
+  const response = await api.post<CreditApiResponse<string>>(`/payments/${paymentId}/cancel`);
   return response.data.data;
 };
