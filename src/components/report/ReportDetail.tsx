@@ -1,11 +1,16 @@
 'use client';
 
-import { addDays, format } from 'date-fns';
+import { format } from 'date-fns';
 import { Calendar, Sparkles, Target } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { cn } from '@/shared/lib/utils';
-import { getReportDetailApi, getReportSuggestionsApi } from '@/entities/reports/api';
-import type { ReportDetailCompleted, SuggestionItem } from '@/entities/reports/model';
+import {
+  getReportSuggestionsApi,
+  getReportTendencyApi,
+  getReportGraphsApi,
+  getReportKeywordsApi,
+} from '@/entities/reports/api';
+import type { SuggestionItem, AiReportTopicItem } from '@/entities/reports/model';
 import { EmotionAreaChart } from './EmotionAreaChart';
 import type { EmotionDataPoint } from './EmotionAreaChart';
 import type { Report } from './types';
@@ -13,64 +18,6 @@ import type { Report } from './types';
 interface ReportDetailProps {
   report: Report;
 }
-
-// '2026.03.17 - 2026.03.23' 형식에서 시작일 파싱
-function parsePeriodStart(period: string): Date {
-  const startStr = period.split(' - ')[0]; // '2026.03.17'
-  const [y, m, d] = startStr.split('.').map(Number);
-  return new Date(y, m - 1, d);
-}
-
-// TODO [API]: GET /v1/reports/{report_id}/graphs 응답으로 그래프 데이터 로드
-//             응답 형식: { graph_count, graphs: [{ session_id, avg_score, recorded_at }], graph_evaluation }
-//             graphs 배열을 EmotionDataPoint[]로 변환하여 표시
-const WEEKLY_SCORES: { score: number; emotion: string }[] = [
-  { score: 20, emotion: '평온' },
-  { score: -35, emotion: '불안' },
-  { score: 15, emotion: '보통' },
-  { score: 60, emotion: '기쁨' },
-  { score: -10, emotion: '피로' },
-  { score: 72, emotion: '행복' },
-  { score: 45, emotion: '안정' },
-];
-
-const MONTHLY_SCORES: { score: number; emotion: string }[] = [
-  { score: 30, emotion: '안정' },
-  { score: -20, emotion: '스트레스' },
-  { score: 55, emotion: '기쁨' },
-  { score: 40, emotion: '평온' },
-];
-
-function buildChartData(report: Report): EmotionDataPoint[] {
-  const start = parsePeriodStart(report.period);
-  if (report.reportType === 'weekly') {
-    return WEEKLY_SCORES.map((d, i) => ({
-      ...d,
-      label: `${i + 1}회차`,
-    }));
-  }
-  // 월간: 매주 시작일 기준 4개 데이터 포인트
-  return MONTHLY_SCORES.map((d, i) => ({
-    ...d,
-    label: format(addDays(start, i * 7), 'MM.dd'),
-  }));
-}
-
-interface Keyword {
-  text: string;
-  isTop?: boolean;
-}
-
-// TODO [API]: KEYWORDS, 키워드 통계(총 키워드 수/긍정/부정 비율)를
-//             GET /reports/:id/keywords 응답으로 교체
-//             응답 형식 예시: { keywords: Keyword[], totalCount: number, positiveRatio: number, negativeRatio: number }
-const KEYWORDS: Keyword[] = [
-  { text: '집중력', isTop: true },
-  { text: '불안' },
-  { text: '긍정' },
-  { text: '스트레스' },
-  { text: '자기효능감' },
-];
 
 const KEYWORD_STYLES = [
   'bg-(--main-blue)/10 text-main-blue',
@@ -83,11 +30,50 @@ const KEYWORD_STYLES = [
 const CARD = 'rounded-[24px] border border-prime-100 bg-white p-10 shadow-sm';
 
 export function ReportDetail({ report }: ReportDetailProps) {
-  const emotionData = buildChartData(report);
+  const [emotionData, setEmotionData] = useState<EmotionDataPoint[]>([]);
+  const [graphEvaluation, setGraphEvaluation] = useState<string | null>(null);
+  const [isGraphLoading, setIsGraphLoading] = useState(true);
+  const [keywords, setKeywords] = useState<AiReportTopicItem[]>([]);
+  const [keywordsEvaluation, setKeywordsEvaluation] = useState<string | null>(null);
+  const [isKeywordsLoading, setIsKeywordsLoading] = useState(true);
   const [suggestions, setSuggestions] = useState<SuggestionItem[]>([]);
   const [isSuggestionsLoading, setIsSuggestionsLoading] = useState(true);
   const [tendencySummary, setTendencySummary] = useState<string | null>(null);
+  const [currentStatus, setCurrentStatus] = useState<string | null>(null);
   const [isTendencyLoading, setIsTendencyLoading] = useState(true);
+
+  useEffect(() => {
+    getReportGraphsApi(report.id)
+      .then((res) => {
+        const mapped: EmotionDataPoint[] = res.graphs.map((g, i) => {
+          const score = g.avg_score;
+          let emotion = '보통';
+          if (score >= 50) emotion = '행복';
+          else if (score >= 20) emotion = '안정';
+          else if (score >= 0) emotion = '평온';
+          else if (score >= -20) emotion = '피로';
+          else emotion = '불안';
+
+          const date = new Date(g.recorded_at);
+          const label = report.reportType === 'weekly' ? `${i + 1}회차` : format(date, 'MM.dd');
+          return { label, score, emotion };
+        });
+        setEmotionData(mapped);
+        setGraphEvaluation(res.graph_evaluation);
+      })
+      .catch(() => setEmotionData([]))
+      .finally(() => setIsGraphLoading(false));
+  }, [report.id, report.reportType]);
+
+  useEffect(() => {
+    getReportKeywordsApi(report.id)
+      .then((res) => {
+        setKeywords(res.topics);
+        setKeywordsEvaluation(res.topics_evaluation);
+      })
+      .catch(() => setKeywords([]))
+      .finally(() => setIsKeywordsLoading(false));
+  }, [report.id]);
 
   useEffect(() => {
     getReportSuggestionsApi(report.id)
@@ -96,11 +82,10 @@ export function ReportDetail({ report }: ReportDetailProps) {
   }, [report.id]);
 
   useEffect(() => {
-    getReportDetailApi(report.id)
-      .then((detail) => {
-        if ('tendency_analysis' in detail) {
-          setTendencySummary((detail as ReportDetailCompleted).tendency_analysis.tendency_summary);
-        }
+    getReportTendencyApi(report.id)
+      .then((res) => {
+        setTendencySummary(res.tendency);
+        setCurrentStatus(res.current_status);
       })
       .finally(() => setIsTendencyLoading(false));
   }, [report.id]);
@@ -148,12 +133,26 @@ export function ReportDetail({ report }: ReportDetailProps) {
       </div>
 
       {/* ── 감정 변화 그래프 (섹션 헤더 포함) ── */}
-      {/* TODO [API]: GET /v1/reports/{report_id}/graphs 응답으로 아래 emotionData 업데이트 필요 */}
       <div
         className="animate-in fade-in-0 slide-in-from-bottom-4"
         style={{ animationDuration: '400ms', animationDelay: '80ms', animationFillMode: 'both' }}
       >
-        <EmotionAreaChart data={emotionData} type={report.reportType ?? 'weekly'} />
+        {isGraphLoading ? (
+          <div className={CARD}>
+            <div className="bg-prime-100 h-75 w-full animate-pulse rounded" />
+          </div>
+        ) : emotionData.length > 0 ? (
+          <>
+            <EmotionAreaChart data={emotionData} type={report.reportType ?? 'weekly'} />
+            {graphEvaluation && (
+              <p className="text-prime-600 mt-4 text-sm leading-relaxed">{graphEvaluation}</p>
+            )}
+          </>
+        ) : (
+          <div className={CARD}>
+            <p className="text-prime-500 text-center text-sm">감정 그래프 데이터가 없어요.</p>
+          </div>
+        )}
       </div>
 
       {/* ── 주요 고민 키워드 ── */}
@@ -171,23 +170,29 @@ export function ReportDetail({ report }: ReportDetailProps) {
         </div>
 
         <div className="flex flex-wrap gap-3">
-          {KEYWORDS.map((kw, i) => (
-            <div
-              key={kw.text}
-              className={cn(
-                'flex items-center gap-3 rounded-3xl px-5 py-3.5 transition-all',
-                KEYWORD_STYLES[i % KEYWORD_STYLES.length]
-              )}
-            >
-              <span className="text-[15px] font-bold">#{kw.text}</span>
-            </div>
-          ))}
+          {isKeywordsLoading ? (
+            <>
+              {[0, 1, 2, 3, 4].map((i) => (
+                <div key={i} className="bg-prime-100 h-11 w-24 animate-pulse rounded-3xl" />
+              ))}
+            </>
+          ) : keywords.length > 0 ? (
+            keywords.map((kw, i) => (
+              <div
+                key={kw.name}
+                className={cn(
+                  'flex items-center gap-3 rounded-3xl px-5 py-3.5 transition-all',
+                  KEYWORD_STYLES[i % KEYWORD_STYLES.length]
+                )}
+              >
+                <span className="text-[15px] font-bold">#{kw.name}</span>
+              </div>
+            ))
+          ) : (
+            <p className="text-prime-500 text-sm">키워드 데이터가 없어요.</p>
+          )}
         </div>
-        {/* 키워드 배지 아래에 추가 */}
-        {/* TODO [API]: GET /reports/:id/keywords 응답의 topicSummary 필드로 교체 */}
-        <p className="text-prime-600 mt-6 text-sm leading-relaxed">
-          이번 기간 동안 반복적으로 등장한 주제는 ...
-        </p>
+        <p className="text-prime-600 mt-6 text-sm leading-relaxed">{keywordsEvaluation ?? ''}</p>
       </div>
 
       {/* ── 사용자 상태 요약 ── */}
@@ -202,19 +207,19 @@ export function ReportDetail({ report }: ReportDetailProps) {
           <p className="text-prime-500 text-[15px]">AI 분석을 통한 현재 심리 상태 종합 평가</p>
         </div>
 
-        {/* TODO [API]: 아래 상태 요약 텍스트 3개(전반적 상태/주요 발견사항/긍정적 변화)를
-                       GET /reports/:id/summary 응답의 summary.overall / summary.findings / summary.positiveChange 필드로 교체 */}
         <div className="space-y-6">
           <div>
             <h4 className="text-prime-700 mb-3 text-base font-bold">전반적 상태</h4>
-            <p className="text-prime-700 text-sm leading-relaxed">
-              이번 주 전반적으로{' '}
-              <span className="rounded bg-amber-100 px-1.5 py-0.5 font-medium">
-                긍정적인 감정 지수
-              </span>
-              를 유지했습니다. 화요일에 일시적인 불안감이 포착되었으나, 목요일 이후 빠르게 회복되는
-              경향을 보였습니다.
-            </p>
+            {isTendencyLoading ? (
+              <div className="space-y-2">
+                <div className="bg-prime-100 h-3.5 w-full animate-pulse rounded" />
+                <div className="bg-prime-100 h-3.5 w-4/5 animate-pulse rounded" />
+              </div>
+            ) : (
+              <p className="text-prime-700 text-sm leading-relaxed">
+                {currentStatus ?? '상태 분석 데이터가 없어요.'}
+              </p>
+            )}
           </div>
 
           <div>

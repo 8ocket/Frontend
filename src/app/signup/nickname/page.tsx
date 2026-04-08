@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import AuroraBackground from '@/shared/ui/AuroraBackground';
@@ -13,7 +13,7 @@ import { generatePositiveNickname } from '@/shared/lib/utils/nickname';
 import { signupApi } from '@/shared/api';
 import { OCCUPATION_MAP, AGE_MAP, GENDER_MAP } from '@/entities/user/model';
 
-const imgVector = '/images/icons/profile-default.svg';
+const imgVector = '/images/icons/profile-default.png';
 
 export default function NicknamePage() {
   const router = useRouter();
@@ -25,20 +25,57 @@ export default function NicknamePage() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null); // 프로필 미리보기 <URL>
   const [profileFile, setProfileFile] = useState<File | null>(null); // 실제 업로드할 파일 객체
+  const [signupError, setSignupError] = useState<string | null>(null);
+  const [nicknameError, setNicknameError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const profileObjectUrlRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (profileObjectUrlRef.current) URL.revokeObjectURL(profileObjectUrlRef.current);
+    };
+  }, []);
 
   const handleProfileClick = () => fileInputRef.current?.click();
 
   const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png'];
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setSignupError('JPG, PNG 형식의 이미지만 업로드할 수 있습니다.');
+      e.target.value = '';
+      return;
+    }
+    if (file.size > MAX_SIZE) {
+      setSignupError('프로필 이미지는 5MB 이하만 업로드할 수 있습니다.');
+      e.target.value = '';
+      return;
+    }
+    setSignupError(null);
+
+    if (profileObjectUrlRef.current) URL.revokeObjectURL(profileObjectUrlRef.current);
     const url = URL.createObjectURL(file);
+    profileObjectUrlRef.current = url;
     setProfileImage(url);
     setProfileFile(file);
   };
 
   const handleNext = async () => {
-    if (!nickname.trim()) return;
+    const trimmed = nickname.trim();
+    if (!trimmed) {
+      setNicknameError('닉네임을 입력해 주세요.');
+      return;
+    }
+    if (trimmed.length < 2) {
+      setNicknameError('닉네임은 2자 이상이어야 합니다.');
+      return;
+    }
+    setNicknameError(null);
+    setSignupError(null);
     try {
       setIsLoading(true);
       await signupApi(
@@ -54,13 +91,14 @@ export default function NicknamePage() {
         {
           ...(user ?? { id: '', email: '' }),
           name: nickname,
-          profileImage: profileImage ?? '/images/icons/profile-default.svg',
+          profileImage: profileImage ?? '/images/icons/profile-default.png',
         },
         token
       );
       setShowSuccessModal(true);
     } catch (error) {
       console.error('회원가입 실패:', error);
+      setSignupError('회원가입에 실패했습니다. 다시 시도해 주세요.');
     } finally {
       setIsLoading(false);
     }
@@ -78,7 +116,7 @@ export default function NicknamePage() {
 
   return (
     <AuroraBackground>
-      <div className="box-border flex min-h-screen-safe items-center justify-center p-4 py-8">
+      <div className="min-h-screen-safe box-border flex items-center justify-center p-4 py-8">
         {/* 카드 — Figma: 568px, white glass, rounded-2xl, px-10 */}
         <div className="relative w-full max-w-142 rounded-2xl border border-white/40 bg-white/70 px-6 py-8 shadow-[0px_8px_32px_0px_rgba(0,0,0,0.08)] md:px-10 md:py-10">
           {/* ── 헤더: 제목 + 뒤로가기 ── */}
@@ -115,7 +153,7 @@ export default function NicknamePage() {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png"
                 className="hidden"
                 onChange={handleProfileChange}
               />
@@ -138,7 +176,10 @@ export default function NicknamePage() {
                     <Input
                       type="text"
                       value={nickname}
-                      onChange={(e) => setNickname(e.target.value)}
+                      onChange={(e) => {
+                        setNickname(e.target.value);
+                        setNicknameError(null);
+                      }}
                       placeholder="즐거운 몽상가"
                       maxLength={20}
                       className="h-14 rounded-xl bg-white/50 px-5 text-base"
@@ -147,6 +188,7 @@ export default function NicknamePage() {
                       {nickname.length}/20
                     </span>
                   </div>
+                  {nicknameError && <p className="text-xs text-red-500">{nicknameError}</p>}
                   <Button
                     onClick={generateRandomNickname}
                     variant="secondary"
@@ -183,6 +225,9 @@ export default function NicknamePage() {
               />
             </div>
           </div>
+
+          {/* 에러 메시지 */}
+          {signupError && <p className="mt-4 text-center text-sm text-red-500">{signupError}</p>}
 
           {/* CTA 버튼 */}
           <Button

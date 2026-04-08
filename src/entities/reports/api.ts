@@ -5,9 +5,12 @@ import {
   ReportCompleteEvent,
   GetReportListResponse,
   ReportDetailResponse,
-  ReportApiResponse,
   ReportType,
   SuggestionItem,
+  ReportListItem,
+  GetReportGraphsResponse,
+  TendencyResponse,
+  GetReportKeywordsResponse,
 } from './model';
 import {
   mockCreateReport,
@@ -105,13 +108,12 @@ export const getReportListApi = async (reportType?: ReportType): Promise<GetRepo
   if (USE_MOCK) return mockGetReportList(reportType);
 
   const params = reportType ? { report_type: reportType } : {};
-  const response = await api.get<ReportApiResponse<GetReportListResponse>>('/reports', { params });
+  const response = await api.get<ReportListItem[]>('/reports', { params });
 
-  if (response.data.code === 'ok' && response.data.data) {
-    return response.data.data;
-  }
-
-  throw new Error(response.data.message || '리포트 목록 조회 실패');
+  return {
+    reports: response.data,
+    can_generate: { eligible: false, saved_session_count: 0, required_session_count: 1 },
+  };
 };
 
 /**
@@ -121,13 +123,8 @@ export const getReportListApi = async (reportType?: ReportType): Promise<GetRepo
 export const getReportDetailApi = async (reportId: string): Promise<ReportDetailResponse> => {
   if (USE_MOCK) return mockGetReportDetail(reportId);
 
-  const response = await api.get<ReportApiResponse<ReportDetailResponse>>(`/reports/${reportId}`);
-
-  if (response.data.code === 'ok' && response.data.data) {
-    return response.data.data;
-  }
-
-  throw new Error(response.data.message || '리포트 상세 조회 실패');
+  const response = await api.get<ReportDetailResponse>(`/reports/${reportId}`);
+  return response.data;
 };
 
 /**
@@ -137,33 +134,36 @@ export const getReportDetailApi = async (reportId: string): Promise<ReportDetail
 export const getReportSuggestionsApi = async (reportId: string): Promise<SuggestionItem[]> => {
   if (USE_MOCK) return mockGetReportSuggestions(reportId);
 
-  const response = await api.get<ReportApiResponse<SuggestionItem[]>>(
-    `/reports/${reportId}/suggestions`
-  );
+  const response = await api.get<SuggestionItem[]>(`/reports/${reportId}/suggestions`);
 
-  if (response.data.code === 'ok' && response.data.data) {
-    return response.data.data;
-  }
-
-  throw new Error(response.data.message || '행동 제언 조회 실패');
+  return response.data;
 };
 
 /**
- * TODO [API]: 감정 그래프 데이터 조회
+ * 감정 그래프 데이터 조회
  * GET /v1/reports/{report_id}/graphs
- *
- * 요청 (Header: token)
- * 응답:
- * {
- *   "graph_count": 5,
- *   "graphs": [
- *     { "session_id": "...", "avg_score": 24, "recorded_at": "2026-03-20T23:19:44.106419" },
- *     ...
- *   ],
- *   "graph_evaluation": "4월 1주차 동안 감정 점수가 -3에서 +5로 변화했습니다. ..."
- * }
- *
- * export const getReportGraphsApi = async (reportId: string): Promise<GetReportGraphsResponse> => {
- *   ...
- * };
  */
+export const getReportGraphsApi = async (reportId: string): Promise<GetReportGraphsResponse> => {
+  const response = await api.get<GetReportGraphsResponse>(`/reports/${reportId}/graphs`);
+  return response.data;
+};
+
+/**
+ * 감정 변화 경향 분석 조회
+ * GET /v1/reports/{report_id}/tendency
+ */
+export const getReportTendencyApi = async (reportId: string): Promise<TendencyResponse> => {
+  const response = await api.get<TendencyResponse>(`/reports/${reportId}/tendency`);
+  return response.data;
+};
+
+/**
+ * 핵심 키워드/토픽 조회
+ * GET /v1/reports/{report_id}/keywords
+ */
+export const getReportKeywordsApi = async (
+  reportId: string
+): Promise<GetReportKeywordsResponse> => {
+  const response = await api.get<GetReportKeywordsResponse>(`/reports/${reportId}/keywords`);
+  return response.data;
+};

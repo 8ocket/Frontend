@@ -83,12 +83,11 @@ api.interceptors.response.use(
           params: { refreshToken },
         });
 
-        const newAccessToken = data.data?.access_token;
+        const newAccessToken = data.accessToken;
         if (!newAccessToken) throw new Error('No access token in response');
 
         setCookie('accessToken', newAccessToken, 60 * 60);
-        if (data.data?.refresh_token)
-          setCookie('refreshToken', data.data.refresh_token, 30 * 24 * 60 * 60);
+        if (data.refreshToken) setCookie('refreshToken', data.refreshToken, 30 * 24 * 60 * 60);
 
         processQueue(null, newAccessToken);
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;

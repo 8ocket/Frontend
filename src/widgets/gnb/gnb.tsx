@@ -164,12 +164,12 @@ export function GNB() {
                 >
                   <div className="border-cta-300 bg-cta-100 relative size-7 shrink-0 overflow-hidden rounded-full border">
                     <Image
-                      src={user?.profileImage ?? '/images/icons/profile-default.svg'}
+                      src={user?.profileImage ?? '/images/icons/profile-default.png'}
                       alt="프로필"
                       fill
                       className={
                         user?.profileImage &&
-                        user.profileImage !== '/images/icons/profile-default.svg'
+                        user.profileImage !== '/images/icons/profile-default.png'
                           ? 'object-cover'
                           : 'object-contain p-1'
                       }
@@ -328,7 +328,7 @@ function ProfileDropdown({
   onProfileHeader: () => void;
 }) {
   const isDefaultImage =
-    !userProfileImage || userProfileImage === '/images/icons/profile-default.svg';
+    !userProfileImage || userProfileImage === '/images/icons/profile-default.png';
 
   return (
     <div className="border-prime-100 absolute top-full right-0 z-50 mt-2 w-59.5 overflow-hidden rounded-2xl border bg-white/90 shadow-sm backdrop-blur-md">
@@ -340,7 +340,7 @@ function ProfileDropdown({
       >
         <div className="border-cta-300 bg-cta-100 relative size-10 shrink-0 overflow-hidden rounded-full border">
           <Image
-            src={userProfileImage ?? '/images/icons/profile-default.svg'}
+            src={userProfileImage ?? '/images/icons/profile-default.png'}
             alt="프로필"
             fill
             className={isDefaultImage ? 'object-contain p-1.5' : 'object-cover'}

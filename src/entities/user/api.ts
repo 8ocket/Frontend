@@ -206,7 +206,7 @@ let defaultProfileImageCache: Blob | null = null;
 
 const getDefaultProfileImage = async (): Promise<Blob> => {
   if (!defaultProfileImageCache) {
-    const res = await fetch('/images/icons/profile-default.svg');
+    const res = await fetch('/images/icons/profile-default.png');
     defaultProfileImageCache = await res.blob();
   }
   return defaultProfileImageCache;
@@ -228,7 +228,7 @@ export const signupApi = async (
   const formData = new FormData();
 
   const image = profileImage ?? (await getDefaultProfileImage());
-  formData.append('profile_image', image, profileImage ? profileImage.name : 'profile-default.svg');
+  formData.append('profile_image', image, profileImage ? profileImage.name : 'profile-default.png');
 
   const contentsBlob = new Blob([JSON.stringify({ nickname, occupation, age, gender })], {
     type: 'application/json',
