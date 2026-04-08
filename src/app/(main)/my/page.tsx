@@ -14,7 +14,7 @@ import { Button } from '@/shared/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
 import { DialogRoot, DialogPortal, DialogOverlay, DialogTitle } from '@/shared/ui';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { getPaymentHistoryApi } from '@/entities/credits/api';
+import { getPaymentHistoryApi, cancelPaymentApi } from '@/entities/credits/api';
 import { PaymentHistoryItem } from '@/entities/credits/model';
 
 // ── 목업 데이터 (API 연동 시 교체) ──────────────────────────────────
@@ -65,7 +65,7 @@ export default function MyPage() {
 
   useEffect(() => {
     getPaymentHistoryApi()
-      .then((res) => setPaymentHistory(res.content))
+      .then((res) => setPaymentHistory(res.content.filter((i) => i.status !== 'READY')))
       .finally(() => setPaymentLoading(false));
 
     const handleClickOutside = (e: MouseEvent) => {
@@ -169,7 +169,7 @@ export default function MyPage() {
                           key={item.approvedAt}
                           className="hover:bg-secondary-50 relative flex items-center justify-between rounded-xl px-3 py-4 transition-colors"
                         >
-                          {/* 좌측: 상품명 + 날짜 */}
+                          {/* 좌측: 상품명 + 날짜 + 사유 */}
                           <div className="flex flex-col gap-1">
                             <span
                               className={`text-sm font-medium tracking-[-0.21px] ${item.status === 'CANCELED' ? 'text-prime-400' : 'text-prime-900'}`}
@@ -177,8 +177,17 @@ export default function MyPage() {
                               {item.orderName}
                             </span>
                             <span className="text-prime-400 text-xs tracking-[-0.18px]">
-                              {item.approvedAt.slice(0, 10).replace(/-/g, '.')}
+                              {item.approvedAt?.slice(0, 10).replace(/-/g, '.') ?? '-'}
                             </span>
+                            {item.status === 'CANCELED' && (
+                              <span className="text-prime-300 text-xs">고객 요청으로 환불 처리됨</span>
+                            )}
+                            {item.status === 'ABORTED' && (
+                              <span className="text-prime-300 text-xs">결제 승인 중 오류가 발생했습니다</span>
+                            )}
+                            {item.status === 'FAILED' && (
+                              <span className="text-prime-300 text-xs">결제에 실패했습니다</span>
+                            )}
                           </div>
 
                           {/* 우측: 금액 + 상태 + 더보기 */}
@@ -192,6 +201,10 @@ export default function MyPage() {
                               {item.status === 'CANCELED' ? (
                                 <span className="bg-error-100 text-error-500 rounded-md px-1.5 py-0.5 text-[10px] font-semibold">
                                   환불완료
+                                </span>
+                              ) : item.status === 'ABORTED' || item.status === 'FAILED' ? (
+                                <span className="bg-prime-100 text-prime-400 rounded-md px-1.5 py-0.5 text-[10px] font-semibold">
+                                  결제실패
                                 </span>
                               ) : (
                                 <span className="text-success-800 text-xs font-medium">
@@ -313,6 +326,12 @@ export default function MyPage() {
         isOpen={refundModalOpen}
         onClose={() => setRefundModalOpen(false)}
         item={selectedPayment}
+        onSuccess={() => {
+          setRefundModalOpen(false);
+          getPaymentHistoryApi()
+            .then((res) => setPaymentHistory(res.content))
+            .catch(() => {});
+        }}
       />
     </div>
   );
@@ -323,11 +342,30 @@ function RefundModal({
   isOpen,
   onClose,
   item,
+  onSuccess,
 }: {
   isOpen: boolean;
   onClose: () => void;
   item: PaymentHistoryItem | null;
+  onSuccess: () => void;
 }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleRefund = async () => {
+    if (!item) return;
+    setLoading(true);
+    setError(null);
+    try {
+      await cancelPaymentApi(item.paymentId);
+      onSuccess();
+    } catch {
+      setError('환불 요청에 실패했습니다. 다시 시도해 주세요.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <DialogRoot open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogPortal>
@@ -357,7 +395,7 @@ function RefundModal({
                   <div className="flex flex-col gap-0.5">
                     <span className="text-prime-900 text-sm font-medium">{item.orderName}</span>
                     <span className="text-prime-400 text-xs">
-                      {item.approvedAt.slice(0, 10).replace(/-/g, '.')}
+                      {item.approvedAt?.slice(0, 10).replace(/-/g, '.') ?? '-'}
                     </span>
                   </div>
                   <span className="text-prime-900 text-sm font-bold">
@@ -409,12 +447,18 @@ function RefundModal({
                 </ul>
               </div>
 
+              {/* 에러 메시지 */}
+              {error && (
+                <p className="text-error-500 text-center text-xs">{error}</p>
+              )}
+
               {/* 버튼 */}
               <div className="flex gap-2.5">
                 <Button
                   type="button"
                   variant="secondary"
                   onClick={onClose}
+                  disabled={loading}
                   className="flex-1 rounded-xl"
                 >
                   취소
@@ -423,10 +467,11 @@ function RefundModal({
                   type="button"
                   variant="primary"
                   semantic="red"
-                  onClick={onClose}
+                  onClick={handleRefund}
+                  disabled={loading}
                   className="flex-1 rounded-xl"
                 >
-                  환불 요청하기
+                  {loading ? '처리 중...' : '환불 요청하기'}
                 </Button>
               </div>
             </div>
