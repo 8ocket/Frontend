@@ -34,9 +34,10 @@ export interface ReportListItem {
   report_type: ReportType;
   period_start: string; // 'yyyy-MM-dd'
   period_end: string; // 'yyyy-MM-dd'
-  session_count: number;
+  session_count?: number;
   status: string; // 'completed' 확인, 'generating'/'failed' 백엔드 확인 필요
   created_at: string; // ISO timestamp
+  is_viewed?: boolean;
 }
 
 export interface CanGenerate {
@@ -117,4 +118,22 @@ export interface GetReportGraphsResponse {
 export interface SuggestionItem {
   title: string;
   content: string;
+}
+
+// --- GET /v1/reports/{report_id}/tendency
+export interface TendencyResponse {
+  current_status: string;
+  tendency: string;
+}
+
+// --- GET /v1/reports/{report_id}/keywords
+export interface AiReportTopicItem {
+  name: string;
+  category: string;
+  pattern: string;
+}
+
+export interface GetReportKeywordsResponse {
+  topics: AiReportTopicItem[];
+  topics_evaluation: string;
 }

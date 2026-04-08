@@ -369,6 +369,7 @@ export default function Home() {
   const [cardsVisible, setCardsVisible] = useState(false);
   const [canGenerate, setCanGenerate] = useState<CanGenerate | null>(null);
   const [weeklyCanGenerate, setWeeklyCanGenerate] = useState<CanGenerate | null>(null);
+  const [reportLoadError, setReportLoadError] = useState(false);
 
   useEffect(() => {
     if (!cardContainer) return;
@@ -396,10 +397,10 @@ export default function Home() {
     fetchCards();
     getReportListApi()
       .then((res) => setCanGenerate(res.can_generate))
-      .catch(() => {});
+      .catch(() => setReportLoadError(true));
     getReportListApi('weekly')
       .then((res) => setWeeklyCanGenerate(res.can_generate))
-      .catch(() => {});
+      .catch(() => setReportLoadError(true));
   }, [fetchCards]);
 
   if (authLoading || !isAuthenticated) {
@@ -462,6 +463,11 @@ export default function Home() {
 
         {/* ── 주간 달성률 | 월간 달성률 ────────────────────────────────────── */}
         <section className="mb-4">
+          {reportLoadError && (
+            <p className="mb-2 text-center text-xs text-red-400">
+              리포트 정보를 불러오지 못했습니다. 새로고침 해주세요.
+            </p>
+          )}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch">
             <WeeklyReportWidget
               sessions={weeklyCanGenerate?.saved_session_count ?? 0}
