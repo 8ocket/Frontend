@@ -16,7 +16,7 @@ export const getCreditProductsApi = async (): Promise<CreditProductResponse[]> =
     ];
   }
 
-  const response = await api.get<CreditApiResponse<CreditProductResponse[]>>('/credit');
+  const response = await api.get<CreditApiResponse<CreditProductResponse[]>>('/credits');
   return response.data.data;
 };
 
