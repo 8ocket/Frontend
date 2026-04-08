@@ -4,18 +4,26 @@ import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { ProfileEditDrawer } from './_components/ProfileEditDrawer';
 import { ChevronRight, Coins, LogOut, MoreVertical, Trash2, X } from 'lucide-react';
 import { useAuthStore } from '@/entities/user/store';
-import { logoutApi } from '@/entities/user/api';
+import { logoutApi, getMyProfileApi } from '@/entities/user/api';
 import { getCookie } from '@/shared/lib/utils/cookie';
 import { useCreditStore } from '@/entities/credits/store';
-import { UserProfileModal } from '@/shared/ui/UserProfileModal';
 import { Button } from '@/shared/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
 import { DialogRoot, DialogPortal, DialogOverlay, DialogTitle } from '@/shared/ui';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { getPaymentHistoryApi, cancelPaymentApi } from '@/entities/credits/api';
 import { PaymentHistoryItem } from '@/entities/credits/model';
+import {
+  OCCUPATION_LABEL,
+  AGE_LABEL,
+  GENDER_LABEL,
+  type OccupationType,
+  type AgeGroup,
+  type Gender,
+} from '@/entities/user/model';
 
 // ── 목업 데이터 (API 연동 시 교체) ──────────────────────────────────
 
@@ -32,14 +40,19 @@ export default function MyPage() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
   const { totalCredit } = useCreditStore();
-  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [editDrawerOpen, setEditDrawerOpen] = useState(false);
   const [refundModalOpen, setRefundModalOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<PaymentHistoryItem | null>(null);
   const dropdownRef = useRef<HTMLUListElement>(null);
 
   const [paymentHistory, setPaymentHistory] = useState<PaymentHistoryItem[]>([]);
   const [paymentLoading, setPaymentLoading] = useState(true);
+
+  // 프로필 부가정보
+  const [profileOccupation, setProfileOccupation] = useState<OccupationType | null>(null);
+  const [profileAgeGroup, setProfileAgeGroup] = useState<AgeGroup | null>(null);
+  const [profileGender, setProfileGender] = useState<Gender | null>(null);
 
   const isDefaultImage =
     !user?.profileImage || user.profileImage === '/images/icons/profile-default.png';
@@ -68,6 +81,8 @@ export default function MyPage() {
       .then((res) => setPaymentHistory(res.content.filter((i) => i.status !== 'READY')))
       .finally(() => setPaymentLoading(false));
 
+    fetchProfile();
+
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setOpenDropdownId(null);
@@ -76,6 +91,16 @@ export default function MyPage() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const fetchProfile = () => {
+    getMyProfileApi()
+      .then((profile) => {
+        setProfileOccupation(profile.occupation ?? null);
+        setProfileAgeGroup(profile.age_group ?? null);
+        setProfileGender(profile.gender ?? null);
+      })
+      .catch(() => {});
+  };
 
   return (
     <div className="min-h-main-safe bg-secondary-100">
@@ -102,10 +127,16 @@ export default function MyPage() {
                   <span className="text-prime-900 truncate text-base font-semibold tracking-[-0.24px]">
                     {user?.name ?? '사용자'}
                   </span>
+                  {/* 직업 / 나이 / 성별 읽기 전용 */}
+                  <div className="text-prime-400 flex flex-wrap gap-x-2 gap-y-0.5 text-xs tracking-[-0.18px]">
+                    {profileOccupation && <span>{OCCUPATION_LABEL[profileOccupation]}</span>}
+                    {profileAgeGroup && <span>{AGE_LABEL[profileAgeGroup]}</span>}
+                    {profileGender && <span>{GENDER_LABEL[profileGender]}</span>}
+                  </div>
                 </div>
                 <button
                   type="button"
-                  onClick={() => setProfileModalOpen(true)}
+                  onClick={() => setEditDrawerOpen(true)}
                   className="border-prime-100 text-prime-700 hover:bg-secondary-50 shrink-0 rounded-lg border bg-white px-3 py-1.5 text-xs font-medium transition-colors"
                 >
                   프로필 수정
@@ -182,10 +213,14 @@ export default function MyPage() {
                                 : '-'}
                             </span>
                             {item.status === 'CANCELED' && (
-                              <span className="text-prime-300 text-xs">고객 요청으로 환불 처리됨</span>
+                              <span className="text-prime-300 text-xs">
+                                고객 요청으로 환불 처리됨
+                              </span>
                             )}
                             {item.status === 'ABORTED' && (
-                              <span className="text-prime-300 text-xs">결제 승인 중 오류가 발생했습니다</span>
+                              <span className="text-prime-300 text-xs">
+                                결제 승인 중 오류가 발생했습니다
+                              </span>
                             )}
                             {item.status === 'FAILED' && (
                               <span className="text-prime-300 text-xs">결제에 실패했습니다</span>
@@ -317,12 +352,6 @@ export default function MyPage() {
         </main>
       </div>
 
-      <UserProfileModal
-        isOpen={profileModalOpen}
-        onClose={() => setProfileModalOpen(false)}
-        userName={user?.name ?? ''}
-      />
-
       {/* 환불 안내 모달 */}
       <RefundModal
         isOpen={refundModalOpen}
@@ -334,6 +363,13 @@ export default function MyPage() {
             .then((res) => setPaymentHistory(res.content))
             .catch(() => {});
         }}
+      />
+
+      {/* 프로필 수정 Drawer */}
+      <ProfileEditDrawer
+        isOpen={editDrawerOpen}
+        onClose={() => setEditDrawerOpen(false)}
+        onSaved={fetchProfile}
       />
     </div>
   );
@@ -450,9 +486,7 @@ function RefundModal({
               </div>
 
               {/* 에러 메시지 */}
-              {error && (
-                <p className="text-error-500 text-center text-xs">{error}</p>
-              )}
+              {error && <p className="text-error-500 text-center text-xs">{error}</p>}
 
               {/* 버튼 */}
               <div className="flex gap-2.5">

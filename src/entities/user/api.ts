@@ -94,16 +94,26 @@ export const getMyProfileApi = async (): Promise<UserProfileResponse> => {
  */
 export const updateMyProfileApi = async (
   nickName: string,
-  profileImage?: File
+  profileImage?: File,
+  options?: {
+    age_group?: AgeGroup | null;
+    occupation?: OccupationType | null;
+    gender?: Gender | null;
+  }
 ): Promise<UpdateMyProfileResponse> => {
   if (USE_MOCK) {
-    return mockUpdateMyProfile(nickName, profileImage);
+    return mockUpdateMyProfile(nickName, profileImage, options);
   }
 
   const formData = new FormData();
 
   if (profileImage) formData.append('profile_image', profileImage);
-  const contentsBlob = new Blob([JSON.stringify({ nickname: nickName })], {
+  const contents: Record<string, unknown> = { nickname: nickName };
+  if (options?.age_group !== undefined) contents.age_group = options.age_group;
+  if (options?.occupation !== undefined) contents.occupation = options.occupation;
+  if (options?.gender !== undefined) contents.gender = options.gender;
+
+  const contentsBlob = new Blob([JSON.stringify(contents)], {
     type: 'application/json',
   });
   formData.append('contents', contentsBlob);

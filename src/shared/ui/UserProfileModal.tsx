@@ -8,6 +8,7 @@ import { X, Camera } from 'lucide-react';
 import { DialogRoot, DialogPortal, DialogOverlay, DialogTitle } from '@/shared/ui';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { useAuthStore } from '@/entities/user/store';
+import { updateMyProfileApi } from '@/entities/user/api';
 
 interface UserProfileModalProps {
   isOpen: boolean;
@@ -21,8 +22,18 @@ export function UserProfileModal({ isOpen, onClose, userName = '' }: UserProfile
   const [profileImage, setProfileImage] = useState<string | null>(
     user?.profileImage ?? '/images/icons/profile-default.png'
   );
+  const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
+  const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const objectUrlRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setNickname(userName);
+      setProfileImage(user?.profileImage ?? '/images/icons/profile-default.png');
+      setSelectedFile(undefined);
+    }
+  }, [isOpen, userName, user?.profileImage]);
 
   useEffect(() => {
     return () => {
@@ -37,18 +48,26 @@ export function UserProfileModal({ isOpen, onClose, userName = '' }: UserProfile
     const url = URL.createObjectURL(file);
     objectUrlRef.current = url;
     setProfileImage(url);
+    setSelectedFile(file);
   };
 
-  const handleSave = () => {
-    if (user) {
-      setUser({
-        ...user,
-        name: nickname,
-        profileImage: profileImage ?? '/images/icons/profile-default.png',
-      });
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await updateMyProfileApi(nickname, selectedFile);
+      if (user) {
+        setUser({
+          ...user,
+          name: nickname,
+          profileImage: profileImage ?? '/images/icons/profile-default.png',
+        });
+      }
+      onClose();
+    } catch {
+      // TODO: 에러 토스트
+    } finally {
+      setSaving(false);
     }
-    // TODO: API 연동
-    onClose();
   };
 
   return (
@@ -146,10 +165,10 @@ export function UserProfileModal({ isOpen, onClose, userName = '' }: UserProfile
               <button
                 type="button"
                 onClick={handleSave}
-                disabled={!nickname.trim()}
+                disabled={!nickname.trim() || saving}
                 className="bg-cta-300 h-14 w-full rounded-xl text-sm font-medium text-white shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1),0px_2px_4px_0px_rgba(0,0,0,0.1)] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                저장하기
+                {saving ? '저장 중...' : '저장하기'}
               </button>
             </div>
           </div>
