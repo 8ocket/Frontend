@@ -8,6 +8,7 @@ import { DialogRoot, DialogPortal, DialogOverlay } from '@/shared/ui';
 import { ToggleGroup } from '@/shared/ui/toggle-group';
 import { useAuthStore } from '@/entities/user/store';
 import { getMyProfileApi, updateMyProfileApi } from '@/entities/user/api';
+import { NicknameSchema } from '@/entities/user/schema';
 import { useToast } from '@/shared/ui/toast';
 import {
   OCCUPATION_MAP,
@@ -119,8 +120,9 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
 
   const handleSave = async () => {
     const trimmed = nickname.trim();
-    if (trimmed.length < 2 || trimmed.length > 15) {
-      toast('닉네임은 2~15자여야 합니다.', 'error');
+    const result = NicknameSchema.safeParse(trimmed);
+    if (!result.success) {
+      toast(result.error.issues[0].message, 'error');
       return;
     }
     setSaving(true);

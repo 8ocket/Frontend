@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { NicknameSchema } from '@/entities/user/schema';
 import AuroraBackground from '@/shared/ui/AuroraBackground';
 import { Button, Input, ToggleGroup } from '@/shared/ui';
 import { SignupCreditModal } from '@/features/auth';
@@ -78,12 +79,9 @@ export default function NicknamePage() {
       setNicknameError('닉네임을 입력해 주세요.');
       return;
     }
-    if (trimmed.length < 2) {
-      setNicknameError('닉네임은 2자 이상이어야 합니다.');
-      return;
-    }
-    if (trimmed.length > 15) {
-      setNicknameError('닉네임은 15자 이하여야 합니다.');
+    const result = NicknameSchema.safeParse(trimmed);
+    if (!result.success) {
+      setNicknameError(result.error.issues[0].message);
       return;
     }
     setNicknameError(null);
