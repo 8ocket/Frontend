@@ -14,8 +14,9 @@ import { Button } from '@/shared/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
 import { DialogRoot, DialogPortal, DialogOverlay, DialogTitle } from '@/shared/ui';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { getPaymentHistoryApi, cancelPaymentApi } from '@/entities/credits/api';
+import { getPaymentHistoryApi, cancelPaymentApi, getMyCreditApi } from '@/entities/credits/api';
 import { PaymentHistoryItem } from '@/entities/credits/model';
+import { useToast } from '@/shared/ui/toast';
 import {
   OCCUPATION_LABEL,
   AGE_LABEL,
@@ -39,15 +40,18 @@ const CREDIT_HISTORY = [
 export default function MyPage() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
-  const { totalCredit } = useCreditStore();
+  const { totalCredit, setTotalCredit } = useCreditStore();
+  const { toast } = useToast();
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
   const [refundModalOpen, setRefundModalOpen] = useState(false);
+  const [deleteAccountModalOpen, setDeleteAccountModalOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<PaymentHistoryItem | null>(null);
   const dropdownRef = useRef<HTMLUListElement>(null);
 
   const [paymentHistory, setPaymentHistory] = useState<PaymentHistoryItem[]>([]);
   const [paymentLoading, setPaymentLoading] = useState(true);
+  const [paymentError, setPaymentError] = useState(false);
 
   // 프로필 부가정보
   const [profileOccupation, setProfileOccupation] = useState<OccupationType | null>(null);
@@ -76,9 +80,20 @@ export default function MyPage() {
     router.replace('/about');
   };
 
+  const fetchProfile = () => {
+    getMyProfileApi()
+      .then((profile) => {
+        setProfileOccupation(profile.occupation ?? null);
+        setProfileAgeGroup(profile.age_group ?? null);
+        setProfileGender(profile.gender ?? null);
+      })
+      .catch(() => toast('프로필 정보를 불러오지 못했습니다.', 'error'));
+  };
+
   useEffect(() => {
     getPaymentHistoryApi()
       .then((res) => setPaymentHistory(res.content.filter((i) => i.status !== 'READY')))
+      .catch(() => setPaymentError(true))
       .finally(() => setPaymentLoading(false));
 
     fetchProfile();
@@ -91,16 +106,6 @@ export default function MyPage() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const fetchProfile = () => {
-    getMyProfileApi()
-      .then((profile) => {
-        setProfileOccupation(profile.occupation ?? null);
-        setProfileAgeGroup(profile.age_group ?? null);
-        setProfileGender(profile.gender ?? null);
-      })
-      .catch(() => {});
-  };
 
   return (
     <div className="min-h-main-safe bg-secondary-100">
@@ -191,6 +196,10 @@ export default function MyPage() {
                 <TabsContent value="payment" className="mt-0">
                   {paymentLoading ? (
                     <div className="text-prime-400 py-12 text-center text-sm">불러오는 중...</div>
+                  ) : paymentError ? (
+                    <div className="text-prime-400 py-12 text-center text-sm">
+                      결제 내역을 불러오지 못했습니다.
+                    </div>
                   ) : paymentHistory.length === 0 ? (
                     <EmptyHistory message="결제 내역이 없습니다." />
                   ) : (
@@ -345,7 +354,7 @@ export default function MyPage() {
                 label="회원탈퇴"
                 labelClassName="text-error-500"
                 iconBg="bg-error-100"
-                onClick={() => {}}
+                onClick={() => setDeleteAccountModalOpen(true)}
               />
             </section>
           </div>
@@ -359,9 +368,13 @@ export default function MyPage() {
         item={selectedPayment}
         onSuccess={() => {
           setRefundModalOpen(false);
+          toast('환불 요청이 완료되었습니다.', 'success');
           getPaymentHistoryApi()
-            .then((res) => setPaymentHistory(res.content))
-            .catch(() => {});
+            .then((res) => setPaymentHistory(res.content.filter((i) => i.status !== 'READY')))
+            .catch(() => toast('결제 내역 갱신에 실패했습니다.', 'error'));
+          getMyCreditApi()
+            .then((res) => setTotalCredit(res.totalCredit))
+            .catch(() => toast('크레딧 갱신에 실패했습니다.', 'error'));
         }}
       />
 
@@ -370,6 +383,12 @@ export default function MyPage() {
         isOpen={editDrawerOpen}
         onClose={() => setEditDrawerOpen(false)}
         onSaved={fetchProfile}
+      />
+
+      {/* 회원탈퇴 확인 모달 */}
+      <DeleteAccountModal
+        isOpen={deleteAccountModalOpen}
+        onClose={() => setDeleteAccountModalOpen(false)}
       />
     </div>
   );
@@ -564,5 +583,97 @@ function MenuRow({
       </span>
       <ChevronRight size={16} className="text-prime-300 shrink-0" />
     </button>
+  );
+}
+
+// ── 회원탈퇴 확인 모달 ─────────────────────────────────────────────
+function DeleteAccountModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const [confirmText, setConfirmText] = useState('');
+  const isConfirmed = confirmText === '회원탈퇴';
+
+  return (
+    <DialogRoot open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogPortal>
+        <DialogOverlay />
+        <DialogPrimitive.Content className="fixed top-1/2 left-1/2 z-50 w-full max-w-105 -translate-x-1/2 -translate-y-1/2 focus:outline-none">
+          <DialogTitle className="sr-only">회원탈퇴</DialogTitle>
+          <div className="border-prime-100 overflow-hidden rounded-2xl border bg-white shadow-sm">
+            {/* 헤더 */}
+            <div className="border-prime-100 flex items-center justify-between border-b px-7 py-5">
+              <span className="text-prime-900 text-base font-semibold tracking-[-0.24px]">
+                정말 탈퇴하시겠어요?
+              </span>
+              <button
+                type="button"
+                onClick={onClose}
+                className="hover:bg-secondary-100 flex size-7 items-center justify-center rounded-full transition-colors"
+              >
+                <X size={16} className="text-prime-400" />
+              </button>
+            </div>
+
+            {/* 바디 */}
+            <div className="flex flex-col gap-5 px-7 py-6">
+              <div className="bg-error-100/60 rounded-xl px-4 py-3.5">
+                <p className="text-error-500 text-xs font-semibold">탈퇴 시 주의사항</p>
+                <ul className="mt-2 flex flex-col gap-1.5">
+                  {[
+                    '모든 상담 기록과 리포트가 영구적으로 삭제됩니다.',
+                    '보유 중인 크레딧은 모두 소멸되며 복구할 수 없습니다.',
+                    '동일 계정으로 재가입하더라도 이전 데이터는 복원되지 않습니다.',
+                  ].map((text) => (
+                    <li
+                      key={text}
+                      className="text-error-500/80 flex items-start gap-1.5 text-xs leading-relaxed"
+                    >
+                      <span className="bg-error-400 mt-1 size-1 shrink-0 rounded-full" />
+                      {text}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-prime-700 text-sm font-medium">
+                  확인을 위해 <span className="text-error-500 font-bold">&quot;회원탈퇴&quot;</span>
+                  를 입력해 주세요
+                </label>
+                <input
+                  type="text"
+                  value={confirmText}
+                  onChange={(e) => setConfirmText(e.target.value)}
+                  placeholder="회원탈퇴"
+                  className="border-prime-200 bg-secondary-50 text-prime-900 placeholder:text-prime-300 focus:border-error-500 h-11 w-full rounded-xl border px-4 text-sm transition-colors focus:bg-white focus:ring-2 focus:ring-red-500/20 focus:outline-none"
+                />
+              </div>
+
+              <div className="flex gap-2.5">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={onClose}
+                  className="flex-1 rounded-xl"
+                >
+                  취소
+                </Button>
+                <Button
+                  type="button"
+                  variant="primary"
+                  semantic="red"
+                  disabled={!isConfirmed}
+                  onClick={() => {
+                    // TODO: 회원탈퇴 API 연동
+                    onClose();
+                  }}
+                  className="flex-1 rounded-xl"
+                >
+                  탈퇴하기
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogPrimitive.Content>
+      </DialogPortal>
+    </DialogRoot>
   );
 }

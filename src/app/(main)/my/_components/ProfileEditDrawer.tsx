@@ -8,6 +8,7 @@ import { DialogRoot, DialogPortal, DialogOverlay } from '@/shared/ui';
 import { ToggleGroup } from '@/shared/ui/toggle-group';
 import { useAuthStore } from '@/entities/user/store';
 import { getMyProfileApi, updateMyProfileApi } from '@/entities/user/api';
+import { useToast } from '@/shared/ui/toast';
 import {
   OCCUPATION_MAP,
   AGE_MAP,
@@ -25,6 +26,7 @@ interface ProfileEditDrawerProps {
 
 export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawerProps) {
   const { user, setUser } = useAuthStore();
+  const { toast } = useToast();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -35,6 +37,7 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const objectUrlRef = useRef<string | null>(null);
+  const [nicknameChangeCount, setNicknameChangeCount] = useState(0);
 
   // 나이 / 직업 / 성별
   const [occupation, setOccupation] = useState<keyof typeof OCCUPATION_MAP>('대학생 / 대학원생');
@@ -75,6 +78,7 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
         const gen = profile.gender ? (GENDER_LABEL[profile.gender] ?? '남성') : '남성';
 
         setNickname(nick);
+        setNicknameChangeCount(profile.nickname_change_count ?? 0);
         if (profile.profile_image_url) setProfileImage(profile.profile_image_url);
         else setProfileImage('/images/icons/profile-default.png');
         setOccupation(occ as keyof typeof OCCUPATION_MAP);
@@ -101,6 +105,11 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
   const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast('이미지 크기는 5MB 이하여야 합니다.', 'error');
+      e.target.value = '';
+      return;
+    }
     if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
     const url = URL.createObjectURL(file);
     objectUrlRef.current = url;
@@ -109,9 +118,14 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
   }, []);
 
   const handleSave = async () => {
+    const trimmed = nickname.trim();
+    if (trimmed.length < 2 || trimmed.length > 15) {
+      toast('닉네임은 2~15자여야 합니다.', 'error');
+      return;
+    }
     setSaving(true);
     try {
-      await updateMyProfileApi(nickname, selectedFile, {
+      await updateMyProfileApi(trimmed, selectedFile, {
         age_group: AGE_MAP[ageGroup],
         occupation: OCCUPATION_MAP[occupation],
         gender: GENDER_MAP[gender],
@@ -127,8 +141,9 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
 
       onSaved?.();
       onClose();
+      toast('프로필이 저장되었습니다.', 'success');
     } catch {
-      // TODO: 에러 토스트
+      toast('프로필 저장에 실패했습니다. 다시 시도해 주세요.', 'error');
     } finally {
       setSaving(false);
     }
@@ -139,7 +154,7 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
       <DialogPortal>
         <DialogOverlay />
         <DialogPrimitive.Content
-          className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col bg-white shadow-xl focus:outline-none data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-200 data-[state=open]:duration-300 sm:max-w-105"
+          className="data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col bg-white shadow-xl focus:outline-none data-[state=closed]:duration-200 data-[state=open]:duration-300 sm:max-w-105"
           aria-describedby={undefined}
         >
           <DialogPrimitive.Title className="sr-only">프로필 수정</DialogPrimitive.Title>
@@ -169,7 +184,7 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="border-cta-300/40 bg-secondary-100 group relative flex size-20 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 transition-all hover:border-cta-300"
+                      className="border-cta-300/40 bg-secondary-100 group hover:border-cta-300 relative flex size-20 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 transition-all"
                       aria-label="프로필 사진 변경"
                     >
                       {!isDefaultImage ? (
@@ -222,7 +237,9 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
                     maxLength={20}
                     className="border-prime-200 bg-secondary-50 text-prime-900 placeholder:text-prime-300 focus:border-cta-300 h-11 w-full rounded-xl border px-4 text-sm transition-colors focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   />
-                  <p className="text-prime-400 text-xs">매월 3회까지 변경 가능 (0/3)</p>
+                  <p className="text-prime-400 text-xs">
+                    매월 3회까지 변경 가능 ({nicknameChangeCount}/3)
+                  </p>
                 </section>
 
                 <hr className="border-prime-100" />
