@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ProfileEditDrawer } from './_components/ProfileEditDrawer';
 import { ChevronRight, Coins, LogOut, MoreVertical, Trash2, X } from 'lucide-react';
 import { useAuthStore } from '@/entities/user/store';
@@ -39,6 +40,7 @@ const CREDIT_HISTORY = [
 
 export default function MyPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { user, logout } = useAuthStore();
   const { totalCredit, setTotalCredit } = useCreditStore();
   const { toast } = useToast();
@@ -49,14 +51,23 @@ export default function MyPage() {
   const [selectedPayment, setSelectedPayment] = useState<PaymentHistoryItem | null>(null);
   const dropdownRef = useRef<HTMLUListElement>(null);
 
-  const [paymentHistory, setPaymentHistory] = useState<PaymentHistoryItem[]>([]);
-  const [paymentLoading, setPaymentLoading] = useState(true);
-  const [paymentError, setPaymentError] = useState(false);
+  const {
+    data: paymentHistory = [],
+    isPending: paymentLoading,
+    isError: paymentError,
+  } = useQuery({
+    queryKey: ['paymentHistory'],
+    queryFn: () => getPaymentHistoryApi(),
+    select: (res) => res.content.filter((i) => i.status !== 'READY'),
+  });
 
-  // 프로필 부가정보
-  const [profileOccupation, setProfileOccupation] = useState<OccupationType | null>(null);
-  const [profileAgeGroup, setProfileAgeGroup] = useState<AgeGroup | null>(null);
-  const [profileGender, setProfileGender] = useState<Gender | null>(null);
+  const { data: profileData } = useQuery({
+    queryKey: ['myProfile'],
+    queryFn: getMyProfileApi,
+  });
+  const profileOccupation = profileData?.occupation ?? null;
+  const profileAgeGroup = profileData?.age_group ?? null;
+  const profileGender = profileData?.gender ?? null;
 
   const isDefaultImage =
     !user?.profileImage || user.profileImage === '/images/icons/profile-default.png';
@@ -80,24 +91,7 @@ export default function MyPage() {
     router.replace('/about');
   };
 
-  const fetchProfile = () => {
-    getMyProfileApi()
-      .then((profile) => {
-        setProfileOccupation(profile.occupation ?? null);
-        setProfileAgeGroup(profile.age_group ?? null);
-        setProfileGender(profile.gender ?? null);
-      })
-      .catch(() => toast('프로필 정보를 불러오지 못했습니다.', 'error'));
-  };
-
   useEffect(() => {
-    getPaymentHistoryApi()
-      .then((res) => setPaymentHistory(res.content.filter((i) => i.status !== 'READY')))
-      .catch(() => setPaymentError(true))
-      .finally(() => setPaymentLoading(false));
-
-    fetchProfile();
-
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setOpenDropdownId(null);
@@ -369,9 +363,7 @@ export default function MyPage() {
         onSuccess={() => {
           setRefundModalOpen(false);
           toast('환불 요청이 완료되었습니다.', 'success');
-          getPaymentHistoryApi()
-            .then((res) => setPaymentHistory(res.content.filter((i) => i.status !== 'READY')))
-            .catch(() => toast('결제 내역 갱신에 실패했습니다.', 'error'));
+          queryClient.invalidateQueries({ queryKey: ['paymentHistory'] });
           getMyCreditApi()
             .then((res) => setTotalCredit(res.totalCredit))
             .catch(() => toast('크레딧 갱신에 실패했습니다.', 'error'));
@@ -382,7 +374,7 @@ export default function MyPage() {
       <ProfileEditDrawer
         isOpen={editDrawerOpen}
         onClose={() => setEditDrawerOpen(false)}
-        onSaved={fetchProfile}
+        onSaved={() => queryClient.invalidateQueries({ queryKey: ['myProfile'] })}
       />
 
       {/* 회원탈퇴 확인 모달 */}

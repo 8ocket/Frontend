@@ -3,10 +3,11 @@
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/shared/lib/utils';
 import { EmotionCardFront, EmotionCardBack, getEmotionDisplayName } from '@/widgets/emotion-card';
 import type { EmotionCardData } from '@/entities/emotion';
-import { useCollectionStore } from '@/entities/emotion';
+import { getCollectionCardsApi } from '@/entities/emotion/api';
 import { EmotionColorLegend } from '@/widgets/emotion-color-legend';
 
 /** 날짜 형식: YYYY.MM.DD */
@@ -200,11 +201,10 @@ export default function CollectionPage() {
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [monthIndex, setMonthIndex] = useState(0); // 0 = 가장 최신 월
   const [direction, setDirection] = useState<1 | -1>(1);
-  const { cards, fetchCards } = useCollectionStore();
-
-  useEffect(() => {
-    fetchCards();
-  }, [fetchCards]);
+  const { data: cards = [] } = useQuery({
+    queryKey: ['collectionCards'],
+    queryFn: getCollectionCardsApi,
+  });
 
   const groups = groupByMonth(cards);
   const totalMonths = groups.length;

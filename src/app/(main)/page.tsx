@@ -6,11 +6,12 @@ import { Check, MessageCircle, FileText, Lock, Layers } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import { EmotionCardFront, getEmotionDisplayName } from '@/widgets/emotion-card';
 import { cn } from '@/shared/lib/utils';
 import type { EmotionCardData } from '@/entities/emotion';
-import { useCollectionStore } from '@/entities/emotion';
+import { getCollectionCardsApi } from '@/entities/emotion/api';
 import { useAuthStore } from '@/entities/user/store';
 import { getReportListApi } from '@/entities/reports/api';
 import type { CanGenerate } from '@/entities/reports/model';
@@ -205,18 +206,12 @@ function MonthlyReportWidget({
 
 // ── 서브 위젯: 출석 현황 (이번 주 도장판) ────────────────────────────────────
 function AttendanceWidget() {
-  const [attendedDates, setAttendedDates] = useState<Set<number>>(new Set());
-  const [loadError, setLoadError] = useState(false);
-
-  useEffect(() => {
-    const yearMonth = format(_today, 'yyyy-MM');
-    getAttendanceApi(yearMonth)
-      .then((res) => {
-        const dates = new Set(res.attendanceDates.map((d) => parseInt(d.split('-')[2], 10)));
-        setAttendedDates(dates);
-      })
-      .catch(() => setLoadError(true));
-  }, []);
+  const yearMonth = format(_today, 'yyyy-MM');
+  const { data: attendedDates = new Set<number>(), isError: loadError } = useQuery({
+    queryKey: ['attendance', yearMonth],
+    queryFn: () => getAttendanceApi(yearMonth),
+    select: (res) => new Set(res.attendanceDates.map((d) => parseInt(d.split('-')[2], 10))),
+  });
 
   const todayDone = attendedDates.has(TODAY_DATE);
 
@@ -367,14 +362,26 @@ function AdBanner() {
 export default function Home() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading, user } = useAuthStore();
-  const { cards: collectionCards, fetchCards } = useCollectionStore();
   const cardSectionRef = useRef<HTMLElement>(null);
   const [cardContainerWidth, setCardContainerWidth] = useState(0);
   const [cardContainer, setCardContainer] = useState<HTMLDivElement | null>(null);
   const [cardsVisible, setCardsVisible] = useState(false);
-  const [canGenerate, setCanGenerate] = useState<CanGenerate | null>(null);
-  const [weeklyCanGenerate, setWeeklyCanGenerate] = useState<CanGenerate | null>(null);
-  const [reportLoadError, setReportLoadError] = useState(false);
+
+  const { data: reportData, isError: reportLoadError } = useQuery({
+    queryKey: ['homeReports'],
+    queryFn: () => Promise.all([getReportListApi(), getReportListApi('weekly')]),
+    select: ([monthlyRes, weeklyRes]) => ({
+      canGenerate: monthlyRes.can_generate,
+      weeklyCanGenerate: weeklyRes.can_generate,
+    }),
+  });
+  const canGenerate = reportData?.canGenerate ?? null;
+  const weeklyCanGenerate = reportData?.weeklyCanGenerate ?? null;
+
+  const { data: collectionCards = [] } = useQuery({
+    queryKey: ['collectionCards'],
+    queryFn: getCollectionCardsApi,
+  });
 
   useEffect(() => {
     if (!cardContainer) return;
@@ -398,15 +405,7 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    fetchCards();
-    Promise.all([getReportListApi(), getReportListApi('weekly')])
-      .then(([monthlyRes, weeklyRes]) => {
-        setCanGenerate(monthlyRes.can_generate);
-        setWeeklyCanGenerate(weeklyRes.can_generate);
-      })
-      .catch(() => setReportLoadError(true));
-  }, [fetchCards]);
+
 
   if (authLoading || !isAuthenticated) {
     return (
