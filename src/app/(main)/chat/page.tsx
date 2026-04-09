@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreditStore } from '@/entities/credits/store';
 import { useAuthStore } from '@/entities/user/store';
-import { useChatModals } from '@/features/select-persona';
 import type { ChatBubbleProps } from '@/widgets/chat-main-area';
 import type { ChatSessionGroup } from '@/widgets/chat-sidebar';
 
@@ -18,13 +17,17 @@ import {
   // ChatSatisfactionModal,  // TODO: 만족도 조사 — 우선순위 보류
 } from '@/components/chat';
 import { finalizeToEmotionCardData } from '@/entities/session/utils';
+import { EmotionCardFront } from '@/widgets/emotion-card';
 import { Menu } from 'lucide-react';
 import {
   getActiveSessionApi,
   getSessionsApi,
   getSessionDetailApi,
   finalizeSessionStream,
+  deleteSessionApi,
 } from '@/entities/session/api';
+import { uploadSummaryCardImageApi } from '@/entities/summary';
+import { useToast } from '@/shared/ui/toast';
 import { getCookie } from '@/shared/lib/utils/cookie';
 import type {
   ActiveSessionResponse,
@@ -32,6 +35,7 @@ import type {
   SessionDetailResponse,
   FinalizeCompleteEvent,
 } from '@/entities/session';
+import type { EmotionCardData } from '@/entities/emotion';
 
 // ── 모달 상태 타입 ──────────────────────────────────────────────
 export type ChatModalType =
@@ -672,9 +676,12 @@ const _MOCK_SESSION_GROUPS = [
 
 export default function ChatPage() {
   const router = useRouter();
-  const { activeModal, openModal, closeModal } = useChatModals();
+  const [activeModal, setActiveModal] = useState<ChatModalType>(null);
+  const openModal = useCallback((type: ChatModalType) => setActiveModal(type), []);
+  const closeModal = useCallback(() => setActiveModal(null), []);
   const { totalCredit } = useCreditStore();
   const { user } = useAuthStore();
+  const { toast } = useToast();
   const remainingCredits = totalCredit;
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -690,6 +697,9 @@ export default function ChatPage() {
   const [finalizeResult, setFinalizeResult] = useState<FinalizeCompleteEvent | null>(null);
   /** finalize 스트림 취소용 — 언마운트 시 abort */
   const finalizeAbortRef = useRef<AbortController | null>(null);
+  /** 감정 카드 앞면 이미지 캡처용 */
+  const captureCardRef = useRef<HTMLDivElement>(null);
+  const [capturePayload, setCapturePayload] = useState<{ data: EmotionCardData; summaryId: string } | null>(null);
   /** 60분 미입력 자동 종료 타이머 */
   const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -698,6 +708,29 @@ export default function ChatPage() {
       finalizeAbortRef.current?.abort();
     };
   }, []);
+
+  // finalize 완료 후 감정 카드 앞면 캡처 → PATCH /image 업로드
+  useEffect(() => {
+    if (!capturePayload) return;
+    const { summaryId } = capturePayload;
+
+    const timer = setTimeout(async () => {
+      if (!captureCardRef.current) return;
+      try {
+        const { toBlob } = await import('html-to-image');
+        const blob = await toBlob(captureCardRef.current, { pixelRatio: 2 });
+        if (!blob) return;
+        const file = new File([blob], 'emotion-card.png', { type: 'image/png' });
+        await uploadSummaryCardImageApi(summaryId, file);
+      } catch {
+        // 업로드 실패는 UX에 영향 없음 — 조용히 무시
+      } finally {
+        setCapturePayload(null);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [capturePayload]);
 
   // 채팅 페이지에서는 body 스크롤 방지
   useEffect(() => {
@@ -793,6 +826,21 @@ export default function ChatPage() {
 
   // ── 핸들러 ───────────────────────────────────────────────────────
 
+  /** 세션 삭제 */
+  const handleDeleteSession = async (id: string) => {
+    try {
+      await deleteSessionApi(id);
+      setSessionList((prev) => prev.filter((s) => s.sessionId !== id));
+      if (activeSessionId === id) {
+        setActiveSessionId(undefined);
+        setSessionDetail(null);
+      }
+      toast('대화가 삭제되었어요.', 'success');
+    } catch {
+      toast('대화 삭제에 실패했어요.', 'error');
+    }
+  };
+
   /** 사이드바 [새로운 상담] 버튼 → 세션 초기화, 입력창 활성화 */
   const handleNewCounsel = () => {
     setSidebarOpen(false);
@@ -881,6 +929,7 @@ export default function ChatPage() {
           if (capturedResult) {
             const cardData = finalizeToEmotionCardData(capturedResult, capturedSessionId);
             setAppendMessage({ variant: 'ai', senderName: '나봄이', avatarSrc: activeAiAvatarSrc, emotionCardData: cardData, cardImageUrl: capturedResult.card_image_url });
+            setCapturePayload({ data: cardData, summaryId: capturedResult.summary_id });
           }
         },
         controller.signal
@@ -926,6 +975,7 @@ export default function ChatPage() {
           onNewCounsel={handleNewCounsel}
           activeSessionId={activeSessionId}
           onSelectSession={handleSelectSession}
+          onDeleteSession={handleDeleteSession}
           sessionGroups={sessionGroups}
         />
       </div>
@@ -941,7 +991,6 @@ export default function ChatPage() {
           onDisabledInputClick={handleDisabledInputClick}
           appendMessage={appendMessage}
           sessionId={activeSessionId}
-          personaId="019d0b99-584b-710a-93d0-f1b64d56ddb4"
           onSessionCreated={(id) => setActiveSessionId(id)}
           aiName={activeAiName}
           aiAvatarSrc={activeAiAvatarSrc}
@@ -1007,6 +1056,23 @@ export default function ChatPage() {
         onYes={closeModal}
         onNo={closeModal}
       /> */}
+
+      {/* 감정 카드 앞면 이미지 캡처용 — 화면 밖에 숨겨서 렌더링 */}
+      {capturePayload && (
+        <div
+          ref={captureCardRef}
+          style={{ position: 'fixed', left: '-9999px', top: 0, width: 400, height: 686, pointerEvents: 'none' }}
+        >
+          <EmotionCardFront
+            layers={capturePayload.data.layers}
+            emotionLabel={
+              (capturePayload.data.layers.find((l) => l.role === 'primary')?.type ?? 'emotion').toUpperCase()
+            }
+            width={400}
+            height={686}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -60,6 +60,8 @@ export interface EmotionLayer {
 export interface EmotionCardData {
   /** 카드 ID */
   cardId: string;
+  /** 요약 ID */
+  summaryId: string;
   /** 세션 ID */
   sessionId: string;
   /** 사용자 이름 */

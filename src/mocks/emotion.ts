@@ -81,6 +81,7 @@ export function mockCardData(
 ): EmotionCardData {
   return {
     cardId,
+    summaryId: overrides?.summaryId ?? cardId,
     sessionId: `session-${cardId}`,
     userName: '민지',
     layers: buildEmotionLayers(extractions),

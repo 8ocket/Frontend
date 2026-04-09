@@ -7,12 +7,10 @@ export interface SessionListQuery {
   size?: number;
   start_date?: string;
   end_date?: string;
-  persona_ids?: string[];
 }
 
 export interface SessionListItem {
   sessionId: string;
-  personaImageUrl: string;
   title: string;
   status: SessionStatus;
   startedAt: string;
@@ -42,6 +40,7 @@ export interface ActiveSessionResponse {
 
 export interface CreateSessionRequest {
   first_content: string;
+  persona_id: string;
 }
 
 // SSE 이벤트 순서: [ai_chunk × N] → ai_complete → session_title → done
@@ -72,7 +71,6 @@ export interface SSEChunkEvent {
 export interface CounselingSessions {
   session_id: string; // PK / UUID
   user_id: string; // FK / 사용자_ID / UUID
-  persona_id: string; // FK / 페르소나_ID / UUID
   status: string | null; // 세션_상태 / VARCHAR(20)
   started_at: Date | null; // 시작_시간 / TIMESTAMP
   ended_at: Date | null; // 종료_시간 / TIMESTAMP
@@ -118,6 +116,7 @@ export interface FinalizeEmotionItem {
 }
 
 export interface FinalizeCompleteEvent {
+  summary_id: string;
   emotions: FinalizeEmotionItem[];
   card_image_url: string;
   summary: {
