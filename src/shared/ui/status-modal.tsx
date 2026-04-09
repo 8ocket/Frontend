@@ -4,39 +4,9 @@ import React, { useState } from 'react';
 
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button';
-import {
-  DialogRoot,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from '@/shared/ui/dialog';
+import { DialogRoot, DialogContent, DialogTitle, DialogDescription } from '@/shared/ui/dialog';
 
-// ── Figma 디자인 시스템: Status Modal ───────────────────────────
-// 350px, rounded-xl(12px), p-24(24px), border 2px glass-stroke/30
-// bg: secondary-100 (#f8fafc)
-//
-// 5가지 시맨틱 variant (첨부 디자인 기준):
-//   safe (green)         — 결제 완료         — 제목: success-800
-//   warning (red)        — 결제 중단         — 제목: error-600
-//   progress (blue)      — 결제 진행중       — 제목: info-600
-//   information (yellow) — 상품 정보 갱신     — 제목: warning-600
-//   refund (red)         — 환불정책 확인      — 제목: error-600
-//
-// Title: Heading 02 (SemiBold 24px, tracking -0.36px, leading 1.3)
-// Body:  Body 01 (Regular 16px, lineHeight 1.6, prime-700)
-// Credit label: tertiary-400 (#8a9ba8)
-// Credit value: info-500 (blue) | error-600 (red)
-// Divider above credit: secondary-200
-// Agreement checkbox: ✓ cta-300 checked, neutral-300 border
-// Buttons: gap-4(16px), flex-1 equal width
-// ─────────────────────────────────────────────────────────────────
-
-export type StatusModalSemantic =
-  | 'safe'
-  | 'warning'
-  | 'progress'
-  | 'information'
-  | 'refund';
+export type StatusModalSemantic = 'safe' | 'warning' | 'progress' | 'information' | 'refund';
 
 export interface StatusModalAction {
   label: string;
@@ -120,11 +90,7 @@ export function StatusModal({
 
   return (
     <DialogRoot open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent
-        showClose={false}
-        maxWidth="max-w-[350px]"
-        className={cn('p-6', className)}
-      >
+      <DialogContent showClose={false} maxWidth="max-w-[350px]" className={cn('p-6', className)}>
         <div className="flex flex-col items-center gap-6">
           {/* ── 텍스트 영역: 제목 + 설명 ── */}
           <div className="flex w-full flex-col items-center gap-4">
@@ -167,9 +133,7 @@ export function StatusModal({
                     CREDIT_COLOR[semantic]
                   )}
                 >
-                  {typeof creditAmount === 'number'
-                    ? creditAmount.toLocaleString()
-                    : creditAmount}
+                  {typeof creditAmount === 'number' ? creditAmount.toLocaleString() : creditAmount}
                 </span>
               </div>
             </div>
@@ -183,20 +147,28 @@ export function StatusModal({
                 onClick={() => setIsAgreed(!isAgreed)}
                 className={cn(
                   'flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-sm border transition-colors',
-                  isAgreed
-                    ? 'border-cta-300 bg-cta-300'
-                    : 'border-neutral-300 bg-secondary-100'
+                  isAgreed ? 'border-cta-300 bg-cta-300' : 'bg-secondary-100 border-neutral-300'
                 )}
               >
                 {isAgreed && (
-                  <svg width="10" height="8" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <svg
+                    width="10"
+                    height="8"
+                    viewBox="0 0 10 8"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1 4L3.5 6.5L9 1"
+                      stroke="white"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 )}
               </button>
-              <span className="text-sm leading-none font-medium text-black">
-                {agreementLabel}
-              </span>
+              <span className="text-sm leading-none font-medium text-black">{agreementLabel}</span>
             </label>
           )}
 
@@ -205,8 +177,10 @@ export function StatusModal({
             <div className="flex w-full gap-4">
               {actions.map((action, idx) => {
                 const btnSemantic = action.semantic ?? BUTTON_SEMANTIC[semantic];
-                const btnVariant = action.variant ?? (idx === 0 && actions.length > 1 ? 'secondary' : 'primary');
-                const isDisabled = action.disabled ?? (showAgreement && btnVariant === 'primary' && !isAgreed);
+                const btnVariant =
+                  action.variant ?? (idx === 0 && actions.length > 1 ? 'secondary' : 'primary');
+                const isDisabled =
+                  action.disabled ?? (showAgreement && btnVariant === 'primary' && !isAgreed);
 
                 return (
                   <Button

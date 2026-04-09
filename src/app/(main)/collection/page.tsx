@@ -4,7 +4,11 @@ import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/shared/lib/utils';
+import { EmotionCardFront, EmotionCardBack, getEmotionDisplayName } from '@/widgets/emotion-card';
+import type { EmotionCardData } from '@/entities/emotion';
+import { getCollectionCardsApi } from '@/entities/emotion/api';
 import { EmotionColorLegend } from '@/widgets/emotion-color-legend';
 import { getSummaryListApi, getSummaryApi } from '@/entities/summary';
 import type { SummaryListItem, SummaryResponse } from '@/entities/summary';
@@ -238,11 +242,10 @@ export default function CollectionPage() {
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [monthIndex, setMonthIndex] = useState(0);
   const [direction, setDirection] = useState<1 | -1>(1);
-  const [cards, setCards] = useState<SummaryListItem[]>([]);
-
-  useEffect(() => {
-    getSummaryListApi().then((res) => setCards(res.content)).catch(() => {});
-  }, []);
+  const { data: cards = [] } = useQuery({
+    queryKey: ['collectionCards'],
+    queryFn: getCollectionCardsApi,
+  });
 
   const groups = groupByMonth(cards);
   const totalMonths = groups.length;

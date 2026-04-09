@@ -20,6 +20,13 @@ import {
   mockUpdateMyProfile,
 } from '@/mocks';
 import { USE_MOCK } from '@/shared/lib/env';
+import { safeParse } from '@/shared/lib/utils/parse';
+import {
+  RefreshTokenResponseSchema,
+  SocialLoginResponseSchema,
+  UserProfileResponseSchema,
+  UpdateMyProfileResponseSchema,
+} from './schema';
 
 /**
  * 토큰 갱신 API
@@ -37,7 +44,7 @@ export const refreshTokenApi = async (refreshToken: string): Promise<RefreshToke
   });
 
   if (response.data.success && response.data.data) {
-    return response.data.data;
+    return safeParse(RefreshTokenResponseSchema, response.data.data);
   }
 
   throw new Error(response.data.error?.message || '토큰 갱신 실패');
@@ -55,7 +62,7 @@ export const kakaoLoginApi = async (code: string): Promise<KakaoLoginResponse> =
   }
 
   const response = await api.get<KakaoLoginResponse>(`/auth/kakao/callback?code=${code}`);
-  return response.data;
+  return safeParse(SocialLoginResponseSchema, response.data);
 };
 
 /**
@@ -70,7 +77,7 @@ export const googleLoginApi = async (code: string): Promise<GoogleLoginResponse>
   }
 
   const response = await api.get<GoogleLoginResponse>(`/auth/google/callback?code=${code}`);
-  return response.data;
+  return safeParse(SocialLoginResponseSchema, response.data);
 };
 
 /**
@@ -85,7 +92,7 @@ export const getMyProfileApi = async (): Promise<UserProfileResponse> => {
   }
 
   const response = await api.get<UserProfileResponse>('/users/me/profile');
-  return response.data;
+  return safeParse(UserProfileResponseSchema, response.data);
 };
 
 /**
@@ -94,21 +101,34 @@ export const getMyProfileApi = async (): Promise<UserProfileResponse> => {
  */
 export const updateMyProfileApi = async (
   nickName: string,
-  profileImage?: File
+  profileImage?: File,
+  options?: {
+    age_group?: AgeGroup | null;
+    occupation?: OccupationType | null;
+    gender?: Gender | null;
+  }
 ): Promise<UpdateMyProfileResponse> => {
   if (USE_MOCK) {
-    return mockUpdateMyProfile(nickName, profileImage);
+    return mockUpdateMyProfile(nickName, profileImage, options);
   }
 
   const formData = new FormData();
 
-  if (profileImage) formData.append('profile_image', profileImage);
-  const contentsBlob = new Blob([JSON.stringify({ nickname: nickName })], {
+  // 백엔드 @RequestPart("profile_image")가 required이므로 파일 없을 땐 빈 Blob 전송
+  formData.append('profile_image', profileImage ?? new Blob(), profileImage?.name ?? '');
+
+  const contents: Record<string, unknown> = { nickname: nickName };
+  if (options?.age_group !== undefined) contents.age_group = options.age_group;
+  if (options?.occupation !== undefined) contents.occupation = options.occupation;
+  if (options?.gender !== undefined) contents.gender = options.gender;
+
+  const contentsBlob = new Blob([JSON.stringify(contents)], {
     type: 'application/json',
   });
   formData.append('contents', contentsBlob);
 
-  const response = await api.patch<ApiResponse<UpdateMyProfileResponse>>(
+  // 백엔드가 ApiResult로 래핑하지 않고 직접 반환
+  const response = await api.patch<UpdateMyProfileResponse>(
     '/users/me/profile',
     formData,
     {
@@ -116,11 +136,7 @@ export const updateMyProfileApi = async (
     }
   );
 
-  if (response.data.success && response.data.data) {
-    return response.data.data;
-  }
-
-  throw new Error(response.data.error?.message || '프로필 수정 실패');
+  return safeParse(UpdateMyProfileResponseSchema, response.data);
 };
 
 // API 함수 모음
@@ -201,17 +217,6 @@ export const socialLoginApi = async (
   throw new Error(response.data.error?.message || '소셜 로그인 실패');
 };
 
-// 모듈 레벨 캐시 — 최초 1회만 fetch
-let defaultProfileImageCache: Blob | null = null;
-
-const getDefaultProfileImage = async (): Promise<Blob> => {
-  if (!defaultProfileImageCache) {
-    const res = await fetch('/images/icons/profile-default.png');
-    defaultProfileImageCache = await res.blob();
-  }
-  return defaultProfileImageCache;
-};
-
 /**
  * 회원가입 (온보딩 정보 저장) API
  * PATCH /v1/users/signup
@@ -227,8 +232,11 @@ export const signupApi = async (
 
   const formData = new FormData();
 
-  const image = profileImage ?? new Blob([]);
-  formData.append('profile_image', image, profileImage ? profileImage.name : 'empty');
+  if (profileImage) {
+    formData.append('profile_image', profileImage, profileImage.name);
+  } else {
+    formData.append('profile_image', new Blob(), '');
+  }
 
   const contentsBlob = new Blob([JSON.stringify({ nickname, occupation, age, gender })], {
     type: 'application/json',

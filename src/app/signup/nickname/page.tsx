@@ -3,11 +3,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { NicknameSchema } from '@/entities/user/schema';
 import AuroraBackground from '@/shared/ui/AuroraBackground';
 import { Button, Input, ToggleGroup } from '@/shared/ui';
 import { SignupCreditModal } from '@/features/auth';
 import { useAuthStore } from '@/entities/user/store';
 import { useCreditStore } from '@/entities/credits/store';
+import { getMyCreditApi } from '@/entities/credits/api';
 import { getCookie } from '@/shared/lib/utils/cookie';
 import { generatePositiveNickname } from '@/shared/lib/utils/nickname';
 import { signupApi } from '@/shared/api';
@@ -17,6 +19,13 @@ const imgVector = '/images/icons/profile-default.png';
 
 export default function NicknamePage() {
   const router = useRouter();
+
+  useEffect(() => {
+    if (!sessionStorage.getItem('pendingSignup')) {
+      router.replace('/');
+    }
+  }, [router]);
+
   const [nickname, setNickname] = useState(generatePositiveNickname);
   const [userType, setUserType] = useState<keyof typeof OCCUPATION_MAP>('대학생 / 대학원생');
   const [ageGroup, setAgeGroup] = useState<keyof typeof AGE_MAP>('20대');
@@ -67,11 +76,12 @@ export default function NicknamePage() {
   const handleNext = async () => {
     const trimmed = nickname.trim();
     if (!trimmed) {
-      setNicknameError('닉네임을 입력해 주세요.');
+      setNicknameError('닉네임을 입력해 주세요 (2~30자)');
       return;
     }
-    if (trimmed.length < 2) {
-      setNicknameError('닉네임은 2자 이상이어야 합니다.');
+    const result = NicknameSchema.safeParse(trimmed);
+    if (!result.success) {
+      setNicknameError(result.error.issues[0].message);
       return;
     }
     setNicknameError(null);
@@ -87,13 +97,15 @@ export default function NicknamePage() {
       );
       const { user, login } = useAuthStore.getState();
       const token = getCookie('accessToken') || '';
+      const refreshToken = getCookie('refreshToken') || '';
       login(
         {
           ...(user ?? { id: '', email: '' }),
           name: nickname,
           profileImage: profileImage ?? '/images/icons/profile-default.png',
         },
-        token
+        token,
+        refreshToken
       );
       setShowSuccessModal(true);
     } catch (error) {
@@ -104,9 +116,14 @@ export default function NicknamePage() {
     }
   };
 
-  const handleSuccessModalClick = () => {
+  const handleSuccessModalClick = async () => {
     sessionStorage.removeItem('pendingSignup');
-    useCreditStore.getState().addFreeCredit(150);
+    try {
+      const credit = await getMyCreditApi();
+      useCreditStore.getState().setTotalCredit(credit.totalCredit);
+    } catch {
+      /* 크레딧 조회 실패해도 진행 */
+    }
     router.push('/chat');
   };
 
@@ -158,9 +175,11 @@ export default function NicknamePage() {
                 onChange={handleProfileChange}
               />
               <p className="text-prime-500 flex-1 text-xs leading-[1.4] tracking-[-0.18px]">
-                프로필을 바꾸고 싶으시다면 아이콘을 눌러 사진을 추가하세요.
+                아이콘을 눌러 사진을 등록해보세요
                 <br />
-                설정하지 않으시면 기본 프로필로 접속합니다.
+                미등록 시 기본 프로필 이미지가 적용됩니다.
+                <br />
+                <span className="text-cta-300">JPG, PNG 권장 · 최대 5MB</span>
               </p>
             </div>
 
@@ -181,11 +200,11 @@ export default function NicknamePage() {
                         setNicknameError(null);
                       }}
                       placeholder="즐거운 몽상가"
-                      maxLength={20}
+                      maxLength={30}
                       className="h-14 rounded-xl bg-white/50 px-5 text-base"
                     />
                     <span className="text-prime-400 pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-xs">
-                      {nickname.length}/20
+                      {nickname.length}/30
                     </span>
                   </div>
                   {nicknameError && <p className="text-xs text-red-500">{nicknameError}</p>}

@@ -22,6 +22,7 @@ export interface MyCreditResponse {
 }
 
 export interface PaymentHistoryItem {
+  paymentId: string;
   amount: number;
   orderName: string;
   status: string;

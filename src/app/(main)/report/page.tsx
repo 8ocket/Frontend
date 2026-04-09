@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ReportSidebar,
   ReportCreationForm,
@@ -8,26 +9,24 @@ import {
   ReportError,
   ReportDetail,
   ReportDetailSkeleton,
+  DeleteReportModal,
   type Report,
   type ReportStatus,
   type ReportType,
 } from '@/components/report';
 import { useToast } from '@/shared/ui/toast';
-import {
-  CanGenerate,
-  ReportCompleteEvent,
-  ReportListItem,
-  ReportStatusEvent,
-} from '@/entities/reports/model';
-import { createReportApi, getReportListApi } from '@/entities/reports/api';
+import { ReportCompleteEvent, ReportListItem, ReportStatusEvent } from '@/entities/reports/model';
+import { createReportApi, deleteReportApi, getReportListApi } from '@/entities/reports/api';
 
 function mapToReport(item: ReportListItem): Report {
-  const month = parseInt(item.period_start.split('-')[1]);
-  const weekNum = Math.ceil(parseInt(item.period_start.split('-')[2]) / 7);
+  const reportType = item.report_type.toLowerCase() as ReportType;
+  const [, startM, startD] = item.period_start.split('-').map(Number);
+  const [, _endM, _endD] = item.period_end.split('-').map(Number);
+  const weekNum = Math.ceil(startD / 7);
   const title =
-    item.report_type === 'weekly'
-      ? `${month}월 ${weekNum}주차 감정 분석`
-      : `${month}월 월간 종합 리포트`;
+    reportType === 'weekly'
+      ? `${startM}월 ${weekNum}주차 감정 분석`
+      : `${startM}월 월간 종합 리포트`;
   const period = `${item.period_start.replace(/-/g, '.')} - ${item.period_end.replace(/-/g, '.')}`;
   const date = item.created_at.split('T')[0].replace(/-/g, '.');
 
@@ -35,11 +34,11 @@ function mapToReport(item: ReportListItem): Report {
     id: item.report_id,
     title,
     date,
-    type: item.report_type === 'weekly' ? '주간 리포트' : '월간 리포트',
+    type: reportType === 'weekly' ? '주간 리포트' : '월간 리포트',
     period,
-    reportType: item.report_type,
-    isFailed: item.status === 'failed',
-    isGenerating: item.status === 'generating',
+    reportType,
+    isFailed: item.status.toLowerCase() === 'failed',
+    isGenerating: item.status.toLowerCase() === 'generating',
   };
 }
 
@@ -47,13 +46,24 @@ const SKELETON_MS = 600;
 
 export default function ReportPage() {
   const { toast } = useToast();
-  const [reports, setReports] = useState<Report[]>([]);
+  const queryClient = useQueryClient();
+
+  const { data: reportData } = useQuery({
+    queryKey: ['reports'],
+    queryFn: () => getReportListApi(),
+  });
+
+  const reports = (reportData?.reports ?? []).map(mapToReport);
+  const _canGenerate = reportData?.can_generate ?? null;
+
   const [viewState, setViewState] = useState<ReportStatus>('idle');
   const [selectedId, setSelectedId] = useState('');
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
   const [sseStep, setSseStep] = useState<'analyzing' | 'generating' | undefined>();
-  // TODO [API]: 기간별 세션 수 연동 시 크레딧/생성 가능 여부 판단에 활용
-  const [canGenerate, setCanGenerate] = useState<CanGenerate | null>(null);
+
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   // 리포트 페이지에서는 body 스크롤 방지
   useEffect(() => {
@@ -65,38 +75,17 @@ export default function ReportPage() {
 
   const loadReports = useCallback(
     async (selectId?: string) => {
-      try {
-        const data = await getReportListApi();
-        const mapped = data.reports.map(mapToReport);
-        setReports(mapped);
-        setCanGenerate(data.can_generate);
-        if (selectId) setSelectedId(selectId);
-      } catch {
-        toast('리포트 목록을 불러오는 데 실패했어요.', 'error');
-      }
+      await queryClient.invalidateQueries({ queryKey: ['reports'] });
+      if (selectId) setSelectedId(selectId);
     },
-    [toast]
+    [queryClient]
   );
-
-  // 목록 초기 로딩
-  useEffect(() => {
-    getReportListApi()
-      .then((data) => {
-        setReports(data.reports.map(mapToReport));
-        setCanGenerate(data.can_generate);
-      })
-      .catch(() => {
-        toast('리포트 목록을 불러오는 데 실패했어요.', 'error');
-      });
-  }, [toast]);
 
   const selectedReport = reports.find((r) => r.id === selectedId);
 
-  const showDetail = useCallback((id: string) => {
+  const showDetail = useCallback((_id: string) => {
     setIsLoadingDetail(true);
     setTimeout(() => setIsLoadingDetail(false), SKELETON_MS);
-    // NEW 배지 제거 — 실제 API 연동 시 isNew 플래그 제거
-    setReports((prev) => prev.map((r) => (r.id === id && r.isNew ? { ...r, isNew: false } : r)));
   }, []);
 
   const handleSelect = (id: string) => {
@@ -145,6 +134,25 @@ export default function ReportPage() {
     }
   };
 
+  const handleDeleteReport = async () => {
+    if (!deleteTargetId) return;
+    setIsDeleting(true);
+    try {
+      await deleteReportApi(deleteTargetId);
+      await queryClient.invalidateQueries({ queryKey: ['reports'] });
+      if (selectedId === deleteTargetId) {
+        setSelectedId('');
+        setViewState('idle');
+      }
+      toast('리포트가 삭제되었어요.', 'success');
+    } catch {
+      toast('리포트 삭제에 실패했어요.', 'error');
+    } finally {
+      setIsDeleting(false);
+      setDeleteTargetId(null);
+    }
+  };
+
   const handleCreateNew = () => setViewState('idle');
 
   return (
@@ -155,11 +163,20 @@ export default function ReportPage() {
         selectedId={selectedId}
         onSelect={handleSelect}
         onCreateNew={handleCreateNew}
+        onDelete={setDeleteTargetId}
         isCreating={viewState === 'idle' || viewState === 'creating'}
       />
 
+      {/* 삭제 확인 다이얼로그 */}
+      <DeleteReportModal
+        isOpen={!!deleteTargetId}
+        onClose={() => setDeleteTargetId(null)}
+        onConfirm={handleDeleteReport}
+        isDeleting={isDeleting}
+      />
+
       {/* 메인 콘텐츠 */}
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+      <div ref={scrollRef} className="flex min-h-0 flex-1 flex-col overflow-y-auto">
         {viewState === 'idle' && (
           <div className="relative flex min-h-full items-center justify-center border-r border-black/5 px-6 py-12 sm:px-12">
             <div
@@ -195,9 +212,7 @@ export default function ReportPage() {
         {viewState === 'creating' && <ReportPolling onComplete={() => {}} sseStep={sseStep} />}
 
         {/* failed: 에러 */}
-        {viewState === 'failed' && (
-          <ReportError onDismiss={handleCreateNew} />
-        )}
+        {viewState === 'failed' && <ReportError onDismiss={handleCreateNew} />}
 
         {/* success: 스켈레톤 → 리포트 상세 */}
         {viewState === 'success' && (

@@ -1,15 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { confirmPaymentApi, getMyCreditApi } from '@/entities/credits/api';
 import { useCreditStore } from '@/entities/credits/store';
+import { StatusModal } from '@/shared/ui/status-modal';
 
 function PaymentSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
 
   useEffect(() => {
     const paymentKey = searchParams.get('paymentKey');
@@ -17,30 +17,30 @@ function PaymentSuccessContent() {
     const amount = Number(searchParams.get('amount'));
 
     if (!paymentKey || !orderId || isNaN(amount)) {
-      Promise.resolve().then(() => setStatus('error'));
+      router.replace('/shop?payment=error');
       return;
     }
 
-    confirmPaymentApi(paymentKey, orderId, amount)
-      .then(() => getMyCreditApi().then((credit) => useCreditStore.getState().setTotalCredit(credit.totalCredit)))
-      .then(() => setStatus('success'))
-      .catch(() => setStatus('error'));
-  }, [searchParams]);
+    const productParam = searchParams.get('product') ?? '';
 
-  if (status === 'loading') return <p className="p-8 text-center">결제 확인 중...</p>;
-  if (status === 'error')
-    return (
-      <div className="flex flex-col items-center gap-4 p-8">
-        <p>결제 처리 중 문제가 발생했습니다.</p>
-        <button onClick={() => router.push('/shop')}>다시 시도</button>
-      </div>
-    );
+    confirmPaymentApi(paymentKey, orderId, amount)
+      .then(() =>
+        getMyCreditApi().then((credit) =>
+          useCreditStore.getState().setTotalCredit(credit.totalCredit)
+        )
+      )
+      .then(() => router.replace(`/shop?payment=success&product=${encodeURIComponent(productParam)}`))
+      .catch(() => router.replace('/shop?payment=error'));
+  }, [searchParams, router]);
 
   return (
-    <div className="flex flex-col items-center gap-4 p-8">
-      <p>결제가 완료되었습니다.</p>
-      <button onClick={() => router.push('/')}>홈으로</button>
-    </div>
+    <StatusModal
+      isOpen
+      onClose={() => {}}
+      semantic="progress"
+      title="결제가 진행중입니다"
+      description="결제 정보를 안전하게 확인 중에 있습니다. 잠시만 기다려주시면 됩니다."
+    />
   );
 }
 
