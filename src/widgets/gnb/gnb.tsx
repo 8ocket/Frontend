@@ -355,10 +355,10 @@ function ProfileDropdown({
         <button
           type="button"
           onClick={onLogout}
-          className="text-error-500 hover:bg-error-100 flex w-full items-center gap-3 px-5 py-3 text-sm font-medium tracking-[-0.21px] transition-colors"
+          className="text-prime-700 hover:bg-secondary-50 flex w-full items-center gap-3 px-5 py-3 text-sm font-medium tracking-[-0.21px] transition-colors"
         >
-          <div className="bg-error-100 flex size-8 shrink-0 items-center justify-center rounded-xl">
-            <LogOut size={15} className="text-error-500" />
+          <div className="bg-prime-100 flex size-8 shrink-0 items-center justify-center rounded-xl">
+            <LogOut size={15} className="text-prime-400" />
           </div>
           로그아웃
         </button>

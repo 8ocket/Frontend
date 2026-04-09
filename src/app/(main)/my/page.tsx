@@ -330,10 +330,10 @@ export default function MyPage() {
               <p className="text-prime-400 px-6 pt-5 text-xs font-medium">설정</p>
 
               <MenuRow
-                icon={<LogOut size={16} className="text-error-500" />}
+                icon={<LogOut size={16} className="text-prime-400" />}
                 label="로그아웃"
-                labelClassName="text-error-500"
-                iconBg="bg-error-100"
+                labelClassName="text-prime-700"
+                iconBg="bg-prime-100"
                 onClick={handleLogout}
               />
               {/* <div className="bg-prime-100 mx-6 h-px" /> */}
