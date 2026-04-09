@@ -5,13 +5,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ProfileEditDrawer } from './_components/ProfileEditDrawer';
+import { ProfileEditDrawer } from '@/components/my/ProfileEditDrawer';
 import { ChevronRight, Coins, LogOut, MoreVertical, Trash2, X } from 'lucide-react';
 import { useAuthStore } from '@/entities/user/store';
 import { logoutApi, getMyProfileApi } from '@/entities/user/api';
 import { getCookie } from '@/shared/lib/utils/cookie';
 import { useCreditStore } from '@/entities/credits/store';
 import { Button } from '@/shared/ui/button';
+import { ProfileAvatar } from '@/shared/ui/profile-avatar';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
 import { DialogRoot, DialogPortal, DialogOverlay, DialogTitle } from '@/shared/ui';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
@@ -69,9 +70,6 @@ export default function MyPage() {
   const profileAgeGroup = profileData?.age_group ?? null;
   const profileGender = profileData?.gender ?? null;
 
-  const isDefaultImage =
-    !user?.profileImage || user.profileImage === '/images/icons/profile-default.png';
-
   const handleLogout = async () => {
     const refreshToken = getCookie('refreshToken');
 
@@ -115,12 +113,7 @@ export default function MyPage() {
               {/* 프로필 */}
               <div className="flex items-center gap-4 px-6 py-4">
                 <div className="border-cta-300 bg-secondary-100 relative size-14 shrink-0 overflow-hidden rounded-full border-2">
-                  <Image
-                    src={user?.profileImage ?? '/images/icons/profile-default.png'}
-                    alt="프로필"
-                    fill
-                    className={isDefaultImage ? 'object-contain p-2' : 'object-cover'}
-                  />
+                  <ProfileAvatar src={user?.profileImage} />
                 </div>
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                   <span className="text-prime-900 truncate text-base font-semibold tracking-[-0.24px]">
