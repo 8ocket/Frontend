@@ -5,13 +5,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ProfileEditDrawer } from './_components/ProfileEditDrawer';
+import { ProfileEditDrawer } from '@/components/my/ProfileEditDrawer';
 import { ChevronRight, Coins, LogOut, MoreVertical, Trash2, X } from 'lucide-react';
 import { useAuthStore } from '@/entities/user/store';
 import { logoutApi, getMyProfileApi } from '@/entities/user/api';
 import { getCookie } from '@/shared/lib/utils/cookie';
 import { useCreditStore } from '@/entities/credits/store';
 import { Button } from '@/shared/ui/button';
+import { ProfileAvatar } from '@/shared/ui/profile-avatar';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
 import { DialogRoot, DialogPortal, DialogOverlay, DialogTitle } from '@/shared/ui';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
@@ -26,6 +27,7 @@ import {
   type AgeGroup,
   type Gender,
 } from '@/entities/user/model';
+
 
 // ── 목업 데이터 (API 연동 시 교체) ──────────────────────────────────
 
@@ -68,9 +70,6 @@ export default function MyPage() {
   const profileOccupation = profileData?.occupation ?? null;
   const profileAgeGroup = profileData?.age_group ?? null;
   const profileGender = profileData?.gender ?? null;
-
-  const isDefaultImage =
-    !user?.profileImage || user.profileImage === '/images/icons/profile-default.png';
 
   const handleLogout = async () => {
     const refreshToken = getCookie('refreshToken');
@@ -115,12 +114,7 @@ export default function MyPage() {
               {/* 프로필 */}
               <div className="flex items-center gap-4 px-6 py-4">
                 <div className="border-cta-300 bg-secondary-100 relative size-14 shrink-0 overflow-hidden rounded-full border-2">
-                  <Image
-                    src={user?.profileImage ?? '/images/icons/profile-default.png'}
-                    alt="프로필"
-                    fill
-                    className={isDefaultImage ? 'object-contain p-2' : 'object-cover'}
-                  />
+                  <ProfileAvatar src={user?.profileImage} />
                 </div>
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                   <span className="text-prime-900 truncate text-base font-semibold tracking-[-0.24px]">
@@ -164,7 +158,7 @@ export default function MyPage() {
               </div>
             </section>
 
-            {/* ── 카드 2: 활동 내역 ── */}
+            {/* ── 카드 4: 활동 내역 ── */}
             <section className="border-prime-100 overflow-hidden rounded-2xl border bg-white shadow-sm">
               <p className="text-prime-400 px-6 pt-5 text-xs font-medium">활동 내역</p>
 
@@ -336,10 +330,10 @@ export default function MyPage() {
               <p className="text-prime-400 px-6 pt-5 text-xs font-medium">설정</p>
 
               <MenuRow
-                icon={<LogOut size={16} className="text-error-500" />}
+                icon={<LogOut size={16} className="text-prime-400" />}
                 label="로그아웃"
-                labelClassName="text-error-500"
-                iconBg="bg-error-100"
+                labelClassName="text-prime-700"
+                iconBg="bg-prime-100"
                 onClick={handleLogout}
               />
               {/* <div className="bg-prime-100 mx-6 h-px" /> */}
@@ -545,6 +539,7 @@ function EmptyHistory({ message }: { message: string }) {
     </div>
   );
 }
+
 
 function MenuRow({
   icon,

@@ -114,7 +114,9 @@ export const updateMyProfileApi = async (
 
   const formData = new FormData();
 
-  if (profileImage) formData.append('profile_image', profileImage);
+  // 백엔드 @RequestPart("profile_image")가 required이므로 파일 없을 땐 빈 Blob 전송
+  formData.append('profile_image', profileImage ?? new Blob(), profileImage?.name ?? '');
+
   const contents: Record<string, unknown> = { nickname: nickName };
   if (options?.age_group !== undefined) contents.age_group = options.age_group;
   if (options?.occupation !== undefined) contents.occupation = options.occupation;
@@ -125,7 +127,8 @@ export const updateMyProfileApi = async (
   });
   formData.append('contents', contentsBlob);
 
-  const response = await api.patch<ApiResponse<UpdateMyProfileResponse>>(
+  // 백엔드가 ApiResult로 래핑하지 않고 직접 반환
+  const response = await api.patch<UpdateMyProfileResponse>(
     '/users/me/profile',
     formData,
     {
@@ -133,11 +136,7 @@ export const updateMyProfileApi = async (
     }
   );
 
-  if (response.data.success && response.data.data) {
-    return safeParse(UpdateMyProfileResponseSchema, response.data.data);
-  }
-
-  throw new Error(response.data.error?.message || '프로필 수정 실패');
+  return safeParse(UpdateMyProfileResponseSchema, response.data);
 };
 
 // API 함수 모음

@@ -74,4 +74,4 @@ export const UpdateMyProfileResponseSchema = z.object({
 export const NicknameSchema = z
   .string()
   .min(2, '닉네임은 2자 이상이어야 합니다.')
-  .max(15, '닉네임은 15자 이하여야 합니다.');
+  .max(30, '닉네임은 30자 이하여야 합니다.');
