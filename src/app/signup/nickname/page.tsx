@@ -175,11 +175,11 @@ export default function NicknamePage() {
                 onChange={handleProfileChange}
               />
               <p className="text-prime-500 flex-1 text-xs leading-[1.4] tracking-[-0.18px]">
-                프로필을 바꾸고 싶으시다면 아이콘을 눌러 사진을 추가하세요.
+                아이콘을 눌러 사진을 등록해보세요
                 <br />
-                설정하지 않으시면 기본 프로필로 접속합니다.
+                미등록 시 기본 프로필 이미지가 적용됩니다.
                 <br />
-                <span className="text-prime-400">JPG, PNG 권장 · 최대 5MB</span>
+                <span className="text-cta-300">JPG, PNG 권장 · 최대 5MB</span>
               </p>
             </div>
 
