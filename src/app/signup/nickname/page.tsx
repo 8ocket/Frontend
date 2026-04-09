@@ -3,11 +3,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { NicknameSchema } from '@/entities/user/schema';
 import AuroraBackground from '@/shared/ui/AuroraBackground';
 import { Button, Input, ToggleGroup } from '@/shared/ui';
 import { SignupCreditModal } from '@/features/auth';
 import { useAuthStore } from '@/entities/user/store';
 import { useCreditStore } from '@/entities/credits/store';
+import { getMyCreditApi } from '@/entities/credits/api';
 import { getCookie } from '@/shared/lib/utils/cookie';
 import { generatePositiveNickname } from '@/shared/lib/utils/nickname';
 import { signupApi } from '@/shared/api';
@@ -17,6 +19,13 @@ const imgVector = '/images/icons/profile-default.png';
 
 export default function NicknamePage() {
   const router = useRouter();
+
+  useEffect(() => {
+    if (!sessionStorage.getItem('pendingSignup')) {
+      router.replace('/');
+    }
+  }, [router]);
+
   const [nickname, setNickname] = useState(generatePositiveNickname);
   const [userType, setUserType] = useState<keyof typeof OCCUPATION_MAP>('대학생 / 대학원생');
   const [ageGroup, setAgeGroup] = useState<keyof typeof AGE_MAP>('20대');
@@ -70,8 +79,9 @@ export default function NicknamePage() {
       setNicknameError('닉네임을 입력해 주세요.');
       return;
     }
-    if (trimmed.length < 2) {
-      setNicknameError('닉네임은 2자 이상이어야 합니다.');
+    const result = NicknameSchema.safeParse(trimmed);
+    if (!result.success) {
+      setNicknameError(result.error.issues[0].message);
       return;
     }
     setNicknameError(null);
@@ -87,13 +97,15 @@ export default function NicknamePage() {
       );
       const { user, login } = useAuthStore.getState();
       const token = getCookie('accessToken') || '';
+      const refreshToken = getCookie('refreshToken') || '';
       login(
         {
           ...(user ?? { id: '', email: '' }),
           name: nickname,
           profileImage: profileImage ?? '/images/icons/profile-default.png',
         },
-        token
+        token,
+        refreshToken
       );
       setShowSuccessModal(true);
     } catch (error) {
@@ -104,9 +116,14 @@ export default function NicknamePage() {
     }
   };
 
-  const handleSuccessModalClick = () => {
+  const handleSuccessModalClick = async () => {
     sessionStorage.removeItem('pendingSignup');
-    useCreditStore.getState().addFreeCredit(150);
+    try {
+      const credit = await getMyCreditApi();
+      useCreditStore.getState().setTotalCredit(credit.totalCredit);
+    } catch {
+      /* 크레딧 조회 실패해도 진행 */
+    }
     router.push('/chat');
   };
 

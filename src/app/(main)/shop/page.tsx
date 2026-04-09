@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, Suspense, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Gift } from 'lucide-react';
 import {
@@ -35,45 +36,50 @@ function ShopPageContent() {
   const [dialogInitialStep, setDialogInitialStep] = useState<
     'confirm' | 'success' | 'error' | undefined
   >(undefined);
-  const [products, setProducts] = useState<CreditProduct[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
+
+  // useQuery + useEffect 조합으로 URL 쿼리 파라미터에 따라 다이얼로그 초기 단계 설정
+  const {
+    data: products = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ['creditProducts'],
+    queryFn: getCreditProductsApi,
+    select: (data) =>
+      data.map((item, index) => ({
+        id: String(index + 1),
+        name: item.name,
+        credits: item.creditAmount,
+        price: item.price,
+        priceFormatted: item.price.toLocaleString(),
+        paymentType: '건당 결제' as const,
+        benefits: BENEFITS_MAP[item.name] ?? [],
+      })),
+  });
 
   useEffect(() => {
-    getCreditProductsApi()
-      .then((data) => {
-        const loadedProducts = data.map((item, index) => ({
-          id: String(index + 1),
-          name: item.name,
-          credits: item.creditAmount,
-          price: item.price,
-          priceFormatted: item.price.toLocaleString(),
-          paymentType: '건당 결제',
-          benefits: BENEFITS_MAP[item.name] ?? [],
-        }));
-        setProducts(loadedProducts);
+    const paymentResult = searchParams.get('payment');
+    if (!paymentResult || products.length === 0) return;
+    if (paymentResult !== 'success' && paymentResult !== 'error') return;
 
-        // 결제 결과 리다이렉트 처리
-        const paymentResult = searchParams.get('payment');
-        if (paymentResult === 'success' || paymentResult === 'error') {
-          let pendingProduct: CreditProduct | null = null;
-          try {
-            const productParam = searchParams.get('product');
-            if (productParam) {
-              const parsed = JSON.parse(productParam) as { name: string; credits: number };
-              pendingProduct = loadedProducts.find((p) => p.credits === parsed.credits) ?? null;
-            }
-          } catch { /* ignore parse errors */ }
-          if (!pendingProduct) pendingProduct = loadedProducts[0] ?? null;
-          setSelectedProduct(pendingProduct);
-          setDialogInitialStep(paymentResult);
-          setIsDialogOpen(true);
-          router.replace('/shop', { scroll: false });
-        }
-      })
-      .catch(() => setIsError(true))
-      .finally(() => setIsLoading(false));
-  }, []);
+    let pendingProduct: CreditProduct | null = null;
+    try {
+      const productParam = searchParams.get('product');
+      if (productParam) {
+        const parsed = JSON.parse(productParam) as { name: string; credits: number };
+        pendingProduct = products.find((p) => p.credits === parsed.credits) ?? null;
+      }
+    } catch {
+      /* ignore */
+    }
+
+    if (!pendingProduct) pendingProduct = products[0] ?? null;
+    setSelectedProduct(pendingProduct);
+    setDialogInitialStep(paymentResult);
+    setIsDialogOpen(true);
+    router.replace('/shop', { scroll: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [products]);
 
   const handlePurchase = (product: CreditProduct) => {
     setSelectedProduct(product);

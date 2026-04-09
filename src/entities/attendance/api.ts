@@ -1,5 +1,7 @@
 import { api } from '@/shared/api/axios';
 import { USE_MOCK } from '@/shared/lib/env';
+import { safeParse } from '@/shared/lib/utils/parse';
+import { AttendanceResponseSchema } from './schema';
 
 interface AttendanceResponse {
   attendanceDates: string[];
@@ -24,5 +26,5 @@ export const getAttendanceApi = async (yearMonth: string): Promise<AttendanceRes
   }
 
   const response = await api.get<AttendanceResponse>(`/attendance/me/${yearMonth}`);
-  return response.data;
+  return safeParse(AttendanceResponseSchema, response.data);
 };

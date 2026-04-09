@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useState, useEffect, useRef } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ReportSidebar,
   ReportCreationForm,
@@ -14,18 +15,13 @@ import {
   type ReportType,
 } from '@/components/report';
 import { useToast } from '@/shared/ui/toast';
-import {
-  CanGenerate,
-  ReportCompleteEvent,
-  ReportListItem,
-  ReportStatusEvent,
-} from '@/entities/reports/model';
+import { ReportCompleteEvent, ReportListItem, ReportStatusEvent } from '@/entities/reports/model';
 import { createReportApi, deleteReportApi, getReportListApi } from '@/entities/reports/api';
 
 function mapToReport(item: ReportListItem): Report {
   const reportType = item.report_type.toLowerCase() as ReportType;
   const [, startM, startD] = item.period_start.split('-').map(Number);
-  const [, endM, endD] = item.period_end.split('-').map(Number);
+  const [, _endM, _endD] = item.period_end.split('-').map(Number);
   const weekNum = Math.ceil(startD / 7);
   const title =
     reportType === 'weekly'
@@ -50,20 +46,24 @@ const SKELETON_MS = 600;
 
 export default function ReportPage() {
   const { toast } = useToast();
-  const [reports, setReports] = useState<Report[]>([]);
+  const queryClient = useQueryClient();
+
+  const { data: reportData } = useQuery({
+    queryKey: ['reports'],
+    queryFn: () => getReportListApi(),
+  });
+
+  const reports = (reportData?.reports ?? []).map(mapToReport);
+  const _canGenerate = reportData?.can_generate ?? null;
+
   const [viewState, setViewState] = useState<ReportStatus>('idle');
   const [selectedId, setSelectedId] = useState('');
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
   const [sseStep, setSseStep] = useState<'analyzing' | 'generating' | undefined>();
-  // TODO [API]: 기간별 세션 수 연동 시 크레딧/생성 가능 여부 판단에 활용
-  const [canGenerate, setCanGenerate] = useState<CanGenerate | null>(null);
+
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    scrollRef.current?.scrollTo({ top: 0 });
-  }, [selectedId]);
 
   // 리포트 페이지에서는 body 스크롤 방지
   useEffect(() => {
@@ -75,38 +75,17 @@ export default function ReportPage() {
 
   const loadReports = useCallback(
     async (selectId?: string) => {
-      try {
-        const data = await getReportListApi();
-        const mapped = data.reports.map(mapToReport);
-        setReports(mapped);
-        setCanGenerate(data.can_generate);
-        if (selectId) setSelectedId(selectId);
-      } catch {
-        toast('리포트 목록을 불러오는 데 실패했어요.', 'error');
-      }
+      await queryClient.invalidateQueries({ queryKey: ['reports'] });
+      if (selectId) setSelectedId(selectId);
     },
-    [toast]
+    [queryClient]
   );
-
-  // 목록 초기 로딩
-  useEffect(() => {
-    getReportListApi()
-      .then((data) => {
-        setReports(data.reports.map(mapToReport));
-        setCanGenerate(data.can_generate);
-      })
-      .catch(() => {
-        toast('리포트 목록을 불러오는 데 실패했어요.', 'error');
-      });
-  }, [toast]);
 
   const selectedReport = reports.find((r) => r.id === selectedId);
 
-  const showDetail = useCallback((id: string) => {
+  const showDetail = useCallback((_id: string) => {
     setIsLoadingDetail(true);
     setTimeout(() => setIsLoadingDetail(false), SKELETON_MS);
-    // NEW 배지 제거 — 실제 API 연동 시 isNew 플래그 제거
-    setReports((prev) => prev.map((r) => (r.id === id && r.isNew ? { ...r, isNew: false } : r)));
   }, []);
 
   const handleSelect = (id: string) => {
@@ -160,7 +139,7 @@ export default function ReportPage() {
     setIsDeleting(true);
     try {
       await deleteReportApi(deleteTargetId);
-      setReports((prev) => prev.filter((r) => r.id !== deleteTargetId));
+      await queryClient.invalidateQueries({ queryKey: ['reports'] });
       if (selectedId === deleteTargetId) {
         setSelectedId('');
         setViewState('idle');

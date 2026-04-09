@@ -69,11 +69,17 @@ export interface BaseProfileResponse {
 // --- /v1/users/me/profile (GET) : 사용자 개인정보 조회
 export interface UserProfileResponse extends BaseProfileResponse {
   nickname_change_count: number;
+  age_group?: AgeGroup | null;
+  occupation?: OccupationType | null;
+  gender?: Gender | null;
 }
 
 // --- /v1/users/me/profile (PATCH) : 프로필 이미지 및 닉네임 수정
 export interface UpdateMyProfileResponse extends BaseProfileResponse {
   updated_at: string;
+  age_group?: AgeGroup | null;
+  occupation?: OccupationType | null;
+  gender?: Gender | null;
 }
 
 // ─── 온보딩 ───
@@ -96,4 +102,23 @@ export const AGE_MAP: Record<string, AgeGroup> = {
 export const GENDER_MAP: Record<string, Gender> = {
   남성: 'MALE',
   여성: 'FEMALE',
+};
+
+// ─── 역방향 맵 (값 → 라벨) ───
+export const OCCUPATION_LABEL: Record<OccupationType, string> = {
+  STUDENT: '대학생 / 대학원생',
+  JOB_SEEKER: '취업 준비생',
+  EMPLOYEE: '직장인',
+  CAREER_SWITCHER: '이직 준비',
+};
+
+export const AGE_LABEL: Record<AgeGroup, string> = {
+  20: '20대',
+  30: '30대',
+  40: '40대',
+};
+
+export const GENDER_LABEL: Record<Gender, string> = {
+  MALE: '남성',
+  FEMALE: '여성',
 };

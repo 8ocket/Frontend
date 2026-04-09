@@ -6,11 +6,12 @@ import { Check, MessageCircle, FileText, Lock, Layers } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import { EmotionCardFront, getEmotionDisplayName } from '@/widgets/emotion-card';
 import { cn } from '@/shared/lib/utils';
 import type { EmotionCardData } from '@/entities/emotion';
-import { useCollectionStore } from '@/entities/emotion';
+import { getCollectionCardsApi } from '@/entities/emotion/api';
 import { useAuthStore } from '@/entities/user/store';
 import { getReportListApi } from '@/entities/reports/api';
 import type { CanGenerate } from '@/entities/reports/model';
@@ -21,7 +22,6 @@ const _today = new Date();
 const TODAY_DATE = getDate(_today);
 const DAYS_IN_MONTH = getDaysInMonth(_today);
 const TODAY_LABEL = format(_today, 'yyyy. MM. dd', { locale: ko });
-const TODAY_MONTH_LABEL = format(_today, 'yyyy.MM.dd', { locale: ko });
 
 // 현재 주차 7일 (월요일 시작)
 const _dayOfWeek = _today.getDay(); // 0=Sun
@@ -206,17 +206,12 @@ function MonthlyReportWidget({
 
 // ── 서브 위젯: 출석 현황 (이번 주 도장판) ────────────────────────────────────
 function AttendanceWidget() {
-  const [attendedDates, setAttendedDates] = useState<Set<number>>(new Set());
-
-  useEffect(() => {
-    const yearMonth = format(_today, 'yyyy-MM');
-    getAttendanceApi(yearMonth)
-      .then((res) => {
-        const dates = new Set(res.attendanceDates.map((d) => parseInt(d.split('-')[2], 10)));
-        setAttendedDates(dates);
-      })
-      .catch(() => {});
-  }, []);
+  const yearMonth = format(_today, 'yyyy-MM');
+  const { data: attendedDates = new Set<number>(), isError: loadError } = useQuery({
+    queryKey: ['attendance', yearMonth],
+    queryFn: () => getAttendanceApi(yearMonth),
+    select: (res) => new Set(res.attendanceDates.map((d) => parseInt(d.split('-')[2], 10))),
+  });
 
   const todayDone = attendedDates.has(TODAY_DATE);
 
@@ -231,76 +226,82 @@ function AttendanceWidget() {
         <span className="text-[11px] text-slate-400">{TODAY_LABEL}</span>
       </div>
 
-      {/* 이번 주 도장판 */}
-      <div className="grid grid-cols-7 gap-1.5">
-        {WEEK_DAYS.map((day, i) => {
-          const isToday = day === TODAY_DATE;
-          const isValid = day >= 1 && day <= DAYS_IN_MONTH;
-          const isAttended = isValid && attendedDates.has(day);
-          const isPast = isValid && day < TODAY_DATE;
-          const isFuture = !isValid || day > TODAY_DATE;
+      {loadError ? (
+        <p className="text-prime-400 py-6 text-center text-xs">출석 정보를 불러오지 못했습니다.</p>
+      ) : (
+        <>
+          {/* 이번 주 도장판 */}
+          <div className="grid grid-cols-7 gap-1.5">
+            {WEEK_DAYS.map((day, i) => {
+              const isToday = day === TODAY_DATE;
+              const isValid = day >= 1 && day <= DAYS_IN_MONTH;
+              const isAttended = isValid && attendedDates.has(day);
+              const isPast = isValid && day < TODAY_DATE;
+              const isFuture = !isValid || day > TODAY_DATE;
 
-          return (
-            <div key={i} className="flex flex-col items-center gap-1.5">
-              <span
-                className={cn(
-                  'text-[10px] font-medium',
-                  isToday ? 'text-cta-400' : 'text-prime-400'
-                )}
-              >
-                {WEEK_LABELS[i]}
-              </span>
-              <div
-                className={cn(
-                  'flex h-10 w-full items-center justify-center rounded-xl transition-all duration-300',
-                  isToday && isAttended && 'bg-cta-300 scale-105 shadow-sm',
-                  isToday && !isAttended && 'bg-cta-300/20 ring-cta-300 ring-2 ring-offset-1',
-                  !isToday && isAttended && 'bg-cta-200',
-                  !isToday && isPast && !isAttended && 'bg-neutral-400',
-                  isFuture && !isToday && 'bg-neutral-300 opacity-60'
-                )}
-              >
-                {isAttended ? (
-                  <Check
-                    className={cn(
-                      'h-4 w-4 transition-all duration-300',
-                      isToday ? 'text-prime-900' : 'text-cta-400'
-                    )}
-                  />
-                ) : (
+              return (
+                <div key={i} className="flex flex-col items-center gap-1.5">
                   <span
                     className={cn(
-                      'text-[13px] font-semibold tabular-nums',
-                      isToday ? 'text-cta-300' : 'text-prime-300'
+                      'text-[10px] font-medium',
+                      isToday ? 'text-cta-400' : 'text-prime-400'
                     )}
                   >
-                    {isValid ? day : ''}
+                    {WEEK_LABELS[i]}
                   </span>
-                )}
+                  <div
+                    className={cn(
+                      'flex h-10 w-full items-center justify-center rounded-xl transition-all duration-300',
+                      isToday && isAttended && 'bg-cta-300 scale-105 shadow-sm',
+                      isToday && !isAttended && 'bg-cta-300/20 ring-cta-300 ring-2 ring-offset-1',
+                      !isToday && isAttended && 'bg-cta-200',
+                      !isToday && isPast && !isAttended && 'bg-neutral-400',
+                      isFuture && !isToday && 'bg-neutral-300 opacity-60'
+                    )}
+                  >
+                    {isAttended ? (
+                      <Check
+                        className={cn(
+                          'h-4 w-4 transition-all duration-300',
+                          isToday ? 'text-prime-900' : 'text-cta-400'
+                        )}
+                      />
+                    ) : (
+                      <span
+                        className={cn(
+                          'text-[13px] font-semibold tabular-nums',
+                          isToday ? 'text-cta-300' : 'text-prime-300'
+                        )}
+                      >
+                        {isValid ? day : ''}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* 하단 */}
+          <div className="mt-auto flex items-center justify-between gap-3">
+            <p className="text-prime-500 text-[12px] leading-snug">
+              이번 달 <span className="text-cta-300 font-bold">{attendedDates.size}회</span> 방문 ·
+              출석 시 3크레딧
+            </p>
+
+            {todayDone ? (
+              <div className="text-prime-400 flex shrink-0 items-center gap-1.5 rounded-xl bg-neutral-200 px-3 py-2 text-xs font-semibold">
+                <Check className="text-cta-300 h-3.5 w-3.5" />
+                오늘 출석 완료
               </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* 하단 */}
-      <div className="mt-auto flex items-center justify-between gap-3">
-        <p className="text-prime-500 text-[12px] leading-snug">
-          이번 달 <span className="text-cta-300 font-bold">{attendedDates.size}회</span> 방문 · 출석
-          시 3크레딧
-        </p>
-
-        {todayDone ? (
-          <div className="text-prime-400 flex shrink-0 items-center gap-1.5 rounded-xl bg-neutral-200 px-3 py-2 text-xs font-semibold">
-            <Check className="text-cta-300 h-3.5 w-3.5" />
-            오늘 출석 완료
+            ) : (
+              <div className="text-prime-400 flex shrink-0 items-center gap-1.5 rounded-xl bg-neutral-200 px-3 py-2 text-xs font-semibold">
+                출석 대기 중
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="text-prime-400 flex shrink-0 items-center gap-1.5 rounded-xl bg-neutral-200 px-3 py-2 text-xs font-semibold">
-            출석 대기 중
-          </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 }
@@ -361,14 +362,26 @@ function AdBanner() {
 export default function Home() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading, user } = useAuthStore();
-  const { cards: collectionCards, fetchCards } = useCollectionStore();
   const cardSectionRef = useRef<HTMLElement>(null);
   const [cardContainerWidth, setCardContainerWidth] = useState(0);
   const [cardContainer, setCardContainer] = useState<HTMLDivElement | null>(null);
   const [cardsVisible, setCardsVisible] = useState(false);
-  const [canGenerate, setCanGenerate] = useState<CanGenerate | null>(null);
-  const [weeklyCanGenerate, setWeeklyCanGenerate] = useState<CanGenerate | null>(null);
-  const [reportLoadError, setReportLoadError] = useState(false);
+
+  const { data: reportData, isError: reportLoadError } = useQuery({
+    queryKey: ['homeReports'],
+    queryFn: () => Promise.all([getReportListApi(), getReportListApi('weekly')]),
+    select: ([monthlyRes, weeklyRes]) => ({
+      canGenerate: monthlyRes.can_generate,
+      weeklyCanGenerate: weeklyRes.can_generate,
+    }),
+  });
+  const canGenerate = reportData?.canGenerate ?? null;
+  const weeklyCanGenerate = reportData?.weeklyCanGenerate ?? null;
+
+  const { data: collectionCards = [] } = useQuery({
+    queryKey: ['collectionCards'],
+    queryFn: getCollectionCardsApi,
+  });
 
   useEffect(() => {
     if (!cardContainer) return;
@@ -392,15 +405,7 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    fetchCards();
-    getReportListApi()
-      .then((res) => setCanGenerate(res.can_generate))
-      .catch(() => setReportLoadError(true));
-    getReportListApi('weekly')
-      .then((res) => setWeeklyCanGenerate(res.can_generate))
-      .catch(() => setReportLoadError(true));
-  }, [fetchCards]);
+
 
   if (authLoading || !isAuthenticated) {
     return (

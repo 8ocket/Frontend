@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { api } from '@/shared/api/axios';
 import {
   CreateReportRequest,
@@ -12,6 +13,14 @@ import {
   TendencyResponse,
   GetReportKeywordsResponse,
 } from './model';
+import { safeParse } from '@/shared/lib/utils/parse';
+import {
+  GetReportListResponseSchema,
+  SuggestionItemSchema,
+  GetReportGraphsResponseSchema,
+  TendencyResponseSchema,
+  GetReportKeywordsResponseSchema,
+} from './schema';
 import {
   mockCreateReport,
   mockGetReportDetail,
@@ -110,10 +119,11 @@ export const getReportListApi = async (reportType?: ReportType): Promise<GetRepo
   const params = reportType ? { report_type: reportType } : {};
   const response = await api.get<ReportListItem[]>('/reports', { params });
 
-  return {
+  const result = {
     reports: response.data,
     can_generate: { eligible: false, saved_session_count: 0, required_session_count: 1 },
   };
+  return safeParse(GetReportListResponseSchema, result);
 };
 
 /**
@@ -136,7 +146,7 @@ export const getReportSuggestionsApi = async (reportId: string): Promise<Suggest
 
   const response = await api.get<SuggestionItem[]>(`/reports/${reportId}/suggestions`);
 
-  return response.data;
+  return safeParse(z.array(SuggestionItemSchema), response.data);
 };
 
 /**
@@ -145,7 +155,7 @@ export const getReportSuggestionsApi = async (reportId: string): Promise<Suggest
  */
 export const getReportGraphsApi = async (reportId: string): Promise<GetReportGraphsResponse> => {
   const response = await api.get<GetReportGraphsResponse>(`/reports/${reportId}/graphs`);
-  return response.data;
+  return safeParse(GetReportGraphsResponseSchema, response.data);
 };
 
 /**
@@ -154,7 +164,7 @@ export const getReportGraphsApi = async (reportId: string): Promise<GetReportGra
  */
 export const getReportTendencyApi = async (reportId: string): Promise<TendencyResponse> => {
   const response = await api.get<TendencyResponse>(`/reports/${reportId}/tendency`);
-  return response.data;
+  return safeParse(TendencyResponseSchema, response.data);
 };
 
 /**
@@ -165,7 +175,7 @@ export const getReportKeywordsApi = async (
   reportId: string
 ): Promise<GetReportKeywordsResponse> => {
   const response = await api.get<GetReportKeywordsResponse>(`/reports/${reportId}/keywords`);
-  return response.data;
+  return safeParse(GetReportKeywordsResponseSchema, response.data);
 };
 
 /**

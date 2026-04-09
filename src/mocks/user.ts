@@ -5,6 +5,9 @@ import {
   GoogleLoginResponse,
   UserProfileResponse,
   UpdateMyProfileResponse,
+  OccupationType,
+  AgeGroup,
+  Gender,
 } from '@/entities/user/model';
 
 export const MOCK_USERS: Array<User & { password: string }> = [
@@ -55,12 +58,20 @@ export const mockGetMyProfile = (): UserProfileResponse => ({
   profile_image_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=test',
   nickname: '테스트 사용자',
   nickname_change_count: 0,
+  age_group: 20,
+  occupation: 'STUDENT',
+  gender: 'MALE',
 });
 
 /** PATCH /v1/users/me/profile */
 export const mockUpdateMyProfile = (
   nickName: string,
-  profileImage?: File
+  profileImage?: File,
+  options?: {
+    age_group?: AgeGroup | null;
+    occupation?: OccupationType | null;
+    gender?: Gender | null;
+  }
 ): UpdateMyProfileResponse => ({
   user_id: '550e8400-e29b-41d4-a716-446655440000',
   profile_image_url: profileImage
@@ -68,6 +79,9 @@ export const mockUpdateMyProfile = (
     : 'https://api.dicebear.com/7.x/avataaars/svg?seed=test',
   nickname: nickName || '테스트 사용자',
   updated_at: new Date().toISOString(),
+  age_group: options?.age_group ?? 20,
+  occupation: options?.occupation ?? 'STUDENT',
+  gender: options?.gender ?? 'MALE',
 });
 
 export const generateMockTokens = (userId: string) => {

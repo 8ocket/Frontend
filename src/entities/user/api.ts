@@ -20,6 +20,13 @@ import {
   mockUpdateMyProfile,
 } from '@/mocks';
 import { USE_MOCK } from '@/shared/lib/env';
+import { safeParse } from '@/shared/lib/utils/parse';
+import {
+  RefreshTokenResponseSchema,
+  SocialLoginResponseSchema,
+  UserProfileResponseSchema,
+  UpdateMyProfileResponseSchema,
+} from './schema';
 
 /**
  * 토큰 갱신 API
@@ -37,7 +44,7 @@ export const refreshTokenApi = async (refreshToken: string): Promise<RefreshToke
   });
 
   if (response.data.success && response.data.data) {
-    return response.data.data;
+    return safeParse(RefreshTokenResponseSchema, response.data.data);
   }
 
   throw new Error(response.data.error?.message || '토큰 갱신 실패');
@@ -55,7 +62,7 @@ export const kakaoLoginApi = async (code: string): Promise<KakaoLoginResponse> =
   }
 
   const response = await api.get<KakaoLoginResponse>(`/auth/kakao/callback?code=${code}`);
-  return response.data;
+  return safeParse(SocialLoginResponseSchema, response.data);
 };
 
 /**
@@ -70,7 +77,7 @@ export const googleLoginApi = async (code: string): Promise<GoogleLoginResponse>
   }
 
   const response = await api.get<GoogleLoginResponse>(`/auth/google/callback?code=${code}`);
-  return response.data;
+  return safeParse(SocialLoginResponseSchema, response.data);
 };
 
 /**
@@ -85,7 +92,7 @@ export const getMyProfileApi = async (): Promise<UserProfileResponse> => {
   }
 
   const response = await api.get<UserProfileResponse>('/users/me/profile');
-  return response.data;
+  return safeParse(UserProfileResponseSchema, response.data);
 };
 
 /**
@@ -94,16 +101,26 @@ export const getMyProfileApi = async (): Promise<UserProfileResponse> => {
  */
 export const updateMyProfileApi = async (
   nickName: string,
-  profileImage?: File
+  profileImage?: File,
+  options?: {
+    age_group?: AgeGroup | null;
+    occupation?: OccupationType | null;
+    gender?: Gender | null;
+  }
 ): Promise<UpdateMyProfileResponse> => {
   if (USE_MOCK) {
-    return mockUpdateMyProfile(nickName, profileImage);
+    return mockUpdateMyProfile(nickName, profileImage, options);
   }
 
   const formData = new FormData();
 
   if (profileImage) formData.append('profile_image', profileImage);
-  const contentsBlob = new Blob([JSON.stringify({ nickname: nickName })], {
+  const contents: Record<string, unknown> = { nickname: nickName };
+  if (options?.age_group !== undefined) contents.age_group = options.age_group;
+  if (options?.occupation !== undefined) contents.occupation = options.occupation;
+  if (options?.gender !== undefined) contents.gender = options.gender;
+
+  const contentsBlob = new Blob([JSON.stringify(contents)], {
     type: 'application/json',
   });
   formData.append('contents', contentsBlob);
@@ -117,7 +134,7 @@ export const updateMyProfileApi = async (
   );
 
   if (response.data.success && response.data.data) {
-    return response.data.data;
+    return safeParse(UpdateMyProfileResponseSchema, response.data.data);
   }
 
   throw new Error(response.data.error?.message || '프로필 수정 실패');

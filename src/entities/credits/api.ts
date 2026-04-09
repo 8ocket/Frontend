@@ -1,6 +1,14 @@
 import { api } from '@/shared/api/axios';
 import { CreditApiResponse, CreditProductResponse, MyCreditResponse, PaymentHistoryResponse } from './model';
 import { USE_MOCK } from '@/shared/lib/env';
+import { safeParse } from '@/shared/lib/utils/parse';
+import {
+  CreditProductResponseSchema,
+  MyCreditResponseSchema,
+  CreatePaymentResponseSchema,
+  PaymentHistoryResponseSchema,
+} from './schema';
+import { z } from 'zod';
 
 /**
  * 크레딧 상품 목록 조회 API
@@ -17,7 +25,7 @@ export const getCreditProductsApi = async (): Promise<CreditProductResponse[]> =
   }
 
   const response = await api.get<CreditApiResponse<CreditProductResponse[]>>('/credits');
-  return response.data.data;
+  return safeParse(z.array(CreditProductResponseSchema), response.data.data);
 };
 
 /**
@@ -31,7 +39,7 @@ export const getMyCreditApi = async (): Promise<MyCreditResponse> => {
   }
 
   const response = await api.get<CreditApiResponse<MyCreditResponse>>('/credits/me');
-  return response.data.data;
+  return safeParse(MyCreditResponseSchema, response.data.data);
 };
 
 /**
@@ -44,7 +52,7 @@ export const createPaymentApi = async (productType: 'SMALL' | 'MEDIUM' | 'LARGE'
   const response = await api.post<
     CreditApiResponse<{ orderId: string; amount: number; orderName: string }>
   >('/payments', { productType });
-  return response.data.data;
+  return safeParse(CreatePaymentResponseSchema, response.data.data);
 };
 
 /**
@@ -65,7 +73,7 @@ export const confirmPaymentApi = async (paymentKey: string, orderId: string, amo
  */
 export const getPaymentHistoryApi = async (): Promise<PaymentHistoryResponse> => {
   const response = await api.get<CreditApiResponse<PaymentHistoryResponse>>('/payments/history');
-  return response.data.data;
+  return safeParse(PaymentHistoryResponseSchema, response.data.data);
 };
 
 /**
