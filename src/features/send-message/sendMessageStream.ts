@@ -17,6 +17,9 @@ export const sendMessageStream = async (
     return mockSendMessageStream(onChunk, onCrisis, onDone);
   }
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30_000);
+
   const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}`, {
     method: 'POST',
     headers: {
@@ -24,7 +27,9 @@ export const sendMessageStream = async (
       'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify({ content }),
+    signal: controller.signal,
   });
+  clearTimeout(timeoutId);
 
   if (!response.ok) throw createHttpStatusError(response.status);
 
@@ -35,6 +40,7 @@ export const sendMessageStream = async (
   const decoder = new TextDecoder();
   // SSE는 이벤트가 chunk 경계에서 잘릴 수 있으므로, 완성되지 않은 마지막 조각을 버퍼에 보관합니다.
   let buffer = '';
+  let doneHandled = false;
 
   while (true) {
     const { done, value } = await reader.read();
@@ -62,15 +68,19 @@ export const sendMessageStream = async (
             if (currentEvent === 'ai_chunk') onChunk(data.content);
             if (currentEvent === 'crisis_check') onCrisis(data.content);
             if (currentEvent === 'done') {
+              doneHandled = true;
               onDone();
               reader.cancel();
               return;
             }
-          } catch {
-            // malformed JSON 무시
+          } catch (e) {
+            console.warn('[SSE] JSON 파싱 실패 — raw:', raw, e);
           }
         }
       }
     }
   }
+
+  // done 이벤트 없이 스트림이 종료된 경우 fallback
+  if (!doneHandled) onDone();
 };

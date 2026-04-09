@@ -29,8 +29,6 @@ export interface ChatMainAreaProps {
   appendMessage?: ChatBubbleProps | null;
   /** 현재 세션 ID — 메시지 전송 시 사용. undefined면 첫 메시지 시 세션 생성 */
   sessionId?: string;
-  /** 세션 생성에 사용할 페르소나 ID */
-  personaId?: string;
   /** 세션 생성 완료 시 호출 — 페이지에서 activeSessionId 업데이트 용도 */
   onSessionCreated?: (sessionId: string) => void;
   /** AI 상담사 표시 이름 */
@@ -54,7 +52,6 @@ export function ChatMainArea({
   onDisabledInputClick,
   appendMessage,
   sessionId,
-  personaId,
   onSessionCreated,
   aiName = '나봄이',
   aiAvatarSrc = '/images/personas/nabomi-44.png',
@@ -79,8 +76,10 @@ export function ChatMainArea({
     if (prevId === sessionId) return;
 
     if (sessionId === undefined) {
-      // 새 세션 시작 준비 → 메시지 초기화
+      // 새 세션 시작 준비 → 메시지 및 스트리밍 상태 초기화
       setMessages([]);
+      setIsStreaming(false);
+      setStreamingText('');
       return;
     }
 
@@ -128,7 +127,7 @@ export function ChatMainArea({
 
       try {
         await createSessionStream(
-          { first_content: content },
+          { first_content: content, persona_id: '019d6ba8-b430-7aeb-b18f-919e08b5f500' },
           token,
           (chunk) => {
             accumulated += chunk;
@@ -238,7 +237,7 @@ export function ChatMainArea({
           onSend={handleSend}
           onEndChat={onEndChat}
           disabled={!isSessionActive || isStreaming}
-          onDisabledClick={onDisabledInputClick}
+          onDisabledClick={!isSessionActive ? onDisabledInputClick : undefined}
         />
       </div>
     </div>

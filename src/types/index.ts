@@ -1,4 +1,3 @@
-export * from './persona';
 export * from './report';
 export * from './knowledge';
 export * from './credit';

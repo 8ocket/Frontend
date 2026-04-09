@@ -227,8 +227,8 @@ export const signupApi = async (
 
   const formData = new FormData();
 
-  const image = profileImage ?? (await getDefaultProfileImage());
-  formData.append('profile_image', image, profileImage ? profileImage.name : 'profile-default.png');
+  const image = profileImage ?? new Blob([]);
+  formData.append('profile_image', image, profileImage ? profileImage.name : 'empty');
 
   const contentsBlob = new Blob([JSON.stringify({ nickname, occupation, age, gender })], {
     type: 'application/json',

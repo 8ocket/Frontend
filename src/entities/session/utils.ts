@@ -30,7 +30,8 @@ export function finalizeToEmotionCardData(
   }));
 
   return {
-    cardId: sessionId,
+    cardId: result.summary_id,
+    summaryId: result.summary_id,
     sessionId,
     layers,
     keywords,

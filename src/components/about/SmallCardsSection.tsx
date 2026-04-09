@@ -17,6 +17,7 @@ import type { EmotionCardData } from '@/entities/emotion';
 const SAMPLE_CARDS: EmotionCardData[] = [
   {
     cardId: 'about-joy',
+    summaryId: 'about-joy',
     sessionId: 'about-sample',
     userName: '민지',
     layers: [
@@ -33,6 +34,7 @@ const SAMPLE_CARDS: EmotionCardData[] = [
   },
   {
     cardId: 'about-anger',
+    summaryId: 'about-anger',
     sessionId: 'about-sample',
     userName: '민지',
     layers: [
@@ -52,6 +54,7 @@ const SAMPLE_CARDS: EmotionCardData[] = [
   },
   {
     cardId: 'about-sadness',
+    summaryId: 'about-sadness',
     sessionId: 'about-sample',
     userName: '민지',
     layers: [

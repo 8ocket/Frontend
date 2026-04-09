@@ -15,6 +15,7 @@ import {
   mockGetActiveSession,
   mockGetSessionDetail,
   mockFinalizeSession,
+  mockDeleteSession,
 } from '@/mocks';
 import { createHttpStatusError } from '@/shared/lib/utils/error';
 import { USE_MOCK } from '@/shared/lib/env';
@@ -39,7 +40,6 @@ export const getSessionsApi = async (
   if (query.size) params.set('size', String(query.size));
   if (query.start_date) params.set('start_date', query.start_date);
   if (query.end_date) params.set('end_date', query.end_date);
-  if (query.persona_ids?.length) params.set('persona_ids', query.persona_ids.join(','));
 
   const response = await api.get<ApiResponse<SessionListResponse>>(
     `/sessions?${params.toString()}`
@@ -101,6 +101,7 @@ export const createSessionStream = async (
   const decoder = new TextDecoder();
   let buffer = '';
   let currentEvent = '';
+  let doneHandled = false;
 
   while (true) {
     const { done, value } = await reader.read();
@@ -130,6 +131,7 @@ export const createSessionStream = async (
             if (currentEvent === 'session_title') onSessionTitle(data.title);
             if (currentEvent === 'error') onError?.(data.message);
             if (currentEvent === 'done') {
+              doneHandled = true;
               onDone();
               reader.cancel();
               return;
@@ -141,6 +143,9 @@ export const createSessionStream = async (
       }
     }
   }
+
+  // done 이벤트 없이 스트림이 종료된 경우 fallback
+  if (!doneHandled) onDone();
 };
 
 /**
@@ -157,6 +162,15 @@ export const getSessionDetailApi = async (sessionId: string): Promise<SessionDet
   }
 
   throw new Error(response.data.error?.message || '세션 상세 조회 실패');
+};
+
+/**
+ * 세션 삭제 API
+ * DELETE /v1/sessions/{session_id}
+ */
+export const deleteSessionApi = async (sessionId: string): Promise<void> => {
+  if (USE_MOCK) return mockDeleteSession(sessionId);
+  await api.delete(`/sessions/${sessionId}`);
 };
 
 /**
@@ -195,6 +209,7 @@ export const finalizeSessionStream = async (
   const decoder = new TextDecoder();
   // finalize SSE도 chunk 단위로 끊어질 수 있어, 이벤트 종료 구분자(\n\n) 기준으로 누적 파싱합니다.
   let buffer = '';
+  let doneHandled = false;
 
   while (true) {
     const { done, value } = await reader.read();
@@ -230,10 +245,14 @@ export const finalizeSessionStream = async (
 
       // done 이벤트는 data 유무/유효성과 무관하게 처리
       if (currentEvent === 'done') {
+        doneHandled = true;
         onDone();
         reader.cancel();
         return;
       }
     }
   }
+
+  // done 이벤트 없이 스트림이 종료된 경우 fallback
+  if (!doneHandled) onDone();
 };

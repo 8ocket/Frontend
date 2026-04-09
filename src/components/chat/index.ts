@@ -5,8 +5,6 @@ export type { ChatSession, ChatSessionGroup } from '@/widgets/chat-sidebar';
 export { ChatMainArea } from '@/widgets/chat-main-area';
 export { ChatBubble } from '@/widgets/chat-main-area';
 export type { ChatBubbleProps, BubbleVariant } from '@/widgets/chat-main-area';
-export { ChatSelectOptions } from '@/widgets/chat-main-area';
-export type { PersonaOption } from '@/widgets/chat-main-area';
 export { ChatInputBar } from '@/features/send-message';
 export { ChatAlertModal } from './ChatAlertModal';
 export { ChatCreditModal } from './ChatCreditModal';
