@@ -164,7 +164,12 @@ export function GNB() {
                   <div className="border-cta-300 bg-cta-100 relative size-7 shrink-0 overflow-hidden rounded-full border">
                     <ProfileAvatar src={user?.profileImage} defaultPadding="p-1" />
                   </div>
-                  <span className="text-prime-900 text-sm font-medium">{user?.name ?? 'MY'}</span>
+                  <span
+                    className="text-prime-900 max-w-24 truncate text-sm font-medium"
+                    title={user?.name}
+                  >
+                    {user?.name ?? 'MY'}
+                  </span>
                 </button>
 
                 {profileDropdownOpen && (

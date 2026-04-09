@@ -28,6 +28,7 @@ import {
   type Gender,
 } from '@/entities/user/model';
 
+
 // ── 목업 데이터 (API 연동 시 교체) ──────────────────────────────────
 
 const CREDIT_HISTORY = [
@@ -157,7 +158,7 @@ export default function MyPage() {
               </div>
             </section>
 
-            {/* ── 카드 2: 활동 내역 ── */}
+            {/* ── 카드 4: 활동 내역 ── */}
             <section className="border-prime-100 overflow-hidden rounded-2xl border bg-white shadow-sm">
               <p className="text-prime-400 px-6 pt-5 text-xs font-medium">활동 내역</p>
 
@@ -538,6 +539,7 @@ function EmptyHistory({ message }: { message: string }) {
     </div>
   );
 }
+
 
 function MenuRow({
   icon,

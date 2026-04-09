@@ -76,7 +76,7 @@ export default function NicknamePage() {
   const handleNext = async () => {
     const trimmed = nickname.trim();
     if (!trimmed) {
-      setNicknameError('닉네임을 입력해 주세요.');
+      setNicknameError('닉네임을 입력해 주세요 (2~30자)');
       return;
     }
     const result = NicknameSchema.safeParse(trimmed);
@@ -178,6 +178,8 @@ export default function NicknamePage() {
                 프로필을 바꾸고 싶으시다면 아이콘을 눌러 사진을 추가하세요.
                 <br />
                 설정하지 않으시면 기본 프로필로 접속합니다.
+                <br />
+                <span className="text-prime-400">JPG, PNG 권장 · 최대 5MB</span>
               </p>
             </div>
 
@@ -198,11 +200,11 @@ export default function NicknamePage() {
                         setNicknameError(null);
                       }}
                       placeholder="즐거운 몽상가"
-                      maxLength={20}
+                      maxLength={30}
                       className="h-14 rounded-xl bg-white/50 px-5 text-base"
                     />
                     <span className="text-prime-400 pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-xs">
-                      {nickname.length}/20
+                      {nickname.length}/30
                     </span>
                   </div>
                   {nicknameError && <p className="text-xs text-red-500">{nicknameError}</p>}

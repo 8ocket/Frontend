@@ -1,9 +1,10 @@
 'use client';
 
-import { format, getDate, getDaysInMonth } from 'date-fns';
+import { format, getDate, getDaysInMonth, getDay, startOfMonth } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { Check, MessageCircle, FileText, Lock, Layers } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -204,8 +205,12 @@ function MonthlyReportWidget({
   );
 }
 
-// ── 서브 위젯: 출석 현황 (이번 주 도장판) ────────────────────────────────────
+// ── 서브 위젯: 출석 현황 ─────────────────────────────────────────────────────
+const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
+const FIRST_DAY_OFFSET = getDay(startOfMonth(_today));
+
 function AttendanceWidget() {
+  const [expanded, setExpanded] = useState(false);
   const yearMonth = format(_today, 'yyyy-MM');
   const { data: attendedDates = new Set<number>(), isError: loadError } = useQuery({
     queryKey: ['attendance', yearMonth],
@@ -215,19 +220,80 @@ function AttendanceWidget() {
 
   const todayDone = attendedDates.has(TODAY_DATE);
 
+  const monthlyCells: (number | null)[] = [
+    ...Array(FIRST_DAY_OFFSET).fill(null),
+    ...Array.from({ length: DAYS_IN_MONTH }, (_, i) => i + 1),
+  ];
+
   return (
     <div className="flex flex-col gap-5 rounded-2xl bg-white/70 p-5 shadow-sm backdrop-blur-sm">
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Check className="text-cta-300 h-4 w-4" aria-hidden="true" />
-          <h3 className="text-[15px] font-semibold text-[#1a222e]">출석 현황</h3>
+          <h3 className="text-[15px] font-semibold text-[#1a222e]">
+            <span className="text-cta-300">{format(_today, 'M월', { locale: ko })}</span> 출석 현황
+          </h3>
         </div>
-        <span className="text-[11px] text-slate-400">{TODAY_LABEL}</span>
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="bg-cta-50 text-cta-300 hover:bg-cta-100 border-cta-200 rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition-colors"
+        >
+          {expanded ? '접기' : '이번 달 전체 보기'}
+        </button>
       </div>
 
       {loadError ? (
         <p className="text-prime-400 py-6 text-center text-xs">출석 정보를 불러오지 못했습니다.</p>
+      ) : expanded ? (
+        /* ── 월간 캘린더 ── */
+        <div>
+          <div className="mb-2 grid grid-cols-7">
+            {DAY_LABELS.map((d, i) => (
+              <span
+                key={d}
+                className={cn(
+                  'py-1 text-center text-xs font-medium',
+                  i === 0 ? 'text-red-400' : i === 6 ? 'text-blue-400' : 'text-prime-300'
+                )}
+              >
+                {d}
+              </span>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-y-1.5">
+            {monthlyCells.map((day, i) => {
+              if (!day) return <div key={`e-${i}`} />;
+              const isToday = day === TODAY_DATE;
+              const isAttended = attendedDates.has(day);
+              const col = (FIRST_DAY_OFFSET + day - 1) % 7;
+              return (
+                <div key={day} className="flex items-center justify-center py-0.5">
+                  <div
+                    className={cn(
+                      'flex size-9 items-center justify-center rounded-full text-sm font-medium transition-colors',
+                      isAttended && isToday && 'bg-cta-300 text-white shadow-sm',
+                      isAttended && !isToday && 'bg-cta-100 text-cta-400',
+                      !isAttended && isToday && 'ring-cta-300 text-cta-300 ring-2 font-bold',
+                      !isAttended && !isToday && col === 0 && 'text-red-400',
+                      !isAttended && !isToday && col === 6 && 'text-blue-400',
+                      !isAttended && !isToday && col !== 0 && col !== 6 && 'text-prime-500'
+                    )}
+                  >
+                    {isAttended ? <Check size={14} strokeWidth={2.5} /> : day}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="border-prime-100 mt-4 flex items-center justify-between border-t pt-4">
+            <p className="text-prime-500 text-[12px]">
+              이번 달 <span className="text-cta-300 font-bold">{attendedDates.size}회</span> 출석
+            </p>
+            <span className="text-prime-300 text-xs">{DAYS_IN_MONTH}일 중 {attendedDates.size}일</span>
+          </div>
+        </div>
       ) : (
         <>
           {/* 이번 주 도장판 */}
@@ -288,7 +354,6 @@ function AttendanceWidget() {
               이번 달 <span className="text-cta-300 font-bold">{attendedDates.size}회</span> 방문 ·
               출석 시 3크레딧
             </p>
-
             {todayDone ? (
               <div className="text-prime-400 flex shrink-0 items-center gap-1.5 rounded-xl bg-neutral-200 px-3 py-2 text-xs font-semibold">
                 <Check className="text-cta-300 h-3.5 w-3.5" />

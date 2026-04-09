@@ -222,7 +222,7 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
                       >
                         사진 변경
                       </button>
-                      <p className="text-prime-400 text-xs">JPG, PNG 파일 권장</p>
+                      <p className="text-prime-400 text-xs">JPG, PNG 권장 · 최대 5MB</p>
                     </div>
                     <input
                       ref={fileInputRef}
@@ -243,8 +243,8 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
                     type="text"
                     value={nickname}
                     onChange={(e) => setNickname(e.target.value)}
-                    placeholder="닉네임을 입력하세요"
-                    maxLength={15}
+                    placeholder="닉네임을 입력하세요 (2~30자)"
+                    maxLength={30}
                     disabled={isNicknameChangeLimitReached}
                     className={`h-11 w-full rounded-xl border px-4 text-sm transition-colors focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:outline-none ${
                       nicknameValidation
