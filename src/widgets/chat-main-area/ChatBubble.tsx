@@ -25,14 +25,14 @@ export type ChatBubbleProps = {
 function UserProfilePhoto() {
   return (
     <div className="flex h-5.25 w-5.25 shrink-0 items-center justify-center rounded-full bg-slate-100">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-prime-800">
         <path
           d="M8 8C9.933 8 11.5 6.433 11.5 4.5C11.5 2.567 9.933 1 8 1C6.067 1 4.5 2.567 4.5 4.5C4.5 6.433 6.067 8 8 8Z"
-          fill="#2b4764"
+          fill="currentColor"
         />
         <path
           d="M8 9.5C4.686 9.5 2 11.01 2 12.875V14H14V12.875C14 11.01 11.314 9.5 8 9.5Z"
-          fill="#2b4764"
+          fill="currentColor"
         />
       </svg>
     </div>
@@ -54,7 +54,7 @@ export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatar
   return (
     <div
       className={[
-        'flex max-w-[60%] flex-col gap-1',
+        'flex max-w-[85%] flex-col gap-1 sm:max-w-[70%] md:max-w-[60%]',
         isAi ? 'items-start self-start' : 'items-end self-end',
       ].join(' ')}
     >
@@ -76,13 +76,7 @@ export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatar
 
         {/* TODO: 타이포그래피 토큰으로 전환 → isAi ? "subtitle-1" : "body-2" + text-prime-500 */}
         <span
-          style={{
-            fontFamily: 'var(--font-pretendard)',
-            fontSize: '14px',
-            fontWeight: isAi ? 600 : 400,
-            lineHeight: '130%',
-            color: 'var(--color-prime-500)',
-          }}
+          className={['text-prime-500', isAi ? 'subtitle-1' : 'body-2'].join(' ')}
         >
           {senderName}
         </span>
@@ -95,9 +89,9 @@ export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatar
           {cardImageUrl && (
             <button
               onClick={(e) => { e.stopPropagation(); handleDownload(); }}
-              className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full shadow-md transition-opacity hover:opacity-90 active:opacity-80"
+              className="bg-main-blue flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-white shadow-md transition-opacity hover:opacity-90 active:opacity-80"
               aria-label="마음 기록 카드 다운로드"
-              style={{ background: '#82C9FF', fontFamily: 'Pretendard', fontSize: '16px', fontStyle: 'normal', fontWeight: 500, lineHeight: '100%', color: '#F8FAFC', textAlign: 'center' }}
+              style={{ fontFamily: 'Pretendard', fontSize: '16px', fontWeight: 500, lineHeight: '100%', textAlign: 'center' }}
             >
               다운로드
             </button>
@@ -109,7 +103,7 @@ export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatar
             'w-fit rounded-2xl px-5 py-2.5 shadow-sm',
             isAi
               ? 'bg-white'
-              : 'bg-[#4A90E2] text-white',
+              : 'bg-cta-500 text-white',
           ].join(' ')}
         >
           {isLoading ? (

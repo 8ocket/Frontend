@@ -14,6 +14,7 @@ import {
   type ReportStatus,
   type ReportType,
 } from '@/components/report';
+import { LayoutList } from 'lucide-react';
 import { useToast } from '@/shared/ui/toast';
 import { ReportCompleteEvent, ReportListItem, ReportStatusEvent } from '@/entities/reports/model';
 import { createReportApi, deleteReportApi, getReportListApi } from '@/entities/reports/api';
@@ -63,6 +64,7 @@ export default function ReportPage() {
 
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [mobileListOpen, setMobileListOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // 리포트 페이지에서는 body 스크롤 방지
@@ -91,6 +93,7 @@ export default function ReportPage() {
   const handleSelect = (id: string) => {
     const report = reports.find((r) => r.id === id);
     setSelectedId(id);
+    setMobileListOpen(false);
     if (report?.isGenerating) {
       setSseStep(undefined);
       setViewState('creating');
@@ -165,6 +168,8 @@ export default function ReportPage() {
         onCreateNew={handleCreateNew}
         onDelete={setDeleteTargetId}
         isCreating={viewState === 'idle' || viewState === 'creating'}
+        isMobileOpen={mobileListOpen}
+        onMobileClose={() => setMobileListOpen(false)}
       />
 
       {/* 삭제 확인 다이얼로그 */}
@@ -177,6 +182,20 @@ export default function ReportPage() {
 
       {/* 메인 콘텐츠 */}
       <div ref={scrollRef} className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        {/* 모바일 리포트 목록 트리거 (lg 미만에서만 표시) */}
+        <div className="border-prime-100 sticky top-0 z-10 flex items-center gap-3 border-b bg-white px-4 py-3 lg:hidden">
+          <button
+            type="button"
+            onClick={() => setMobileListOpen(true)}
+            className="hover:bg-prime-50 text-prime-700 flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
+          >
+            <LayoutList className="size-4" />
+            리포트 목록
+          </button>
+          {selectedReport && (
+            <span className="text-prime-500 truncate text-sm">{selectedReport.title}</span>
+          )}
+        </div>
         {viewState === 'idle' && (
           <div className="relative flex min-h-full items-center justify-center border-r border-black/5 px-6 py-12 sm:px-12">
             <div

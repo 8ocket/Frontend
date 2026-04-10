@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { AlertCircle, Calendar, FileText, PlusCircle, Trash2 } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { AlertCircle, Calendar, FileText, PlusCircle, Trash2, X } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import type { Report, ReportType } from './types';
 
@@ -22,6 +23,8 @@ interface ReportSidebarProps {
   onCreateNew: () => void;
   onDelete: (id: string) => void;
   isCreating: boolean;
+  isMobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
 export function ReportSidebar({
@@ -31,6 +34,8 @@ export function ReportSidebar({
   onCreateNew,
   onDelete,
   isCreating,
+  isMobileOpen,
+  onMobileClose,
 }: ReportSidebarProps) {
   const [filter, setFilter] = useState<'all' | ReportType>('all');
 
@@ -53,10 +58,22 @@ export function ReportSidebar({
     },
   ];
 
-  return (
-    <aside className="border-prime-100 hidden w-72 shrink-0 flex-col border-r bg-white xl:flex">
+  const sidebarContent = (
+    <>
       {/* 헤더 */}
       <div className="border-prime-100 border-b px-5 py-4">
+        {/* 모바일 닫기 버튼 */}
+        <div className="mb-3 flex items-center justify-between lg:hidden">
+          <span className="text-prime-900 text-sm font-bold">리포트 목록</span>
+          <button
+            type="button"
+            onClick={onMobileClose}
+            className="hover:bg-secondary-100 flex size-8 items-center justify-center rounded-lg transition-colors"
+            aria-label="닫기"
+          >
+            <X size={18} />
+          </button>
+        </div>
         <p className="text-prime-400 mb-4 text-[11px] font-semibold tracking-widest uppercase">
           Report History
         </p>
@@ -197,14 +214,14 @@ export function ReportSidebar({
                     </p>
                   )}
 
-                  {/* 삭제 버튼 */}
+                  {/* 삭제 버튼 — 터치 기기 대응: 항상 표시 */}
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       onDelete(report.id);
                     }}
-                    className="text-prime-300 hover:text-error-500 absolute top-2.5 right-2.5 rounded p-1 opacity-0 transition-all group-hover:opacity-100"
+                    className="text-prime-300 hover:text-error-500 absolute top-2.5 right-2.5 rounded p-1 transition-all lg:opacity-0 lg:group-hover:opacity-100"
                     aria-label="리포트 삭제"
                   >
                     <Trash2 className="size-3.5" />
@@ -240,6 +257,39 @@ export function ReportSidebar({
           All rights reserved.
         </p>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* 데스크톱 사이드바 (lg+) */}
+      <aside className="border-prime-100 hidden w-80.75 shrink-0 flex-col border-r border-l bg-white lg:flex">
+        {sidebarContent}
+      </aside>
+
+      {/* 모바일 드로어 (lg 미만) */}
+      <AnimatePresence>
+        {isMobileOpen && (
+          <>
+            <motion.div
+              className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={onMobileClose}
+            />
+            <motion.aside
+              className="border-prime-100 fixed inset-y-0 left-0 z-50 flex w-[min(320px,85vw)] flex-col border-r border-l bg-white lg:hidden"
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            >
+              {sidebarContent}
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
