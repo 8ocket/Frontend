@@ -17,7 +17,6 @@ import {
   mockFinalizeSession,
   mockDeleteSession,
 } from '@/mocks';
-import { createHttpStatusError } from '@/shared/lib/utils/error';
 import { USE_MOCK } from '@/shared/lib/env';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/v1';
@@ -93,7 +92,14 @@ export const createSessionStream = async (
     body: JSON.stringify(req),
   });
 
-  if (!response.ok) throw createHttpStatusError(response.status);
+  if (!response.ok) {
+    let code = '';
+    try {
+      const body = await response.json();
+      code = body.code || body.error?.code || '';
+    } catch {}
+    throw new Error(code || String(response.status));
+  }
 
   const reader = response.body?.getReader();
   if (!reader) return;

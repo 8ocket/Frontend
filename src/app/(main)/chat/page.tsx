@@ -866,6 +866,17 @@ export default function ChatPage() {
   const handleNewCounsel = () => {
     setSidebarOpen(false);
     closeModal();
+
+    // 오늘 이미 세션이 있으면 추가 상담(70 크레딧 차감) → 크레딧 사전 체크
+    const today = new Date().toDateString();
+    const hasTodaySession = sessionList.some(
+      (s) => new Date(s.startedAt).toDateString() === today
+    );
+    if (hasTodaySession && totalCredit < 70) {
+      openModal('credit-shortage');
+      return;
+    }
+
     setActiveSessionId(undefined); // 새 세션 준비 (첫 메시지 전송 시 생성)
     setIsSessionActive(true);
   };

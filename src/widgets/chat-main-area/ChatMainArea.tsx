@@ -45,7 +45,7 @@ export interface ChatMainAreaProps {
 
 export function ChatMainArea({
   onEndChat,
-  onCreditShortage: _onCreditShortage,
+  onCreditShortage,
   onUnfinishedSession: _onUnfinishedSession,
   initialMessages = [],
   isSessionActive = true,
@@ -156,7 +156,12 @@ export function ChatMainArea({
           }
         );
       } catch (err) {
-        console.error('Session create error:', err);
+        const code = err instanceof Error ? err.message : '';
+        if (code === 'INSUFFICIENT_CREDIT') {
+          onCreditShortage?.();
+        } else {
+          console.warn('Session create error:', code || err);
+        }
         setIsStreaming(false);
         setStreamingText('');
       }

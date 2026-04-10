@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ReportSidebar,
@@ -17,6 +18,8 @@ import {
 import { useToast } from '@/shared/ui/toast';
 import { ReportCompleteEvent, ReportListItem, ReportStatusEvent } from '@/entities/reports/model';
 import { createReportApi, deleteReportApi, getReportListApi } from '@/entities/reports/api';
+import { ChatCreditModal } from '@/components/chat';
+import { useCreditStore } from '@/entities/credits/store';
 
 function mapToReport(item: ReportListItem): Report {
   const reportType = item.report_type.toLowerCase() as ReportType;
@@ -46,7 +49,10 @@ const SKELETON_MS = 600;
 
 export default function ReportPage() {
   const { toast } = useToast();
+  const router = useRouter();
   const queryClient = useQueryClient();
+  const { totalCredit } = useCreditStore();
+  const [creditModalOpen, setCreditModalOpen] = useState(false);
 
   const { data: reportData } = useQuery({
     queryKey: ['reports'],
@@ -123,7 +129,9 @@ export default function ReportPage() {
       );
     } catch (err) {
       const code = err instanceof Error ? err.message : '';
-      if (code === 'INSUFFICIENT_SESSIONS') {
+      if (code === 'INSUFFICIENT_CREDIT') {
+        setCreditModalOpen(true);
+      } else if (code === 'INSUFFICIENT_SESSIONS') {
         toast('기간 내 상담 기록이 3개 이상이어야 해요.', 'error');
       } else if (code === 'REPORT_ALREADY_EXISTS') {
         toast('해당 기간의 리포트가 이미 존재해요.', 'error');
@@ -165,6 +173,18 @@ export default function ReportPage() {
         onCreateNew={handleCreateNew}
         onDelete={setDeleteTargetId}
         isCreating={viewState === 'idle' || viewState === 'creating'}
+      />
+
+      {/* 크레딧 부족 모달 */}
+      <ChatCreditModal
+        isOpen={creditModalOpen}
+        onClose={() => setCreditModalOpen(false)}
+        remainingCredits={totalCredit}
+        onEnd={() => setCreditModalOpen(false)}
+        onPurchase={() => {
+          setCreditModalOpen(false);
+          router.push('/shop');
+        }}
       />
 
       {/* 삭제 확인 다이얼로그 */}
