@@ -27,6 +27,7 @@ export function SignupCreditModal({ isOpen, onConfirm }: SignupCreditModalProps)
             src="/images/logo/logo-small.svg"
             alt="MindLog"
             fill
+            sizes="48px"
             className="object-contain"
           />
         </div>

@@ -629,6 +629,7 @@ export default function Home() {
             src="/images/icons/aichatbtn.png"
             alt="AI 상담 받으러 가기"
             fill
+            sizes="110px"
             className="object-cover"
           />
         </button>

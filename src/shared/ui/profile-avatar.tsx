@@ -24,6 +24,8 @@ export function ProfileAvatar({
   const isDefault = !src || src === DEFAULT_PROFILE || imgError;
   const imgSrc = isDefault ? DEFAULT_PROFILE : src;
 
+  const isExternal = !isDefault && imgSrc.startsWith('http');
+
   if (isDefault) {
     return (
       <div className={cn('absolute inset-0', defaultPadding)}>
@@ -31,6 +33,7 @@ export function ProfileAvatar({
           src={imgSrc}
           alt="프로필"
           fill
+          sizes="80px"
           className="object-contain"
           onError={() => setImgError(true)}
         />
@@ -45,6 +48,7 @@ export function ProfileAvatar({
       fill={!size}
       width={size}
       height={size}
+      unoptimized={isExternal}
       className={cn('object-cover', className)}
       onError={() => setImgError(true)}
     />
