@@ -20,7 +20,7 @@ export default function SupportPage() {
     });
 
   return (
-    <div className="min-h-main-safe bg-linear-to-b from-secondary-100 to-white">
+    <div className="min-h-main-safe from-secondary-100 bg-linear-to-b to-white">
       <main className="layout-container px-gutter mx-auto max-w-6xl pt-20 pb-32 sm:pt-28">
         <div className="mb-14 sm:mb-20">
           <h1 className="text-prime-900 mb-3 text-[28px] leading-tight font-bold tracking-tight sm:text-[36px]">
@@ -43,15 +43,6 @@ export default function SupportPage() {
               isLast={index === FAQ_ITEMS.length - 1}
             />
           ))}
-        </div>
-
-        <div className="mt-20 text-center sm:mt-28">
-          <p className="text-prime-500 mb-5 text-[14px] sm:text-[15px]">
-            원하시는 답변을 찾지 못하셨나요?
-          </p>
-          <Button variant="secondary" size="default" className="rounded-full px-7 shadow-sm sm:text-[15px]">
-            1:1 문의하기
-          </Button>
         </div>
       </main>
     </div>
