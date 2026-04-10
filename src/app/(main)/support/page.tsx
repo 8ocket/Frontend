@@ -1,12 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-import { Button } from '@/shared/ui/button';
+import { useMemo, useState } from 'react';
 import FaqItem from './FaqItem';
-import { FAQ_ITEMS } from './faqData';
+import { FAQ_CATEGORIES } from './faqData';
+
+const ALL_LABEL = '전체';
+const CATEGORY_LABELS = [ALL_LABEL, ...FAQ_CATEGORIES.map((c) => c.label)];
 
 export default function SupportPage() {
   const [openIds, setOpenIds] = useState<Set<number>>(new Set());
+  const [activeFilter, setActiveFilter] = useState(ALL_LABEL);
 
   const toggle = (id: number) =>
     setOpenIds((prev) => {
@@ -18,6 +21,18 @@ export default function SupportPage() {
       }
       return next;
     });
+
+  const filteredItems = useMemo(() => {
+    if (activeFilter === ALL_LABEL) {
+      return FAQ_CATEGORIES.flatMap((c) => c.items);
+    }
+    return FAQ_CATEGORIES.find((c) => c.label === activeFilter)?.items ?? [];
+  }, [activeFilter]);
+
+  const handleFilterChange = (label: string) => {
+    setActiveFilter(label);
+    setOpenIds(new Set());
+  };
 
   return (
     <div className="min-h-main-safe from-secondary-100 bg-linear-to-b to-white">
@@ -32,15 +47,31 @@ export default function SupportPage() {
           </p>
         </div>
 
-        <div className="border-prime-100 overflow-hidden rounded-2xl border bg-white shadow-sm">
-          {FAQ_ITEMS.map((item, index) => (
+        <div className="mb-6 flex flex-wrap gap-2 sm:mb-8">
+          {CATEGORY_LABELS.map((label) => (
+            <button
+              key={label}
+              type="button"
+              onClick={() => handleFilterChange(label)}
+              className={`rounded-full px-4 py-2 text-[13px] font-semibold transition-all sm:text-[14px] ${
+                activeFilter === label
+                  ? 'bg-cta-600 text-white shadow-sm'
+                  : 'bg-white text-prime-600 border border-prime-200 hover:border-cta-300 hover:text-cta-600'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <div className="space-y-3 sm:space-y-4">
+          {filteredItems.map((item) => (
             <FaqItem
               key={item.id}
               question={item.question}
               answer={item.answer}
               isOpen={openIds.has(item.id)}
               onToggle={() => toggle(item.id)}
-              isLast={index === FAQ_ITEMS.length - 1}
             />
           ))}
         </div>

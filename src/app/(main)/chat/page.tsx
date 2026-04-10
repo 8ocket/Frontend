@@ -699,7 +699,10 @@ export default function ChatPage() {
   const finalizeAbortRef = useRef<AbortController | null>(null);
   /** 감정 카드 앞면 이미지 캡처용 */
   const captureCardRef = useRef<HTMLDivElement>(null);
-  const [capturePayload, setCapturePayload] = useState<{ data: EmotionCardData; summaryId: string } | null>(null);
+  const [capturePayload, setCapturePayload] = useState<{
+    data: EmotionCardData;
+    summaryId: string;
+  } | null>(null);
   /** 60분 미입력 자동 종료 타이머 */
   const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -743,10 +746,13 @@ export default function ChatPage() {
   // 60분 미입력 자동 종료 타이머 — 세션 활성 상태에서만 동작
   const resetInactivityTimer = useCallback(() => {
     if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
-    inactivityTimerRef.current = setTimeout(() => {
-      setIsSessionActive(false);
-      finalizeAbortRef.current?.abort();
-    }, 60 * 60 * 1000);
+    inactivityTimerRef.current = setTimeout(
+      () => {
+        setIsSessionActive(false);
+        finalizeAbortRef.current?.abort();
+      },
+      60 * 60 * 1000
+    );
   }, []);
 
   useEffect(() => {
@@ -928,7 +934,13 @@ export default function ChatPage() {
           // 텍스트 버블 대신 감정 카드 버블 표시
           if (capturedResult) {
             const cardData = finalizeToEmotionCardData(capturedResult, capturedSessionId);
-            setAppendMessage({ variant: 'ai', senderName: '나봄이', avatarSrc: activeAiAvatarSrc, emotionCardData: cardData, cardImageUrl: capturedResult.card_image_url });
+            setAppendMessage({
+              variant: 'ai',
+              senderName: '나봄이',
+              avatarSrc: activeAiAvatarSrc,
+              emotionCardData: cardData,
+              cardImageUrl: capturedResult.card_image_url,
+            });
             setCapturePayload({ data: cardData, summaryId: capturedResult.summary_id });
           }
         },
@@ -939,17 +951,24 @@ export default function ChatPage() {
       closeModal();
       const code = err instanceof Error ? err.message : '';
       const message =
-        code === 'SESSION_ALREADY_SAVED' ? '이미 저장된 상담입니다.' :
-        code === 'SESSION_TOO_SHORT' ? '상담이 너무 짧아 기록을 생성할 수 없습니다.' :
-        code === 'SESSION_NOT_FOUND' ? '세션을 찾을 수 없습니다.' :
-        '마음 기록 생성에 실패했습니다.';
-      setAppendMessage({ variant: 'ai', senderName: '나봄이', avatarSrc: activeAiAvatarSrc, content: message });
+        code === 'SESSION_ALREADY_SAVED'
+          ? '이미 저장된 상담입니다.'
+          : code === 'SESSION_TOO_SHORT'
+            ? '상담이 너무 짧아 기록을 생성할 수 없습니다.'
+            : code === 'SESSION_NOT_FOUND'
+              ? '세션을 찾을 수 없습니다.'
+              : '마음 기록 생성에 실패했습니다.';
+      setAppendMessage({
+        variant: 'ai',
+        senderName: '나봄이',
+        avatarSrc: activeAiAvatarSrc,
+        content: message,
+      });
     }
   };
 
   return (
     <div className="layout-container bg-bg-light relative flex h-[calc(100dvh-4rem)] min-h-0 overflow-hidden md:h-[calc(100dvh-5rem)]">
-
       {/* 모바일 사이드바 오버레이 */}
       {sidebarOpen && (
         <div
@@ -1063,13 +1082,20 @@ export default function ChatPage() {
       {capturePayload && (
         <div
           ref={captureCardRef}
-          style={{ position: 'fixed', left: '-9999px', top: 0, width: 400, height: 686, pointerEvents: 'none' }}
+          style={{
+            position: 'fixed',
+            left: '-9999px',
+            top: 0,
+            width: 400,
+            height: 686,
+            pointerEvents: 'none',
+          }}
         >
           <EmotionCardFront
             layers={capturePayload.data.layers}
-            emotionLabel={
-              (capturePayload.data.layers.find((l) => l.role === 'primary')?.type ?? 'emotion').toUpperCase()
-            }
+            emotionLabel={(
+              capturePayload.data.layers.find((l) => l.role === 'primary')?.type ?? 'emotion'
+            ).toUpperCase()}
             width={400}
             height={686}
           />
