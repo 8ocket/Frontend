@@ -1,5 +1,10 @@
 import { api } from '@/shared/api/axios';
-import { CreditApiResponse, CreditProductResponse, MyCreditResponse, PaymentHistoryResponse } from './model';
+import {
+  CreditApiResponse,
+  CreditProductResponse,
+  MyCreditResponse,
+  PaymentHistoryResponse,
+} from './model';
 import { USE_MOCK } from '@/shared/lib/env';
 import { safeParse } from '@/shared/lib/utils/parse';
 import {
@@ -35,7 +40,7 @@ export const getCreditProductsApi = async (): Promise<CreditProductResponse[]> =
  */
 export const getMyCreditApi = async (): Promise<MyCreditResponse> => {
   if (USE_MOCK) {
-    return { totalCredit: 150 }; // 예시로 150 크레딧 반환
+    return { totalCredit: 150, transactions: [] };
   }
 
   const response = await api.get<CreditApiResponse<MyCreditResponse>>('/credits/me');
