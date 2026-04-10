@@ -86,7 +86,7 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
         const occ = profile.occupation
           ? (OCCUPATION_LABEL[profile.occupation] ?? '대학생 / 대학원생')
           : '대학생 / 대학원생';
-        const age = profile.age_group ? (AGE_LABEL[profile.age_group] ?? '20대') : '20대';
+        const age = profile.age ? (AGE_LABEL[profile.age] ?? '20대') : '20대';
         const gen = profile.gender ? (GENDER_LABEL[profile.gender] ?? '남성') : '남성';
 
         setNickname(nick);
@@ -140,17 +140,21 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
     const trimmed = nickname.trim();
     setSaving(true);
     try {
-      await updateMyProfileApi(trimmed, selectedFile, {
-        age_group: AGE_MAP[ageGroup],
-        occupation: OCCUPATION_MAP[occupation],
-        gender: GENDER_MAP[gender],
-      });
+      const updatedProfile = await updateMyProfileApi(
+        nicknameChanged ? trimmed : undefined,
+        selectedFile,
+        {
+          age: AGE_MAP[ageGroup],
+          occupation: OCCUPATION_MAP[occupation],
+          gender: GENDER_MAP[gender],
+        }
+      );
 
       if (user) {
         setUser({
           ...user,
-          name: trimmed,
-          profileImage: profileImage ?? '/images/icons/profile-default.png',
+          name: updatedProfile.nickname,
+          profileImage: updatedProfile.profile_image_url ?? '/images/icons/profile-default.png',
         });
       }
 
