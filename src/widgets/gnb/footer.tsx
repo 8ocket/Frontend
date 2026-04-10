@@ -6,9 +6,11 @@ const FOOTER_LINKS = [
   { label: 'AI 이용 안내', href: '/terms/aiServiceTerm' },
 ];
 
-export function Footer() {
+export function Footer({ seamless }: { seamless?: boolean }) {
   return (
-    <footer className="mt-auto border-t border-[#eee] bg-[#fafafa] pb-10 pt-3">
+    <footer
+      className={`relative z-10 mt-auto pb-10 pt-3 ${seamless ? 'bg-[#F8FAFC]' : 'border-t border-[#eee] bg-[#fafafa]'}`}
+    >
       <div className="mx-auto flex max-w-360 flex-col gap-y-2 px-8 sm:px-12 md:flex-row md:items-center md:justify-between">
         {/* 약관 링크 */}
         <nav className="flex flex-wrap items-center gap-y-1">

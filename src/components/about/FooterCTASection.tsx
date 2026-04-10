@@ -17,19 +17,30 @@ export function FooterCTASection() {
 
   return (
     // min-h-screen을 사용하여 아랫 공간을 충분히 확보합니다.
-    <section className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden pt-40 pb-20">
-      {/* --- [1번 전략] 배경 이미지 연장 --- */}
-      <div className="absolute inset-0 z-0">
+    <section className="relative flex w-full flex-col items-center justify-center pt-32 pb-24">
+      {/* 배경 레이어 — -bottom-32로 푸터 영역까지 연장 */}
+      <div className="absolute inset-x-0 top-0 -bottom-32 z-0">
+        {/* 물결 패턴 */}
         <div
-          className="absolute inset-0 opacity-15 transition-opacity duration-1000"
+          className="absolute inset-0"
           style={{
+            opacity: 0.85,
             backgroundImage: "url('/images/backgrounds/brandInfo-bg.png')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'bottom center', // 물결의 하단부가 보이도록 설정
+            backgroundSize: '120%',
+            backgroundPosition: 'center',
           }}
         />
-        {/* 하단 페이드: 배경색(#F8FAFC)으로 아주 길고 부드럽게 녹아들게 합니다. */}
-        <div className="absolute inset-x-0 bottom-0 h-[40vh] bg-gradient-to-t from-[#F8FAFC] to-transparent" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(ellipse 70% 55% at 50% 48%, rgba(248,250,252,0.82) 0%, rgba(248,250,252,0.35) 55%, transparent 80%)',
+          }}
+        />
+        {/* 상단 페이드 */}
+        <div className="absolute inset-x-0 top-0 h-[20vh] bg-linear-to-b from-[#F8FAFC] to-transparent" />
+        {/* 하단 페이드 */}
+        <div className="absolute inset-x-0 bottom-0 h-[50%] bg-linear-to-t from-[#F8FAFC] to-transparent" />
       </div>
 
       {/* 콘텐츠 영역 */}
@@ -39,7 +50,11 @@ export function FooterCTASection() {
       >
         {/* 메인 메시지 및 버튼 */}
         <div className="mb-12 flex flex-col items-center gap-6">
-          <h2 className="text-[40px] font-bold tracking-tight text-[#1A222E]">물처럼, 유연하게</h2>
+          <h2 className="font-sans text-[44px] leading-[1.35] font-extrabold tracking-[-1px] text-[#0D1520] drop-shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
+            물처럼 유연하게
+            <br />
+            거울처럼 선명하게
+          </h2>
           <p className="max-w-2xl text-[20px] leading-[1.7] whitespace-pre-line text-[#3F527E] opacity-90">
             {`감정을 억누르거나 부정하실 필요는 없어요.\n때로는 흘러가게 두고, 가만히 들여다보는 것만으로도 충분합니다.`}
           </p>
@@ -49,7 +64,7 @@ export function FooterCTASection() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.98 }}
           onClick={handleCTA}
-          className="mb-[25vh] rounded-full bg-[#82C8FF] px-16 py-5 text-[18px] font-semibold text-white shadow-xl shadow-blue-100/50"
+          className="rounded-full bg-[#82C8FF] px-16 py-5 text-[18px] font-semibold text-white shadow-xl shadow-blue-100/50"
         >
           AI 상담 시작하기
         </motion.button>
