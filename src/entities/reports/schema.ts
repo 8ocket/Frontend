@@ -1,7 +1,9 @@
 import { z } from 'zod';
 
 // 리포트 타입
-export const ReportTypeSchema = z.enum(['weekly', 'monthly']);
+export const ReportTypeSchema = z
+  .enum(['weekly', 'monthly', 'WEEKLY', 'MONTHLY'])
+  .transform((v) => v.toLowerCase() as 'weekly' | 'monthly');
 
 // 리포트 목록 아이템
 export const ReportListItemSchema = z.object({
