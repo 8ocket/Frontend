@@ -22,7 +22,7 @@ export function SignupCreditModal({ isOpen, onConfirm }: SignupCreditModalProps)
       {/* 카드 */}
       <div className="flex w-full max-w-142 flex-col items-center gap-8 rounded-2xl border border-white/40 bg-white/70 px-10 py-10 shadow-[0px_8px_32px_0px_rgba(0,0,0,0.08)]">
         {/* 로고 아이콘 */}
-        <div className="relative size-24">
+        <div className="relative size-12">
           <Image
             src="/images/logo/logo-small.svg"
             alt="MindLog"
