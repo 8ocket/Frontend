@@ -189,6 +189,11 @@ export function ChatMainArea({
           ]);
           setStreamingText('');
           setIsStreaming(false);
+        },
+        (errorMessage) => {
+          console.error('SSE error:', errorMessage);
+          setStreamingText('');
+          setIsStreaming(false);
         }
       );
     } catch (err) {

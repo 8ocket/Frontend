@@ -62,7 +62,7 @@ export interface SendMessageRequest {
 }
 
 // SSE 이벤트 타입
-export type SSEEventType = 'ai_chunk' | 'ai_complete' | 'crisis_check' | 'done';
+export type SSEEventType = 'ai_chunk' | 'ai_complete' | 'crisis_check' | 'done' | 'error';
 
 export interface SSEChunkEvent {
   content: string;

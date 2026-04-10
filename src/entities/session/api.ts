@@ -183,7 +183,8 @@ export const finalizeSessionStream = async (
   onStatus: (step: string, message: string) => void,
   onComplete: (data: FinalizeCompleteEvent) => void,
   onDone: () => void,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  onError?: (message: string) => void
 ): Promise<void> => {
   if (USE_MOCK) return mockFinalizeSession(onStatus, onComplete, onDone);
 
@@ -237,6 +238,7 @@ export const finalizeSessionStream = async (
             const data = JSON.parse(raw);
             if (currentEvent === 'status') onStatus(data.step, data.message);
             if (currentEvent === 'ai_complete') onComplete(data);
+            if (currentEvent === 'server_error' || currentEvent === 'error') onError?.(data.content ?? data.message);
           } catch {
             // malformed JSON 무시
           }

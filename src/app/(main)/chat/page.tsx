@@ -932,7 +932,12 @@ export default function ChatPage() {
             setCapturePayload({ data: cardData, summaryId: capturedResult.summary_id });
           }
         },
-        controller.signal
+        controller.signal,
+        (errorMessage) => {
+          closeModal();
+          console.error('Finalize SSE error:', errorMessage);
+          setAppendMessage({ variant: 'ai', senderName: '나봄이', avatarSrc: activeAiAvatarSrc, content: '마음 기록 생성 중 오류가 발생했습니다.' });
+        }
       );
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') return;
