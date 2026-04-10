@@ -58,17 +58,17 @@ export const mockGetMyProfile = (): UserProfileResponse => ({
   profile_image_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=test',
   nickname: '테스트 사용자',
   nickname_change_count: 0,
-  age_group: 20,
+  age: 20,
   occupation: 'STUDENT',
   gender: 'MALE',
 });
 
 /** PATCH /v1/users/me/profile */
 export const mockUpdateMyProfile = (
-  nickName: string,
+  nickName: string | undefined,
   profileImage?: File,
   options?: {
-    age_group?: AgeGroup | null;
+    age?: AgeGroup | null;
     occupation?: OccupationType | null;
     gender?: Gender | null;
   }
@@ -79,7 +79,7 @@ export const mockUpdateMyProfile = (
     : 'https://api.dicebear.com/7.x/avataaars/svg?seed=test',
   nickname: nickName || '테스트 사용자',
   updated_at: new Date().toISOString(),
-  age_group: options?.age_group ?? 20,
+  age: options?.age ?? 20,
   occupation: options?.occupation ?? 'STUDENT',
   gender: options?.gender ?? 'MALE',
 });

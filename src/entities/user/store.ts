@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { setCookie, deleteCookie } from '@/shared/lib/utils/cookie';
 import { User } from '@/entities/user/model';
+import { useCreditStore } from '@/entities/credits/store';
 
 interface AuthState {
   user: User | null;
@@ -40,6 +41,7 @@ export const useAuthStore = create<AuthState>()(
       logout: () => {
         deleteCookie('accessToken');
         deleteCookie('refreshToken');
+        useCreditStore.getState().resetCredits();
         set({ user: null, isAuthenticated: false });
       },
 

@@ -134,6 +134,7 @@ function CardOverlay({ data, onClose }: { data: SummaryListItem; onClose: () => 
                   src={data.backImageUrl}
                   alt="마음 기록 카드 뒷면"
                   fill
+                  sizes="(max-width: 768px) 100vw, 400px"
                   className="object-cover"
                 />
                 <div className="absolute inset-x-4 top-12 bottom-12 overflow-y-auto rounded-2xl bg-white/80 p-5 backdrop-blur-md">

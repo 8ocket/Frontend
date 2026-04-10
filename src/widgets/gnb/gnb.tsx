@@ -120,6 +120,7 @@ export function GNB() {
               src="/images/logo/logo-small.svg"
               alt="MindLog"
               fill
+              sizes="32px"
               className="object-contain"
             />
           </div>

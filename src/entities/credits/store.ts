@@ -12,6 +12,7 @@ interface CreditState {
   addFreeCredit: (amount: number) => void;
   usePaidCredit: (amount: number) => void;
   useFreeCredit: (amount: number) => void;
+  resetCredits: () => void;
 }
 
 export const useCreditStore = create<CreditState>()(
@@ -30,6 +31,7 @@ export const useCreditStore = create<CreditState>()(
         set((state) => ({ paidCredit: Math.max(0, state.paidCredit - amount) })),
       useFreeCredit: (amount) =>
         set((state) => ({ freeCredit: Math.max(0, state.freeCredit - amount) })),
+      resetCredits: () => set({ totalCredit: 0, paidCredit: 0, freeCredit: 0 }),
     }),
     {
       name: 'credit-storage',

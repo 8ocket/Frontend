@@ -17,16 +17,23 @@ export interface CreditBalanceResponse {
   freeCredit: number;
 }
 
+export interface CreditTransaction {
+  transactionType: string;
+  amount: number;
+  createdAt: string;
+}
+
 export interface MyCreditResponse {
   totalCredit: number;
+  transactions: CreditTransaction[];
 }
 
 export interface PaymentHistoryItem {
-  paymentId: string;
+  paymentId?: string;
   amount: number;
   orderName: string;
   status: string;
-  approvedAt: string;
+  approvedAt: string | null;
 }
 
 export interface PaymentHistoryResponse {
