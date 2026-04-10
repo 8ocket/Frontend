@@ -143,6 +143,7 @@ export interface SessionDetailResponse {
   status: string;
   messages: SessionDetailMessage[];
   has_summary: boolean;
+  card_image_url?: string;
 }
 
 export interface SessionCheckpointMapping {

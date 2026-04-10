@@ -778,14 +778,25 @@ export default function ChatPage() {
   // 세션 상세 → ChatBubbleProps[] 변환 (API는 최신→과거 순, 표시는 과거→최신)
   const activeMessages = useMemo((): ChatBubbleProps[] => {
     if (!sessionDetail) return [];
-    return [...sessionDetail.messages].reverse().map((m) => ({
+    const messages: ChatBubbleProps[] = [...sessionDetail.messages].reverse().map((m) => ({
       variant: m.role === 'assistant' ? 'ai' : 'user',
       senderName: m.role === 'assistant' ? '나봄이' : (user?.name ?? '나'),
       content: m.content,
       avatarSrc: m.role === 'assistant' ? '/images/personas/nabomi-44.png' : undefined,
       userAvatarSrc: m.role === 'user' ? (user?.profileImage ?? undefined) : undefined,
     }));
-  }, [sessionDetail]);
+
+    if (sessionDetail.status === 'SAVED' && sessionDetail.card_image_url) {
+      messages.push({
+        variant: 'ai',
+        senderName: '나봄이',
+        avatarSrc: '/images/personas/nabomi-44.png',
+        cardImageUrl: sessionDetail.card_image_url,
+      });
+    }
+
+    return messages;
+  }, [sessionDetail, user]);
 
   const activeAiName = '나봄이';
   const activeAiAvatarSrc = '/images/personas/nabomi-44.png';

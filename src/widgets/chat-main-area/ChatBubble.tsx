@@ -83,6 +83,9 @@ export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatar
             </button>
           )}
         </div>
+      ) : cardImageUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={cardImageUrl} alt="마음 기록 카드" className="rounded-2xl object-cover shadow-sm" style={{ width: 200 }} />
       ) : (
         <div
           className={[
