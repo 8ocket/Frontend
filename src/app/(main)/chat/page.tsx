@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCreditStore } from '@/entities/credits/store';
 import { useAuthStore } from '@/entities/user/store';
 import type { ChatBubbleProps } from '@/widgets/chat-main-area';
@@ -684,6 +684,7 @@ export default function ChatPage() {
   const { toast } = useToast();
   const remainingCredits = totalCredit;
 
+  const searchParams = useSearchParams();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSessionId, setActiveSessionId] = useState<string | undefined>(undefined);
   const [unfinishedSession, setUnfinishedSession] = useState<ActiveSessionResponse | null>(null);
@@ -807,6 +808,15 @@ export default function ChatPage() {
     }
     return Array.from(groupMap.values());
   }, [sessionList]);
+
+  // ── ?session= 쿼리로 세션 자동 선택 ──────────────────────────────
+  useEffect(() => {
+    const sessionId = searchParams.get('session');
+    if (sessionId) {
+      handleSelectSession(sessionId);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── 진입 시 미완료 세션 확인 + 세션 목록 조회 ──────────────────
   useEffect(() => {
