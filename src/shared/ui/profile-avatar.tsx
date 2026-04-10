@@ -23,7 +23,6 @@ export function ProfileAvatar({
 
   const isDefault = !src || src === DEFAULT_PROFILE || imgError;
   const imgSrc = isDefault ? DEFAULT_PROFILE : src;
-
   const isExternal = !isDefault && imgSrc.startsWith('http');
 
   if (isDefault) {
