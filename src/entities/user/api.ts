@@ -100,10 +100,10 @@ export const getMyProfileApi = async (): Promise<UserProfileResponse> => {
  * PATCH /v1/users/me/profile
  */
 export const updateMyProfileApi = async (
-  nickName: string,
+  nickName?: string,
   profileImage?: File,
   options?: {
-    age_group?: AgeGroup | null;
+    age?: AgeGroup | null;
     occupation?: OccupationType | null;
     gender?: Gender | null;
   }
@@ -117,8 +117,9 @@ export const updateMyProfileApi = async (
   // 백엔드 @RequestPart("profile_image")가 required이므로 파일 없을 땐 빈 Blob 전송
   formData.append('profile_image', profileImage ?? new Blob(), profileImage?.name ?? '');
 
-  const contents: Record<string, unknown> = { nickname: nickName };
-  if (options?.age_group !== undefined) contents.age_group = options.age_group;
+  const contents: Record<string, unknown> = {};
+  if (nickName !== undefined) contents.nickname = nickName;
+  if (options?.age !== undefined) contents.age = options.age;
   if (options?.occupation !== undefined) contents.occupation = options.occupation;
   if (options?.gender !== undefined) contents.gender = options.gender;
 
@@ -128,13 +129,7 @@ export const updateMyProfileApi = async (
   formData.append('contents', contentsBlob);
 
   // 백엔드가 ApiResult로 래핑하지 않고 직접 반환
-  const response = await api.patch<UpdateMyProfileResponse>(
-    '/users/me/profile',
-    formData,
-    {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    }
-  );
+  const response = await api.patch<UpdateMyProfileResponse>('/users/me/profile', formData);
 
   return safeParse(UpdateMyProfileResponseSchema, response.data);
 };
