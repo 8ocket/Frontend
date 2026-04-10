@@ -24,7 +24,7 @@ export type ChatBubbleProps = {
 
 export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatarSrc, isLoading, emotionCardData, cardImageUrl }: ChatBubbleProps) {
   const isAi = variant === 'ai';
-  const resolvedAvatarSrc = isAi ? (avatarSrc ?? '/images/personas/nabomi-44.png') : avatarSrc;
+  const resolvedAvatarSrc = avatarSrc ?? '/images/personas/nabomi-44.png';
 
   const handleDownload = () => {
     if (!cardImageUrl) return;

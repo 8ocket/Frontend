@@ -114,8 +114,6 @@ export function ChatDemoSection() {
                   variant="user"
                   senderName="YOU"
                   content={USER_MESSAGE}
-                  avatarSrc={undefined}
-                  userAvatarSrc={undefined}
                 />
               </motion.div>
             )}
@@ -150,7 +148,6 @@ export function ChatDemoSection() {
                   senderName="정신건강 상담사"
                   content={AI_MESSAGE}
                   avatarSrc="/images/personas/mental.png"
-                  userAvatarSrc={undefined}
                 />
               </motion.div>
             )}

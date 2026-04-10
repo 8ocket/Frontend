@@ -1,6 +1,7 @@
 export interface SummaryListItem {
   summaryId: string;
   cardId: string;
+  sessionId: string;
   frontImageUrl: string;
   backImageUrl: string;
   createdAt: string;
