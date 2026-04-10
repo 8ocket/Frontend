@@ -8,6 +8,7 @@ import {
   ActiveSessionResponse,
   SessionDetailResponse,
   FinalizeCompleteEvent,
+  SessionProgressResponse,
 } from '@/entities/session/model';
 import {
   mockGetSessions,
@@ -16,6 +17,7 @@ import {
   mockGetSessionDetail,
   mockFinalizeSession,
   mockDeleteSession,
+  mockGetSessionProgress,
 } from '@/mocks';
 import { createHttpStatusError } from '@/shared/lib/utils/error';
 import { USE_MOCK } from '@/shared/lib/env';
@@ -87,7 +89,7 @@ export const createSessionStream = async (
   const response = await fetch(`${API_BASE_URL}/sessions`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${token}`,
+      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(req),
@@ -255,4 +257,21 @@ export const finalizeSessionStream = async (
 
   // done 이벤트 없이 스트림이 종료된 경우 fallback
   if (!doneHandled) onDone();
+};
+
+/**
+ * 리포트 달성률 조회 API
+ * GET /v1/sessions/me/progress
+ */
+export const getSessionProgressApi = async (): Promise<SessionProgressResponse[]> => {
+  if (USE_MOCK) return mockGetSessionProgress();
+
+  const response =
+    await api.get<ApiResponse<SessionProgressResponse[]>>('/sessions/me/progress');
+
+  if (response.data.success && response.data.data) {
+    return response.data.data;
+  }
+
+  throw new Error(response.data.error?.message || '리포트 달성률 조회 실패');
 };

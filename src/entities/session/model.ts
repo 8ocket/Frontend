@@ -152,3 +152,14 @@ export interface SessionCheckpointMapping {
   created_at: Date | null; // 생성일시 / TIMESTAMP
   updated_at: Date | null; // 수정일시 / TIMESTAMP
 }
+
+// ─── /v1/sessions/me/progress (GET) - 리포트 달성률 조회 ───
+
+export type ProgressReportType = 'WEEKLY' | 'MONTHLY';
+
+export interface SessionProgressResponse {
+  report_type: ProgressReportType;
+  current_count: number;
+  required_count: number;
+  progress_percentage: number;
+}

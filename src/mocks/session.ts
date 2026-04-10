@@ -1,4 +1,4 @@
-import { SessionListQuery, SessionListResponse, SessionListItem, CreateSessionRequest, CreateSessionAiCompleteEvent, ActiveSessionResponse } from '@/entities/session';
+import { SessionListQuery, SessionListResponse, SessionListItem, CreateSessionRequest, CreateSessionAiCompleteEvent, ActiveSessionResponse, SessionProgressResponse } from '@/entities/session';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -128,3 +128,9 @@ export const mockSendMessageStream = async (
   }
   onDone();
 };
+
+/** GET /v1/sessions/me/progress */
+export const mockGetSessionProgress = (): SessionProgressResponse[] => [
+  { report_type: 'WEEKLY', current_count: 3, required_count: 5, progress_percentage: 60 },
+  { report_type: 'MONTHLY', current_count: 8, required_count: 15, progress_percentage: 53 },
+];

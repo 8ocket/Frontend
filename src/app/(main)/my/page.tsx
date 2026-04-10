@@ -7,7 +7,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ProfileEditDrawer } from '@/components/my/ProfileEditDrawer';
 import { ChevronRight, Coins, LogOut, MoreVertical, Trash2, X } from 'lucide-react';
 import { useAuthStore } from '@/entities/user/store';
-import { logoutApi, getMyProfileApi } from '@/entities/user/api';
+import { logoutApi, getMyProfileApi, withdrawUserApi } from '@/entities/user/api';
 import { getCookie } from '@/shared/lib/utils/cookie';
 import { useCreditStore } from '@/entities/credits/store';
 import { Button } from '@/shared/ui/button';
@@ -594,6 +594,10 @@ function MenuRow({
 // ── 회원탈퇴 확인 모달 ─────────────────────────────────────────────
 function DeleteAccountModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [confirmText, setConfirmText] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { logout } = useAuthStore();
+  const router = useRouter();
+  const { toast } = useToast();
   const isConfirmed = confirmText === '회원탈퇴';
 
   return (
@@ -665,14 +669,23 @@ function DeleteAccountModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                   type="button"
                   variant="primary"
                   semantic="red"
-                  disabled={!isConfirmed}
-                  onClick={() => {
-                    // TODO: 회원탈퇴 API 연동
-                    onClose();
+                  disabled={!isConfirmed || isLoading}
+                  onClick={async () => {
+                    setIsLoading(true);
+                    try {
+                      await withdrawUserApi();
+                      logout();
+                      router.replace('/about');
+                      toast('회원탈퇴가 완료되었습니다.', 'success');
+                    } catch {
+                      toast('회원탈퇴에 실패했습니다. 다시 시도해주세요.', 'error');
+                    } finally {
+                      setIsLoading(false);
+                    }
                   }}
                   className="flex-1 rounded-xl"
                 >
-                  탈퇴하기
+                  {isLoading ? '처리 중...' : '탈퇴하기'}
                 </Button>
               </div>
             </div>

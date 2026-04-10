@@ -18,6 +18,7 @@ import {
   mockGoogleLogin,
   mockGetMyProfile,
   mockUpdateMyProfile,
+  mockWithdrawUser,
 } from '@/mocks';
 import { USE_MOCK } from '@/shared/lib/env';
 import { safeParse } from '@/shared/lib/utils/parse';
@@ -241,4 +242,14 @@ export const signupApi = async (
   await api.patch('/users/signup', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
+};
+
+/**
+ * 회원 탈퇴 API
+ * DELETE /v1/users/me/withdraw
+ */
+export const withdrawUserApi = async (): Promise<void> => {
+  if (USE_MOCK) return mockWithdrawUser();
+
+  await api.delete('/users/me/withdraw');
 };

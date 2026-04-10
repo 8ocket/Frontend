@@ -56,7 +56,7 @@ export default function SupportPage() {
               className={`rounded-full px-4 py-2 text-[13px] font-semibold transition-all sm:text-[14px] ${
                 activeFilter === label
                   ? 'bg-cta-600 text-white shadow-sm'
-                  : 'bg-white text-prime-600 border border-prime-200 hover:border-cta-300 hover:text-cta-600'
+                  : 'text-prime-600 border-prime-200 hover:border-cta-300 hover:text-cta-600 border bg-white'
               }`}
             >
               {label}

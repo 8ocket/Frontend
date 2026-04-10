@@ -103,3 +103,8 @@ export const mockLogin = (email: string, password: string): AuthResponse | null 
     isNewUser: false,
   };
 };
+
+/** DELETE /v1/users/me/withdraw */
+export const mockWithdrawUser = async (): Promise<void> => {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+};
