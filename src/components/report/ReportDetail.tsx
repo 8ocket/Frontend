@@ -20,7 +20,7 @@ interface ReportDetailProps {
 }
 
 
-const CARD = 'rounded-[24px] border border-prime-100 bg-white p-10 shadow-sm';
+const CARD = 'rounded-[24px] border border-prime-100 bg-white p-5 md:p-10 shadow-sm';
 
 export function ReportDetail({ report }: ReportDetailProps) {
   const [emotionData, setEmotionData] = useState<EmotionDataPoint[]>([]);
@@ -110,7 +110,7 @@ export function ReportDetail({ report }: ReportDetailProps) {
                 </span>
               )}
             </div>
-            <h1 className="text-prime-900 mb-3 text-[36px] font-bold tracking-tight">
+            <h1 className="text-prime-900 mb-3 text-2xl font-bold tracking-tight md:text-[36px]">
               {report.title}
             </h1>
             <div className="text-prime-500 flex flex-wrap items-center gap-4">
@@ -262,7 +262,7 @@ export function ReportDetail({ report }: ReportDetailProps) {
               {[0, 1].map((i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-6 rounded-3xl p-7"
+                  className="flex items-start gap-4 rounded-3xl p-4 md:items-center md:gap-6 md:p-7"
                   style={{ background: 'rgba(130,201,255,0.2)' }}
                 >
                   <div
@@ -281,7 +281,7 @@ export function ReportDetail({ report }: ReportDetailProps) {
             suggestions.map((suggestion, i) => (
               <div
                 key={suggestion.title}
-                className="flex items-center gap-6 rounded-3xl p-7"
+                className="flex items-start gap-4 rounded-3xl p-4 md:items-center md:gap-6 md:p-7"
                 style={{ background: 'rgba(130,201,255,0.2)' }}
               >
                 <div

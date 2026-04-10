@@ -49,7 +49,7 @@ export function IntroSection() {
 
   return (
     // 1. 전체 화면을 꽉 채우는 컨테이너 설정
-    <section className="relative flex h-screen w-full flex-col items-center overflow-hidden">
+    <section className="relative flex min-h-screen-safe w-full flex-col items-center overflow-hidden">
       {/* 2. 배경 레이어 그룹: AboutPage에서 이동됨 */}
       <div className="absolute inset-0 z-0">
         <div

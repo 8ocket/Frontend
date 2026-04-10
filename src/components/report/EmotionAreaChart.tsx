@@ -62,7 +62,7 @@ export function EmotionAreaChart({ data, type }: EmotionAreaChartProps) {
   } as const;
 
   return (
-    <div className="border-prime-100 rounded-[24px] border bg-white p-10 shadow-sm">
+    <div className="border-prime-100 rounded-[24px] border bg-white p-5 shadow-sm md:p-10">
       {/* 헤더 */}
       <div className="mb-8">
         <div className="mb-3 flex items-center justify-between">

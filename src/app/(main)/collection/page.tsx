@@ -310,7 +310,7 @@ export default function CollectionPage() {
                 animate="center"
                 exit="exit"
                 transition={{ duration: 0.35, ease: 'easeInOut' }}
-                className="grid grid-cols-7 gap-x-6 gap-y-10"
+                className="grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 sm:gap-x-4 md:gap-x-6 md:gap-y-10"
               >
                 {monthCards.map((card) => (
                   <GridCard

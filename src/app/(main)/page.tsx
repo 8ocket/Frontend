@@ -612,7 +612,7 @@ export default function Home() {
       {/* ── Floating AI 상담 버튼 ─────────────────────────────────────────────── */}
       <div
         className="fixed right-6 bottom-10 z-50 sm:right-8 sm:bottom-12"
-        style={{ width: 110, height: 110 }}
+        style={{ width: 'clamp(80px, 20vw, 110px)', height: 'clamp(80px, 20vw, 110px)' }}
       >
         {/* 글로우 레이어 */}
         <div

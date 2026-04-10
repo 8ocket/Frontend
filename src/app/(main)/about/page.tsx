@@ -10,7 +10,7 @@ export default function AboutPage() {
   return (
     // 가로 스크롤 방지
     <div className="relative -mt-16 min-h-screen overflow-x-hidden md:-mt-20">
-      <main className="flex w-full flex-col items-center" style={{ gap: 320, paddingBottom: 0 }}>
+      <main className="flex w-full flex-col items-center" style={{ gap: 'clamp(80px, 15vw, 320px)', paddingBottom: 0 }}>
         <IntroSection />
         <ChatDemoSection />
         <SmallCardsSection />
