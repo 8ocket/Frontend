@@ -102,7 +102,7 @@ export default function NicknamePage() {
         {
           ...(user ?? { id: '', email: '' }),
           name: nickname,
-          profileImage: profileImage ?? '/images/icons/profile-default.png',
+          profileImage: profileImage ?? undefined,
         },
         token,
         refreshToken

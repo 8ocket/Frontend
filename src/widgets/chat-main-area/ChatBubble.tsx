@@ -5,6 +5,7 @@
 
 import { EmotionCard } from '@/widgets/emotion-card';
 import type { EmotionCardData } from '@/entities/emotion';
+import { ProfileAvatar } from '@/shared/ui/profile-avatar';
 
 export type BubbleVariant = 'ai' | 'user';
 
@@ -20,24 +21,6 @@ export type ChatBubbleProps = {
   /** 감정 카드 다운로드 URL (백엔드 생성 이미지) */
   cardImageUrl?: string;
 };
-
-// User Profile Photo — 21×21 흰 원 + 사용자 실루엣 벡터 (fill=#2b4764)
-function UserProfilePhoto() {
-  return (
-    <div className="flex h-5.25 w-5.25 shrink-0 items-center justify-center rounded-full bg-slate-100">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path
-          d="M8 8C9.933 8 11.5 6.433 11.5 4.5C11.5 2.567 9.933 1 8 1C6.067 1 4.5 2.567 4.5 4.5C4.5 6.433 6.067 8 8 8Z"
-          fill="#2b4764"
-        />
-        <path
-          d="M8 9.5C4.686 9.5 2 11.01 2 12.875V14H14V12.875C14 11.01 11.314 9.5 8 9.5Z"
-          fill="#2b4764"
-        />
-      </svg>
-    </div>
-  );
-}
 
 export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatarSrc, isLoading, emotionCardData, cardImageUrl }: ChatBubbleProps) {
   const isAi = variant === 'ai';
@@ -65,13 +48,10 @@ export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatar
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={resolvedAvatarSrc} alt={senderName} className="h-full w-full object-cover" />
           </div>
-        ) : userAvatarSrc ? (
-          <div className="h-5.25 w-5.25 shrink-0 overflow-hidden rounded-full">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={userAvatarSrc} alt={senderName} className="h-full w-full object-cover" />
-          </div>
         ) : (
-          <UserProfilePhoto />
+          <div className="border-cta-300 bg-cta-100 relative h-5.25 w-5.25 shrink-0 overflow-hidden rounded-full border">
+            <ProfileAvatar src={userAvatarSrc} defaultPadding="p-1" />
+          </div>
         )}
 
         {/* TODO: 타이포그래피 토큰으로 전환 → isAi ? "subtitle-1" : "body-2" + text-prime-500 */}
