@@ -6,9 +6,6 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/shared/lib/utils';
-import { EmotionCardFront, EmotionCardBack, getEmotionDisplayName } from '@/widgets/emotion-card';
-import type { EmotionCardData } from '@/entities/emotion';
-import { getCollectionCardsApi } from '@/entities/emotion/api';
 import { EmotionColorLegend } from '@/widgets/emotion-color-legend';
 import { getSummaryListApi, getSummaryApi } from '@/entities/summary';
 import type { SummaryListItem, SummaryResponse } from '@/entities/summary';
@@ -195,7 +192,7 @@ function CardOverlay({ data, onClose }: { data: SummaryListItem; onClose: () => 
           transition={{ duration: 0.15 }}
         >
           <Link
-            href={`/chat?session=${data.summaryId}`}
+            href={`/chat?session=${data.sessionId}`}
             onClick={onClose}
             className={cn(
               'flex items-center justify-center rounded-lg border px-6 py-3.5',
@@ -243,8 +240,8 @@ export default function CollectionPage() {
   const [monthIndex, setMonthIndex] = useState(0);
   const [direction, setDirection] = useState<1 | -1>(1);
   const { data: cards = [] } = useQuery({
-    queryKey: ['collectionCards'],
-    queryFn: getCollectionCardsApi,
+    queryKey: ['summaryList'],
+    queryFn: () => getSummaryListApi().then((res) => res.content),
   });
 
   const groups = groupByMonth(cards);
