@@ -1017,7 +1017,12 @@ export default function ChatPage() {
           onDisabledInputClick={handleDisabledInputClick}
           appendMessage={appendMessage}
           sessionId={activeSessionId}
-          onSessionCreated={(id) => setActiveSessionId(id)}
+          onSessionCreated={(id) => {
+            setActiveSessionId(id);
+            getSessionsApi()
+              .then((res) => setSessionList(res.sessions))
+              .catch(() => {});
+          }}
           aiName={activeAiName}
           aiAvatarSrc={activeAiAvatarSrc}
           onUserMessage={resetInactivityTimer}
