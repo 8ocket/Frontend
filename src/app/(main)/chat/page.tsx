@@ -831,18 +831,20 @@ export default function ChatPage() {
 
   // ── 진입 시 미완료 세션 확인 + 세션 목록 조회 ──────────────────
   useEffect(() => {
-    getActiveSessionApi()
-      .then((session) => {
-        if (session) {
-          setUnfinishedSession(session);
-          openModal('unfinished-session');
-        }
-      })
-      .catch(() => {});
+    Promise.all([
+      getActiveSessionApi().catch(() => null),
+      getSessionsApi().catch(() => null),
+    ]).then(([activeSession, sessionData]) => {
+      const sessions = sessionData?.sessions ?? [];
+      setSessionList(sessions);
 
-    getSessionsApi()
-      .then((res) => setSessionList(res.sessions))
-      .catch(() => {});
+      if (activeSession) {
+        setUnfinishedSession(activeSession);
+        openModal('unfinished-session');
+      } else if (sessions.length === 0) {
+        openModal('new-session');
+      }
+    });
   }, [openModal]);
 
   // ── 핸들러 ───────────────────────────────────────────────────────
