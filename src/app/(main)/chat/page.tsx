@@ -1032,9 +1032,10 @@ export default function ChatPage() {
           sessionId={activeSessionId}
           onSessionCreated={(id) => {
             setActiveSessionId(id);
-            getSessionsApi()
-              .then((res) => setSessionList(res.sessions))
-              .catch(() => {});
+            setSessionList((prev) => [
+              { sessionId: id, title: '', status: 'ACTIVE', startedAt: new Date().toISOString() },
+              ...prev,
+            ]);
           }}
           aiName={activeAiName}
           aiAvatarSrc={activeAiAvatarSrc}
