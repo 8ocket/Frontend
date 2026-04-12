@@ -127,7 +127,7 @@ export function ChatMainArea({
 
       try {
         await createSessionStream(
-          { first_content: content, persona_id: '019d6ba8-b430-7aeb-b18f-919e08b5f500' },
+          { first_content: content },
           token,
           (chunk) => {
             accumulated += chunk;

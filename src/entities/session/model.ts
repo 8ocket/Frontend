@@ -40,7 +40,6 @@ export interface ActiveSessionResponse {
 
 export interface CreateSessionRequest {
   first_content: string;
-  persona_id: string;
 }
 
 // SSE 이벤트 순서: [ai_chunk × N] → ai_complete → session_title → done

@@ -35,7 +35,10 @@ export const sendMessageStream = async (
   if (!response.ok) throw createHttpStatusError(response.status);
 
   const reader = response.body?.getReader();
-  if (!reader) return;
+  if (!reader) {
+    onDone();
+    return;
+  }
 
   let currentEvent = '' as SSEEventType;
   const decoder = new TextDecoder();
