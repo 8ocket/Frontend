@@ -138,16 +138,17 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
       return;
     }
     const trimmed = nickname.trim();
+    const options = {
+      age: AGE_MAP[ageGroup],
+      occupation: OCCUPATION_MAP[occupation],
+      gender: GENDER_MAP[gender],
+    };
     setSaving(true);
     try {
       const updatedProfile = await updateMyProfileApi(
         nicknameChanged ? trimmed : undefined,
         selectedFile,
-        {
-          age: AGE_MAP[ageGroup],
-          occupation: OCCUPATION_MAP[occupation],
-          gender: GENDER_MAP[gender],
-        }
+        options
       );
 
       if (user) {
@@ -162,10 +163,36 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
       onClose();
       toast('프로필이 저장되었습니다.', 'success');
     } catch (err) {
-      const message =
-        err instanceof Error && err.message
-          ? err.message
-          : '프로필 저장에 실패했습니다. 다시 시도해 주세요.';
+      // 사진 포함 요청이 실패한 경우 사진 없이 재시도
+      if (selectedFile) {
+        try {
+          const updatedProfile = await updateMyProfileApi(
+            nicknameChanged ? trimmed : undefined,
+            undefined,
+            options
+          );
+
+          if (user) {
+            setUser({
+              ...user,
+              name: updatedProfile.nickname,
+              profileImage:
+                updatedProfile.profile_image_url ?? '/images/icons/profile-default.png',
+            });
+          }
+
+          onSaved?.();
+          onClose();
+          toast('사진 저장에 실패했습니다. 나머지 항목은 저장되었습니다.', 'error');
+          return;
+        } catch {
+          // 재시도도 실패하면 아래 공통 에러 처리로 진행
+        }
+      }
+
+      const axiosMessage =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      const message = axiosMessage || '프로필 저장에 실패했습니다. 다시 시도해 주세요.';
       toast(message, 'error');
     } finally {
       setSaving(false);
@@ -249,14 +276,16 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
                     onChange={(e) => setNickname(e.target.value)}
                     placeholder="닉네임을 입력하세요 (2~30자)"
                     maxLength={30}
-                    disabled={isNicknameChangeLimitReached}
+                    disabled={nicknameChangeCount >= 3}
                     className={`h-11 w-full rounded-xl border px-4 text-sm transition-colors focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:outline-none ${
                       nicknameValidation
                         ? 'border-error-400 bg-error-50 focus:border-error-400'
                         : 'border-prime-200 bg-secondary-50 focus:border-cta-300'
                     } text-prime-900 placeholder:text-prime-300 disabled:cursor-not-allowed disabled:opacity-60`}
                   />
-                  {nicknameValidation ? (
+                  {nicknameChangeCount >= 3 ? (
+                    <p className="text-error-500 text-xs">이번 달 닉네임 변경 횟수를 초과했습니다.</p>
+                  ) : nicknameValidation ? (
                     <p className="text-error-500 text-xs">{nicknameValidation}</p>
                   ) : (
                     <p className="text-prime-400 text-xs">

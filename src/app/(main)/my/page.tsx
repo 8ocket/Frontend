@@ -130,10 +130,19 @@ export default function MyPage() {
                     {user?.name ?? '사용자'}
                   </span>
                   {/* 직업 / 나이 / 성별 읽기 전용 */}
-                  <div className="text-prime-400 flex flex-wrap gap-x-2 gap-y-0.5 text-xs tracking-[-0.18px]">
-                    {profileOccupation && <span>{OCCUPATION_LABEL[profileOccupation]}</span>}
-                    {profileAge && <span>{AGE_LABEL[profileAge]}</span>}
-                    {profileGender && <span>{GENDER_LABEL[profileGender]}</span>}
+                  <div className="text-prime-400 flex flex-wrap items-center gap-x-1 gap-y-0.5 text-xs tracking-[-0.18px]">
+                    {[
+                      profileOccupation && OCCUPATION_LABEL[profileOccupation],
+                      profileAge && AGE_LABEL[profileAge],
+                      profileGender && GENDER_LABEL[profileGender],
+                    ]
+                      .filter(Boolean)
+                      .map((label, i, arr) => (
+                        <span key={label as string} className="flex items-center gap-1">
+                          {label}
+                          {i < arr.length - 1 && <span className="text-prime-200">·</span>}
+                        </span>
+                      ))}
                   </div>
                 </div>
                 <button
