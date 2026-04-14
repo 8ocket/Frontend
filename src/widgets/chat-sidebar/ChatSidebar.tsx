@@ -98,24 +98,7 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, on
             style={{ opacity: newCounselHovered ? 1 : 0 }}
           >
             <div
-              style={{
-                display: 'inline-flex',
-                padding: '10px',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: '10px',
-                borderRadius: '8px',
-                opacity: 0.5,
-                background: 'rgba(130, 201, 255, 0.20)',
-                color: '#1A222E',
-                textAlign: 'center',
-                fontFamily: 'Pretendard',
-                fontSize: '12px',
-                fontStyle: 'normal',
-                fontWeight: 500,
-                lineHeight: '120%',
-                letterSpacing: '-0.18px',
-              }}
+              className="inline-flex items-center justify-center gap-2.5 rounded-lg bg-main-blue/20 p-2.5 text-center text-xs font-medium leading-[120%] tracking-tight text-prime-900 opacity-50"
             >
               기본 무료 1회 · 추가 상담은 70 크레딧 차감
             </div>
@@ -128,10 +111,13 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, on
           onClick={onNewCounsel}
           onMouseEnter={() => setNewCounselHovered(true)}
           onMouseLeave={() => setNewCounselHovered(false)}
-          className="border-prime-200 text-prime-500 hover:border-main-blue hover:text-main-blue flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed py-2.5 text-sm font-semibold transition-all active:opacity-80"
-          style={{ fontFamily: 'var(--font-pretendard)' }}
+          onFocus={() => setNewCounselHovered(true)}
+          onBlur={() => setNewCounselHovered(false)}
+          onTouchStart={() => setNewCounselHovered(true)}
+          onTouchEnd={() => setNewCounselHovered(false)}
+          className="bg-main-blue text-white flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:bg-main-blue/90"
         >
-          <PlusCircle size={16} strokeWidth={2} className="text-main-blue" />
+          <PlusCircle size={16} strokeWidth={2} />
           새로운 상담
         </button>
       </div>
@@ -144,7 +130,6 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, on
             type="text"
             placeholder="검색"
             className="text-prime-900 placeholder:text-prime-400 w-full bg-transparent text-[13px] outline-none"
-            style={{ fontFamily: 'var(--font-pretendard)' }}
           />
         </div>
         <button
@@ -152,7 +137,6 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, on
           type="button"
           onClick={() => setFilterOpen((prev) => !prev)}
           className="border-prime-100 text-prime-500 hover:border-main-blue hover:text-main-blue rounded-lg border bg-[#F8FAFF] px-3 py-2 text-[13px] font-medium transition-colors"
-          style={{ fontFamily: 'var(--font-pretendard)' }}
         >
           필터
         </button>

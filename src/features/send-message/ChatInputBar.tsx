@@ -60,7 +60,7 @@ export function ChatInputBar({
         type="button"
         onClick={onEndChat}
         disabled={disabled}
-        className="group flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-50 transition-colors hover:bg-red-50 active:bg-red-100 disabled:opacity-40"
+        className="group flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-50 transition-colors hover:bg-red-50 active:bg-red-100 disabled:opacity-40"
       >
         <X
           size={16}
@@ -95,7 +95,7 @@ export function ChatInputBar({
         onClick={disabled ? onDisabledClick : handleSendClick}
         disabled={!disabled && !canSend}
         className={[
-          'flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all',
+          'flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all',
           canSend
             ? 'bg-blue-50 hover:bg-blue-100 active:bg-blue-200'
             : 'cursor-not-allowed bg-slate-50',

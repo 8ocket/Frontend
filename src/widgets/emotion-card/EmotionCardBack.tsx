@@ -61,6 +61,7 @@ export function EmotionCardBack({
   // 글래스 패널 내부 패딩
   const panelPadding = 14;
   const panelWidth = width - panelPadding * 2;
+  const panelHeight = Math.round(height * 0.82);
 
   return (
     <div
@@ -96,13 +97,14 @@ export function EmotionCardBack({
 
       {/* ─── 글래스모피즘 정보 패널 ─── */}
       <div
-        className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col gap-6 rounded-2xl px-5 py-6 backdrop-blur-md"
+        className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col justify-between rounded-2xl px-5 py-6 backdrop-blur-md"
         style={{
           width: panelWidth,
+          height: panelHeight,
           backgroundColor: 'rgba(252, 251, 249, 0.95)',
         }}
       >
-        <div className="flex w-full flex-col gap-6">
+        <div className="flex w-full flex-col gap-4 overflow-hidden">
           {/* 상담 요약 헤더 */}
           <motion.div {...sectionMotion(0, animated)}>
             <SummaryHeader

@@ -19,15 +19,8 @@ interface ReportDetailProps {
   report: Report;
 }
 
-const KEYWORD_STYLES = [
-  'bg-(--main-blue)/10 text-main-blue',
-  'bg-error-400/10 text-error-500',
-  'bg-success-700/10 text-success-700',
-  'bg-warning-500/10 text-warning-600',
-  'bg-prime-200/60 text-prime-600',
-];
 
-const CARD = 'rounded-[24px] border border-prime-100 bg-white p-10 shadow-sm';
+const CARD = 'rounded-[24px] border border-prime-100 bg-white p-5 md:p-10 shadow-sm';
 
 export function ReportDetail({ report }: ReportDetailProps) {
   const [emotionData, setEmotionData] = useState<EmotionDataPoint[]>([]);
@@ -117,7 +110,7 @@ export function ReportDetail({ report }: ReportDetailProps) {
                 </span>
               )}
             </div>
-            <h1 className="text-prime-900 mb-3 text-[36px] font-bold tracking-tight">
+            <h1 className="text-prime-900 mb-3 text-2xl font-bold tracking-tight md:text-[36px]">
               {report.title}
             </h1>
             <div className="text-prime-500 flex flex-wrap items-center gap-4">
@@ -177,13 +170,10 @@ export function ReportDetail({ report }: ReportDetailProps) {
               ))}
             </>
           ) : keywords.length > 0 ? (
-            keywords.map((kw, i) => (
+            keywords.map((kw) => (
               <div
                 key={kw.name}
-                className={cn(
-                  'flex items-center gap-3 rounded-3xl px-5 py-3.5 transition-all',
-                  KEYWORD_STYLES[i % KEYWORD_STYLES.length]
-                )}
+                className="bg-prime-100 text-prime-600 flex items-center gap-3 rounded-3xl px-5 py-3.5 transition-all"
               >
                 <span className="text-[15px] font-bold">#{kw.name}</span>
               </div>
@@ -241,33 +231,48 @@ export function ReportDetail({ report }: ReportDetailProps) {
 
       {/* ── 맞춤 행동 제언 ── */}
       <div
-        className="bg-main-blue animate-in fade-in-0 slide-in-from-bottom-4 rounded-[24px] p-12 shadow-sm"
-        style={{ animationDuration: '400ms', animationDelay: '320ms', animationFillMode: 'both' }}
+        className="animate-in fade-in-0 slide-in-from-bottom-4 flex flex-col gap-10 rounded-[24px] p-6"
+        style={{
+          animationDuration: '400ms',
+          animationDelay: '320ms',
+          animationFillMode: 'both',
+          background: 'rgba(130,201,255,0.1)',
+        }}
       >
-        <div className="mb-10 text-center">
-          <div className="mb-5 inline-flex size-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-            <Target className="size-8 text-white" />
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div
+            className="flex size-12 items-center justify-center rounded-full"
+            style={{ background: 'rgba(130,201,255,0.2)' }}
+          >
+            <Target className="size-6 text-prime-900" />
           </div>
-          <h3 className="text-prime-900 mb-3 text-[28px] font-bold tracking-tight">
-            맞춤 행동 제언
-          </h3>
-          <p className="text-prime-900/70 text-[15px]">
-            AI가 분석한 상태에 맞는 실천 가능한 액션 플랜
-          </p>
+          <div className="flex flex-col gap-4">
+            <h3 className="text-prime-900 text-2xl font-semibold tracking-tight">
+              맞춤 행동 제언
+            </h3>
+            <p className="text-prime-900 text-sm font-semibold">
+              AI가 분석한 상태에 맞는 실천 가능한 액션 플랜
+            </p>
+          </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           {isSuggestionsLoading ? (
             <>
               {[0, 1].map((i) => (
-                <div key={i} className="rounded-4xl border border-white/20 bg-white/10 p-7">
-                  <div className="flex items-start gap-5">
-                    <div className="size-10 shrink-0 animate-pulse rounded-full bg-white/20" />
-                    <div className="flex-1 space-y-3">
-                      <div className="h-4 w-1/3 animate-pulse rounded bg-white/20" />
-                      <div className="h-3 w-full animate-pulse rounded bg-white/10" />
-                      <div className="h-3 w-4/5 animate-pulse rounded bg-white/10" />
-                    </div>
+                <div
+                  key={i}
+                  className="flex items-start gap-4 rounded-3xl p-4 md:items-center md:gap-6 md:p-7"
+                  style={{ background: 'rgba(130,201,255,0.2)' }}
+                >
+                  <div
+                    className="size-11 shrink-0 animate-pulse rounded-full"
+                    style={{ background: 'rgba(130,201,255,0.3)' }}
+                  />
+                  <div className="flex-1 space-y-4">
+                    <div className="bg-prime-200 h-4 w-1/3 animate-pulse rounded" />
+                    <div className="bg-prime-100 h-3 w-full animate-pulse rounded" />
+                    <div className="bg-prime-100 h-3 w-4/5 animate-pulse rounded" />
                   </div>
                 </div>
               ))}
@@ -276,16 +281,20 @@ export function ReportDetail({ report }: ReportDetailProps) {
             suggestions.map((suggestion, i) => (
               <div
                 key={suggestion.title}
-                className="rounded-4xl border border-white/20 bg-white/10 p-7 backdrop-blur-sm transition-all hover:bg-white/15"
+                className="flex items-start gap-4 rounded-3xl p-4 md:items-center md:gap-6 md:p-7"
+                style={{ background: 'rgba(130,201,255,0.2)' }}
               >
-                <div className="flex items-start gap-5">
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                    <span className="text-lg font-bold text-white">{i + 1}</span>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="mb-3 text-[17px] font-bold text-white">{suggestion.title}</h4>
-                    <p className="text-sm leading-relaxed text-white/90">{suggestion.content}</p>
-                  </div>
+                <div
+                  className="flex size-11 shrink-0 items-center justify-center rounded-full"
+                  style={{ background: 'rgba(130,201,255,0.3)' }}
+                >
+                  <span className="text-prime-900 text-xl font-semibold">{i + 1}</span>
+                </div>
+                <div className="flex flex-col gap-4">
+                  <h4 className="text-prime-900 text-xl font-semibold leading-snug">
+                    {suggestion.title}
+                  </h4>
+                  <p className="text-prime-900 text-base leading-relaxed">{suggestion.content}</p>
                 </div>
               </div>
             ))

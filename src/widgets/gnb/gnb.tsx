@@ -95,6 +95,7 @@ export function GNB() {
   };
 
   return (
+    <>
     <header
       className="text-prime-900 fixed top-0 right-0 left-0 z-50 w-full backdrop-blur-md"
       style={
@@ -120,6 +121,7 @@ export function GNB() {
               src="/images/logo/logo-small.svg"
               alt="MindLog"
               fill
+              sizes="32px"
               className="object-contain"
             />
           </div>
@@ -206,7 +208,7 @@ export function GNB() {
         <button
           type="button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="hover:bg-secondary-100 flex h-9 w-9 items-center justify-center rounded-lg transition-colors lg:hidden"
+          className="hover:bg-secondary-100 flex h-11 w-11 items-center justify-center rounded-lg transition-colors lg:hidden"
           aria-label={mobileMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
           aria-expanded={mobileMenuOpen}
         >
@@ -214,10 +216,15 @@ export function GNB() {
         </button>
       </nav>
 
-      {/* 모바일 메뉴 오버레이 */}
+    </header>
+
+      {/* 모바일 메뉴 오버레이 — header 밖에 렌더링 (backdrop-filter containing block 이슈 회피) */}
       {mobileMenuOpen && (
         <div className="fixed inset-x-0 top-16 bottom-0 z-40 flex flex-col overflow-y-auto bg-white md:top-20 lg:hidden">
-          <div className="flex flex-col gap-1 px-4 py-4">
+          <div
+            className="flex flex-col gap-1 px-4 py-4"
+            style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
+          >
             {(isAuthenticated ? MEMBER_NAV_ITEMS : GUEST_NAV_ITEMS).map(({ label, href }) => (
               <MobileNavItem key={href} label={label} href={href} active={pathname === href} />
             ))}
@@ -225,6 +232,17 @@ export function GNB() {
             {isAuthenticated ? (
               <>
                 <MobileNavItem label="마이페이지" href="/my" active={pathname === '/my'} />
+                <div className="border-prime-100 my-2 border-t" />
+                {/* 크레딧 잔액 */}
+                <Link
+                  href="/shop?tab=credit"
+                  className="text-prime-700 hover:bg-secondary-50 flex items-center gap-2 rounded-xl px-4 py-3 text-base font-medium transition-all"
+                >
+                  <div className="bg-interactive-glass-blue-50 flex size-6 items-center justify-center rounded-full">
+                    <Coins size={13} strokeWidth={2} className="text-cta-300" />
+                  </div>
+                  {totalCredit.toLocaleString()} 크레딧
+                </Link>
                 <div className="border-prime-100 my-2 border-t" />
                 <button
                   onClick={handleLogout}
@@ -244,7 +262,7 @@ export function GNB() {
           </div>
         </div>
       )}
-    </header>
+    </>
   );
 }
 

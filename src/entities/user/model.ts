@@ -69,7 +69,7 @@ export interface BaseProfileResponse {
 // --- /v1/users/me/profile (GET) : 사용자 개인정보 조회
 export interface UserProfileResponse extends BaseProfileResponse {
   nickname_change_count: number;
-  age_group?: AgeGroup | null;
+  age?: AgeGroup | null;
   occupation?: OccupationType | null;
   gender?: Gender | null;
 }
@@ -77,7 +77,7 @@ export interface UserProfileResponse extends BaseProfileResponse {
 // --- /v1/users/me/profile (PATCH) : 프로필 이미지 및 닉네임 수정
 export interface UpdateMyProfileResponse extends BaseProfileResponse {
   updated_at: string;
-  age_group?: AgeGroup | null;
+  age?: AgeGroup | null;
   occupation?: OccupationType | null;
   gender?: Gender | null;
 }

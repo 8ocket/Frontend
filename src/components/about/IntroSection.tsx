@@ -49,7 +49,7 @@ export function IntroSection() {
 
   return (
     // 1. 전체 화면을 꽉 채우는 컨테이너 설정
-    <section className="relative flex h-screen w-full flex-col items-center overflow-hidden">
+    <section className="relative flex min-h-screen-safe w-full flex-col items-center overflow-hidden">
       {/* 2. 배경 레이어 그룹: AboutPage에서 이동됨 */}
       <div className="absolute inset-0 z-0">
         <div
@@ -68,7 +68,7 @@ export function IntroSection() {
           transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
         />
         {/* 하단 페이드: 다음 섹션인 #F8FAFC와 자연스럽게 연결 */}
-        <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[#F8FAFC] to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-64 bg-linear-to-t from-[#F8FAFC] to-transparent" />
       </div>
 
       {/* 3. 콘텐츠 그룹: 1077px 너비 안에서 정렬 */}
@@ -85,7 +85,7 @@ export function IntroSection() {
             </h1>
           </div>
 
-          <div className="relative min-h-[80px] w-full max-w-2xl px-4">
+          <div className="relative min-h-20 w-full max-w-2xl px-4">
             <AnimatePresence mode="wait">
               <motion.p
                 key={slideIndex}

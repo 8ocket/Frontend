@@ -987,28 +987,19 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="layout-container relative box-border flex h-[calc(100dvh-4rem)] min-h-0 overflow-hidden md:h-[calc(100dvh-5rem)]">
-      {/* 모바일 사이드바 토글 버튼 */}
-      <button
-        type="button"
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="bg-secondary-100/80 absolute top-3 left-3 z-30 flex h-10 w-10 items-center justify-center rounded-lg shadow-md backdrop-blur-sm lg:hidden"
-        aria-label="상담 목록 열기"
-      >
-        <Menu size={20} />
-      </button>
+    <div className="layout-container bg-bg-light relative flex h-[calc(100dvh-4rem)] min-h-0 overflow-hidden md:h-[calc(100dvh-5rem)]">
 
       {/* 모바일 사이드바 오버레이 */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/30 lg:hidden"
+          className="fixed inset-0 z-[55] bg-black/40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* 사이드바 — 모바일: 슬라이드 오버레이, 데스크톱: 고정 */}
       <div
-        className={`fixed inset-y-0 left-0 z-40 w-[min(320px,85vw)] transform pt-16 transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:z-auto lg:w-80.75 lg:translate-x-0 lg:pt-0 lg:transition-none`}
+        className={`fixed inset-y-0 left-0 z-[60] w-[min(320px,85vw)] transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:z-auto lg:w-80.75 lg:translate-x-0 lg:transition-none`}
       >
         <ChatSidebar
           onNewCounsel={handleNewCounsel}
@@ -1020,7 +1011,18 @@ export default function ChatPage() {
       </div>
 
       {/* 메인 채팅 영역 */}
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-r border-black/5 pt-14 lg:pt-0">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-r border-black/5">
+        {/* 모바일 상담 목록 트리거 (lg 미만에서만 표시) */}
+        <div className="border-prime-100 sticky top-0 z-10 flex items-center gap-3 border-b bg-white px-4 py-3 lg:hidden">
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            className="hover:bg-prime-50 text-prime-700 flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
+          >
+            <Menu className="size-4" />
+            상담 목록
+          </button>
+        </div>
         <ChatMainArea
           onEndChat={handleEndChat}
           onCreditShortage={() => openModal('credit-shortage')}

@@ -2,7 +2,7 @@
 
 import { format, getDate, getDaysInMonth, getDay, startOfMonth } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { Check, MessageCircle, FileText, Lock, Layers } from 'lucide-react';
+import { Check, FileText, Lock, Layers } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -275,7 +275,7 @@ function AttendanceWidget() {
                       'flex size-9 items-center justify-center rounded-full text-sm font-medium transition-colors',
                       isAttended && isToday && 'bg-cta-300 text-white shadow-sm',
                       isAttended && !isToday && 'bg-cta-100 text-cta-400',
-                      !isAttended && isToday && 'ring-cta-300 text-cta-300 ring-2 font-bold',
+                      !isAttended && isToday && 'ring-cta-300 text-cta-300 font-bold ring-2',
                       !isAttended && !isToday && col === 0 && 'text-red-400',
                       !isAttended && !isToday && col === 6 && 'text-blue-400',
                       !isAttended && !isToday && col !== 0 && col !== 6 && 'text-prime-500'
@@ -291,7 +291,9 @@ function AttendanceWidget() {
             <p className="text-prime-500 text-[12px]">
               이번 달 <span className="text-cta-300 font-bold">{attendedDates.size}회</span> 출석
             </p>
-            <span className="text-prime-300 text-xs">{DAYS_IN_MONTH}일 중 {attendedDates.size}일</span>
+            <span className="text-prime-300 text-xs">
+              {DAYS_IN_MONTH}일 중 {attendedDates.size}일
+            </span>
           </div>
         </div>
       ) : (
@@ -470,8 +472,6 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
-
-
   if (authLoading || !isAuthenticated) {
     return (
       <div className="min-h-main-safe flex items-center justify-center">
@@ -612,7 +612,7 @@ export default function Home() {
       {/* ── Floating AI 상담 버튼 ─────────────────────────────────────────────── */}
       <div
         className="fixed right-6 bottom-10 z-50 sm:right-8 sm:bottom-12"
-        style={{ width: 110, height: 110 }}
+        style={{ width: 'clamp(80px, 20vw, 110px)', height: 'clamp(80px, 20vw, 110px)' }}
       >
         {/* 글로우 레이어 */}
         <div
@@ -622,13 +622,16 @@ export default function Home() {
         <button
           type="button"
           onClick={() => router.push('/chat')}
-          className="bg-cta-300 relative flex h-full w-full flex-col items-center justify-center gap-1 overflow-hidden rounded-full shadow-lg shadow-[#82C9FF]/30 transition-transform hover:scale-105 active:scale-95"
+          className="relative h-full w-full overflow-hidden rounded-full transition-transform hover:scale-105 active:scale-95"
           aria-label="AI 상담 받으러 가기"
         >
-          <span className="text-prime-700 text-center text-[14px] leading-none font-medium whitespace-pre-line">
-            {'AI 상담\n받으러 가기'}
-          </span>
-          <MessageCircle className="mt-1 h-12 w-12 text-[#1a222e]" aria-hidden="true" />
+          <Image
+            src="/images/icons/aichatbtn.png"
+            alt="AI 상담 받으러 가기"
+            fill
+            sizes="110px"
+            className="object-cover"
+          />
         </button>
       </div>
     </div>

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -19,26 +18,20 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { getPaymentHistoryApi, cancelPaymentApi, getMyCreditApi } from '@/entities/credits/api';
 import { PaymentHistoryItem } from '@/entities/credits/model';
 import { useToast } from '@/shared/ui/toast';
-import {
-  OCCUPATION_LABEL,
-  AGE_LABEL,
-  GENDER_LABEL,
-  type OccupationType,
-  type AgeGroup,
-  type Gender,
-} from '@/entities/user/model';
+import { OCCUPATION_LABEL, AGE_LABEL, GENDER_LABEL } from '@/entities/user/model';
 
-
-// ── 목업 데이터 (API 연동 시 교체) ──────────────────────────────────
-
-const CREDIT_HISTORY = [
-  { id: 'c1', date: '2026.03.24', label: 'AI 상담 이용', delta: -70, balance: 930 },
-  { id: 'c2', date: '2026.03.22', label: '주간 리포트 발행', delta: -500, balance: 1000 },
-  { id: 'c3', date: '2026.03.20', label: '크레딧 충전', delta: +1000, balance: 1500 },
-  { id: 'c4', date: '2026.02.28', label: 'AI 상담 이용', delta: -70, balance: 500 },
-  { id: 'c5', date: '2026.02.14', label: '크레딧 충전', delta: +300, balance: 570 },
-];
-// ─────────────────────────────────────────────────────────────────────
+const TRANSACTION_LABEL: Record<string, string> = {
+  SIGNUP_BONUS: '회원가입 보너스',
+  ATTENDANCE_CHECK: '출석체크 보너스',
+  SAVE_SESSION: '상담 저장 보너스',
+  WATCH_AD: '광고 시청 보너스',
+  SURVEY: '설문 조사 보너스',
+  AI_WEEKLY_REPORT: 'AI 주간 리포트',
+  AI_MONTHLY_REPORT: 'AI 월간 리포트',
+  EXTRA_SESSION: 'AI 상담 이용',
+  CHARGE: '크레딧 충전',
+  REFUND: '크레딧 환불',
+};
 
 export default function MyPage() {
   const router = useRouter();
@@ -63,13 +56,29 @@ export default function MyPage() {
     select: (res) => res.content.filter((i) => i.status !== 'READY'),
   });
 
+  const {
+    data: creditData,
+    isPending: creditLoading,
+    isError: creditError,
+  } = useQuery({
+    queryKey: ['myCredit'],
+    queryFn: getMyCreditApi,
+  });
+  const creditTransactions = creditData?.transactions ?? [];
+
   const { data: profileData } = useQuery({
     queryKey: ['myProfile'],
     queryFn: getMyProfileApi,
   });
   const profileOccupation = profileData?.occupation ?? null;
-  const profileAgeGroup = profileData?.age_group ?? null;
+  const profileAge = profileData?.age ?? null;
   const profileGender = profileData?.gender ?? null;
+
+  useEffect(() => {
+    if (creditData) {
+      setTotalCredit(creditData.totalCredit);
+    }
+  }, [creditData, setTotalCredit]);
 
   const handleLogout = async () => {
     const refreshToken = getCookie('refreshToken');
@@ -123,7 +132,7 @@ export default function MyPage() {
                   {/* 직업 / 나이 / 성별 읽기 전용 */}
                   <div className="text-prime-400 flex flex-wrap gap-x-2 gap-y-0.5 text-xs tracking-[-0.18px]">
                     {profileOccupation && <span>{OCCUPATION_LABEL[profileOccupation]}</span>}
-                    {profileAgeGroup && <span>{AGE_LABEL[profileAgeGroup]}</span>}
+                    {profileAge && <span>{AGE_LABEL[profileAge]}</span>}
                     {profileGender && <span>{GENDER_LABEL[profileGender]}</span>}
                   </div>
                 </div>
@@ -192,131 +201,140 @@ export default function MyPage() {
                     <EmptyHistory message="결제 내역이 없습니다." />
                   ) : (
                     <ul className="divide-prime-100 divide-y px-4 pb-2" ref={dropdownRef}>
-                      {paymentHistory.map((item) => (
-                        <li
-                          key={item.approvedAt}
-                          className="hover:bg-secondary-50 relative flex items-center justify-between rounded-xl px-3 py-4 transition-colors"
-                        >
-                          {/* 좌측: 상품명 + 날짜 + 사유 */}
-                          <div className="flex flex-col gap-1">
-                            <span
-                              className={`text-sm font-medium tracking-[-0.21px] ${item.status === 'CANCELED' ? 'text-prime-400' : 'text-prime-900'}`}
-                            >
-                              {item.orderName}
-                            </span>
-                            <span className="text-prime-400 text-xs tracking-[-0.18px]">
-                              {item.approvedAt
-                                ? `${item.approvedAt.slice(0, 10).replace(/-/g, '.')} ${item.approvedAt.slice(11, 19)}`
-                                : '-'}
-                            </span>
-                            {item.status === 'CANCELED' && (
-                              <span className="text-prime-300 text-xs">
-                                고객 요청으로 환불 처리됨
-                              </span>
-                            )}
-                            {item.status === 'ABORTED' && (
-                              <span className="text-prime-300 text-xs">
-                                결제 승인 중 오류가 발생했습니다
-                              </span>
-                            )}
-                            {item.status === 'FAILED' && (
-                              <span className="text-prime-300 text-xs">결제에 실패했습니다</span>
-                            )}
-                          </div>
+                      {paymentHistory.map((item, idx) => {
+                        const itemKey =
+                          item.paymentId ??
+                          `${item.orderName}-${item.amount}-${item.approvedAt ?? 'pending'}-${idx}`;
+                        const canRefund = item.status === 'DONE' && !!item.paymentId;
 
-                          {/* 우측: 금액 + 상태 + 더보기 */}
-                          <div className="flex items-center gap-2">
-                            <div className="flex flex-col items-end gap-1">
+                        return (
+                          <li
+                            key={itemKey}
+                            className="hover:bg-secondary-50 relative flex items-center justify-between rounded-xl px-3 py-4 transition-colors"
+                          >
+                            {/* 좌측: 상품명 + 날짜 + 사유 */}
+                            <div className="flex flex-col gap-1">
                               <span
-                                className={`text-sm font-bold tracking-[-0.21px] ${item.status === 'CANCELED' ? 'text-prime-400 line-through' : 'text-prime-900'}`}
+                                className={`text-sm font-medium tracking-[-0.21px] ${item.status === 'CANCELED' ? 'text-prime-400' : 'text-prime-900'}`}
                               >
-                                {item.amount.toLocaleString()}원
+                                {item.orderName}
                               </span>
-                              {item.status === 'CANCELED' ? (
-                                <span className="bg-error-100 text-error-500 rounded-md px-1.5 py-0.5 text-[10px] font-semibold">
-                                  환불완료
+                              <span className="text-prime-400 text-xs tracking-[-0.18px]">
+                                {item.approvedAt
+                                  ? `${item.approvedAt.slice(0, 10).replace(/-/g, '.')} ${item.approvedAt.slice(11, 19)}`
+                                  : '-'}
+                              </span>
+                              {item.status === 'CANCELED' && (
+                                <span className="text-prime-300 text-xs">
+                                  고객 요청으로 환불 처리됨
                                 </span>
-                              ) : item.status === 'ABORTED' || item.status === 'FAILED' ? (
-                                <span className="bg-prime-100 text-prime-400 rounded-md px-1.5 py-0.5 text-[10px] font-semibold">
-                                  결제실패
+                              )}
+                              {item.status === 'ABORTED' && (
+                                <span className="text-prime-300 text-xs">
+                                  결제 승인 중 오류가 발생했습니다
                                 </span>
-                              ) : (
-                                <span className="text-success-800 text-xs font-medium">
-                                  결제완료
-                                </span>
+                              )}
+                              {item.status === 'FAILED' && (
+                                <span className="text-prime-300 text-xs">결제에 실패했습니다</span>
                               )}
                             </div>
 
-                            {/* 더보기 버튼 자리 — 항상 동일 너비 확보 */}
-                            <div className="relative size-7 shrink-0">
-                              {item.status === 'DONE' && (
-                                <>
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      setOpenDropdownId(
-                                        openDropdownId === item.approvedAt ? null : item.approvedAt
-                                      )
-                                    }
-                                    className="text-prime-400 hover:bg-secondary-100 flex size-7 items-center justify-center rounded-lg transition-colors"
-                                  >
-                                    <MoreVertical size={15} />
-                                  </button>
-                                  {openDropdownId === item.approvedAt && (
-                                    <div className="border-prime-100 absolute top-full right-0 z-20 mt-1 w-36 overflow-hidden rounded-xl border bg-white shadow-sm">
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          setSelectedPayment(item);
-                                          setOpenDropdownId(null);
-                                          setRefundModalOpen(true);
-                                        }}
-                                        className="text-error-500 hover:bg-error-100/50 flex w-full items-center px-4 py-3 text-sm font-medium transition-colors"
-                                      >
-                                        환불 요청하기
-                                      </button>
-                                    </div>
-                                  )}
-                                </>
-                              )}
+                            {/* 우측: 금액 + 상태 + 더보기 */}
+                            <div className="flex items-center gap-2">
+                              <div className="flex flex-col items-end gap-1">
+                                <span
+                                  className={`text-sm font-bold tracking-[-0.21px] ${item.status === 'CANCELED' ? 'text-prime-400 line-through' : 'text-prime-900'}`}
+                                >
+                                  {item.amount.toLocaleString()}원
+                                </span>
+                                {item.status === 'CANCELED' ? (
+                                  <span className="bg-error-100 text-error-500 rounded-md px-1.5 py-0.5 text-[10px] font-semibold">
+                                    환불완료
+                                  </span>
+                                ) : item.status === 'ABORTED' || item.status === 'FAILED' ? (
+                                  <span className="bg-prime-100 text-prime-400 rounded-md px-1.5 py-0.5 text-[10px] font-semibold">
+                                    결제실패
+                                  </span>
+                                ) : (
+                                  <span className="text-success-800 text-xs font-medium">
+                                    결제완료
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* 더보기 버튼 자리 — 항상 동일 너비 확보 */}
+                              <div className="relative size-7 shrink-0">
+                                {canRefund && (
+                                  <>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setOpenDropdownId(
+                                          openDropdownId === itemKey ? null : itemKey
+                                        )
+                                      }
+                                      className="text-prime-400 hover:bg-secondary-100 flex size-7 items-center justify-center rounded-lg transition-colors"
+                                    >
+                                      <MoreVertical size={15} />
+                                    </button>
+                                    {openDropdownId === itemKey && (
+                                      <div className="border-prime-100 absolute top-full right-0 z-20 mt-1 w-36 overflow-hidden rounded-xl border bg-white shadow-sm">
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setSelectedPayment(item);
+                                            setOpenDropdownId(null);
+                                            setRefundModalOpen(true);
+                                          }}
+                                          className="text-error-500 hover:bg-error-100/50 flex w-full items-center px-4 py-3 text-sm font-medium transition-colors"
+                                        >
+                                          환불 요청하기
+                                        </button>
+                                      </div>
+                                    )}
+                                  </>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        </li>
-                      ))}
+                          </li>
+                        );
+                      })}
                     </ul>
                   )}
                 </TabsContent>
 
                 {/* 크레딧 사용 내역 탭 */}
                 <TabsContent value="credit" className="mt-0">
-                  {CREDIT_HISTORY.length === 0 ? (
+                  {creditLoading ? (
+                    <div className="text-prime-400 py-12 text-center text-sm">불러오는 중...</div>
+                  ) : creditError ? (
+                    <div className="text-prime-400 py-12 text-center text-sm">
+                      크레딧 내역을 불러오지 못했습니다.
+                    </div>
+                  ) : creditTransactions.length === 0 ? (
                     <EmptyHistory message="크레딧 사용 내역이 없습니다." />
                   ) : (
                     <ul className="divide-prime-100 divide-y px-4 pb-2">
-                      {CREDIT_HISTORY.map((item) => (
+                      {creditTransactions.map((item, idx) => (
                         <li
-                          key={item.id}
+                          key={idx}
                           className="hover:bg-secondary-50 flex items-center justify-between rounded-xl px-3 py-4 transition-colors"
                         >
                           <div className="flex flex-col gap-1">
                             <span className="text-prime-900 text-sm font-medium tracking-[-0.21px]">
-                              {item.label}
+                              {TRANSACTION_LABEL[item.transactionType] ?? item.transactionType}
                             </span>
                             <span className="text-prime-400 text-xs tracking-[-0.18px]">
-                              {item.date}
+                              {item.createdAt.slice(0, 10).replace(/-/g, '.')}{' '}
+                              {item.createdAt.slice(11, 16)}
                             </span>
                           </div>
-                          <div className="flex flex-col items-end gap-1">
-                            <span
-                              className={`text-sm font-bold tracking-[-0.21px] ${item.delta > 0 ? 'text-cta-300' : 'text-prime-900'}`}
-                            >
-                              {item.delta > 0 ? '+' : ''}
-                              {item.delta.toLocaleString()} 크레딧
-                            </span>
-                            <span className="text-prime-400 text-xs tracking-[-0.18px]">
-                              잔액 {item.balance.toLocaleString()}
-                            </span>
-                          </div>
+                          <span
+                            className={`text-sm font-bold tracking-[-0.21px] ${item.amount > 0 ? 'text-cta-300' : 'text-prime-900'}`}
+                          >
+                            {item.amount > 0 ? '+' : ''}
+                            {item.amount.toLocaleString()} 크레딧
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -358,6 +376,7 @@ export default function MyPage() {
           setRefundModalOpen(false);
           toast('환불 요청이 완료되었습니다.', 'success');
           queryClient.invalidateQueries({ queryKey: ['paymentHistory'] });
+          queryClient.invalidateQueries({ queryKey: ['myCredit'] });
           getMyCreditApi()
             .then((res) => setTotalCredit(res.totalCredit))
             .catch(() => toast('크레딧 갱신에 실패했습니다.', 'error'));
@@ -396,7 +415,7 @@ function RefundModal({
   const [error, setError] = useState<string | null>(null);
 
   const handleRefund = async () => {
-    if (!item) return;
+    if (!item?.paymentId) return;
     setLoading(true);
     setError(null);
     try {
@@ -539,7 +558,6 @@ function EmptyHistory({ message }: { message: string }) {
     </div>
   );
 }
-
 
 function MenuRow({
   icon,

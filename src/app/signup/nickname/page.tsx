@@ -12,7 +12,7 @@ import { useCreditStore } from '@/entities/credits/store';
 import { getMyCreditApi } from '@/entities/credits/api';
 import { getCookie } from '@/shared/lib/utils/cookie';
 import { generatePositiveNickname } from '@/shared/lib/utils/nickname';
-import { signupApi } from '@/shared/api';
+import { signupApi, getMyProfileApi } from '@/shared/api';
 import { OCCUPATION_MAP, AGE_MAP, GENDER_MAP } from '@/entities/user/model';
 
 const imgVector = '/images/icons/profile-default.png';
@@ -38,6 +38,7 @@ export default function NicknamePage() {
   const [nicknameError, setNicknameError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const profileObjectUrlRef = useRef<string | null>(null);
+  const isSubmittingRef = useRef(false);
 
   useEffect(() => {
     return () => {
@@ -74,6 +75,7 @@ export default function NicknamePage() {
   };
 
   const handleNext = async () => {
+    if (isSubmittingRef.current) return;
     const trimmed = nickname.trim();
     if (!trimmed) {
       setNicknameError('닉네임을 입력해 주세요 (2~30자)');
@@ -87,6 +89,7 @@ export default function NicknamePage() {
     setNicknameError(null);
     setSignupError(null);
     try {
+      isSubmittingRef.current = true;
       setIsLoading(true);
       await signupApi(
         nickname,
@@ -95,14 +98,15 @@ export default function NicknamePage() {
         GENDER_MAP[gender],
         profileFile ?? undefined
       );
+      const profile = await getMyProfileApi();
       const { user, login } = useAuthStore.getState();
       const token = getCookie('accessToken') || '';
       const refreshToken = getCookie('refreshToken') || '';
       login(
         {
           ...(user ?? { id: '', email: '' }),
-          name: nickname,
-          profileImage: profileImage ?? undefined,
+          name: profile.nickname,
+          profileImage: profile.profile_image_url ?? '/images/icons/profile-default.png',
         },
         token,
         refreshToken
@@ -112,6 +116,7 @@ export default function NicknamePage() {
       console.error('회원가입 실패:', error);
       setSignupError('회원가입에 실패했습니다. 다시 시도해 주세요.');
     } finally {
+      isSubmittingRef.current = false;
       setIsLoading(false);
     }
   };
@@ -160,10 +165,10 @@ export default function NicknamePage() {
                 className="border-cta-300 bg-secondary-100 relative flex size-15 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2"
               >
                 {profileImage ? (
-                  <Image src={profileImage} alt="profile" fill className="object-cover" />
+                  <Image src={profileImage} alt="profile" fill sizes="60px" className="object-cover" />
                 ) : (
                   <div className="relative h-10.75 w-10.75">
-                    <Image src={imgVector} alt="profile" fill className="object-contain" />
+                    <Image src={imgVector} alt="profile" fill sizes="43px" className="object-contain" />
                   </div>
                 )}
               </button>

@@ -44,7 +44,12 @@ export const RefreshTokenResponseSchema = z.object({
 });
 
 // OccupationType / AgeGroup / Gender
-export const OccupationTypeSchema = z.enum(['STUDENT', 'JOB_SEEKER', 'EMPLOYEE', 'CAREER_SWITCHER']);
+export const OccupationTypeSchema = z.enum([
+  'STUDENT',
+  'JOB_SEEKER',
+  'EMPLOYEE',
+  'CAREER_SWITCHER',
+]);
 export const AgeGroupSchema = z.union([z.literal(20), z.literal(30), z.literal(40)]);
 export const GenderSchema = z.enum(['MALE', 'FEMALE']);
 
@@ -54,7 +59,7 @@ export const UserProfileResponseSchema = z.object({
   profile_image_url: z.string().optional(),
   nickname: z.string(),
   nickname_change_count: z.number(),
-  age_group: AgeGroupSchema.nullable().optional(),
+  age: AgeGroupSchema.nullable().optional(),
   occupation: OccupationTypeSchema.nullable().optional(),
   gender: GenderSchema.nullable().optional(),
 });
@@ -65,7 +70,7 @@ export const UpdateMyProfileResponseSchema = z.object({
   profile_image_url: z.string().optional(),
   nickname: z.string(),
   updated_at: z.string(),
-  age_group: AgeGroupSchema.nullable().optional(),
+  age: AgeGroupSchema.nullable().optional(),
   occupation: OccupationTypeSchema.nullable().optional(),
   gender: GenderSchema.nullable().optional(),
 });

@@ -26,6 +26,7 @@ export const useAuth = () => {
         };
         const tempToken = `temp_token_${Date.now()}`;
         login(tempUser, tempToken, tempToken);
+        sessionStorage.setItem('pendingSignup', 'true');
         router.push('/signup');
       } else {
         const response = await socialLoginApi(provider);

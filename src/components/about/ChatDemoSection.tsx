@@ -54,12 +54,12 @@ export function ChatDemoSection() {
   }, [chatInView]);
 
   return (
-    <div className="flex flex-col items-center" style={{ width: 1077, gap: 40 }}>
+    <div className="flex w-full flex-col items-center px-4" style={{ maxWidth: 1077, gap: 40 }}>
       {/* TextBlock */}
       <motion.div
         ref={textRef}
-        className="flex flex-col items-center text-center"
-        style={{ width: 505, gap: 40 }}
+        className="flex w-full flex-col items-center text-center"
+        style={{ maxWidth: 505, gap: 40 }}
         initial={{ opacity: 0, y: 24 }}
         animate={textInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
