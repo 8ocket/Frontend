@@ -13,6 +13,7 @@ import { getMyCreditApi } from '@/entities/credits/api';
 import { getCookie } from '@/shared/lib/utils/cookie';
 import { generatePositiveNickname } from '@/shared/lib/utils/nickname';
 import { signupApi, getMyProfileApi } from '@/shared/api';
+import { USE_MOCK } from '@/shared/lib/env';
 import { OCCUPATION_MAP, AGE_MAP, GENDER_MAP } from '@/entities/user/model';
 
 const imgVector = '/images/icons/profile-default.png';
@@ -57,11 +58,15 @@ export default function NicknamePage() {
 
     if (!ALLOWED_TYPES.includes(file.type)) {
       setSignupError('JPG, PNG 형식의 이미지만 업로드할 수 있습니다.');
+      setProfileImage(null);
+      setProfileFile(null);
       e.target.value = '';
       return;
     }
     if (file.size > MAX_SIZE) {
       setSignupError('프로필 이미지는 5MB 이하만 업로드할 수 있습니다.');
+      setProfileImage(null);
+      setProfileFile(null);
       e.target.value = '';
       return;
     }
@@ -72,6 +77,7 @@ export default function NicknamePage() {
     profileObjectUrlRef.current = url;
     setProfileImage(url);
     setProfileFile(file);
+    e.target.value = ''; // 같은 파일 재선택 가능하도록 초기화
   };
 
   const handleNext = async () => {
@@ -98,19 +104,31 @@ export default function NicknamePage() {
         GENDER_MAP[gender],
         profileFile ?? undefined
       );
-      const profile = await getMyProfileApi();
       const { user, login } = useAuthStore.getState();
       const token = getCookie('accessToken') || '';
       const refreshToken = getCookie('refreshToken') || '';
-      login(
-        {
-          ...(user ?? { id: '', email: '' }),
-          name: profile.nickname,
-          profileImage: profile.profile_image_url ?? '/images/icons/profile-default.png',
-        },
-        token,
-        refreshToken
-      );
+      if (USE_MOCK) {
+        login(
+          {
+            ...(user ?? { id: '', email: '' }),
+            name: nickname,
+            profileImage: profileImage ?? '/images/icons/profile-default.png',
+          },
+          token,
+          refreshToken
+        );
+      } else {
+        const profile = await getMyProfileApi();
+        login(
+          {
+            ...(user ?? { id: '', email: '' }),
+            name: profile.nickname,
+            profileImage: profile.profile_image_url ?? '/images/icons/profile-default.png',
+          },
+          token,
+          refreshToken
+        );
+      }
       setShowSuccessModal(true);
     } catch (error) {
       console.error('회원가입 실패:', error);
@@ -142,17 +160,27 @@ export default function NicknamePage() {
         {/* 카드 — Figma: 568px, white glass, rounded-2xl, px-10 */}
         <div className="relative w-full max-w-142 rounded-2xl border border-white/40 bg-white/70 px-6 py-8 shadow-[0px_8px_32px_0px_rgba(0,0,0,0.08)] md:px-10 md:py-10">
           {/* ── 헤더: 제목 + 뒤로가기 ── */}
-          <div className="flex items-center justify-between">
-            <h1 className="text-prime-900 text-2xl leading-[1.3] font-semibold tracking-[-0.36px]">
-              개인정보 설정하기
-            </h1>
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="bg-cta-300 flex h-6 w-6 items-center justify-center overflow-hidden rounded-full"
-            >
-              <Image src="/images/icons/Back.png" alt="뒤로가기" width={24} height={24} />
-            </button>
+          <div className="flex flex-col gap-4.75">
+            <div className="flex items-center justify-between">
+              <p className="text-prime-900 text-[20px] leading-[1.3] font-semibold tracking-[-0.3px]">
+                회원가입
+              </p>
+              <button
+                type="button"
+                onClick={() => router.back()}
+                className="bg-cta-300 flex h-6 w-6 items-center justify-center overflow-hidden rounded-full"
+              >
+                <Image src="/images/icons/Back.png" alt="뒤로가기" width={24} height={24} />
+              </button>
+            </div>
+            <div className="flex flex-col gap-2.5">
+              <p className="text-prime-900 text-[24px] leading-[1.3] font-semibold tracking-[-0.36px]">
+                개인정보 설정하기
+              </p>
+              <p className="text-prime-900 text-[12px] leading-[1.2] font-medium tracking-[-0.18px]">
+                서비스 이용을 위해 기본 정보를 입력해 주세요.
+              </p>
+            </div>
           </div>
 
           {/* ── 콘텐츠 ── */}
@@ -202,17 +230,19 @@ export default function NicknamePage() {
                       value={nickname}
                       onChange={(e) => {
                         setNickname(e.target.value);
-                        setNicknameError(null);
+                        if (e.target.value.trim()) setNicknameError(null);
                       }}
                       placeholder="즐거운 몽상가"
                       maxLength={30}
                       className="h-14 rounded-xl bg-white/50 px-5 text-base"
                     />
                     <span className="text-prime-400 pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-xs">
-                      {nickname.length}/30
+                      {nickname.trim().length}/30
                     </span>
                   </div>
-                  {nicknameError && <p className="text-xs text-red-500">{nicknameError}</p>}
+                  {(nicknameError || signupError) && (
+                    <p className="text-xs text-red-500">{nicknameError || signupError}</p>
+                  )}
                   <Button
                     onClick={generateRandomNickname}
                     variant="secondary"
@@ -249,9 +279,6 @@ export default function NicknamePage() {
               />
             </div>
           </div>
-
-          {/* 에러 메시지 */}
-          {signupError && <p className="mt-4 text-center text-sm text-red-500">{signupError}</p>}
 
           {/* CTA 버튼 */}
           <Button

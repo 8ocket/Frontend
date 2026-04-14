@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useRouter } from 'next/navigation';
@@ -93,23 +94,9 @@ export default function SignupPage() {
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="bg-cta-300 flex h-6 w-6 items-center justify-center overflow-hidden rounded-3xl"
+                className="bg-cta-300 flex h-6 w-6 items-center justify-center overflow-hidden rounded-full"
               >
-                <svg
-                  width="15"
-                  height="14"
-                  viewBox="0 0 15 14"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M10 2L5 7L10 12"
-                    stroke="white"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <Image src="/images/icons/Back.png" alt="뒤로가기" width={24} height={24} />
               </button>
             </div>
             <div className="flex flex-col gap-2.5">

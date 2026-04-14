@@ -230,8 +230,6 @@ export const signupApi = async (
 
   if (profileImage) {
     formData.append('profile_image', profileImage, profileImage.name);
-  } else {
-    formData.append('profile_image', new Blob(), '');
   }
 
   const contentsBlob = new Blob([JSON.stringify({ nickname, occupation, age, gender })], {
