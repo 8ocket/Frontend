@@ -13,7 +13,7 @@ export function EmotionColorLegend() {
     <div
       className={cn(
         'w-full rounded-2xl border transition-colors duration-300',
-        'border-[rgba(130,201,255,0.5)] bg-[rgba(130,201,255,0.06)]'
+        'border-[rgba(141,194,238,0.5)] bg-[rgba(141,194,238,0.06)]'
       )}
     >
       {/* 헤더 (항상 노출) */}
@@ -57,7 +57,7 @@ export function EmotionColorLegend() {
                   return (
                     <div
                       key={type}
-                      className="flex items-center gap-2.5 rounded-sm border border-[rgba(130,201,255,0.5)] bg-secondary px-2 py-1.5"
+                      className="flex items-center gap-2.5 rounded-sm border border-[rgba(141,194,238,0.5)] bg-secondary px-2 py-1.5"
                     >
                       <span
                         className="shrink-0 rounded-full"

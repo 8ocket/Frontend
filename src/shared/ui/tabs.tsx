@@ -9,7 +9,7 @@ import { cn } from '@/shared/lib/utils';
 // Border: cta-300, 1px
 // 높이: 44px (h-11), Radius: MD (8px)
 // 탭 간격: 16px (gap-4), 패딩: 10px (p-2.5)
-// Active: bg-interactive/glass/blue-50 (rgba(130,201,255,0.5))
+// Active: bg-interactive/glass/blue-50 (rgba(141,194,238,0.5))
 // Inactive: text-prime-500
 // Font: Pretendard Medium 16px
 // ─────────────────────────────────────────────────────────────────

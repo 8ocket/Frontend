@@ -5,7 +5,7 @@ import React, { createContext, useCallback, useContext, useEffect, useRef, useSt
 import { cn } from '@/shared/lib/utils';
 
 // ── Figma 디자인 시스템: 토스트 (node 340:1075 > 토스트) ─────────
-// bg: secondary-100, border: glass-stroke/30 (rgba(130,201,255,0.3))
+// bg: secondary-100, border: glass-stroke/30 (rgba(141,194,238,0.3))
 // rounded-xl, p-4, shadow-lg
 // Semantic: blue(info) / green(success) / red(error) / yellow(warning)
 // Auto-dismiss: 3000ms
@@ -61,7 +61,7 @@ function ToastCard({ item, onRemove }: { item: ToastItem; onRemove: (id: string)
       aria-live="polite"
       onAnimationEnd={handleAnimationEnd}
       className={cn(
-        'bg-secondary-100 flex min-w-[260px] max-w-[360px] items-center gap-3 rounded-xl border-2 border-l-4 border-[rgba(130,201,255,0.3)] p-4 shadow-lg',
+        'bg-secondary-100 flex min-w-[260px] max-w-[360px] items-center gap-3 rounded-xl border-2 border-l-4 border-[rgba(141,194,238,0.3)] p-4 shadow-lg',
         SEMANTIC_STYLES[item.semantic],
         visible ? 'animate-in fade-in-0 slide-in-from-bottom-4' : 'animate-out fade-out-0 slide-out-to-bottom-4'
       )}

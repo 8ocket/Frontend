@@ -46,20 +46,20 @@
   --color-cta-900: #002d4f;
   --color-cta-800: #004a82;
   --color-cta-700: #0067b5;
-  --color-cta-600: #0084e8;
-  --color-cta-500: #1c9dff;
-  --color-cta-400: #4fb3ff;
-  --color-cta-300: #82c9ff;
+  --color-cta-600: #1a7dcb;
+  --color-cta-500: #3a96dd;
+  --color-cta-400: #62ace6;
+  --color-cta-300: #8dc2ee;
   --color-main-blue: var(--main-blue);
   --color-bg-light: var(--bg-light);
-  --color-cta-200: #b5dfff;
-  --color-cta-100: #e8f5ff;
+  --color-cta-200: #bbd8f4;
+  --color-cta-100: #eaf3fc;
 
   /* Text - 텍스트 색상 */
   --color-inverse: #f8fafc;
 
   /* Interactive - 상호작용 */
-  --color-interactive-glass-blue-50: rgba(130, 201, 255, 0.5);
+  --color-interactive-glass-blue-50: rgba(141, 194, 238, 0.5);
 
   /* Semantic - Success (그린) */
   --color-success-950: #06442f;
@@ -180,7 +180,7 @@
 
 :root {
   /* Brand alias tokens */
-  --main-blue: #82c9ff;
+  --main-blue: #8dc2ee;
   --bg-light: #f8fafc;
   --white: #ffffff;
 
@@ -312,11 +312,11 @@
 
 /* ── Swiper pagination — 홈 배너 (home-banner) ──────────────────────────── */
 .home-banner .swiper-pagination-bullet {
-  background: rgba(130, 201, 255, 0.5);
+  background: rgba(141, 194, 238, 0.5);
   opacity: 1;
 }
 .home-banner .swiper-pagination-bullet-active {
-  background: #82c9ff;
+  background: #8dc2ee;
 }
 
 @layer components {

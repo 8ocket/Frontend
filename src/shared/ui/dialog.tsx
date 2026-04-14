@@ -56,7 +56,7 @@ function DialogContent({
         data-slot="dialog-content"
         className={cn(
           'bg-secondary-100 fixed top-1/2 left-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2',
-          'rounded-xl border-2 border-[rgba(130,201,255,0.3)] p-6 shadow-lg',
+          'rounded-xl border-2 border-[rgba(141,194,238,0.3)] p-6 shadow-lg',
           'focus:outline-none',
           maxWidth,
           className

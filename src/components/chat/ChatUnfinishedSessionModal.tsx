@@ -3,7 +3,7 @@
 // Figma MODAL 14 (node 2113:9375) — 미완결 상담 알림
 // Root: 350×335(HUG), VERTICAL, padding 24px all
 // bg: VariableID:575:5007 = #F8FAFC (secondary-100)
-// border: 2px INSIDE, VariableID:1243:2688 = rgba(130,201,255,0.30)
+// border: 2px INSIDE, VariableID:1243:2688 = rgba(141,194,238,0.30)
 // radius: VariableID:1180:2200 = 12px
 // props: Sementic Type=Yellow, Alarm=Information, Contents=미완결 상담
 

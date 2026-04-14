@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { cn } from '@/shared/lib/utils';
 
 // ── Figma 디자인 시스템: Checkbox (node 1306:3235) ──────────────
@@ -81,21 +79,17 @@ export function CheckboxItem({
         >
           <span>{label}</span>
           {showTag && (
-            <>
-              <span> (</span>
-              <span
-                className={
-                  error
-                    ? 'text-error-700'
-                    : required
-                      ? 'text-[rgba(130,201,255,0.8)]'
-                      : 'text-warning-500'
-                }
-              >
-                {required ? '필수' : '선택'}
-              </span>
-              <span>)</span>
-            </>
+            <span
+              className={
+                error
+                  ? 'text-error-700'
+                  : required
+                    ? 'text-error-500'
+                    : 'text-warning-500'
+              }
+            >
+              {required ? ' *' : ' (선택)'}
+            </span>
           )}
         </p>
       </button>
