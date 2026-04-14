@@ -1,0 +1,386 @@
+'use client';
+
+import { useState, useEffect, useRef, useTransition } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
+import { Menu, X, User, LogOut, Coins } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useAuthStore } from '@/entities/user/store';
+import { cn } from '@/shared/lib/utils';
+import { Button } from '@/shared/ui/button';
+import { ProfileAvatar } from '@/shared/ui/profile-avatar';
+import { useCreditStore } from '@/entities/credits/store';
+
+// Figma: GNB (1738:4600)
+// 1440x80
+
+const MEMBER_NAV_ITEMS = [
+  { label: '홈', href: '/' },
+  { label: 'AI 상담', href: '/chat' },
+  { label: '마음기록 모음', href: '/collection' },
+  { label: '심화 리포트', href: '/report' },
+  { label: '상점', href: '/shop' },
+  { label: '브랜드 소개', href: '/about' },
+  { label: '고객 지원', href: '/support' },
+] as const;
+
+const GUEST_NAV_ITEMS = [
+  { label: '브랜드 소개', href: '/about' },
+  { label: '고객 지원', href: '/support' },
+] as const;
+
+export function GNB() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { isAuthenticated, user, logout } = useAuthStore();
+  const { totalCredit } = useCreditStore();
+  const [scrollRatio, setScrollRatio] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [, startTransition] = useTransition();
+
+  // 경로 변경 시 모바일 메뉴 닫기
+  useEffect(() => {
+    startTransition(() => {
+      setMobileMenuOpen(false);
+    });
+  }, [pathname]);
+
+  // 스크롤 감지 — 0~80px 구간을 0~1로 정규화
+  useEffect(() => {
+    const handleScroll = () => setScrollRatio(Math.min(window.scrollY / 80, 1));
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // 모바일 메뉴 열림 시 스크롤 방지
+  useEffect(() => {
+    document.body.style.overflow = mobileMenuOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
+  // GNB 컴포넌트 내부
+  const handleLogout = () => {
+    // 1. 상태 관리 저장소 비우기 (Zustand 등)
+    logout();
+
+    // 2. 브라우저 물리 저장소 강제 초기화 (임시 대응 핵심)
+    localStorage.clear();
+    sessionStorage.clear();
+
+    // 3. 쿠키 삭제 (중요한 세션 쿠키가 있다면 명시적 삭제)
+    document.cookie.split(';').forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, '')
+        .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
+    });
+
+    // 4. 메인으로 리다이렉트 (로그인 상태가 꼬이지 않도록 replace 추천)
+    router.replace('/');
+  };
+
+  return (
+    <>
+    <header
+      className="text-prime-900 fixed top-0 right-0 left-0 z-50 w-full backdrop-blur-md"
+      style={
+        pathname === '/about'
+          ? {
+              backgroundColor: `rgba(255,255,255,${scrollRatio * 0.6})`,
+              boxShadow: `0 4px 30px rgba(0,0,0,${scrollRatio * 0.03})`,
+            }
+          : {
+              backgroundColor: `rgba(255,255,255,${0.6 + scrollRatio * 0.3})`,
+              boxShadow:
+                scrollRatio > 0
+                  ? `0 4px 30px rgba(0,0,0,${scrollRatio * 0.08})`
+                  : '0 1px 0 rgba(0,0,0,0.06)',
+            }
+      }
+    >
+      <nav className="layout-container px-gutter flex h-16 items-center justify-between md:h-20">
+        {/* 로고 */}
+        <Link href="/" className="flex shrink-0 items-center gap-2">
+          <div className="relative size-8 overflow-hidden rounded-full">
+            <Image
+              src="/images/logo/logo-small.svg"
+              alt="MindLog"
+              fill
+              sizes="32px"
+              className="object-contain"
+            />
+          </div>
+          <span className="text-prime-900 text-lg leading-6.75 font-normal tracking-[-0.27px] whitespace-nowrap">
+            마인드 로그
+          </span>
+        </Link>
+
+        {/* 데스크톱 메뉴 */}
+        <div className="hidden items-center gap-1 lg:flex">
+          {(isAuthenticated ? MEMBER_NAV_ITEMS : GUEST_NAV_ITEMS).map(({ label, href }) => (
+            <NavItem key={href} label={label} href={href} active={pathname === href} />
+          ))}
+        </div>
+
+        {/* 우측 유틸리티 영역 */}
+        <div className="hidden lg:flex">
+          {isAuthenticated ? (
+            // 크레딧 + 프로필 — 하나의 그룹으로 묶어 시각 분리
+            <div className="border-prime-100 flex items-center gap-3 rounded-full border bg-white/70 px-4 py-1.5">
+              {/* 크레딧 */}
+              <Link
+                href="/shop?tab=credit"
+                className="text-prime-600 hover:text-prime-900 flex items-center gap-1.5 text-sm font-medium transition-colors"
+              >
+                <div className="bg-interactive-glass-blue-50 flex size-6 items-center justify-center rounded-full">
+                  <Coins size={13} strokeWidth={2} className="text-cta-300" />
+                </div>
+                {totalCredit.toLocaleString()} 크레딧
+              </Link>
+
+              {/* 구분선 */}
+              <div className="bg-prime-100 h-4 w-px" />
+
+              {/* 프로필 버튼 + 드롭다운 */}
+              <div ref={dropdownRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => setProfileDropdownOpen((v) => !v)}
+                  className="flex items-center gap-2 transition-opacity hover:opacity-70"
+                >
+                  <div className="border-cta-300 bg-cta-100 relative size-7 shrink-0 overflow-hidden rounded-full border">
+                    <ProfileAvatar src={user?.profileImage} defaultPadding="p-1" />
+                  </div>
+                  <span
+                    className="text-prime-900 max-w-24 truncate text-sm font-medium"
+                    title={user?.name}
+                  >
+                    {user?.name ?? 'MY'}
+                  </span>
+                </button>
+
+                {profileDropdownOpen && (
+                  <ProfileDropdown
+                    userName={user?.name ?? ''}
+                    userProfileImage={user?.profileImage}
+                    onLogout={() => {
+                      setProfileDropdownOpen(false);
+                      handleLogout();
+                    }}
+                    onMypage={() => {
+                      setProfileDropdownOpen(false);
+                      router.push('/my');
+                    }}
+                    onProfileHeader={() => {
+                      setProfileDropdownOpen(false);
+                      router.push('/my');
+                    }}
+                  />
+                )}
+              </div>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="text-prime-700 hover:text-prime-900 text-sm font-medium transition-colors"
+            >
+              로그인
+            </Link>
+          )}
+        </div>
+
+        {/* 모바일 햄버거 버튼 */}
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="hover:bg-secondary-100 flex h-11 w-11 items-center justify-center rounded-lg transition-colors lg:hidden"
+          aria-label={mobileMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
+          aria-expanded={mobileMenuOpen}
+        >
+          {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
+      </nav>
+
+    </header>
+
+      {/* 모바일 메뉴 오버레이 — header 밖에 렌더링 (backdrop-filter containing block 이슈 회피) */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-x-0 top-16 bottom-0 z-40 flex flex-col overflow-y-auto bg-white md:top-20 lg:hidden">
+          <div
+            className="flex flex-col gap-1 px-4 py-4"
+            style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
+          >
+            {(isAuthenticated ? MEMBER_NAV_ITEMS : GUEST_NAV_ITEMS).map(({ label, href }) => (
+              <MobileNavItem key={href} label={label} href={href} active={pathname === href} />
+            ))}
+
+            {isAuthenticated ? (
+              <>
+                <MobileNavItem label="마이페이지" href="/my" active={pathname === '/my'} />
+                <div className="border-prime-100 my-2 border-t" />
+                {/* 크레딧 잔액 */}
+                <Link
+                  href="/shop?tab=credit"
+                  className="text-prime-700 hover:bg-secondary-50 flex items-center gap-2 rounded-xl px-4 py-3 text-base font-medium transition-all"
+                >
+                  <div className="bg-interactive-glass-blue-50 flex size-6 items-center justify-center rounded-full">
+                    <Coins size={13} strokeWidth={2} className="text-cta-300" />
+                  </div>
+                  {totalCredit.toLocaleString()} 크레딧
+                </Link>
+                <div className="border-prime-100 my-2 border-t" />
+                <button
+                  onClick={handleLogout}
+                  className="text-error-500 hover:bg-error-100 w-full rounded-xl px-4 py-3 text-left text-base font-medium transition-all"
+                >
+                  로그아웃
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="border-prime-100 my-2 border-t" />
+                <Button asChild variant="primary" size="default" className="rounded-xl text-base">
+                  <Link href="/login">로그인</Link>
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+// NavItem — framer-motion 알약 hover 배경
+function NavItem({ label, href, active }: { readonly label: string; readonly href: string; readonly active: boolean }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <Link
+      href={href}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className={cn(
+        'relative flex flex-col items-center gap-1 rounded-full px-3.5 py-2 text-sm font-medium tracking-[-0.21px] transition-colors',
+        active ? 'text-prime-900' : 'text-prime-700 hover:text-prime-900'
+      )}
+    >
+      <AnimatePresence>
+        {hovered && !active && (
+          <motion.div
+            layoutId={`nav-hover-${href}`}
+            className="absolute inset-0 rounded-full"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ type: 'spring', bounce: 0.2, duration: 0.35 }}
+          />
+        )}
+      </AnimatePresence>
+      <span className="relative z-10">{label}</span>
+      <span
+        className={cn(
+          'relative z-10 block h-0.5 rounded-full transition-all duration-200',
+          active ? 'bg-cta-300 w-full' : 'bg-prime-300 w-0'
+        )}
+      />
+    </Link>
+  );
+}
+
+function MobileNavItem({ label, href, active }: { readonly label: string; readonly href: string; readonly active: boolean }) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        'flex items-center justify-between rounded-xl px-4 py-3 text-base font-medium transition-all',
+        active ? 'text-prime-900' : 'text-prime-700 hover:text-prime-900'
+      )}
+    >
+      {label}
+      <span
+        className={cn(
+          'h-2 w-2 rounded-full transition-all',
+          active ? 'bg-cta-300 opacity-100' : 'bg-prime-200 opacity-0'
+        )}
+      />
+    </Link>
+  );
+}
+
+// ── ProfileDropdown — Figma node 18:368 ─────────────────────────────────────
+function ProfileDropdown({
+  userName,
+  userProfileImage,
+  onLogout,
+  onMypage,
+  onProfileHeader,
+}: {
+  readonly userName: string;
+  readonly userProfileImage?: string;
+  readonly onLogout: () => void;
+  readonly onMypage: () => void;
+  readonly onProfileHeader: () => void;
+}) {
+  return (
+    <div className="border-prime-100 absolute top-full right-0 z-50 mt-2 w-59.5 overflow-hidden rounded-2xl border bg-white/90 shadow-sm backdrop-blur-md">
+      {/* 헤더: 아바타 + 이름 + 이메일 */}
+      <button
+        type="button"
+        onClick={onProfileHeader}
+        className="border-prime-100 hover:bg-secondary-50 flex w-full items-center gap-3 border-b px-5 py-4 transition-colors"
+      >
+        <div className="border-cta-300 bg-cta-100 relative size-10 shrink-0 overflow-hidden rounded-full border">
+          <ProfileAvatar src={userProfileImage} defaultPadding="p-1.5" />
+        </div>
+        <div className="flex min-w-0 flex-col">
+          <span className="text-prime-900 truncate text-sm leading-normal font-medium tracking-[-0.21px]">
+            {userName}
+          </span>
+        </div>
+      </button>
+
+      {/* 메뉴 항목 */}
+      <div className="py-2">
+        <button
+          type="button"
+          onClick={onMypage}
+          className="text-prime-900 hover:bg-secondary-50 flex w-full items-center gap-3 px-5 py-3 text-sm font-medium tracking-[-0.21px] transition-colors"
+        >
+          <div className="bg-interactive-glass-blue-50 flex size-8 shrink-0 items-center justify-center rounded-xl">
+            <User size={15} className="text-cta-300" />
+          </div>
+          마이페이지
+        </button>
+
+        <div className="bg-prime-100 mx-3 my-1 h-px" />
+
+        <button
+          type="button"
+          onClick={onLogout}
+          className="text-prime-700 hover:bg-secondary-50 flex w-full items-center gap-3 px-5 py-3 text-sm font-medium tracking-[-0.21px] transition-colors"
+        >
+          <div className="bg-prime-100 flex size-8 shrink-0 items-center justify-center rounded-xl">
+            <LogOut size={15} className="text-prime-400" />
+          </div>
+          로그아웃
+        </button>
+      </div>
+    </div>
+  );
+}

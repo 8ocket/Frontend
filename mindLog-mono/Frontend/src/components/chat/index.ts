@@ -1,0 +1,21 @@
+// 채팅 관련 컴포넌트 export
+export { ChatSidebar } from '@/widgets/chat-sidebar';
+export { ChatSessionList } from '@/widgets/chat-sidebar';
+export type { ChatSession, ChatSessionGroup } from '@/widgets/chat-sidebar';
+export { ChatMainArea } from '@/widgets/chat-main-area';
+export { ChatBubble } from '@/widgets/chat-main-area';
+export type { ChatBubbleProps, BubbleVariant } from '@/widgets/chat-main-area';
+export { ChatInputBar } from '@/features/send-message';
+export { ChatAlertModal } from './ChatAlertModal';
+export { ChatCreditModal } from './ChatCreditModal';
+export type { ChatCreditModalProps } from './ChatCreditModal';
+export { ChatNewSessionModal } from './ChatNewSessionModal';
+export type { ChatNewSessionModalProps } from './ChatNewSessionModal';
+export { ChatUnfinishedSessionModal } from './ChatUnfinishedSessionModal';
+export type { ChatUnfinishedSessionModalProps } from './ChatUnfinishedSessionModal';
+export { ChatFilterPanel } from '@/widgets/chat-sidebar';
+export { ChatSatisfactionModal } from './ChatSatisfactionModal';
+export type { ChatSatisfactionModalProps } from './ChatSatisfactionModal';
+export { ChatWelcomeHeader } from './ChatWelcomeHeader';
+export { ChatLogo } from '@/widgets/chat-main-area';
+export { ChatScrollbar } from '@/widgets/chat-sidebar';
