@@ -17,7 +17,6 @@ import {
   mockFinalizeSession,
   mockDeleteSession,
 } from '@/mocks';
-import { createHttpStatusError } from '@/shared/lib/utils/error';
 import { USE_MOCK } from '@/shared/lib/env';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/v1';
@@ -93,7 +92,14 @@ export const createSessionStream = async (
     body: JSON.stringify(req),
   });
 
-  if (!response.ok) throw createHttpStatusError(response.status);
+  if (!response.ok) {
+    let code = '';
+    try {
+      const body = await response.json();
+      code = body.code || body.error?.code || '';
+    } catch {}
+    throw new Error(code || String(response.status));
+  }
 
   const reader = response.body?.getReader();
   if (!reader) return;
@@ -183,7 +189,8 @@ export const finalizeSessionStream = async (
   onStatus: (step: string, message: string) => void,
   onComplete: (data: FinalizeCompleteEvent) => void,
   onDone: () => void,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  onError?: (message: string) => void
 ): Promise<void> => {
   if (USE_MOCK) return mockFinalizeSession(onStatus, onComplete, onDone);
 
@@ -237,6 +244,7 @@ export const finalizeSessionStream = async (
             const data = JSON.parse(raw);
             if (currentEvent === 'status') onStatus(data.step, data.message);
             if (currentEvent === 'ai_complete') onComplete(data);
+            if (currentEvent === 'server_error' || currentEvent === 'error') onError?.(data.content ?? data.message);
           } catch {
             // malformed JSON 무시
           }

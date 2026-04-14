@@ -40,7 +40,6 @@ export interface ActiveSessionResponse {
 
 export interface CreateSessionRequest {
   first_content: string;
-  persona_id: string;
 }
 
 // SSE 이벤트 순서: [ai_chunk × N] → ai_complete → session_title → done
@@ -62,7 +61,7 @@ export interface SendMessageRequest {
 }
 
 // SSE 이벤트 타입
-export type SSEEventType = 'ai_chunk' | 'ai_complete' | 'crisis_check' | 'done';
+export type SSEEventType = 'ai_chunk' | 'ai_complete' | 'crisis_check' | 'done' | 'error';
 
 export interface SSEChunkEvent {
   content: string;
@@ -143,6 +142,7 @@ export interface SessionDetailResponse {
   status: string;
   messages: SessionDetailMessage[];
   has_summary: boolean;
+  card_image_url?: string;
 }
 
 export interface SessionCheckpointMapping {

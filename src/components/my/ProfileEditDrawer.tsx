@@ -34,7 +34,7 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
 
   // 프로필 사진 / 닉네임
   const [nickname, setNickname] = useState('');
-  const [profileImage, setProfileImage] = useState<string>('/images/icons/profile-default.png');
+  const [profileImage, setProfileImage] = useState<string | undefined>(undefined);
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const objectUrlRef = useRef<string | null>(null);
@@ -92,7 +92,7 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
         setNickname(nick);
         setNicknameChangeCount(profile.nickname_change_count ?? 0);
         if (profile.profile_image_url) setProfileImage(profile.profile_image_url);
-        else setProfileImage('/images/icons/profile-default.png');
+        else setProfileImage(undefined);
         setOccupation(occ as keyof typeof OCCUPATION_MAP);
         setAgeGroup(age as keyof typeof AGE_MAP);
         setGender(gen as keyof typeof GENDER_MAP);

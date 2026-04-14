@@ -45,7 +45,7 @@ export interface ChatMainAreaProps {
 
 export function ChatMainArea({
   onEndChat,
-  onCreditShortage: _onCreditShortage,
+  onCreditShortage,
   onUnfinishedSession: _onUnfinishedSession,
   initialMessages = [],
   isSessionActive = true,
@@ -67,6 +67,9 @@ export function ChatMainArea({
   const prevSessionIdRef = useRef<string | undefined>(sessionId);
   // handleSend에서 세션을 직접 생성한 경우 true → sessionId 변경 시 메시지 유지
   const justCreatedSessionRef = useRef(false);
+  // 항상 최신 initialMessages를 참조하기 위한 ref
+  const initialMessagesRef = useRef(initialMessages);
+  initialMessagesRef.current = initialMessages;
 
   // 세션 전환 시 메시지 교체 (sessionId 기준으로 판단)
   useEffect(() => {
@@ -90,8 +93,8 @@ export function ChatMainArea({
     }
 
     // 이어가기 / 사이드바 세션 선택 → initialMessages 로드
-    setMessages(initialMessages);
-  }, [sessionId]); // eslint-disable-line react-hooks/exhaustive-deps
+    setMessages(initialMessagesRef.current);
+  }, [sessionId]);
 
   // 외부에서 메시지 추가 (예: 종료 시 "마음 기록 제작 중")
   useEffect(() => {
@@ -127,7 +130,7 @@ export function ChatMainArea({
 
       try {
         await createSessionStream(
-          { first_content: content, persona_id: '019d6ba8-b430-7aeb-b18f-919e08b5f500' },
+          { first_content: content },
           token,
           (chunk) => {
             accumulated += chunk;
@@ -156,7 +159,12 @@ export function ChatMainArea({
           }
         );
       } catch (err) {
-        console.error('Session create error:', err);
+        const code = err instanceof Error ? err.message : '';
+        if (code === 'INSUFFICIENT_CREDIT') {
+          onCreditShortage?.();
+        } else {
+          console.warn('Session create error:', code || err);
+        }
         setIsStreaming(false);
         setStreamingText('');
       }
@@ -187,6 +195,11 @@ export function ChatMainArea({
             ...prev,
             { variant: 'ai', senderName: aiName, content: accumulated, avatarSrc: aiAvatarSrc },
           ]);
+          setStreamingText('');
+          setIsStreaming(false);
+        },
+        (errorMessage) => {
+          console.error('SSE error:', errorMessage);
           setStreamingText('');
           setIsStreaming(false);
         }
