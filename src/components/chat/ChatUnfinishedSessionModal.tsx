@@ -78,8 +78,8 @@ export function ChatUnfinishedSessionModal({
             <div className="flex w-full flex-col items-center gap-6">
               {/* 본문 — Pretendard Regular 16px, lh 25.6px, #3F526F, CENTER */}
               {/* VariableID:575:5015 = prime-700, style: Body 01 */}
-              <DialogDescription className="body-1 text-prime-700 w-full text-center">
-                {'이전에 중단되어 마무리가 되지 않은 \n상담이 있습니다. 돌아가서 진행하시습니까?'}
+              <DialogDescription className="body-1 text-prime-700 w-full whitespace-pre-line text-center">
+                {'이전에 중단되어 마무리가 되지 않은 \n상담이 있습니다. 돌아가서 진행하시겠습니까?'}
               </DialogDescription>
             </div>
 
@@ -109,7 +109,7 @@ export function ChatUnfinishedSessionModal({
             <Button
               variant="secondary"
               onClick={onIgnore}
-              className="w-35 shrink-0 px-6"
+              className="flex-1 px-6"
             >
               무시하기
             </Button>
@@ -118,7 +118,7 @@ export function ChatUnfinishedSessionModal({
             <Button
               variant="primary"
               onClick={onResume}
-              className="w-35 shrink-0 px-6"
+              className="flex-1 px-6"
             >
               진행한다
             </Button>

@@ -73,7 +73,7 @@ export function ChatAlertModal({ isOpen, onClose, onWait, onEnd }: ChatAlertModa
             <Button
               variant="secondary"
               onClick={onWait}
-              className="w-35 shrink-0 px-6"
+              className="flex-1 px-6"
             >
               대기한다
             </Button>
@@ -82,7 +82,7 @@ export function ChatAlertModal({ isOpen, onClose, onWait, onEnd }: ChatAlertModa
             <Button
               variant="primary"
               onClick={onEnd}
-              className="w-35 shrink-0 px-6"
+              className="flex-1 px-6"
             >
               종료하기
             </Button>

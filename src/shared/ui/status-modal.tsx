@@ -146,7 +146,7 @@ export function StatusModal({
                 type="button"
                 onClick={() => setIsAgreed(!isAgreed)}
                 className={cn(
-                  'flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-sm border transition-colors',
+                  'flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border transition-colors',
                   isAgreed ? 'border-cta-300 bg-cta-300' : 'bg-secondary-100 border-neutral-300'
                 )}
               >

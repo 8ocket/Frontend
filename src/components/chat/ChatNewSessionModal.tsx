@@ -64,7 +64,7 @@ export function ChatNewSessionModal({ isOpen, onClose, onConfirm, overlayBlur = 
             <div className="flex w-full flex-col items-center gap-6">
               {/* 본문 — Pretendard Regular 16px, lh 25.6px, #3F526F, CENTER */}
               {/* VariableID:575:5015 = prime-700, style: Body 01 */}
-              <DialogDescription className="body-1 text-prime-700 w-full text-center">
+              <DialogDescription className="body-1 text-prime-700 w-full whitespace-pre-line text-center">
                 {'왼쪽 사이드바의 [상담] 버튼을 누르시면 \n새로운 상담을 진행하실 수 있습니다.'}
               </DialogDescription>
             </div>

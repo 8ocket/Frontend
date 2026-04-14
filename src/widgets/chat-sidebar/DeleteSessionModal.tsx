@@ -48,7 +48,6 @@ export function DeleteSessionModal({ isOpen, onClose, onConfirm }: DeleteSession
             />
             <DialogTitle
               className="w-full text-center text-2xl font-semibold leading-[1.3] tracking-[-0.36px] text-prime-900"
-              style={{ fontFamily: 'var(--font-pretendard)' }}
             >
               대화를 삭제하시나요?
             </DialogTitle>
@@ -57,7 +56,7 @@ export function DeleteSessionModal({ isOpen, onClose, onConfirm }: DeleteSession
           {/* 본문 */}
           <DialogDescription
             className="text-prime-700 w-full text-center text-base font-normal leading-[1.6]"
-            style={{ wordBreak: 'keep-all', fontFamily: 'var(--font-pretendard)' }}
+            style={{ wordBreak: 'keep-all' }}
           >
             본 대화를 삭제할 경우 복구가 불가능하며<br />심화 리포트와 감정 카드도 함께 삭제됩니다.
             <br />그래도 삭제하시겠습니까?
@@ -81,7 +80,6 @@ export function DeleteSessionModal({ isOpen, onClose, onConfirm }: DeleteSession
             </button>
             <span
               className="text-sm font-medium text-black"
-              style={{ fontFamily: 'var(--font-pretendard)' }}
             >
               위 내용을 확인 했습니다.
             </span>
@@ -93,7 +91,6 @@ export function DeleteSessionModal({ isOpen, onClose, onConfirm }: DeleteSession
               type="button"
               onClick={() => { setAgreed(false); onClose(); }}
               className="h-11 flex-1 rounded-lg border border-cta-300 bg-secondary-100 text-base font-medium text-prime-700 transition-opacity hover:opacity-80"
-              style={{ fontFamily: 'var(--font-pretendard)' }}
             >
               취소하기
             </button>
@@ -102,7 +99,6 @@ export function DeleteSessionModal({ isOpen, onClose, onConfirm }: DeleteSession
               onClick={() => { setAgreed(false); onConfirm(); }}
               disabled={!agreed}
               className="h-11 flex-1 rounded-lg bg-cta-300 text-base font-medium text-prime-900 transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
-              style={{ fontFamily: 'var(--font-pretendard)' }}
             >
               삭제하기
             </button>

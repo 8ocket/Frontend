@@ -50,14 +50,14 @@ export function ChatSatisfactionModal({ isOpen, onClose, onYes, onNo }: ChatSati
             <Button
               variant="secondary"
               onClick={onNo}
-              className="w-35 shrink-0 px-6"
+              className="flex-1 px-6"
             >
               아니오
             </Button>
             <Button
               variant="primary"
               onClick={onYes}
-              className="w-35 shrink-0 px-6"
+              className="flex-1 px-6"
             >
               네, 도움됐어요!
             </Button>

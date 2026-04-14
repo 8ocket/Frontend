@@ -95,7 +95,7 @@ export function ChatCreditModal({
             <Button
               variant="secondary"
               onClick={onEnd}
-              className="w-35 shrink-0 px-6"
+              className="flex-1 px-6"
             >
               종료하기
             </Button>
@@ -104,7 +104,7 @@ export function ChatCreditModal({
             <Button
               variant="primary"
               onClick={onPurchase}
-              className="w-35 shrink-0 px-6"
+              className="flex-1 px-6"
             >
               구매하기
             </Button>
