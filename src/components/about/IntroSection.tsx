@@ -101,18 +101,19 @@ export function IntroSection() {
           </div>
         </div>
 
-        {/* 4. 스크롤 유도 화살표: 화면 하단에 고정 */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: isTypingDone ? 1 : 0 }}
-          className="absolute bottom-12 flex flex-col items-center gap-2"
-        >
-          <span className="text-sm font-medium text-[#3F527E] opacity-60">스크롤하여 시작하기</span>
-          <div className="animate-bounce">
-            <ChevronDown size={28} strokeWidth={1.5} style={{ color: '#3F527E' }} />
-          </div>
-        </motion.div>
-      </div>
+        </div>
+
+      {/* 4. 스크롤 유도 화살표: section 기준 하단에 고정 */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isTypingDone ? 1 : 0 }}
+        className="absolute bottom-12 z-10 flex flex-col items-center gap-2"
+      >
+        <span className="text-sm font-medium text-[#3F527E] opacity-60">스크롤하여 시작하기</span>
+        <div className="animate-bounce">
+          <ChevronDown size={28} strokeWidth={1.5} style={{ color: '#3F527E' }} />
+        </div>
+      </motion.div>
     </section>
   );
 }

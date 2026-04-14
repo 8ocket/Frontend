@@ -236,13 +236,13 @@ export function ReportDetail({ report }: ReportDetailProps) {
           animationDuration: '400ms',
           animationDelay: '320ms',
           animationFillMode: 'both',
-          background: 'rgba(130,201,255,0.1)',
+          background: 'rgba(141,194,238,0.1)',
         }}
       >
         <div className="flex flex-col items-center gap-4 text-center">
           <div
             className="flex size-12 items-center justify-center rounded-full"
-            style={{ background: 'rgba(130,201,255,0.2)' }}
+            style={{ background: 'rgba(141,194,238,0.2)' }}
           >
             <Target className="size-6 text-prime-900" />
           </div>
@@ -263,11 +263,11 @@ export function ReportDetail({ report }: ReportDetailProps) {
                 <div
                   key={i}
                   className="flex items-start gap-4 rounded-3xl p-4 md:items-center md:gap-6 md:p-7"
-                  style={{ background: 'rgba(130,201,255,0.2)' }}
+                  style={{ background: 'rgba(141,194,238,0.2)' }}
                 >
                   <div
                     className="size-11 shrink-0 animate-pulse rounded-full"
-                    style={{ background: 'rgba(130,201,255,0.3)' }}
+                    style={{ background: 'rgba(141,194,238,0.3)' }}
                   />
                   <div className="flex-1 space-y-4">
                     <div className="bg-prime-200 h-4 w-1/3 animate-pulse rounded" />
@@ -282,11 +282,11 @@ export function ReportDetail({ report }: ReportDetailProps) {
               <div
                 key={suggestion.title}
                 className="flex items-start gap-4 rounded-3xl p-4 md:items-center md:gap-6 md:p-7"
-                style={{ background: 'rgba(130,201,255,0.2)' }}
+                style={{ background: 'rgba(141,194,238,0.2)' }}
               >
                 <div
                   className="flex size-11 shrink-0 items-center justify-center rounded-full"
-                  style={{ background: 'rgba(130,201,255,0.3)' }}
+                  style={{ background: 'rgba(141,194,238,0.3)' }}
                 >
                   <span className="text-prime-900 text-xl font-semibold">{i + 1}</span>
                 </div>

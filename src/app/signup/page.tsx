@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useRouter } from 'next/navigation';
@@ -80,9 +80,10 @@ export default function SignupPage() {
 
   return (
     <AuroraBackground>
-      <div className="min-h-screen-safe relative w-full overflow-y-auto px-0 py-0">
-        {/* 모바일: 세로 스택, 데스크톱: 좌측 고정 */}
-        <div className="relative z-10 flex w-full flex-col gap-12 px-6 py-8 md:absolute md:top-1/2 md:left-[12.5%] md:w-89.5 md:-translate-y-1/2 md:px-0 md:py-0">
+      <div className="min-h-screen-safe relative w-full overflow-y-auto">
+        {/* 모바일/태블릿: 세로 스택, 데스크톱(lg+): 좌우 flex */}
+        <div className="relative z-10 flex min-h-screen-safe flex-col lg:flex-row lg:items-center lg:justify-start lg:gap-10 lg:pl-[12.5%] lg:pr-[2%]">
+        <div className="flex w-full flex-col gap-12 px-6 py-8 md:absolute md:top-1/2 md:left-[12.5%] md:w-89.5 md:-translate-y-1/2 md:px-0 md:py-0 md:max-h-[90vh] md:overflow-y-auto lg:relative lg:top-auto lg:left-auto lg:translate-y-0 lg:shrink-0 lg:w-89.5">
           {/* 헤더 */}
           <div className="flex flex-col gap-4.75">
             <div className="flex items-center justify-between">
@@ -140,20 +141,22 @@ export default function SignupPage() {
                         <div
                           className={cn(
                             'flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border border-neutral-300 transition-colors',
-                            groupChecked ? 'bg-cta-300' : 'bg-white'
+                            groupChecked ? 'bg-cta-300' : 'bg-secondary-100'
                           )}
                         >
                           {groupChecked && (
-                            <span className="text-secondary-100 text-[12px]">✓</span>
+                            <span className="text-secondary-100 text-[12px] leading-none font-semibold">✓</span>
                           )}
                           {groupIndeterminate && (
-                            <span className="text-prime-700 text-[12px]">-</span>
+                            <span className="text-neutral-400 text-[12px] leading-none font-semibold">-</span>
                           )}
                         </div>
-                        <span className="text-prime-900 text-[14px] font-medium">
+                        <span className="text-prime-800 text-base font-medium">
                           {group.label}
                         </span>
-                        <span className="text-cta-300 text-[11px] font-medium">[필수]</span>
+                        <span className={cn('text-base font-medium', group.required ? 'text-error-500' : 'text-warning-500')}>
+                          {group.required ? '*' : '(선택)'}
+                        </span>
                       </button>
                     )}
                     <div className={cn('flex flex-col gap-3', isMulti && 'ml-6')}>
@@ -183,11 +186,11 @@ export default function SignupPage() {
               <div
                 className={cn(
                   'flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border border-neutral-300 transition-colors',
-                  allAgree ? 'bg-cta-300' : 'bg-white'
+                  allAgree ? 'bg-cta-300' : 'bg-secondary-100'
                 )}
               >
                 {allAgree && (
-                  <span className="text-secondary-100 text-[12px] leading-[1.6]">✓</span>
+                  <span className="text-secondary-100 text-[12px] leading-none font-semibold">✓</span>
                 )}
               </div>
               <span className="text-secondary-100 text-[16px] leading-none font-medium">
@@ -207,25 +210,27 @@ export default function SignupPage() {
           </Button>
         </div>
 
-        {/* 우측: 약관 세부내용 패널 — 모바일: 전체화면 오버레이, 데스크톱: 우측 패널 */}
-        {selectedTerm && (
-          <div className="fixed inset-0 z-20 bg-white/95 p-4 md:absolute md:inset-auto md:top-[20.1%] md:left-[35.3%] md:h-[59.8vh] md:w-[50.4%] md:bg-transparent md:p-0">
-            <TermsDetailPanel
-              key={selectedTerm}
-              title={TERMS_LIST.find((t) => t.key === selectedTerm)!.label}
-              onClose={() => setSelectedTerm(null)}
-              onAgree={() => handleAgree(selectedTerm)}
-              onDisagree={() => handleDisagree(selectedTerm)}
-              isAgreed={agreements[selectedTerm]}
-            >
-              <div className="prose prose-sm max-w-none">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {TERMS_CONTENT[selectedTerm]}
-                </ReactMarkdown>
-              </div>
-            </TermsDetailPanel>
-          </div>
-        )}
+          {/* 우측: 약관 세부내용 패널 — 모바일: 전체화면 오버레이, 데스크톱: flex 우측 패널 */}
+          {selectedTerm && (
+            <div className="fixed inset-0 z-20 bg-white/95 p-4 lg:inset-auto lg:top-1/2 lg:right-[6%] lg:max-h-[90vh] lg:h-[62vh] lg:w-[44%] lg:-translate-y-1/2 lg:bg-transparent lg:p-0">
+              <TermsDetailPanel
+                key={selectedTerm}
+                title={TERMS_LIST.find((t) => t.key === selectedTerm)!.label}
+                required={TERMS_GROUPS.find((g) => g.items.some((i) => i.key === selectedTerm))?.required}
+                onClose={() => setSelectedTerm(null)}
+                onAgree={() => handleAgree(selectedTerm)}
+                onDisagree={() => handleDisagree(selectedTerm)}
+                isAgreed={agreements[selectedTerm]}
+              >
+                <div className="prose prose-sm max-w-none">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {TERMS_CONTENT[selectedTerm]}
+                  </ReactMarkdown>
+                </div>
+              </TermsDetailPanel>
+            </div>
+          )}
+        </div>
       </div>
     </AuroraBackground>
   );

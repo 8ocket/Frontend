@@ -3,7 +3,7 @@
 // Figma MODAL 10 (node 2113:9240) — 크레딧 부족 알림
 // Root: 350×329(HUG), VERTICAL, padding 24px all
 // bg: VariableID:575:5007 = #F8FAFC (secondary-100)
-// border: 2px INSIDE, VariableID:1243:2688 = rgba(130,201,255,0.30)
+// border: 2px INSIDE, VariableID:1243:2688 = rgba(141,194,238,0.30)
 // radius: 12px
 
 import { Button } from '@/shared/ui/button';

@@ -48,3 +48,22 @@ next-env.d.ts
 
 # local tool directories
 .claude/
+
+# other projects (not part of this repo)
+NewTaskry/
+RUN_LOCAL_DEVELOPMENT.md
+dacade-local/
+dancade/
+mindLog-backend/
+mindLog.code-workspace
+mindLog/
+pokemonDex/
+start-dev.sh
+wittie/
+
+# mindLog-mono subfolders (managed separately via remote)
+mindLog-mono/AI/
+mindLog-mono/Backend/
+mindLog-mono/Terraform/
+mindLog-mono/.vscode/
+mindLog-mono/memory/

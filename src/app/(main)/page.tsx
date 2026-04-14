@@ -417,8 +417,8 @@ function AdBanner() {
             className={cn(
               'rounded-full transition-all duration-300',
               idx === current
-                ? 'h-2 w-7 bg-[rgba(130,201,255,0.9)]'
-                : 'h-2 w-2 bg-[rgba(130,201,255,0.4)]'
+                ? 'h-2 w-7 bg-[rgba(141,194,238,0.9)]'
+                : 'h-2 w-2 bg-[rgba(141,194,238,0.4)]'
             )}
           />
         ))}

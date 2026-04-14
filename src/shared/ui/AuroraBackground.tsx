@@ -37,12 +37,12 @@ export default function AuroraBackground({ children, className = '' }: AuroraBac
       >
         <motion.div
           className="absolute inset-0"
-          initial={{ background: 'radial-gradient(circle at 20% 30%, rgba(130, 201, 255, 0.55) 0%, transparent 65%)' }}
+          initial={{ background: 'radial-gradient(circle at 20% 30%, rgba(141, 194, 238, 0.55) 0%, transparent 65%)' }}
           animate={{
             background: [
-              'radial-gradient(circle at 20% 30%, rgba(130, 201, 255, 0.55) 0%, transparent 65%)',
-              'radial-gradient(circle at 80% 70%, rgba(130, 201, 255, 0.55) 0%, transparent 65%)',
-              'radial-gradient(circle at 20% 30%, rgba(130, 201, 255, 0.55) 0%, transparent 65%)',
+              'radial-gradient(circle at 20% 30%, rgba(141, 194, 238, 0.55) 0%, transparent 65%)',
+              'radial-gradient(circle at 80% 70%, rgba(141, 194, 238, 0.55) 0%, transparent 65%)',
+              'radial-gradient(circle at 20% 30%, rgba(141, 194, 238, 0.55) 0%, transparent 65%)',
             ],
           }}
           transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}

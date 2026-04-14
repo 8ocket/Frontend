@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { cn } from '@/shared/lib/utils';
 
 // ── Figma 디자인 시스템: Checkbox (node 1306:3235) ──────────────
