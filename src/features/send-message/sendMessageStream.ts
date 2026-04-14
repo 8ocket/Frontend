@@ -11,7 +11,8 @@ export const sendMessageStream = async (
   token: string,
   onChunk: (chunk: string) => void,
   onCrisis: (msg: string) => void,
-  onDone: () => void
+  onDone: () => void,
+  onError?: (message: string) => void
 ) => {
   if (USE_MOCK) {
     return mockSendMessageStream(onChunk, onCrisis, onDone);
@@ -34,7 +35,10 @@ export const sendMessageStream = async (
   if (!response.ok) throw createHttpStatusError(response.status);
 
   const reader = response.body?.getReader();
-  if (!reader) return;
+  if (!reader) {
+    onDone();
+    return;
+  }
 
   let currentEvent = '' as SSEEventType;
   const decoder = new TextDecoder();
@@ -63,16 +67,19 @@ export const sendMessageStream = async (
         if (line.startsWith('data:')) {
           const raw = line.replace('data:', '').trim();
           if (!raw) continue;
+
+          if (currentEvent === 'done') {
+            doneHandled = true;
+            onDone();
+            reader.cancel();
+            return;
+          }
+
           try {
             const data = JSON.parse(raw);
             if (currentEvent === 'ai_chunk') onChunk(data.content);
             if (currentEvent === 'crisis_check') onCrisis(data.content);
-            if (currentEvent === 'done') {
-              doneHandled = true;
-              onDone();
-              reader.cancel();
-              return;
-            }
+            if (currentEvent === 'error') onError?.(data.message);
           } catch (e) {
             console.warn('[SSE] JSON 파싱 실패 — raw:', raw, e);
           }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCreditStore } from '@/entities/credits/store';
 import { useAuthStore } from '@/entities/user/store';
 import type { ChatBubbleProps } from '@/widgets/chat-main-area';
@@ -684,6 +684,7 @@ export default function ChatPage() {
   const { toast } = useToast();
   const remainingCredits = totalCredit;
 
+  const searchParams = useSearchParams();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSessionId, setActiveSessionId] = useState<string | undefined>(undefined);
   const [unfinishedSession, setUnfinishedSession] = useState<ActiveSessionResponse | null>(null);
@@ -783,14 +784,25 @@ export default function ChatPage() {
   // 세션 상세 → ChatBubbleProps[] 변환 (API는 최신→과거 순, 표시는 과거→최신)
   const activeMessages = useMemo((): ChatBubbleProps[] => {
     if (!sessionDetail) return [];
-    return [...sessionDetail.messages].reverse().map((m) => ({
+    const messages: ChatBubbleProps[] = [...sessionDetail.messages].reverse().map((m) => ({
       variant: m.role === 'assistant' ? 'ai' : 'user',
       senderName: m.role === 'assistant' ? '나봄이' : (user?.name ?? '나'),
       content: m.content,
       avatarSrc: m.role === 'assistant' ? '/images/personas/nabomi-44.png' : undefined,
       userAvatarSrc: m.role === 'user' ? (user?.profileImage ?? undefined) : undefined,
     }));
-  }, [sessionDetail]);
+
+    if (sessionDetail.status === 'SAVED' && sessionDetail.card_image_url) {
+      messages.push({
+        variant: 'ai',
+        senderName: '나봄이',
+        avatarSrc: '/images/personas/nabomi-44.png',
+        cardImageUrl: sessionDetail.card_image_url,
+      });
+    }
+
+    return messages;
+  }, [sessionDetail, user]);
 
   const activeAiName = '나봄이';
   const activeAiAvatarSrc = '/images/personas/nabomi-44.png';
@@ -814,20 +826,31 @@ export default function ChatPage() {
     return Array.from(groupMap.values());
   }, [sessionList]);
 
+  // ── ?session= 쿼리로 세션 자동 선택 ──────────────────────────────
+  useEffect(() => {
+    const sessionId = searchParams.get('session');
+    if (sessionId) {
+      handleSelectSession(sessionId);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // ── 진입 시 미완료 세션 확인 + 세션 목록 조회 ──────────────────
   useEffect(() => {
-    getActiveSessionApi()
-      .then((session) => {
-        if (session) {
-          setUnfinishedSession(session);
-          openModal('unfinished-session');
-        }
-      })
-      .catch(() => {});
+    Promise.all([
+      getActiveSessionApi().catch(() => null),
+      getSessionsApi().catch(() => null),
+    ]).then(([activeSession, sessionData]) => {
+      const sessions = sessionData?.sessions ?? [];
+      setSessionList(sessions);
 
-    getSessionsApi()
-      .then((res) => setSessionList(res.sessions))
-      .catch(() => {});
+      if (activeSession) {
+        setUnfinishedSession(activeSession);
+        openModal('unfinished-session');
+      } else if (sessions.length === 0) {
+        openModal('new-session');
+      }
+    });
   }, [openModal]);
 
   // ── 핸들러 ───────────────────────────────────────────────────────
@@ -851,6 +874,17 @@ export default function ChatPage() {
   const handleNewCounsel = () => {
     setSidebarOpen(false);
     closeModal();
+
+    // 오늘 이미 세션이 있으면 추가 상담(70 크레딧 차감) → 크레딧 사전 체크
+    const today = new Date().toDateString();
+    const hasTodaySession = sessionList.some(
+      (s) => new Date(s.startedAt).toDateString() === today
+    );
+    if (hasTodaySession && totalCredit < 70) {
+      openModal('credit-shortage');
+      return;
+    }
+
     setActiveSessionId(undefined); // 새 세션 준비 (첫 메시지 전송 시 생성)
     setIsSessionActive(true);
   };
@@ -944,7 +978,12 @@ export default function ChatPage() {
             setCapturePayload({ data: cardData, summaryId: capturedResult.summary_id });
           }
         },
-        controller.signal
+        controller.signal,
+        (errorMessage) => {
+          closeModal();
+          console.error('Finalize SSE error:', errorMessage);
+          setAppendMessage({ variant: 'ai', senderName: '나봄이', avatarSrc: activeAiAvatarSrc, content: '마음 기록 생성 중 오류가 발생했습니다.' });
+        }
       );
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') return;
@@ -1012,7 +1051,13 @@ export default function ChatPage() {
           onDisabledInputClick={handleDisabledInputClick}
           appendMessage={appendMessage}
           sessionId={activeSessionId}
-          onSessionCreated={(id) => setActiveSessionId(id)}
+          onSessionCreated={(id) => {
+            setActiveSessionId(id);
+            setSessionList((prev) => [
+              { sessionId: id, title: '', status: 'ACTIVE', startedAt: new Date().toISOString() },
+              ...prev,
+            ]);
+          }}
           aiName={activeAiName}
           aiAvatarSrc={activeAiAvatarSrc}
           onUserMessage={resetInactivityTimer}
