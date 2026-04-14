@@ -95,20 +95,20 @@ export function TermsDetailPanel({
       </div>
 
       {/* 본문: 스크롤 영역 */}
-      <div className="relative min-h-0 flex-1">
-        <div
-          ref={scrollRef}
-          className="no-scrollbar size-full overflow-y-auto"
-        >
-          <div className="text-prime-700 text-sm leading-[1.6] font-normal">{children}</div>
+      <div
+        ref={scrollRef}
+        className="no-scrollbar min-h-0 flex-1 overflow-y-auto"
+      >
+        <div className="text-prime-700 text-sm leading-[1.6] font-normal">{children}</div>
+      </div>
+
+      {/* 하단 스크롤 화살표 */}
+      <div className={cn('flex justify-center transition-opacity duration-300', isScrolledToBottom ? 'opacity-0 pointer-events-none' : 'opacity-100')}>
+        <div className="animate-bounce text-prime-400">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </div>
-        {/* 하단 페이드 — 스크롤 가능함을 암시 */}
-        <div
-          className={cn(
-            'pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-[rgba(248,250,252,0.95)] to-transparent transition-opacity duration-300',
-            isScrolledToBottom ? 'opacity-0' : 'opacity-100'
-          )}
-        />
       </div>
 
       {/* 동의/미동의 버튼 */}
