@@ -11,6 +11,8 @@ interface ProfileAvatarProps {
   defaultPadding?: string;
 }
 
+const DEFAULT_PROFILE = '/images/icons/profile-default.png';
+
 function DefaultProfileIcon({ padding }: { padding: string }) {
   return (
     <div className={cn('absolute inset-0 flex items-center justify-center', padding)}>
