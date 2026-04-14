@@ -36,13 +36,15 @@ export const updateSummaryApi = async (
 /**
  * 마음 기록 카드 앞면 이미지 업로드
  * PATCH /v1/summaries/{summary_id}/image
+ * 백엔드 @RequestPart("summary_card") — 필드명 "summary_card"
  */
-export const uploadSummaryCardImageApi = async (summaryId: string, file: File): Promise<void> => {
+export const uploadSummaryCardImageApi = async (
+  summaryId: string,
+  frontFile: File,
+): Promise<void> => {
   const formData = new FormData();
-  formData.append('summary_card', file);
-  await api.patch(`/summaries/${summaryId}/image`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
+  formData.append('summary_card', frontFile);
+  await api.patch(`/summaries/${summaryId}/image`, formData);
 };
 
 /**

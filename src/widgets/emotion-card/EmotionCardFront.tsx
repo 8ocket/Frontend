@@ -31,6 +31,15 @@ export function EmotionCardFront({
   const primaryMeta = primaryLayer ? EMOTION_META[primaryLayer.type] : null;
   const bgColor = primaryMeta?.hex ?? '#f8fafc';
 
+  // color-mix()는 html-to-image에서 지원되지 않으므로 rgba로 직접 계산
+  const bgRgba = (() => {
+    const hex = bgColor.replace('#', '');
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, 0.1)`;
+  })();
+
   // 브러시 크기 — Figma: primary 100%, secondary 86%, background 71%
   const brushSizeMap: Record<string, number> = {
     primary: width,
@@ -64,7 +73,7 @@ export function EmotionCardFront({
       style={{
         width,
         height,
-        backgroundColor: `color-mix(in srgb, ${bgColor} 10%, transparent)`,
+        backgroundColor: bgRgba,
       }}
     >
       {/* 브러시 레이어 */}

@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 import { ChatBubble, ChatBubbleProps } from './ChatBubble';
+import { ChatScrollbar } from './ChatScrollbar';
 import { ChatInputBar } from '@/features/send-message';
 import { sendMessageStream } from '@/features/send-message/sendMessageStream';
 import { createSessionStream } from '@/entities/session/api';
@@ -63,6 +64,8 @@ export function ChatMainArea({
   const [inputValue, setInputValue] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState('');
+  const [scrollRatio, setScrollRatio] = useState(0);
+  const [thumbRatio, setThumbRatio] = useState(1);
   const scrollRef = useRef<HTMLDivElement>(null);
   const prevSessionIdRef = useRef<string | undefined>(sessionId);
   // handleSend에서 세션을 직접 생성한 경우 true → sessionId 변경 시 메시지 유지
@@ -103,12 +106,31 @@ export function ChatMainArea({
     }
   }, [appendMessage]);
 
-  // 메시지 추가 또는 스트리밍 업데이트 시 스크롤 하단으로
+  // 스크롤 위치 추적 → scrollRatio 업데이트
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+    const el = scrollRef.current;
+    if (!el) return;
+    const handler = () => {
+      const maxScroll = el.scrollHeight - el.clientHeight;
+      setScrollRatio(maxScroll > 0 ? el.scrollTop / maxScroll : 0);
+    };
+    el.addEventListener('scroll', handler);
+    return () => el.removeEventListener('scroll', handler);
+  }, []);
+
+  // 메시지/스트리밍 변경 시 thumbRatio 재계산 + 스크롤 하단으로
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+    setThumbRatio(el.clientHeight / el.scrollHeight);
   }, [messages, streamingText]);
+
+  const handleScrollTo = useCallback((ratio: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollTop = ratio * (el.scrollHeight - el.clientHeight);
+  }, []);
 
   async function handleSend() {
     if (!inputValue.trim() || isStreaming) return;
@@ -222,21 +244,31 @@ export function ChatMainArea({
         <ChatLogo size={884} />
       </div>
 
-      {/* Message scroll area */}
-      <div
-        ref={scrollRef}
-        className="relative flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-6 pb-28"
-      >
-        {messages.map((msg, i) => (
-          <ChatBubble key={i} {...msg} />
-        ))}
-        {isStreaming && (
-          <ChatBubble
-            variant="ai"
-            senderName={aiName}
-            content={streamingText}
-            avatarSrc={aiAvatarSrc}
-            isLoading={!streamingText}
+      {/* Message scroll area + custom scrollbar */}
+      <div className="relative flex min-h-0 flex-1">
+        <div
+          ref={scrollRef}
+          className="relative flex flex-1 flex-col gap-4 overflow-y-auto p-6 pb-28"
+          style={{ scrollbarWidth: 'none' }}
+        >
+          {messages.map((msg, i) => (
+            <ChatBubble key={i} {...msg} />
+          ))}
+          {isStreaming && (
+            <ChatBubble
+              variant="ai"
+              senderName={aiName}
+              content={streamingText}
+              avatarSrc={aiAvatarSrc}
+              isLoading={!streamingText}
+            />
+          )}
+        </div>
+        {thumbRatio < 1 && (
+          <ChatScrollbar
+            scrollRatio={scrollRatio}
+            thumbRatio={thumbRatio}
+            onScrollTo={handleScrollTo}
           />
         )}
       </div>
