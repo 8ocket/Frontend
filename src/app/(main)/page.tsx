@@ -1,16 +1,18 @@
 'use client';
 
-import { format, getDate, getDaysInMonth } from 'date-fns';
+import { format, getDate, getDaysInMonth, getDay, startOfMonth } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { Check, MessageCircle, FileText, Lock, Layers } from 'lucide-react';
+import { Check, FileText, Lock, Layers } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import { EmotionCardFront, getEmotionDisplayName } from '@/widgets/emotion-card';
 import { cn } from '@/shared/lib/utils';
 import type { EmotionCardData } from '@/entities/emotion';
-import { useCollectionStore } from '@/entities/emotion';
+import { getCollectionCardsApi } from '@/entities/emotion/api';
 import { useAuthStore } from '@/entities/user/store';
 import { getReportListApi } from '@/entities/reports/api';
 import type { CanGenerate } from '@/entities/reports/model';
@@ -21,7 +23,6 @@ const _today = new Date();
 const TODAY_DATE = getDate(_today);
 const DAYS_IN_MONTH = getDaysInMonth(_today);
 const TODAY_LABEL = format(_today, 'yyyy. MM. dd', { locale: ko });
-const TODAY_MONTH_LABEL = format(_today, 'yyyy.MM.dd', { locale: ko });
 
 // 현재 주차 7일 (월요일 시작)
 const _dayOfWeek = _today.getDay(); // 0=Sun
@@ -204,21 +205,25 @@ function MonthlyReportWidget({
   );
 }
 
-// ── 서브 위젯: 출석 현황 (이번 주 도장판) ────────────────────────────────────
-function AttendanceWidget() {
-  const [attendedDates, setAttendedDates] = useState<Set<number>>(new Set());
+// ── 서브 위젯: 출석 현황 ─────────────────────────────────────────────────────
+const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
+const FIRST_DAY_OFFSET = getDay(startOfMonth(_today));
 
-  useEffect(() => {
-    const yearMonth = format(_today, 'yyyy-MM');
-    getAttendanceApi(yearMonth)
-      .then((res) => {
-        const dates = new Set(res.attendanceDates.map((d) => parseInt(d.split('-')[2], 10)));
-        setAttendedDates(dates);
-      })
-      .catch(() => {});
-  }, []);
+function AttendanceWidget() {
+  const [expanded, setExpanded] = useState(false);
+  const yearMonth = format(_today, 'yyyy-MM');
+  const { data: attendedDates = new Set<number>(), isError: loadError } = useQuery({
+    queryKey: ['attendance', yearMonth],
+    queryFn: () => getAttendanceApi(yearMonth),
+    select: (res) => new Set(res.attendanceDates.map((d) => parseInt(d.split('-')[2], 10))),
+  });
 
   const todayDone = attendedDates.has(TODAY_DATE);
+
+  const monthlyCells: (number | null)[] = [
+    ...Array(FIRST_DAY_OFFSET).fill(null),
+    ...Array.from({ length: DAYS_IN_MONTH }, (_, i) => i + 1),
+  ];
 
   return (
     <div className="flex flex-col gap-5 rounded-2xl bg-white/70 p-5 shadow-sm backdrop-blur-sm">
@@ -226,82 +231,144 @@ function AttendanceWidget() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Check className="text-cta-300 h-4 w-4" aria-hidden="true" />
-          <h3 className="text-[15px] font-semibold text-[#1a222e]">출석 현황</h3>
+          <h3 className="text-[15px] font-semibold text-[#1a222e]">
+            <span className="text-cta-300">{format(_today, 'M월', { locale: ko })}</span> 출석 현황
+          </h3>
         </div>
-        <span className="text-[11px] text-slate-400">{TODAY_LABEL}</span>
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="bg-cta-50 text-cta-300 hover:bg-cta-100 border-cta-200 rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition-colors"
+        >
+          {expanded ? '접기' : '이번 달 전체 보기'}
+        </button>
       </div>
 
-      {/* 이번 주 도장판 */}
-      <div className="grid grid-cols-7 gap-1.5">
-        {WEEK_DAYS.map((day, i) => {
-          const isToday = day === TODAY_DATE;
-          const isValid = day >= 1 && day <= DAYS_IN_MONTH;
-          const isAttended = isValid && attendedDates.has(day);
-          const isPast = isValid && day < TODAY_DATE;
-          const isFuture = !isValid || day > TODAY_DATE;
-
-          return (
-            <div key={i} className="flex flex-col items-center gap-1.5">
+      {loadError ? (
+        <p className="text-prime-400 py-6 text-center text-xs">출석 정보를 불러오지 못했습니다.</p>
+      ) : expanded ? (
+        /* ── 월간 캘린더 ── */
+        <div>
+          <div className="mb-2 grid grid-cols-7">
+            {DAY_LABELS.map((d, i) => (
               <span
+                key={d}
                 className={cn(
-                  'text-[10px] font-medium',
-                  isToday ? 'text-cta-400' : 'text-prime-400'
+                  'py-1 text-center text-xs font-medium',
+                  i === 0 ? 'text-red-400' : i === 6 ? 'text-blue-400' : 'text-prime-300'
                 )}
               >
-                {WEEK_LABELS[i]}
+                {d}
               </span>
-              <div
-                className={cn(
-                  'flex h-10 w-full items-center justify-center rounded-xl transition-all duration-300',
-                  isToday && isAttended && 'bg-cta-300 scale-105 shadow-sm',
-                  isToday && !isAttended && 'bg-cta-300/20 ring-cta-300 ring-2 ring-offset-1',
-                  !isToday && isAttended && 'bg-cta-200',
-                  !isToday && isPast && !isAttended && 'bg-neutral-400',
-                  isFuture && !isToday && 'bg-neutral-300 opacity-60'
-                )}
-              >
-                {isAttended ? (
-                  <Check
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-y-1.5">
+            {monthlyCells.map((day, i) => {
+              if (!day) return <div key={`e-${i}`} />;
+              const isToday = day === TODAY_DATE;
+              const isAttended = attendedDates.has(day);
+              const col = (FIRST_DAY_OFFSET + day - 1) % 7;
+              return (
+                <div key={day} className="flex items-center justify-center py-0.5">
+                  <div
                     className={cn(
-                      'h-4 w-4 transition-all duration-300',
-                      isToday ? 'text-prime-900' : 'text-cta-400'
-                    )}
-                  />
-                ) : (
-                  <span
-                    className={cn(
-                      'text-[13px] font-semibold tabular-nums',
-                      isToday ? 'text-cta-300' : 'text-prime-300'
+                      'flex size-9 items-center justify-center rounded-full text-sm font-medium transition-colors',
+                      isAttended && isToday && 'bg-cta-300 text-white shadow-sm',
+                      isAttended && !isToday && 'bg-cta-100 text-cta-400',
+                      !isAttended && isToday && 'ring-cta-300 text-cta-300 font-bold ring-2',
+                      !isAttended && !isToday && col === 0 && 'text-red-400',
+                      !isAttended && !isToday && col === 6 && 'text-blue-400',
+                      !isAttended && !isToday && col !== 0 && col !== 6 && 'text-prime-500'
                     )}
                   >
-                    {isValid ? day : ''}
+                    {isAttended ? <Check size={14} strokeWidth={2.5} /> : day}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="border-prime-100 mt-4 flex items-center justify-between border-t pt-4">
+            <p className="text-prime-500 text-[12px]">
+              이번 달 <span className="text-cta-300 font-bold">{attendedDates.size}회</span> 출석
+            </p>
+            <span className="text-prime-300 text-xs">
+              {DAYS_IN_MONTH}일 중 {attendedDates.size}일
+            </span>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* 이번 주 도장판 */}
+          <div className="grid grid-cols-7 gap-1.5">
+            {WEEK_DAYS.map((day, i) => {
+              const isToday = day === TODAY_DATE;
+              const isValid = day >= 1 && day <= DAYS_IN_MONTH;
+              const isAttended = isValid && attendedDates.has(day);
+              const isPast = isValid && day < TODAY_DATE;
+              const isFuture = !isValid || day > TODAY_DATE;
+
+              return (
+                <div key={i} className="flex flex-col items-center gap-1.5">
+                  <span
+                    className={cn(
+                      'text-[10px] font-medium',
+                      isToday ? 'text-cta-400' : 'text-prime-400'
+                    )}
+                  >
+                    {WEEK_LABELS[i]}
                   </span>
-                )}
+                  <div
+                    className={cn(
+                      'flex h-10 w-full items-center justify-center rounded-xl transition-all duration-300',
+                      isToday && isAttended && 'bg-cta-300 scale-105 shadow-sm',
+                      isToday && !isAttended && 'bg-cta-300/20 ring-cta-300 ring-2 ring-offset-1',
+                      !isToday && isAttended && 'bg-cta-200',
+                      !isToday && isPast && !isAttended && 'bg-neutral-400',
+                      isFuture && !isToday && 'bg-neutral-300 opacity-60'
+                    )}
+                  >
+                    {isAttended ? (
+                      <Check
+                        className={cn(
+                          'h-4 w-4 transition-all duration-300',
+                          isToday ? 'text-prime-900' : 'text-cta-400'
+                        )}
+                      />
+                    ) : (
+                      <span
+                        className={cn(
+                          'text-[13px] font-semibold tabular-nums',
+                          isToday ? 'text-cta-300' : 'text-prime-300'
+                        )}
+                      >
+                        {isValid ? day : ''}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* 하단 */}
+          <div className="mt-auto flex items-center justify-between gap-3">
+            <p className="text-prime-500 text-[12px] leading-snug">
+              이번 달 <span className="text-cta-300 font-bold">{attendedDates.size}회</span> 방문 ·
+              출석 시 3크레딧
+            </p>
+            {todayDone ? (
+              <div className="text-prime-400 flex shrink-0 items-center gap-1.5 rounded-xl bg-neutral-200 px-3 py-2 text-xs font-semibold">
+                <Check className="text-cta-300 h-3.5 w-3.5" />
+                오늘 출석 완료
               </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* 하단 */}
-      <div className="mt-auto flex items-center justify-between gap-3">
-        <p className="text-prime-500 text-[12px] leading-snug">
-          이번 달{' '}
-          <span className="text-cta-300 font-bold">{attendedDates.size}회</span>{' '}
-          방문 · 출석 시 3크레딧
-        </p>
-
-        {todayDone ? (
-          <div className="text-prime-400 flex shrink-0 items-center gap-1.5 rounded-xl bg-neutral-200 px-3 py-2 text-xs font-semibold">
-            <Check className="text-cta-300 h-3.5 w-3.5" />
-            오늘 출석 완료
+            ) : (
+              <div className="text-prime-400 flex shrink-0 items-center gap-1.5 rounded-xl bg-neutral-200 px-3 py-2 text-xs font-semibold">
+                출석 대기 중
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="text-prime-400 flex shrink-0 items-center gap-1.5 rounded-xl bg-neutral-200 px-3 py-2 text-xs font-semibold">
-            출석 대기 중
-          </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 }
@@ -362,13 +429,26 @@ function AdBanner() {
 export default function Home() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading, user } = useAuthStore();
-  const { cards: collectionCards, fetchCards } = useCollectionStore();
   const cardSectionRef = useRef<HTMLElement>(null);
   const [cardContainerWidth, setCardContainerWidth] = useState(0);
   const [cardContainer, setCardContainer] = useState<HTMLDivElement | null>(null);
   const [cardsVisible, setCardsVisible] = useState(false);
-  const [canGenerate, setCanGenerate] = useState<CanGenerate | null>(null);
-  const [weeklyCanGenerate, setWeeklyCanGenerate] = useState<CanGenerate | null>(null);
+
+  const { data: reportData, isError: reportLoadError } = useQuery({
+    queryKey: ['homeReports'],
+    queryFn: () => Promise.all([getReportListApi(), getReportListApi('weekly')]),
+    select: ([monthlyRes, weeklyRes]) => ({
+      canGenerate: monthlyRes.can_generate,
+      weeklyCanGenerate: weeklyRes.can_generate,
+    }),
+  });
+  const canGenerate = reportData?.canGenerate ?? null;
+  const weeklyCanGenerate = reportData?.weeklyCanGenerate ?? null;
+
+  const { data: collectionCards = [] } = useQuery({
+    queryKey: ['collectionCards'],
+    queryFn: getCollectionCardsApi,
+  });
 
   useEffect(() => {
     if (!cardContainer) return;
@@ -391,16 +471,6 @@ export default function Home() {
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
-
-  useEffect(() => {
-    fetchCards();
-    getReportListApi()
-      .then((res) => setCanGenerate(res.can_generate))
-      .catch(() => {});
-    getReportListApi('weekly')
-      .then((res) => setWeeklyCanGenerate(res.can_generate))
-      .catch(() => {});
-  }, [fetchCards]);
 
   if (authLoading || !isAuthenticated) {
     return (
@@ -462,6 +532,11 @@ export default function Home() {
 
         {/* ── 주간 달성률 | 월간 달성률 ────────────────────────────────────── */}
         <section className="mb-4">
+          {reportLoadError && (
+            <p className="mb-2 text-center text-xs text-red-400">
+              리포트 정보를 불러오지 못했습니다. 새로고침 해주세요.
+            </p>
+          )}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch">
             <WeeklyReportWidget
               sessions={weeklyCanGenerate?.saved_session_count ?? 0}
@@ -473,7 +548,7 @@ export default function Home() {
               sessions={canGenerate?.saved_session_count ?? 0}
               goal={canGenerate?.required_session_count ?? 1}
               progress={
-                canGenerate
+                canGenerate && canGenerate.required_session_count > 0
                   ? Math.round(
                       (canGenerate.saved_session_count / canGenerate.required_session_count) * 100
                     )
@@ -537,7 +612,7 @@ export default function Home() {
       {/* ── Floating AI 상담 버튼 ─────────────────────────────────────────────── */}
       <div
         className="fixed right-6 bottom-10 z-50 sm:right-8 sm:bottom-12"
-        style={{ width: 110, height: 110 }}
+        style={{ width: 'clamp(80px, 20vw, 110px)', height: 'clamp(80px, 20vw, 110px)' }}
       >
         {/* 글로우 레이어 */}
         <div
@@ -547,13 +622,16 @@ export default function Home() {
         <button
           type="button"
           onClick={() => router.push('/chat')}
-          className="bg-cta-300 relative flex h-full w-full flex-col items-center justify-center gap-1 overflow-hidden rounded-full shadow-lg shadow-[#82C9FF]/30 transition-transform hover:scale-105 active:scale-95"
+          className="relative h-full w-full overflow-hidden rounded-full transition-transform hover:scale-105 active:scale-95"
           aria-label="AI 상담 받으러 가기"
         >
-          <span className="text-prime-700 text-center text-[14px] leading-none font-medium whitespace-pre-line">
-            {'AI 상담\n받으러 가기'}
-          </span>
-          <MessageCircle className="mt-1 h-12 w-12 text-[#1a222e]" aria-hidden="true" />
+          <Image
+            src="/images/icons/aichatbtn.png"
+            alt="AI 상담 받으러 가기"
+            fill
+            sizes="110px"
+            className="object-cover"
+          />
         </button>
       </div>
     </div>

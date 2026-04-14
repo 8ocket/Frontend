@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { api } from '@/shared/api/axios';
 import {
   CreateReportRequest,
@@ -5,11 +6,27 @@ import {
   ReportCompleteEvent,
   GetReportListResponse,
   ReportDetailResponse,
-  ReportApiResponse,
   ReportType,
   SuggestionItem,
+  ReportListItem,
+  GetReportGraphsResponse,
+  TendencyResponse,
+  GetReportKeywordsResponse,
 } from './model';
-import { mockCreateReport, mockGetReportDetail, mockGetReportList, mockGetReportSuggestions } from '@/mocks';
+import { safeParse } from '@/shared/lib/utils/parse';
+import {
+  GetReportListResponseSchema,
+  SuggestionItemSchema,
+  GetReportGraphsResponseSchema,
+  TendencyResponseSchema,
+  GetReportKeywordsResponseSchema,
+} from './schema';
+import {
+  mockCreateReport,
+  mockGetReportDetail,
+  mockGetReportList,
+  mockGetReportSuggestions,
+} from '@/mocks';
 import { USE_MOCK } from '@/shared/lib/env';
 import { getCookie } from '@/shared/lib/utils/cookie';
 
@@ -100,13 +117,13 @@ export const getReportListApi = async (reportType?: ReportType): Promise<GetRepo
   if (USE_MOCK) return mockGetReportList(reportType);
 
   const params = reportType ? { report_type: reportType } : {};
-  const response = await api.get<ReportApiResponse<GetReportListResponse>>('/reports', { params });
+  const response = await api.get<ReportListItem[]>('/reports', { params });
 
-  if (response.data.code === 'ok' && response.data.data) {
-    return response.data.data;
-  }
-
-  throw new Error(response.data.message || '리포트 목록 조회 실패');
+  const result = {
+    reports: response.data,
+    can_generate: { eligible: false, saved_session_count: 0, required_session_count: 1 },
+  };
+  return safeParse(GetReportListResponseSchema, result);
 };
 
 /**
@@ -116,13 +133,8 @@ export const getReportListApi = async (reportType?: ReportType): Promise<GetRepo
 export const getReportDetailApi = async (reportId: string): Promise<ReportDetailResponse> => {
   if (USE_MOCK) return mockGetReportDetail(reportId);
 
-  const response = await api.get<ReportApiResponse<ReportDetailResponse>>(`/reports/${reportId}`);
-
-  if (response.data.code === 'ok' && response.data.data) {
-    return response.data.data;
-  }
-
-  throw new Error(response.data.message || '리포트 상세 조회 실패');
+  const response = await api.get<ReportDetailResponse>(`/reports/${reportId}`);
+  return response.data;
 };
 
 /**
@@ -132,13 +144,44 @@ export const getReportDetailApi = async (reportId: string): Promise<ReportDetail
 export const getReportSuggestionsApi = async (reportId: string): Promise<SuggestionItem[]> => {
   if (USE_MOCK) return mockGetReportSuggestions(reportId);
 
-  const response = await api.get<ReportApiResponse<SuggestionItem[]>>(
-    `/reports/${reportId}/suggestions`,
-  );
+  const response = await api.get<SuggestionItem[]>(`/reports/${reportId}/suggestions`);
 
-  if (response.data.code === 'ok' && response.data.data) {
-    return response.data.data;
-  }
+  return safeParse(z.array(SuggestionItemSchema), response.data);
+};
 
-  throw new Error(response.data.message || '행동 제언 조회 실패');
+/**
+ * 감정 그래프 데이터 조회
+ * GET /v1/reports/{report_id}/graphs
+ */
+export const getReportGraphsApi = async (reportId: string): Promise<GetReportGraphsResponse> => {
+  const response = await api.get<GetReportGraphsResponse>(`/reports/${reportId}/graphs`);
+  return safeParse(GetReportGraphsResponseSchema, response.data);
+};
+
+/**
+ * 감정 변화 경향 분석 조회
+ * GET /v1/reports/{report_id}/tendency
+ */
+export const getReportTendencyApi = async (reportId: string): Promise<TendencyResponse> => {
+  const response = await api.get<TendencyResponse>(`/reports/${reportId}/tendency`);
+  return safeParse(TendencyResponseSchema, response.data);
+};
+
+/**
+ * 핵심 키워드/토픽 조회
+ * GET /v1/reports/{report_id}/keywords
+ */
+export const getReportKeywordsApi = async (
+  reportId: string
+): Promise<GetReportKeywordsResponse> => {
+  const response = await api.get<GetReportKeywordsResponse>(`/reports/${reportId}/keywords`);
+  return safeParse(GetReportKeywordsResponseSchema, response.data);
+};
+
+/**
+ * 리포트 삭제
+ * DELETE /v1/reports/{report_id}
+ */
+export const deleteReportApi = async (reportId: string): Promise<void> => {
+  await api.delete(`/reports/${reportId}`);
 };

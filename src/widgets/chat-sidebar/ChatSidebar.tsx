@@ -23,6 +23,7 @@ const PAGE_SIZE = 5;
 
 export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, onDeleteSession, sessionGroups = [] }: ChatSidebarProps = {}) {
   const [filterOpen, setFilterOpen] = useState(false);
+  const [newCounselHovered, setNewCounselHovered] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
   const filterRef = useRef<HTMLDivElement>(null);
   const filterBtnRef = useRef<HTMLButtonElement>(null);
@@ -84,18 +85,39 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, on
     <aside className="lg:border-prime-100 relative flex h-full w-full shrink-0 flex-col bg-white lg:w-80.75 lg:border-r lg:border-l">
       {/* 헤더 영역 */}
       <div className="border-prime-100 border-b px-5 py-4">
-        <p className="text-prime-400 mb-4 text-[11px] font-semibold tracking-widest uppercase">
-          Consultation History
-        </p>
+        {/* CONSULTATION HISTORY ↔ 크레딧 안내 뱃지 (새로운 상담 hover 시 전환) */}
+        <div className="relative mb-4 flex items-center">
+          <p
+            className="text-prime-400 text-[11px] font-semibold tracking-widest uppercase transition-opacity duration-200"
+            style={{ opacity: newCounselHovered ? 0 : 1 }}
+          >
+            Consultation History
+          </p>
+          <div
+            className="absolute right-0 transition-opacity duration-200"
+            style={{ opacity: newCounselHovered ? 1 : 0 }}
+          >
+            <div
+              className="inline-flex items-center justify-center gap-2.5 rounded-lg bg-main-blue/20 p-2.5 text-center text-xs font-medium leading-[120%] tracking-tight text-prime-900 opacity-50"
+            >
+              기본 무료 1회 · 추가 상담은 70 크레딧 차감
+            </div>
+          </div>
+        </div>
 
         {/* 새로운 상담 버튼 */}
         <button
           type="button"
           onClick={onNewCounsel}
-          className="border-prime-200 text-prime-500 hover:border-main-blue hover:text-main-blue flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed py-2.5 text-sm font-semibold transition-all active:opacity-80"
-          style={{ fontFamily: 'var(--font-pretendard)' }}
+          onMouseEnter={() => setNewCounselHovered(true)}
+          onMouseLeave={() => setNewCounselHovered(false)}
+          onFocus={() => setNewCounselHovered(true)}
+          onBlur={() => setNewCounselHovered(false)}
+          onTouchStart={() => setNewCounselHovered(true)}
+          onTouchEnd={() => setNewCounselHovered(false)}
+          className="bg-main-blue text-white flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:bg-main-blue/90"
         >
-          <PlusCircle size={16} strokeWidth={2} className="text-main-blue" />
+          <PlusCircle size={16} strokeWidth={2} />
           새로운 상담
         </button>
       </div>
@@ -108,7 +130,6 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, on
             type="text"
             placeholder="검색"
             className="text-prime-900 placeholder:text-prime-400 w-full bg-transparent text-[13px] outline-none"
-            style={{ fontFamily: 'var(--font-pretendard)' }}
           />
         </div>
         <button
@@ -116,7 +137,6 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, on
           type="button"
           onClick={() => setFilterOpen((prev) => !prev)}
           className="border-prime-100 text-prime-500 hover:border-main-blue hover:text-main-blue rounded-lg border bg-[#F8FAFF] px-3 py-2 text-[13px] font-medium transition-colors"
-          style={{ fontFamily: 'var(--font-pretendard)' }}
         >
           필터
         </button>

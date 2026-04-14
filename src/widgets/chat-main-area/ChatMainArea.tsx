@@ -29,29 +29,35 @@ export interface ChatMainAreaProps {
   appendMessage?: ChatBubbleProps | null;
   /** 현재 세션 ID — 메시지 전송 시 사용. undefined면 첫 메시지 시 세션 생성 */
   sessionId?: string;
-  /** 세션 생성에 사용할 페르소나 ID */
-  personaId?: string;
   /** 세션 생성 완료 시 호출 — 페이지에서 activeSessionId 업데이트 용도 */
   onSessionCreated?: (sessionId: string) => void;
   /** AI 상담사 표시 이름 */
   aiName?: string;
   /** AI 상담사 아바타 이미지 URL */
   aiAvatarSrc?: string;
+  /** 사용자가 메시지를 전송할 때 호출 — 60분 자동 종료 타이머 리셋용 */
+  onUserMessage?: () => void;
+  /** 사용자 닉네임 */
+  userName?: string;
+  /** 사용자 프로필 이미지 URL */
+  userAvatarSrc?: string;
 }
 
 export function ChatMainArea({
   onEndChat,
-  onCreditShortage: _onCreditShortage,
+  onCreditShortage,
   onUnfinishedSession: _onUnfinishedSession,
   initialMessages = [],
   isSessionActive = true,
   onDisabledInputClick,
   appendMessage,
   sessionId,
-  personaId,
   onSessionCreated,
   aiName = '나봄이',
   aiAvatarSrc = '/images/personas/nabomi-44.png',
+  onUserMessage,
+  userName = '나',
+  userAvatarSrc,
 }: ChatMainAreaProps = {}) {
   const [messages, setMessages] = useState<ChatBubbleProps[]>(initialMessages);
   const [inputValue, setInputValue] = useState('');
@@ -61,6 +67,9 @@ export function ChatMainArea({
   const prevSessionIdRef = useRef<string | undefined>(sessionId);
   // handleSend에서 세션을 직접 생성한 경우 true → sessionId 변경 시 메시지 유지
   const justCreatedSessionRef = useRef(false);
+  // 항상 최신 initialMessages를 참조하기 위한 ref
+  const initialMessagesRef = useRef(initialMessages);
+  initialMessagesRef.current = initialMessages;
 
   // 세션 전환 시 메시지 교체 (sessionId 기준으로 판단)
   useEffect(() => {
@@ -70,8 +79,10 @@ export function ChatMainArea({
     if (prevId === sessionId) return;
 
     if (sessionId === undefined) {
-      // 새 세션 시작 준비 → 메시지 초기화
+      // 새 세션 시작 준비 → 메시지 및 스트리밍 상태 초기화
       setMessages([]);
+      setIsStreaming(false);
+      setStreamingText('');
       return;
     }
 
@@ -82,8 +93,8 @@ export function ChatMainArea({
     }
 
     // 이어가기 / 사이드바 세션 선택 → initialMessages 로드
-    setMessages(initialMessages);
-  }, [sessionId]); // eslint-disable-line react-hooks/exhaustive-deps
+    setMessages(initialMessagesRef.current);
+  }, [sessionId]);
 
   // 외부에서 메시지 추가 (예: 종료 시 "마음 기록 제작 중")
   useEffect(() => {
@@ -104,8 +115,9 @@ export function ChatMainArea({
 
     const content = inputValue.trim();
     setInputValue('');
+    onUserMessage?.();
 
-    setMessages((prev) => [...prev, { variant: 'user', senderName: 'User Name', content }]);
+    setMessages((prev) => [...prev, { variant: 'user', senderName: userName, userAvatarSrc, content }]);
 
     const token = getCookie('accessToken') ?? '';
 
@@ -147,7 +159,12 @@ export function ChatMainArea({
           }
         );
       } catch (err) {
-        console.error('Session create error:', err);
+        const code = err instanceof Error ? err.message : '';
+        if (code === 'INSUFFICIENT_CREDIT') {
+          onCreditShortage?.();
+        } else {
+          console.warn('Session create error:', code || err);
+        }
         setIsStreaming(false);
         setStreamingText('');
       }
@@ -178,6 +195,11 @@ export function ChatMainArea({
             ...prev,
             { variant: 'ai', senderName: aiName, content: accumulated, avatarSrc: aiAvatarSrc },
           ]);
+          setStreamingText('');
+          setIsStreaming(false);
+        },
+        (errorMessage) => {
+          console.error('SSE error:', errorMessage);
           setStreamingText('');
           setIsStreaming(false);
         }
@@ -228,7 +250,7 @@ export function ChatMainArea({
           onSend={handleSend}
           onEndChat={onEndChat}
           disabled={!isSessionActive || isStreaming}
-          onDisabledClick={onDisabledInputClick}
+          onDisabledClick={!isSessionActive ? onDisabledInputClick : undefined}
         />
       </div>
     </div>

@@ -8,6 +8,7 @@ import {
   ActiveSessionResponse,
   SessionDetailResponse,
   FinalizeCompleteEvent,
+  SessionProgressResponse,
 } from '@/entities/session/model';
 import {
   mockGetSessions,
@@ -15,8 +16,9 @@ import {
   mockGetActiveSession,
   mockGetSessionDetail,
   mockFinalizeSession,
+  mockDeleteSession,
+  mockGetSessionProgress,
 } from '@/mocks';
-import { createHttpStatusError } from '@/shared/lib/utils/error';
 import { USE_MOCK } from '@/shared/lib/env';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/v1';
@@ -39,7 +41,6 @@ export const getSessionsApi = async (
   if (query.size) params.set('size', String(query.size));
   if (query.start_date) params.set('start_date', query.start_date);
   if (query.end_date) params.set('end_date', query.end_date);
-  if (query.persona_ids?.length) params.set('persona_ids', query.persona_ids.join(','));
 
   const response = await api.get<ApiResponse<SessionListResponse>>(
     `/sessions?${params.toString()}`
@@ -87,13 +88,20 @@ export const createSessionStream = async (
   const response = await fetch(`${API_BASE_URL}/sessions`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${token}`,
+      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(req),
   });
 
-  if (!response.ok) throw createHttpStatusError(response.status);
+  if (!response.ok) {
+    let code = '';
+    try {
+      const body = await response.json();
+      code = body.code || body.error?.code || '';
+    } catch {}
+    throw new Error(code || String(response.status));
+  }
 
   const reader = response.body?.getReader();
   if (!reader) return;
@@ -101,6 +109,7 @@ export const createSessionStream = async (
   const decoder = new TextDecoder();
   let buffer = '';
   let currentEvent = '';
+  let doneHandled = false;
 
   while (true) {
     const { done, value } = await reader.read();
@@ -130,6 +139,7 @@ export const createSessionStream = async (
             if (currentEvent === 'session_title') onSessionTitle(data.title);
             if (currentEvent === 'error') onError?.(data.message);
             if (currentEvent === 'done') {
+              doneHandled = true;
               onDone();
               reader.cancel();
               return;
@@ -141,6 +151,9 @@ export const createSessionStream = async (
       }
     }
   }
+
+  // done 이벤트 없이 스트림이 종료된 경우 fallback
+  if (!doneHandled) onDone();
 };
 
 /**
@@ -160,6 +173,15 @@ export const getSessionDetailApi = async (sessionId: string): Promise<SessionDet
 };
 
 /**
+ * 세션 삭제 API
+ * DELETE /v1/sessions/{session_id}
+ */
+export const deleteSessionApi = async (sessionId: string): Promise<void> => {
+  if (USE_MOCK) return mockDeleteSession(sessionId);
+  await api.delete(`/sessions/${sessionId}`);
+};
+
+/**
  * 세션 종료 + 마음 기록 생성 (SSE)
  * POST /v1/sessions/{session_id}/finalize
  */
@@ -169,7 +191,8 @@ export const finalizeSessionStream = async (
   onStatus: (step: string, message: string) => void,
   onComplete: (data: FinalizeCompleteEvent) => void,
   onDone: () => void,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  onError?: (message: string) => void
 ): Promise<void> => {
   if (USE_MOCK) return mockFinalizeSession(onStatus, onComplete, onDone);
 
@@ -195,6 +218,7 @@ export const finalizeSessionStream = async (
   const decoder = new TextDecoder();
   // finalize SSE도 chunk 단위로 끊어질 수 있어, 이벤트 종료 구분자(\n\n) 기준으로 누적 파싱합니다.
   let buffer = '';
+  let doneHandled = false;
 
   while (true) {
     const { done, value } = await reader.read();
@@ -222,6 +246,7 @@ export const finalizeSessionStream = async (
             const data = JSON.parse(raw);
             if (currentEvent === 'status') onStatus(data.step, data.message);
             if (currentEvent === 'ai_complete') onComplete(data);
+            if (currentEvent === 'server_error' || currentEvent === 'error') onError?.(data.content ?? data.message);
           } catch {
             // malformed JSON 무시
           }
@@ -230,10 +255,31 @@ export const finalizeSessionStream = async (
 
       // done 이벤트는 data 유무/유효성과 무관하게 처리
       if (currentEvent === 'done') {
+        doneHandled = true;
         onDone();
         reader.cancel();
         return;
       }
     }
   }
+
+  // done 이벤트 없이 스트림이 종료된 경우 fallback
+  if (!doneHandled) onDone();
+};
+
+/**
+ * 리포트 달성률 조회 API
+ * GET /v1/sessions/me/progress
+ */
+export const getSessionProgressApi = async (): Promise<SessionProgressResponse[]> => {
+  if (USE_MOCK) return mockGetSessionProgress();
+
+  const response =
+    await api.get<ApiResponse<SessionProgressResponse[]>>('/sessions/me/progress');
+
+  if (response.data.success && response.data.data) {
+    return response.data.data;
+  }
+
+  throw new Error(response.data.error?.message || '리포트 달성률 조회 실패');
 };

@@ -28,6 +28,10 @@ api.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
+    // FormData 전송 시 Content-Type을 삭제해 브라우저가 boundary 포함한 헤더를 자동 설정하도록 함
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
     return config;
   },
   (error) => Promise.reject(error)
@@ -83,12 +87,11 @@ api.interceptors.response.use(
           params: { refreshToken },
         });
 
-        const newAccessToken = data.data?.access_token;
+        const newAccessToken = data.accessToken;
         if (!newAccessToken) throw new Error('No access token in response');
 
         setCookie('accessToken', newAccessToken, 60 * 60);
-        if (data.data?.refresh_token)
-          setCookie('refreshToken', data.data.refresh_token, 30 * 24 * 60 * 60);
+        if (data.refreshToken) setCookie('refreshToken', data.refreshToken, 30 * 24 * 60 * 60);
 
         processQueue(null, newAccessToken);
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;

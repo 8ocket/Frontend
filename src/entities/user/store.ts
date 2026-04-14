@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { setCookie, deleteCookie } from '@/shared/lib/utils/cookie';
 import { User } from '@/entities/user/model';
+import { useCreditStore } from '@/entities/credits/store';
 
 interface AuthState {
   user: User | null;
@@ -40,6 +41,7 @@ export const useAuthStore = create<AuthState>()(
       logout: () => {
         deleteCookie('accessToken');
         deleteCookie('refreshToken');
+        useCreditStore.getState().resetCredits();
         set({ user: null, isAuthenticated: false });
       },
 
@@ -53,7 +55,7 @@ export const useAuthStore = create<AuthState>()(
       onRehydrateStorage: () => (state) => {
         if (state) {
           state.isAuthenticated = !!state.user;
-          state.isLoading = false;
+          // isLoading은 AuthInitializer가 쿠키 검증 후 false로 설정
         }
       },
     }

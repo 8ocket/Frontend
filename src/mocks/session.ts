@@ -1,4 +1,4 @@
-import { SessionListQuery, SessionListResponse, SessionListItem, CreateSessionRequest, CreateSessionAiCompleteEvent, ActiveSessionResponse } from '@/entities/session';
+import { SessionListQuery, SessionListResponse, SessionListItem, CreateSessionRequest, CreateSessionAiCompleteEvent, ActiveSessionResponse, SessionProgressResponse } from '@/entities/session';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -9,21 +9,18 @@ export const mockGetSessions = (query: SessionListQuery = {}): SessionListRespon
   const allSessions: SessionListItem[] = [
     {
       sessionId: 'session-001',
-      personaImageUrl: '/images/personas/mental.png',
       title: '오늘 직장에서 있었던 일',
       status: 'SAVED',
       startedAt: '2026-03-10T14:30:00Z',
     },
     {
       sessionId: 'session-002',
-      personaImageUrl: '/images/personas/coaching.png',
       title: '친구와의 갈등',
       status: 'SAVED',
       startedAt: '2026-03-08T10:00:00Z',
     },
     {
       sessionId: 'session-003',
-      personaImageUrl: '/images/personas/career.png',
       title: '번아웃 극복하기',
       status: 'ACTIVE',
       startedAt: '2026-03-13T09:00:00Z',
@@ -84,6 +81,7 @@ export const mockFinalizeSession = async (
   onStatus('creating_card', '마음기록 카드를 생성 중입니다 ...');
   await delay(1000);
   onComplete({
+    summary_id: 'mock-summary-id',
     emotions: [
       { intensity: 4, source_keyword: '오늘 너무 힘들었어', emotion_type: 'sadness' },
       { intensity: 3, source_keyword: '화가 났어', emotion_type: 'anger' },
@@ -114,6 +112,10 @@ export const mockGetSessionDetail = async (sessionId: string): Promise<import('@
   };
 };
 
+export const mockDeleteSession = async (_sessionId: string): Promise<void> => {
+  await delay(300);
+};
+
 export const mockSendMessageStream = async (
   onChunk: (chunk: string) => void,
   onCrisis: (_msg: string) => void,
@@ -126,3 +128,9 @@ export const mockSendMessageStream = async (
   }
   onDone();
 };
+
+/** GET /v1/sessions/me/progress */
+export const mockGetSessionProgress = (): SessionProgressResponse[] => [
+  { report_type: 'WEEKLY', current_count: 3, required_count: 5, progress_percentage: 60 },
+  { report_type: 'MONTHLY', current_count: 8, required_count: 15, progress_percentage: 53 },
+];

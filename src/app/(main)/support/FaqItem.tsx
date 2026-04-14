@@ -8,22 +8,25 @@ interface FaqItemProps {
   answer: string;
   isOpen: boolean;
   onToggle: () => void;
-  isLast: boolean;
 }
 
 const FALLBACK_ANSWER = '현재 답변을 정성껏 준비 중입니다. 잠시만 기다려 주세요.';
 
-export default function FaqItem({ question, answer, isOpen, onToggle, isLast }: FaqItemProps) {
+export default function FaqItem({ question, answer, isOpen, onToggle }: FaqItemProps) {
   return (
-    <div className={!isLast ? 'border-b border-prime-100' : ''}>
+    <div
+      className={`overflow-hidden rounded-3xl border bg-white transition-shadow ${
+        isOpen ? 'border-cta-200 shadow-md' : 'border-prime-100 shadow-sm hover:shadow-md'
+      }`}
+    >
       <button
         type="button"
         onClick={onToggle}
-        className="group hover:bg-secondary-50 focus:bg-secondary-100/80 flex w-full items-start justify-between gap-4 px-5 py-5 text-left transition-all focus:outline-none sm:items-center sm:px-8 sm:py-6"
+        className="group flex w-full items-start justify-between gap-4 px-6 py-5 text-left transition-all focus:outline-none sm:items-center sm:px-8 sm:py-6"
       >
         <span
-          className={`text-[15px] leading-relaxed font-semibold transition-colors sm:text-[16px] ${
-            isOpen ? 'text-prime-900' : 'text-prime-900 group-hover:text-prime-700'
+          className={`text-[15px] leading-relaxed font-bold transition-colors sm:text-[16px] ${
+            isOpen ? 'text-prime-950' : 'text-prime-900 group-hover:text-prime-950'
           }`}
         >
           {question}
@@ -31,11 +34,13 @@ export default function FaqItem({ question, answer, isOpen, onToggle, isLast }: 
         <motion.div
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
-          className={`shrink-0 transition-colors ${
-            isOpen ? 'text-prime-700' : 'text-prime-300 group-hover:text-prime-500'
+          className={`flex shrink-0 items-center justify-center rounded-full p-1.5 transition-colors ${
+            isOpen
+              ? 'bg-cta-100 text-cta-600'
+              : 'bg-prime-50 text-prime-400 group-hover:bg-cta-50 group-hover:text-cta-500'
           }`}
         >
-          <ChevronDown size={20} strokeWidth={2.5} />
+          <ChevronDown size={18} strokeWidth={2.5} />
         </motion.div>
       </button>
 
@@ -45,8 +50,8 @@ export default function FaqItem({ question, answer, isOpen, onToggle, isLast }: 
         transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
         className="overflow-hidden"
       >
-        <div className="px-5 pb-6 sm:px-8 sm:pb-7">
-          <div className="bg-secondary-100 text-prime-600 rounded-2xl p-6 text-[14px] leading-relaxed whitespace-pre-line sm:text-[15px]">
+        <div className="px-6 pb-7 sm:px-8 sm:pb-8">
+          <div className="border-cta-300 text-prime-700 border-l-[3px] py-1 pl-5 text-[14px] leading-[1.8] whitespace-pre-line sm:text-[15px]">
             {answer || FALLBACK_ANSWER}
           </div>
         </div>

@@ -10,4 +10,5 @@ export interface Report {
   reportType: ReportType;
   isNew?: boolean;
   isFailed?: boolean;
+  isGenerating?: boolean;
 }

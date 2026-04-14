@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useMemo, useRef, useCallback, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCreditStore } from '@/entities/credits/store';
-import { useChatModals } from '@/features/select-persona';
+import { useAuthStore } from '@/entities/user/store';
 import type { ChatBubbleProps } from '@/widgets/chat-main-area';
 import type { ChatSessionGroup } from '@/widgets/chat-sidebar';
 
@@ -14,14 +14,20 @@ import {
   ChatCreditModal,
   ChatNewSessionModal,
   ChatUnfinishedSessionModal,
+  // ChatSatisfactionModal,  // TODO: 만족도 조사 — 우선순위 보류
 } from '@/components/chat';
+import { finalizeToEmotionCardData } from '@/entities/session/utils';
+import { EmotionCardFront } from '@/widgets/emotion-card';
 import { Menu } from 'lucide-react';
 import {
   getActiveSessionApi,
   getSessionsApi,
   getSessionDetailApi,
   finalizeSessionStream,
+  deleteSessionApi,
 } from '@/entities/session/api';
+import { uploadSummaryCardImageApi } from '@/entities/summary';
+import { useToast } from '@/shared/ui/toast';
 import { getCookie } from '@/shared/lib/utils/cookie';
 import type {
   ActiveSessionResponse,
@@ -29,6 +35,7 @@ import type {
   SessionDetailResponse,
   FinalizeCompleteEvent,
 } from '@/entities/session';
+import type { EmotionCardData } from '@/entities/emotion';
 
 // ── 모달 상태 타입 ──────────────────────────────────────────────
 export type ChatModalType =
@@ -36,6 +43,7 @@ export type ChatModalType =
   | 'new-session'
   | 'unfinished-session'
   | 'end-confirm'
+  // | 'satisfaction'  // TODO: 만족도 조사 — 우선순위 보류
   | null;
 
 // ── 더미 세션 데이터 (TODO: API 연동 시 제거) ───────────────────
@@ -666,12 +674,17 @@ const _MOCK_SESSION_GROUPS = [
   },
 ];
 
-export default function ChatPage() {
+function ChatPageContent() {
   const router = useRouter();
-  const { activeModal, openModal, closeModal } = useChatModals();
+  const [activeModal, setActiveModal] = useState<ChatModalType>(null);
+  const openModal = useCallback((type: ChatModalType) => setActiveModal(type), []);
+  const closeModal = useCallback(() => setActiveModal(null), []);
   const { totalCredit } = useCreditStore();
+  const { user } = useAuthStore();
+  const { toast } = useToast();
   const remainingCredits = totalCredit;
 
+  const searchParams = useSearchParams();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSessionId, setActiveSessionId] = useState<string | undefined>(undefined);
   const [unfinishedSession, setUnfinishedSession] = useState<ActiveSessionResponse | null>(null);
@@ -681,17 +694,47 @@ export default function ChatPage() {
   /** 채팅창에 외부에서 append할 메시지 */
   const [appendMessage, setAppendMessage] = useState<ChatBubbleProps | null>(null);
   const [sessionDetail, setSessionDetail] = useState<SessionDetailResponse | null>(null);
-  /** finalize 완료 데이터 — 추후 카드 표시 등에 활용 */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_finalizeResult, setFinalizeResult] = useState<FinalizeCompleteEvent | null>(null);
+  /** finalize 완료 데이터 */
+  const [finalizeResult, setFinalizeResult] = useState<FinalizeCompleteEvent | null>(null);
   /** finalize 스트림 취소용 — 언마운트 시 abort */
   const finalizeAbortRef = useRef<AbortController | null>(null);
+  /** 감정 카드 앞면 이미지 캡처용 */
+  const captureCardRef = useRef<HTMLDivElement>(null);
+  const [capturePayload, setCapturePayload] = useState<{
+    data: EmotionCardData;
+    summaryId: string;
+  } | null>(null);
+  /** 60분 미입력 자동 종료 타이머 */
+  const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return () => {
       finalizeAbortRef.current?.abort();
     };
   }, []);
+
+  // finalize 완료 후 감정 카드 앞면 캡처 → PATCH /image 업로드
+  useEffect(() => {
+    if (!capturePayload) return;
+    const { summaryId } = capturePayload;
+
+    const timer = setTimeout(async () => {
+      if (!captureCardRef.current) return;
+      try {
+        const { toBlob } = await import('html-to-image');
+        const blob = await toBlob(captureCardRef.current, { pixelRatio: 2 });
+        if (!blob) return;
+        const file = new File([blob], 'emotion-card.png', { type: 'image/png' });
+        await uploadSummaryCardImageApi(summaryId, file);
+      } catch {
+        // 업로드 실패는 UX에 영향 없음 — 조용히 무시
+      } finally {
+        setCapturePayload(null);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [capturePayload]);
 
   // 채팅 페이지에서는 body 스크롤 방지
   useEffect(() => {
@@ -700,6 +743,29 @@ export default function ChatPage() {
       document.body.style.overflow = '';
     };
   }, []);
+
+  // 60분 미입력 자동 종료 타이머 — 세션 활성 상태에서만 동작
+  const resetInactivityTimer = useCallback(() => {
+    if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
+    inactivityTimerRef.current = setTimeout(
+      () => {
+        setIsSessionActive(false);
+        finalizeAbortRef.current?.abort();
+      },
+      60 * 60 * 1000
+    );
+  }, []);
+
+  useEffect(() => {
+    if (isSessionActive) {
+      resetInactivityTimer();
+    } else {
+      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
+    }
+    return () => {
+      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
+    };
+  }, [isSessionActive, resetInactivityTimer]);
 
   // activeSessionId 변경 시 세션 상세 조회 (새 세션 생성 시에만 — 이어가기/사이드바는 핸들러에서 pre-fetch)
   useEffect(() => {
@@ -718,13 +784,25 @@ export default function ChatPage() {
   // 세션 상세 → ChatBubbleProps[] 변환 (API는 최신→과거 순, 표시는 과거→최신)
   const activeMessages = useMemo((): ChatBubbleProps[] => {
     if (!sessionDetail) return [];
-    return [...sessionDetail.messages].reverse().map((m) => ({
+    const messages: ChatBubbleProps[] = [...sessionDetail.messages].reverse().map((m) => ({
       variant: m.role === 'assistant' ? 'ai' : 'user',
-      senderName: m.role === 'assistant' ? '나봄이' : '나',
+      senderName: m.role === 'assistant' ? '나봄이' : (user?.name ?? '나'),
       content: m.content,
       avatarSrc: m.role === 'assistant' ? '/images/personas/nabomi-44.png' : undefined,
+      userAvatarSrc: m.role === 'user' ? (user?.profileImage ?? undefined) : undefined,
     }));
-  }, [sessionDetail]);
+
+    if (sessionDetail.status === 'SAVED' && sessionDetail.card_image_url) {
+      messages.push({
+        variant: 'ai',
+        senderName: '나봄이',
+        avatarSrc: '/images/personas/nabomi-44.png',
+        cardImageUrl: sessionDetail.card_image_url,
+      });
+    }
+
+    return messages;
+  }, [sessionDetail, user]);
 
   const activeAiName = '나봄이';
   const activeAiAvatarSrc = '/images/personas/nabomi-44.png';
@@ -748,28 +826,65 @@ export default function ChatPage() {
     return Array.from(groupMap.values());
   }, [sessionList]);
 
+  // ── ?session= 쿼리로 세션 자동 선택 ──────────────────────────────
+  useEffect(() => {
+    const sessionId = searchParams.get('session');
+    if (sessionId) {
+      handleSelectSession(sessionId);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // ── 진입 시 미완료 세션 확인 + 세션 목록 조회 ──────────────────
   useEffect(() => {
-    getActiveSessionApi()
-      .then((session) => {
-        if (session) {
-          setUnfinishedSession(session);
-          openModal('unfinished-session');
-        }
-      })
-      .catch(() => {});
+    Promise.all([
+      getActiveSessionApi().catch(() => null),
+      getSessionsApi().catch(() => null),
+    ]).then(([activeSession, sessionData]) => {
+      const sessions = sessionData?.sessions ?? [];
+      setSessionList(sessions);
 
-    getSessionsApi()
-      .then((res) => setSessionList(res.sessions))
-      .catch(() => {});
+      if (activeSession) {
+        setUnfinishedSession(activeSession);
+        openModal('unfinished-session');
+      } else if (sessions.length === 0) {
+        openModal('new-session');
+      }
+    });
   }, [openModal]);
 
   // ── 핸들러 ───────────────────────────────────────────────────────
+
+  /** 세션 삭제 */
+  const handleDeleteSession = async (id: string) => {
+    try {
+      await deleteSessionApi(id);
+      setSessionList((prev) => prev.filter((s) => s.sessionId !== id));
+      if (activeSessionId === id) {
+        setActiveSessionId(undefined);
+        setSessionDetail(null);
+      }
+      toast('대화가 삭제되었어요.', 'success');
+    } catch {
+      toast('대화 삭제에 실패했어요.', 'error');
+    }
+  };
 
   /** 사이드바 [새로운 상담] 버튼 → 세션 초기화, 입력창 활성화 */
   const handleNewCounsel = () => {
     setSidebarOpen(false);
     closeModal();
+
+    // 오늘 이미 세션이 있으면 추가 상담(70 크레딧 차감) → 크레딧 사전 체크
+    const today = new Date().toDateString();
+    const hasTodaySession = sessionList.some(
+      (s) => new Date(s.startedAt).toDateString() === today
+    );
+    if (hasTodaySession && totalCredit < 70) {
+      openModal('credit-shortage');
+      return;
+    }
+
     setActiveSessionId(undefined); // 새 세션 준비 (첫 메시지 전송 시 생성)
     setIsSessionActive(true);
   };
@@ -807,17 +922,23 @@ export default function ChatPage() {
 
   const handleEndChat = () => openModal('end-confirm');
 
-  /** 종료 확인 → finalize SSE 호출 → 완료 메시지 */
+  /** 종료 확인 → finalize SSE 호출 → 감정 카드 버블 */
   const handleEndConfirmed = async () => {
     closeModal();
     setIsSessionActive(false);
     setAppendMessage({
       variant: 'ai',
-      senderName: '마음 기록',
+      senderName: '나봄이',
+      avatarSrc: activeAiAvatarSrc,
       content: '마음 기록을 생성 중입니다.',
     });
 
     if (!activeSessionId) return;
+
+    // TODO: 만족도 조사 — 우선순위 보류
+    // if ((sessionList.length + 1) % 5 === 0) {
+    //   openModal('satisfaction');
+    // }
 
     const token = getCookie('accessToken') ?? '';
     if (!token) {
@@ -828,67 +949,99 @@ export default function ChatPage() {
     const controller = new AbortController();
     finalizeAbortRef.current = controller;
 
+    // onDone 클로저에서 state 참조가 stale해질 수 있으므로 로컬 변수로 캡처
+    let capturedResult: typeof finalizeResult = null;
+    const capturedSessionId = activeSessionId;
+
     try {
       await finalizeSessionStream(
-        activeSessionId,
+        capturedSessionId,
         token,
         () => {}, // status 이벤트 — 고정 메시지 유지
-        (data) => setFinalizeResult(data),
-        () => {
-          setAppendMessage({
-            variant: 'ai',
-            senderName: '마음 기록',
-            content: '마음 기록이 완성되었습니다.',
-          });
+        (data) => {
+          setFinalizeResult(data);
+          capturedResult = data;
         },
-        controller.signal
+        () => {
+          // 만족도 팝업이 열려 있으면 닫기
+          closeModal();
+          // 텍스트 버블 대신 감정 카드 버블 표시
+          if (capturedResult) {
+            const cardData = finalizeToEmotionCardData(capturedResult, capturedSessionId);
+            setAppendMessage({
+              variant: 'ai',
+              senderName: '나봄이',
+              avatarSrc: activeAiAvatarSrc,
+              emotionCardData: cardData,
+              cardImageUrl: capturedResult.card_image_url,
+            });
+            setCapturePayload({ data: cardData, summaryId: capturedResult.summary_id });
+          }
+        },
+        controller.signal,
+        (errorMessage) => {
+          closeModal();
+          console.error('Finalize SSE error:', errorMessage);
+          setAppendMessage({ variant: 'ai', senderName: '나봄이', avatarSrc: activeAiAvatarSrc, content: '마음 기록 생성 중 오류가 발생했습니다.' });
+        }
       );
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') return;
+      closeModal();
       const code = err instanceof Error ? err.message : '';
       const message =
-        code === 'SESSION_ALREADY_SAVED' ? '이미 저장된 상담입니다.' :
-        code === 'SESSION_TOO_SHORT' ? '상담이 너무 짧아 기록을 생성할 수 없습니다.' :
-        code === 'SESSION_NOT_FOUND' ? '세션을 찾을 수 없습니다.' :
-        '마음 기록 생성에 실패했습니다.';
-      setAppendMessage({ variant: 'ai', senderName: '마음 기록', content: message });
+        code === 'SESSION_ALREADY_SAVED'
+          ? '이미 저장된 상담입니다.'
+          : code === 'SESSION_TOO_SHORT'
+            ? '상담이 너무 짧아 기록을 생성할 수 없습니다.'
+            : code === 'SESSION_NOT_FOUND'
+              ? '세션을 찾을 수 없습니다.'
+              : '마음 기록 생성에 실패했습니다.';
+      setAppendMessage({
+        variant: 'ai',
+        senderName: '나봄이',
+        avatarSrc: activeAiAvatarSrc,
+        content: message,
+      });
     }
   };
 
   return (
-    <div className="layout-container relative box-border flex h-[calc(100dvh-4rem)] min-h-0 overflow-hidden md:h-[calc(100dvh-5rem)]">
-      {/* 모바일 사이드바 토글 버튼 */}
-      <button
-        type="button"
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="bg-secondary-100/80 absolute top-3 left-3 z-30 flex h-10 w-10 items-center justify-center rounded-lg shadow-md backdrop-blur-sm lg:hidden"
-        aria-label="상담 목록 열기"
-      >
-        <Menu size={20} />
-      </button>
-
+    <div className="layout-container bg-bg-light relative flex h-[calc(100dvh-4rem)] min-h-0 overflow-hidden md:h-[calc(100dvh-5rem)]">
       {/* 모바일 사이드바 오버레이 */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/30 lg:hidden"
+          className="fixed inset-0 z-[55] bg-black/40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* 사이드바 — 모바일: 슬라이드 오버레이, 데스크톱: 고정 */}
       <div
-        className={`fixed inset-y-0 left-0 z-40 w-[min(320px,85vw)] transform pt-16 transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:z-auto lg:w-80.75 lg:translate-x-0 lg:pt-0 lg:transition-none`}
+        className={`fixed inset-y-0 left-0 z-[60] w-[min(320px,85vw)] transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:z-auto lg:w-80.75 lg:translate-x-0 lg:transition-none`}
       >
         <ChatSidebar
           onNewCounsel={handleNewCounsel}
           activeSessionId={activeSessionId}
           onSelectSession={handleSelectSession}
+          onDeleteSession={handleDeleteSession}
           sessionGroups={sessionGroups}
         />
       </div>
 
       {/* 메인 채팅 영역 */}
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-r border-black/5 pt-14 lg:pt-0">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-r border-black/5">
+        {/* 모바일 상담 목록 트리거 (lg 미만에서만 표시) */}
+        <div className="border-prime-100 sticky top-0 z-10 flex items-center gap-3 border-b bg-white px-4 py-3 lg:hidden">
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            className="hover:bg-prime-50 text-prime-700 flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
+          >
+            <Menu className="size-4" />
+            상담 목록
+          </button>
+        </div>
         <ChatMainArea
           onEndChat={handleEndChat}
           onCreditShortage={() => openModal('credit-shortage')}
@@ -898,10 +1051,18 @@ export default function ChatPage() {
           onDisabledInputClick={handleDisabledInputClick}
           appendMessage={appendMessage}
           sessionId={activeSessionId}
-          personaId="019d0b99-584b-710a-93d0-f1b64d56ddb4"
-          onSessionCreated={(id) => setActiveSessionId(id)}
+          onSessionCreated={(id) => {
+            setActiveSessionId(id);
+            setSessionList((prev) => [
+              { sessionId: id, title: '', status: 'ACTIVE', startedAt: new Date().toISOString() },
+              ...prev,
+            ]);
+          }}
           aiName={activeAiName}
           aiAvatarSrc={activeAiAvatarSrc}
+          onUserMessage={resetInactivityTimer}
+          userName={user?.name}
+          userAvatarSrc={user?.profileImage}
         />
       </div>
 
@@ -953,6 +1114,46 @@ export default function ChatPage() {
         onWait={closeModal}
         onEnd={handleEndConfirmed}
       />
+
+      {/* TODO: 만족도 조사 — 우선순위 보류 */}
+      {/* <ChatSatisfactionModal
+        isOpen={activeModal === 'satisfaction'}
+        onClose={closeModal}
+        onYes={closeModal}
+        onNo={closeModal}
+      /> */}
+
+      {/* 감정 카드 앞면 이미지 캡처용 — 화면 밖에 숨겨서 렌더링 */}
+      {capturePayload && (
+        <div
+          ref={captureCardRef}
+          style={{
+            position: 'fixed',
+            left: '-9999px',
+            top: 0,
+            width: 400,
+            height: 686,
+            pointerEvents: 'none',
+          }}
+        >
+          <EmotionCardFront
+            layers={capturePayload.data.layers}
+            emotionLabel={(
+              capturePayload.data.layers.find((l) => l.role === 'primary')?.type ?? 'emotion'
+            ).toUpperCase()}
+            width={400}
+            height={686}
+          />
+        </div>
+      )}
     </div>
+  );
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense>
+      <ChatPageContent />
+    </Suspense>
   );
 }

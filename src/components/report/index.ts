@@ -1,4 +1,5 @@
 export { ReportSidebar } from './ReportSidebar';
+export { DeleteReportModal } from './DeleteReportModal';
 export { ReportCreationForm } from './ReportCreationForm';
 export { ReportPolling } from './ReportPolling';
 export { ReportError } from './ReportError';

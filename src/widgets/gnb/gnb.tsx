@@ -8,8 +8,8 @@ import { Menu, X, User, LogOut, Coins } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAuthStore } from '@/entities/user/store';
 import { cn } from '@/shared/lib/utils';
-import { UserProfileModal } from '@/shared/ui/UserProfileModal';
 import { Button } from '@/shared/ui/button';
+import { ProfileAvatar } from '@/shared/ui/profile-avatar';
 import { useCreditStore } from '@/entities/credits/store';
 
 // Figma: GNB (1738:4600)
@@ -38,7 +38,6 @@ export function GNB() {
   const [scrollRatio, setScrollRatio] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [, startTransition] = useTransition();
 
@@ -96,6 +95,7 @@ export function GNB() {
   };
 
   return (
+    <>
     <header
       className="text-prime-900 fixed top-0 right-0 left-0 z-50 w-full backdrop-blur-md"
       style={
@@ -121,6 +121,7 @@ export function GNB() {
               src="/images/logo/logo-small.svg"
               alt="MindLog"
               fill
+              sizes="32px"
               className="object-contain"
             />
           </div>
@@ -163,19 +164,14 @@ export function GNB() {
                   className="flex items-center gap-2 transition-opacity hover:opacity-70"
                 >
                   <div className="border-cta-300 bg-cta-100 relative size-7 shrink-0 overflow-hidden rounded-full border">
-                    <Image
-                      src={user?.profileImage ?? '/images/icons/profile-default.svg'}
-                      alt="프로필"
-                      fill
-                      className={
-                        user?.profileImage &&
-                        user.profileImage !== '/images/icons/profile-default.svg'
-                          ? 'object-cover'
-                          : 'object-contain p-1'
-                      }
-                    />
+                    <ProfileAvatar src={user?.profileImage} defaultPadding="p-1" />
                   </div>
-                  <span className="text-prime-900 text-sm font-medium">{user?.name ?? 'MY'}</span>
+                  <span
+                    className="text-prime-900 max-w-24 truncate text-sm font-medium"
+                    title={user?.name}
+                  >
+                    {user?.name ?? 'MY'}
+                  </span>
                 </button>
 
                 {profileDropdownOpen && (
@@ -192,7 +188,7 @@ export function GNB() {
                     }}
                     onProfileHeader={() => {
                       setProfileDropdownOpen(false);
-                      setProfileModalOpen(true);
+                      router.push('/my');
                     }}
                   />
                 )}
@@ -208,13 +204,11 @@ export function GNB() {
           )}
         </div>
 
-        <UserProfileModal isOpen={profileModalOpen} onClose={() => setProfileModalOpen(false)} />
-
         {/* 모바일 햄버거 버튼 */}
         <button
           type="button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="hover:bg-secondary-100 flex h-9 w-9 items-center justify-center rounded-lg transition-colors lg:hidden"
+          className="hover:bg-secondary-100 flex h-11 w-11 items-center justify-center rounded-lg transition-colors lg:hidden"
           aria-label={mobileMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
           aria-expanded={mobileMenuOpen}
         >
@@ -222,10 +216,15 @@ export function GNB() {
         </button>
       </nav>
 
-      {/* 모바일 메뉴 오버레이 */}
+    </header>
+
+      {/* 모바일 메뉴 오버레이 — header 밖에 렌더링 (backdrop-filter containing block 이슈 회피) */}
       {mobileMenuOpen && (
         <div className="fixed inset-x-0 top-16 bottom-0 z-40 flex flex-col overflow-y-auto bg-white md:top-20 lg:hidden">
-          <div className="flex flex-col gap-1 px-4 py-4">
+          <div
+            className="flex flex-col gap-1 px-4 py-4"
+            style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
+          >
             {(isAuthenticated ? MEMBER_NAV_ITEMS : GUEST_NAV_ITEMS).map(({ label, href }) => (
               <MobileNavItem key={href} label={label} href={href} active={pathname === href} />
             ))}
@@ -233,6 +232,17 @@ export function GNB() {
             {isAuthenticated ? (
               <>
                 <MobileNavItem label="마이페이지" href="/my" active={pathname === '/my'} />
+                <div className="border-prime-100 my-2 border-t" />
+                {/* 크레딧 잔액 */}
+                <Link
+                  href="/shop?tab=credit"
+                  className="text-prime-700 hover:bg-secondary-50 flex items-center gap-2 rounded-xl px-4 py-3 text-base font-medium transition-all"
+                >
+                  <div className="bg-interactive-glass-blue-50 flex size-6 items-center justify-center rounded-full">
+                    <Coins size={13} strokeWidth={2} className="text-cta-300" />
+                  </div>
+                  {totalCredit.toLocaleString()} 크레딧
+                </Link>
                 <div className="border-prime-100 my-2 border-t" />
                 <button
                   onClick={handleLogout}
@@ -252,7 +262,7 @@ export function GNB() {
           </div>
         </div>
       )}
-    </header>
+    </>
   );
 }
 
@@ -327,9 +337,6 @@ function ProfileDropdown({
   onMypage: () => void;
   onProfileHeader: () => void;
 }) {
-  const isDefaultImage =
-    !userProfileImage || userProfileImage === '/images/icons/profile-default.svg';
-
   return (
     <div className="border-prime-100 absolute top-full right-0 z-50 mt-2 w-59.5 overflow-hidden rounded-2xl border bg-white/90 shadow-sm backdrop-blur-md">
       {/* 헤더: 아바타 + 이름 + 이메일 */}
@@ -339,12 +346,7 @@ function ProfileDropdown({
         className="border-prime-100 hover:bg-secondary-50 flex w-full items-center gap-3 border-b px-5 py-4 transition-colors"
       >
         <div className="border-cta-300 bg-cta-100 relative size-10 shrink-0 overflow-hidden rounded-full border">
-          <Image
-            src={userProfileImage ?? '/images/icons/profile-default.svg'}
-            alt="프로필"
-            fill
-            className={isDefaultImage ? 'object-contain p-1.5' : 'object-cover'}
-          />
+          <ProfileAvatar src={userProfileImage} defaultPadding="p-1.5" />
         </div>
         <div className="flex min-w-0 flex-col">
           <span className="text-prime-900 truncate text-sm leading-normal font-medium tracking-[-0.21px]">
@@ -371,10 +373,10 @@ function ProfileDropdown({
         <button
           type="button"
           onClick={onLogout}
-          className="text-error-500 hover:bg-error-100 flex w-full items-center gap-3 px-5 py-3 text-sm font-medium tracking-[-0.21px] transition-colors"
+          className="text-prime-700 hover:bg-secondary-50 flex w-full items-center gap-3 px-5 py-3 text-sm font-medium tracking-[-0.21px] transition-colors"
         >
-          <div className="bg-error-100 flex size-8 shrink-0 items-center justify-center rounded-xl">
-            <LogOut size={15} className="text-error-500" />
+          <div className="bg-prime-100 flex size-8 shrink-0 items-center justify-center rounded-xl">
+            <LogOut size={15} className="text-prime-400" />
           </div>
           로그아웃
         </button>

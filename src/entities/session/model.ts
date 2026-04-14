@@ -7,12 +7,10 @@ export interface SessionListQuery {
   size?: number;
   start_date?: string;
   end_date?: string;
-  persona_ids?: string[];
 }
 
 export interface SessionListItem {
   sessionId: string;
-  personaImageUrl: string;
   title: string;
   status: SessionStatus;
   startedAt: string;
@@ -63,7 +61,7 @@ export interface SendMessageRequest {
 }
 
 // SSE 이벤트 타입
-export type SSEEventType = 'ai_chunk' | 'ai_complete' | 'crisis_check' | 'done';
+export type SSEEventType = 'ai_chunk' | 'ai_complete' | 'crisis_check' | 'done' | 'error';
 
 export interface SSEChunkEvent {
   content: string;
@@ -72,7 +70,6 @@ export interface SSEChunkEvent {
 export interface CounselingSessions {
   session_id: string; // PK / UUID
   user_id: string; // FK / 사용자_ID / UUID
-  persona_id: string; // FK / 페르소나_ID / UUID
   status: string | null; // 세션_상태 / VARCHAR(20)
   started_at: Date | null; // 시작_시간 / TIMESTAMP
   ended_at: Date | null; // 종료_시간 / TIMESTAMP
@@ -118,6 +115,7 @@ export interface FinalizeEmotionItem {
 }
 
 export interface FinalizeCompleteEvent {
+  summary_id: string;
   emotions: FinalizeEmotionItem[];
   card_image_url: string;
   summary: {
@@ -144,6 +142,7 @@ export interface SessionDetailResponse {
   status: string;
   messages: SessionDetailMessage[];
   has_summary: boolean;
+  card_image_url?: string;
 }
 
 export interface SessionCheckpointMapping {
@@ -152,4 +151,15 @@ export interface SessionCheckpointMapping {
   thread_id: string; // Thread_ID / VARCHAR(100)
   created_at: Date | null; // 생성일시 / TIMESTAMP
   updated_at: Date | null; // 수정일시 / TIMESTAMP
+}
+
+// ─── /v1/sessions/me/progress (GET) - 리포트 달성률 조회 ───
+
+export type ProgressReportType = 'WEEKLY' | 'MONTHLY';
+
+export interface SessionProgressResponse {
+  report_type: ProgressReportType;
+  current_count: number;
+  required_count: number;
+  progress_percentage: number;
 }

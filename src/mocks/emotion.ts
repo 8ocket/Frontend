@@ -81,6 +81,7 @@ export function mockCardData(
 ): EmotionCardData {
   return {
     cardId,
+    summaryId: overrides?.summaryId ?? cardId,
     sessionId: `session-${cardId}`,
     userName: '민지',
     layers: buildEmotionLayers(extractions),
@@ -162,16 +163,13 @@ function daysAgo(n: number): Date {
   return d;
 }
 
-/** 컬렉션 페이지용 카드 목록 (7개, 다양한 감정 조합) */
+/** 컬렉션 페이지용 카드 목록 (30개, 다양한 감정 조합) */
 export const MOCK_COLLECTION_CARDS: EmotionCardData[] = [
   mockCardData('card-01', daysAgo(0), mockExtractions('joy'), {
     keywords: [{ keyword: '합격', emotionType: 'joy', percentage: 100 }],
-    summary: {
-      title: '오늘의 기쁨을 충분히 누려도 괜찮아요. 당신은 그럴 자격이 있어요.',
-      description: '',
-    },
+    summary: { title: '오늘의 기쁨을 충분히 누려도 괜찮아요. 당신은 그럴 자격이 있어요.', description: '' },
     fact: '오랫동안 준비해온 취업 면접 결과가 나왔고, 최종 합격 통보를 받았다.',
-    emotion: '몇 달간의 긴장과 불안이 한꺼번에 풀리는 느낌이었다. 온몸이 가벼워지고 눈물이 날 것 같은 기쁨이었다.',
+    emotion: '몇 달간의 긴장과 불안이 한꺼번에 풀리는 느낌이었다.',
     insight: '이 기쁨이 단순한 성공이 아니라, 포기하지 않은 나 자신에 대한 보상임을 느꼈다.',
   }),
   mockCardData('card-02', daysAgo(1), mockExtractions('surprise', 'trust'), {
@@ -201,12 +199,9 @@ export const MOCK_COLLECTION_CARDS: EmotionCardData[] = [
       { keyword: '이별', emotionType: 'sadness', percentage: 65 },
       { keyword: '외로움', emotionType: 'fear', percentage: 35 },
     ],
-    summary: {
-      title: '슬픔은 소중했던 것이 있었다는 증거예요. 충분히 슬퍼해도 괜찮아요.',
-      description: '',
-    },
+    summary: { title: '슬픔은 소중했던 것이 있었다는 증거예요. 충분히 슬퍼해도 괜찮아요.', description: '' },
     fact: '오랫동안 함께했던 친구가 멀리 이사를 가게 되었다는 소식을 들었다.',
-    emotion: '앞으로 자주 볼 수 없다는 사실이 실감나면서 가슴이 먹먹해졌다. 혼자 남겨지는 것 같은 두려움도 들었다.',
+    emotion: '앞으로 자주 볼 수 없다는 사실이 실감나면서 가슴이 먹먹해졌다.',
     insight: '이 슬픔은 관계를 소중히 여기는 내 마음에서 비롯된 것임을 알게 되었다.',
   }),
   mockCardData('card-07', daysAgo(6), mockExtractions('anger', 'disgust'), {
@@ -214,12 +209,136 @@ export const MOCK_COLLECTION_CARDS: EmotionCardData[] = [
       { keyword: '불공정', emotionType: 'anger', percentage: 65 },
       { keyword: '무시', emotionType: 'disgust', percentage: 35 },
     ],
-    summary: {
-      title: '그 분노는 당신의 기준과 가치관이 살아있다는 신호예요.',
-      description: '',
-    },
-    fact: '팀 프로젝트에서 내가 작성한 보고서가 팀장의 이름으로 윗선에 보고되었다는 것을 알게 되었다.',
-    emotion: '배신감과 함께 억울함이 치밀어 올랐다. 노력이 무시당한 것 같아 분하고 불쾌했다.',
+    summary: { title: '그 분노는 당신의 기준과 가치관이 살아있다는 신호예요.', description: '' },
+    fact: '팀 프로젝트에서 내가 작성한 보고서가 팀장의 이름으로 윗선에 보고되었다.',
+    emotion: '배신감과 함께 억울함이 치밀어 올랐다.',
     insight: '이 분노의 근원은 공정함과 인정에 대한 나의 강한 욕구임을 이해하게 되었다.',
+  }),
+  mockCardData('card-08', daysAgo(7), mockExtractions('anticipation', 'joy'), {
+    keywords: [
+      { keyword: '설렘', emotionType: 'anticipation', percentage: 60 },
+      { keyword: '기쁨', emotionType: 'joy', percentage: 40 },
+    ],
+  }),
+  mockCardData('card-09', daysAgo(8), mockExtractions('fear', 'sadness'), {
+    keywords: [
+      { keyword: '걱정', emotionType: 'fear', percentage: 70 },
+      { keyword: '우울', emotionType: 'sadness', percentage: 30 },
+    ],
+  }),
+  mockCardData('card-10', daysAgo(9), mockExtractions('disgust', 'anger', 'sadness'), {
+    keywords: [
+      { keyword: '혐오', emotionType: 'disgust', percentage: 55 },
+      { keyword: '분노', emotionType: 'anger', percentage: 30 },
+      { keyword: '슬픔', emotionType: 'sadness', percentage: 15 },
+    ],
+  }),
+  mockCardData('card-11', daysAgo(10), mockExtractions('trust'), {
+    keywords: [{ keyword: '믿음', emotionType: 'trust', percentage: 100 }],
+  }),
+  mockCardData('card-12', daysAgo(11), mockExtractions('joy', 'trust', 'anticipation'), {
+    keywords: [
+      { keyword: '행복', emotionType: 'joy', percentage: 50 },
+      { keyword: '신뢰', emotionType: 'trust', percentage: 30 },
+      { keyword: '기대', emotionType: 'anticipation', percentage: 20 },
+    ],
+  }),
+  mockCardData('card-13', daysAgo(12), mockExtractions('sadness'), {
+    keywords: [{ keyword: '그리움', emotionType: 'sadness', percentage: 100 }],
+  }),
+  mockCardData('card-14', daysAgo(13), mockExtractions('anger', 'fear'), {
+    keywords: [
+      { keyword: '분노', emotionType: 'anger', percentage: 60 },
+      { keyword: '불안', emotionType: 'fear', percentage: 40 },
+    ],
+  }),
+  mockCardData('card-15', daysAgo(14), mockExtractions('surprise', 'joy'), {
+    keywords: [
+      { keyword: '놀람', emotionType: 'surprise', percentage: 55 },
+      { keyword: '기쁨', emotionType: 'joy', percentage: 45 },
+    ],
+  }),
+  mockCardData('card-16', daysAgo(15), mockExtractions('anticipation'), {
+    keywords: [{ keyword: '기대', emotionType: 'anticipation', percentage: 100 }],
+  }),
+  mockCardData('card-17', daysAgo(16), mockExtractions('fear', 'disgust', 'anger'), {
+    keywords: [
+      { keyword: '두려움', emotionType: 'fear', percentage: 50 },
+      { keyword: '혐오', emotionType: 'disgust', percentage: 30 },
+      { keyword: '분노', emotionType: 'anger', percentage: 20 },
+    ],
+  }),
+  mockCardData('card-18', daysAgo(17), mockExtractions('trust', 'anticipation'), {
+    keywords: [
+      { keyword: '신뢰', emotionType: 'trust', percentage: 65 },
+      { keyword: '기대', emotionType: 'anticipation', percentage: 35 },
+    ],
+  }),
+  mockCardData('card-19', daysAgo(18), mockExtractions('sadness', 'anger'), {
+    keywords: [
+      { keyword: '상실', emotionType: 'sadness', percentage: 60 },
+      { keyword: '억울함', emotionType: 'anger', percentage: 40 },
+    ],
+  }),
+  mockCardData('card-20', daysAgo(19), mockExtractions('joy', 'surprise', 'trust'), {
+    keywords: [
+      { keyword: '성취', emotionType: 'joy', percentage: 55 },
+      { keyword: '놀람', emotionType: 'surprise', percentage: 25 },
+      { keyword: '감사', emotionType: 'trust', percentage: 20 },
+    ],
+  }),
+  mockCardData('card-21', daysAgo(20), mockExtractions('disgust'), {
+    keywords: [{ keyword: '불쾌함', emotionType: 'disgust', percentage: 100 }],
+  }),
+  mockCardData('card-22', daysAgo(21), mockExtractions('anticipation', 'fear'), {
+    keywords: [
+      { keyword: '설렘', emotionType: 'anticipation', percentage: 55 },
+      { keyword: '긴장', emotionType: 'fear', percentage: 45 },
+    ],
+  }),
+  mockCardData('card-23', daysAgo(22), mockExtractions('anger'), {
+    keywords: [{ keyword: '분노', emotionType: 'anger', percentage: 100 }],
+  }),
+  mockCardData('card-24', daysAgo(23), mockExtractions('trust', 'joy'), {
+    keywords: [
+      { keyword: '감사', emotionType: 'trust', percentage: 60 },
+      { keyword: '기쁨', emotionType: 'joy', percentage: 40 },
+    ],
+  }),
+  mockCardData('card-25', daysAgo(24), mockExtractions('sadness', 'fear', 'disgust'), {
+    keywords: [
+      { keyword: '우울', emotionType: 'sadness', percentage: 50 },
+      { keyword: '불안', emotionType: 'fear', percentage: 30 },
+      { keyword: '무기력', emotionType: 'disgust', percentage: 20 },
+    ],
+  }),
+  mockCardData('card-26', daysAgo(25), mockExtractions('surprise', 'anticipation'), {
+    keywords: [
+      { keyword: '놀람', emotionType: 'surprise', percentage: 55 },
+      { keyword: '기대', emotionType: 'anticipation', percentage: 45 },
+    ],
+  }),
+  mockCardData('card-27', daysAgo(26), mockExtractions('joy', 'anticipation', 'trust'), {
+    keywords: [
+      { keyword: '희망', emotionType: 'joy', percentage: 50 },
+      { keyword: '기대', emotionType: 'anticipation', percentage: 30 },
+      { keyword: '신뢰', emotionType: 'trust', percentage: 20 },
+    ],
+  }),
+  mockCardData('card-28', daysAgo(27), mockExtractions('fear'), {
+    keywords: [{ keyword: '두려움', emotionType: 'fear', percentage: 100 }],
+  }),
+  mockCardData('card-29', daysAgo(28), mockExtractions('anger', 'disgust'), {
+    keywords: [
+      { keyword: '좌절', emotionType: 'anger', percentage: 65 },
+      { keyword: '실망', emotionType: 'disgust', percentage: 35 },
+    ],
+  }),
+  mockCardData('card-30', daysAgo(29), mockExtractions('trust', 'surprise', 'joy'), {
+    keywords: [
+      { keyword: '신뢰', emotionType: 'trust', percentage: 50 },
+      { keyword: '놀람', emotionType: 'surprise', percentage: 30 },
+      { keyword: '기쁨', emotionType: 'joy', percentage: 20 },
+    ],
   }),
 ];

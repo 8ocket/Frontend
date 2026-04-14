@@ -17,6 +17,7 @@ import type { EmotionCardData } from '@/entities/emotion';
 const SAMPLE_CARDS: EmotionCardData[] = [
   {
     cardId: 'about-joy',
+    summaryId: 'about-joy',
     sessionId: 'about-sample',
     userName: '민지',
     layers: [
@@ -33,6 +34,7 @@ const SAMPLE_CARDS: EmotionCardData[] = [
   },
   {
     cardId: 'about-anger',
+    summaryId: 'about-anger',
     sessionId: 'about-sample',
     userName: '민지',
     layers: [
@@ -52,6 +54,7 @@ const SAMPLE_CARDS: EmotionCardData[] = [
   },
   {
     cardId: 'about-sadness',
+    summaryId: 'about-sadness',
     sessionId: 'about-sample',
     userName: '민지',
     layers: [
@@ -178,8 +181,8 @@ export function SmallCardsSection() {
   const inView = useInView(ref, { once: true, margin: '-100px' });
 
   return (
-    <div className="flex flex-col items-center" style={{ width: 1077, gap: 80 }}>
-      <div className="flex flex-col items-center text-center" style={{ width: 551, gap: 16 }}>
+    <div className="flex w-full flex-col items-center px-4" style={{ maxWidth: 1077, gap: 80 }}>
+      <div className="flex w-full flex-col items-center text-center" style={{ maxWidth: 551, gap: 16 }}>
         <h2
           style={{
             fontSize: 24,
