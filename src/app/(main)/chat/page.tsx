@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCreditStore } from '@/entities/credits/store';
 import { useAuthStore } from '@/entities/user/store';
@@ -674,7 +674,7 @@ const _MOCK_SESSION_GROUPS = [
   },
 ];
 
-export default function ChatPage() {
+function ChatPageContent() {
   const router = useRouter();
   const [activeModal, setActiveModal] = useState<ChatModalType>(null);
   const openModal = useCallback((type: ChatModalType) => setActiveModal(type), []);
@@ -1147,5 +1147,13 @@ export default function ChatPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense>
+      <ChatPageContent />
+    </Suspense>
   );
 }
