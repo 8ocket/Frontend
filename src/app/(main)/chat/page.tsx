@@ -785,11 +785,11 @@ function ChatPageContent() {
   const activeMessages = useMemo((): ChatBubbleProps[] => {
     if (!sessionDetail) return [];
     const messages: ChatBubbleProps[] = [...sessionDetail.messages].reverse().map((m) => ({
-      variant: m.role === 'assistant' ? 'ai' : 'user',
-      senderName: m.role === 'assistant' ? '나봄이' : (user?.name ?? '나'),
+      variant: m.role === 'ASSISTANT' ? 'ai' : 'user',
+      senderName: m.role === 'ASSISTANT' ? '나봄이' : (user?.name ?? '나'),
       content: m.content,
-      avatarSrc: m.role === 'assistant' ? '/images/personas/nabomi-44.png' : undefined,
-      userAvatarSrc: m.role === 'user' ? (user?.profileImage ?? undefined) : undefined,
+      avatarSrc: m.role === 'ASSISTANT' ? '/images/personas/nabomi-44.png' : undefined,
+      userAvatarSrc: m.role === 'USER' ? (user?.profileImage ?? undefined) : undefined,
     }));
 
     if (sessionDetail.status === 'SAVED' && sessionDetail.card_image_url) {
