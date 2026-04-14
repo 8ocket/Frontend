@@ -256,19 +256,7 @@ export default function MyPage() {
                                 >
                                   {item.amount.toLocaleString()}원
                                 </span>
-                                {item.status === 'CANCELED' ? (
-                                  <span className="bg-error-100 text-error-500 rounded-md px-1.5 py-0.5 text-[10px] font-semibold">
-                                    환불완료
-                                  </span>
-                                ) : item.status === 'ABORTED' || item.status === 'FAILED' ? (
-                                  <span className="bg-prime-100 text-prime-400 rounded-md px-1.5 py-0.5 text-[10px] font-semibold">
-                                    결제실패
-                                  </span>
-                                ) : (
-                                  <span className="text-success-800 text-xs font-medium">
-                                    결제완료
-                                  </span>
-                                )}
+                                <PaymentStatusBadge status={item.status} />
                               </div>
 
                               {/* 더보기 버튼 자리 — 항상 동일 너비 확보 */}
@@ -409,6 +397,28 @@ export default function MyPage() {
 }
 
 // ── 환불 안내 모달 ────────────────────────────────────────────────────
+function PaymentStatusBadge({ status }: { status: string }) {
+  if (status === 'CANCELED') {
+    return (
+      <span className="bg-error-100 text-error-500 rounded-md px-1.5 py-0.5 text-[10px] font-semibold">
+        환불완료
+      </span>
+    );
+  }
+  if (status === 'ABORTED' || status === 'FAILED') {
+    return (
+      <span className="bg-prime-100 text-prime-400 rounded-md px-1.5 py-0.5 text-[10px] font-semibold">
+        결제실패
+      </span>
+    );
+  }
+  return (
+    <span className="text-success-800 text-xs font-medium">
+      결제완료
+    </span>
+  );
+}
+
 function RefundModal({
   isOpen,
   onClose,

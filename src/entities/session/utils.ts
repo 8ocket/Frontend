@@ -1,6 +1,6 @@
+import type { BrushRole, EmotionCardData, EmotionKeywordTag, EmotionLayer } from '@/entities/emotion';
+import { BRUSH_LAYER_CONFIG, toEmotionType } from '@/widgets/emotion-card/constants';
 import type { FinalizeCompleteEvent } from './model';
-import type { EmotionCardData, EmotionKeywordTag, EmotionLayer, BrushRole } from '@/entities/emotion';
-import { toEmotionType, BRUSH_LAYER_CONFIG } from '@/widgets/emotion-card/constants';
 
 /**
  * FinalizeCompleteEvent → EmotionCardData 변환
@@ -28,7 +28,6 @@ export function finalizeToEmotionCardData(
     keyword: em.source_keyword,
     emotionType: toEmotionType(em.emotion_type) ?? undefined,
   }));
-
   return {
     cardId: result.summary_id,
     summaryId: result.summary_id,

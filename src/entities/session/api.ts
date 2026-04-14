@@ -1,24 +1,24 @@
-import { api } from '@/shared/api/axios';
-import { ApiResponse } from '@/entities/user/model';
 import {
+  ActiveSessionResponse,
+  CreateSessionAiCompleteEvent,
+  CreateSessionRequest,
+  FinalizeCompleteEvent,
+  SessionDetailResponse,
   SessionListQuery,
   SessionListResponse,
-  CreateSessionRequest,
-  CreateSessionAiCompleteEvent,
-  ActiveSessionResponse,
-  SessionDetailResponse,
-  FinalizeCompleteEvent,
   SessionProgressResponse,
 } from '@/entities/session/model';
+import { ApiResponse } from '@/entities/user/model';
 import {
-  mockGetSessions,
   mockCreateSessionStream,
+  mockDeleteSession,
+  mockFinalizeSession,
   mockGetActiveSession,
   mockGetSessionDetail,
-  mockFinalizeSession,
-  mockDeleteSession,
   mockGetSessionProgress,
+  mockGetSessions,
 } from '@/mocks';
+import { api } from '@/shared/api/axios';
 import { USE_MOCK } from '@/shared/lib/env';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/v1';
@@ -46,11 +46,8 @@ export const getSessionsApi = async (
     `/sessions?${params.toString()}`
   );
 
-  if (response.data.success && response.data.data) {
-    return response.data.data;
-  }
-
-  throw new Error(response.data.error?.message || '세션 목록 조회 실패');
+  const { sessions, pagination } = response.data as unknown as SessionListResponse;
+  return { sessions, pagination };
 };
 
 /**
@@ -164,12 +161,8 @@ export const getSessionDetailApi = async (sessionId: string): Promise<SessionDet
   if (USE_MOCK) return mockGetSessionDetail(sessionId);
 
   const response = await api.get<ApiResponse<SessionDetailResponse>>(`/sessions/${sessionId}`);
-
-  if (response.data.success && response.data.data) {
-    return response.data.data;
-  }
-
-  throw new Error(response.data.error?.message || '세션 상세 조회 실패');
+  const { card_image_url, persona_image_url, persona_name, status, messages, has_summary, session_id } = response.data as unknown as SessionDetailResponse;
+  return { session_id, card_image_url, persona_image_url, persona_name, status, messages, has_summary };
 };
 
 /**

@@ -18,6 +18,7 @@ const providerConfig: Record<
     textColor: string;
     borderColor?: string;
     icon: string;
+    iconSize: { width: number; height: number };
   }
 > = {
   kakao: {
@@ -25,12 +26,14 @@ const providerConfig: Record<
     bgColor: loginColors.kakao,
     textColor: 'text-[#1a222e]',
     icon: loginImages.kakaoIcon,
+    iconSize: { width: 20, height: 18 },
   },
   naver: {
     label: 'naverButton',
     bgColor: loginColors.naver,
     textColor: 'text-white',
     icon: loginImages.naverIcon,
+    iconSize: { width: 16, height: 17 },
   },
   google: {
     label: 'googleButton',
@@ -38,6 +41,7 @@ const providerConfig: Record<
     textColor: 'text-[#1a222e]',
     borderColor: '#acb4bb',
     icon: loginImages.googleIcon,
+    iconSize: { width: 19, height: 20 },
   },
 };
 
@@ -65,8 +69,8 @@ export function LoginButton({
       <Image
         src={config.icon}
         alt={`${provider} icon`}
-        width={provider === 'kakao' ? 20 : provider === 'naver' ? 16 : 19}
-        height={provider === 'kakao' ? 18 : provider === 'naver' ? 17 : 20}
+        width={config.iconSize.width}
+        height={config.iconSize.height}
         className="h-6 w-6"
       />
       <span className="text-[16px] leading-none font-medium tracking-tight">

@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useQuery } from '@tanstack/react-query';
+import type { SummaryListItem, SummaryResponse } from '@/entities/summary';
+import { getSummaryApi, getSummaryListApi } from '@/entities/summary';
 import { cn } from '@/shared/lib/utils';
 import { EmotionColorLegend } from '@/widgets/emotion-color-legend';
-import { getSummaryListApi, getSummaryApi } from '@/entities/summary';
-import type { SummaryListItem, SummaryResponse } from '@/entities/summary';
+import { useQuery } from '@tanstack/react-query';
+import { AnimatePresence, motion } from 'framer-motion';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 
 /** 날짜 형식: YYYY.MM.DD */
 function formatDate(date: Date): string {

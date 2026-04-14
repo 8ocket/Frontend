@@ -283,15 +283,15 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
                         : 'border-prime-200 bg-secondary-50 focus:border-cta-300'
                     } text-prime-900 placeholder:text-prime-300 disabled:cursor-not-allowed disabled:opacity-60`}
                   />
-                  {nicknameChangeCount >= 3 ? (
-                    <p className="text-error-500 text-xs">이번 달 닉네임 변경 횟수를 초과했습니다.</p>
-                  ) : nicknameValidation ? (
-                    <p className="text-error-500 text-xs">{nicknameValidation}</p>
-                  ) : (
-                    <p className="text-prime-400 text-xs">
-                      매월 3회까지 변경 가능 ({nicknameChangeCount}/3)
-                    </p>
-                  )}
+                  {(() => {
+                    if (nicknameChangeCount >= 3) {
+                      return <p className="text-error-500 text-xs">이번 달 닉네임 변경 횟수를 초과했습니다.</p>;
+                    }
+                    if (nicknameValidation) {
+                      return <p className="text-error-500 text-xs">{nicknameValidation}</p>;
+                    }
+                    return <p className="text-prime-400 text-xs">매월 3회까지 변경 가능 ({nicknameChangeCount}/3)</p>;
+                  })()}
                 </section>
 
                 <hr className="border-prime-100" />
