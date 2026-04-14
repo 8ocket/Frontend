@@ -1,1 +1,0 @@
-export { EmotionColorLegend } from './EmotionColorLegend';
