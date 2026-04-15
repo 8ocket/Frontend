@@ -9,10 +9,8 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-import { EmotionCardFront, getEmotionDisplayName } from '@/widgets/emotion-card';
 import { cn } from '@/shared/lib/utils';
-import type { EmotionCardData } from '@/entities/emotion';
-import { getCollectionCardsApi } from '@/entities/emotion/api';
+import { getSummaryListApi } from '@/entities/summary';
 import { useAuthStore } from '@/entities/user/store';
 import { getReportListApi } from '@/entities/reports/api';
 import type { CanGenerate } from '@/entities/reports/model';
@@ -36,11 +34,6 @@ const BANNER_IMAGES = [
   '/images/banner/banner2.svg',
   '/images/banner/banner3.svg',
 ];
-
-function getPrimaryEmotionLabel(card: EmotionCardData): string {
-  const primary = card.layers.find((l) => l.role === 'primary');
-  return primary ? getEmotionDisplayName(primary.type, null) : 'EMOTION';
-}
 
 // ── 주간 리포트 달성률 위젯 ──────────────────────────────────────────────────
 function WeeklyReportWidget({
@@ -207,7 +200,15 @@ function MonthlyReportWidget({
 
 // ── 서브 위젯: 출석 현황 ─────────────────────────────────────────────────────
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
-const DAY_COLORS = ['text-red-400', 'text-prime-300', 'text-prime-300', 'text-prime-300', 'text-prime-300', 'text-prime-300', 'text-blue-400'];
+const DAY_COLORS = [
+  'text-red-400',
+  'text-prime-300',
+  'text-prime-300',
+  'text-prime-300',
+  'text-prime-300',
+  'text-prime-300',
+  'text-blue-400',
+];
 const FIRST_DAY_OFFSET = getDay(startOfMonth(_today));
 
 function AttendanceWidget() {
@@ -252,13 +253,7 @@ function AttendanceWidget() {
         <div>
           <div className="mb-2 grid grid-cols-7">
             {DAY_LABELS.map((d, i) => (
-              <span
-                key={d}
-                className={cn(
-                  'py-1 text-center text-xs font-medium',
-                  DAY_COLORS[i]
-                )}
-              >
+              <span key={d} className={cn('py-1 text-center text-xs font-medium', DAY_COLORS[i])}>
                 {d}
               </span>
             ))}
@@ -434,6 +429,15 @@ export default function Home() {
   const [cardContainerWidth, setCardContainerWidth] = useState(0);
   const [cardContainer, setCardContainer] = useState<HTMLDivElement | null>(null);
   const [cardsVisible, setCardsVisible] = useState(false);
+  const [flippedCardId, setFlippedCardId] = useState<string | null>(null);
+
+  const handleCardClick = (summaryId: string) => {
+    if (flippedCardId === summaryId) {
+      router.push('/collection');
+    } else {
+      setFlippedCardId(summaryId);
+    }
+  };
 
   const { data: reportData, isError: reportLoadError } = useQuery({
     queryKey: ['homeReports'],
@@ -447,8 +451,8 @@ export default function Home() {
   const weeklyCanGenerate = reportData?.weeklyCanGenerate ?? null;
 
   const { data: collectionCards = [] } = useQuery({
-    queryKey: ['collectionCards'],
-    queryFn: getCollectionCardsApi,
+    queryKey: ['summaryList'],
+    queryFn: () => getSummaryListApi().then((res) => res.content),
   });
 
   useEffect(() => {
@@ -580,37 +584,66 @@ export default function Home() {
               />
               <div
                 ref={setCardContainer}
-                className="no-scrollbar snap-x snap-mandatory flex items-end gap-4 overflow-x-auto pr-8 pb-1"
+                className="no-scrollbar flex snap-x snap-mandatory items-end gap-4 overflow-x-auto pr-8 pb-1"
               >
                 {collectionCards.length === 0 ? (
-                  <p className="text-prime-400 py-8 text-center text-sm w-full">
+                  <p className="text-prime-400 w-full py-8 text-center text-sm">
                     아직 생성된 감정카드가 없어요
                   </p>
                 ) : (
-                  collectionCards.slice(0, visibleCount).map((card, index) => {
-                    const emotionLabel = getPrimaryEmotionLabel(card);
-                    return (
-                      <button
-                        key={card.cardId}
-                        type="button"
-                        onClick={() => router.push('/collection')}
+                  collectionCards.slice(0, visibleCount).map((card, index) => (
+                    <button
+                      key={card.summaryId}
+                      type="button"
+                      onClick={() => handleCardClick(card.summaryId)}
+                      style={{
+                        transitionDelay: `${index * 80}ms`,
+                        opacity: cardsVisible ? 1 : 0,
+                        transform: cardsVisible ? 'translateY(0)' : 'translateY(14px)',
+                        perspective: '1200px',
+                      }}
+                      className="shrink-0 cursor-pointer snap-start transition-[opacity,transform] duration-500"
+                      aria-label="감정카드 — 마음기록 모음 보기"
+                    >
+                      <div
                         style={{
-                          transitionDelay: `${index * 80}ms`,
-                          opacity: cardsVisible ? 1 : 0,
-                          transform: cardsVisible ? 'translateY(0)' : 'translateY(14px)',
+                          width: cardWidth || 175,
+                          height: cardHeight || 300,
+                          position: 'relative',
+                          transformStyle: 'preserve-3d',
+                          transition: 'transform 0.7s ease-in-out',
+                          transform: flippedCardId === card.summaryId ? 'rotateY(180deg)' : 'rotateY(0deg)',
                         }}
-                        className="snap-start shrink-0 cursor-pointer transition-all duration-500 hover:scale-105 active:scale-95"
-                        aria-label={`${emotionLabel} 감정카드 — 마음기록 모음 보기`}
                       >
-                        <EmotionCardFront
-                          layers={card.layers}
-                          emotionLabel={emotionLabel}
-                          width={cardWidth || 175}
-                          height={cardHeight || 300}
-                        />
-                      </button>
-                    );
-                  })
+                        {/* 앞면 */}
+                        <div
+                          className="absolute inset-0 overflow-hidden rounded-3xl shadow-md ring-1 ring-black/5"
+                          style={{ backfaceVisibility: 'hidden' }}
+                        >
+                          <Image
+                            src={card.frontImageUrl}
+                            alt="마음 기록 카드 앞면"
+                            width={cardWidth || 175}
+                            height={cardHeight || 300}
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
+                        {/* 뒷면 */}
+                        <div
+                          className="absolute inset-0 overflow-hidden rounded-3xl shadow-md ring-1 ring-black/5"
+                          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+                        >
+                          <Image
+                            src={card.backImageUrl}
+                            alt="마음 기록 카드 뒷면"
+                            width={cardWidth || 175}
+                            height={cardHeight || 300}
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
+                      </div>
+                    </button>
+                  ))
                 )}
               </div>
             </div>
