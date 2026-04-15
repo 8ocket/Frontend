@@ -67,3 +67,6 @@ mindLog-mono/Backend/
 mindLog-mono/Terraform/
 mindLog-mono/.vscode/
 mindLog-mono/memory/
+
+
+*.md
