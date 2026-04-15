@@ -105,8 +105,8 @@ export const mockGetSessionDetail = async (sessionId: string): Promise<import('@
     status: 'SAVED',
     // 최신 → 과거 순 (API 스펙)
     messages: [
-      { message_id: 'msg-002', role: 'user', content: '오늘 팀 미팅에서 제 의견이 무시당한 것 같아서...', sequence_num: 2, created_at: '2026-02-21T14:31:00Z' },
-      { message_id: 'msg-001', role: 'assistant', content: '안녕하세요, 오늘은 어떤 이야기를 나눠볼까요?', sequence_num: 1, created_at: '2026-02-21T14:30:01Z' },
+      { message_id: 'msg-002', role: 'USER', content: '오늘 팀 미팅에서 제 의견이 무시당한 것 같아서...', sequence_num: 2, created_at: '2026-02-21T14:31:00Z' },
+      { message_id: 'msg-001', role: 'ASSISTANT', content: '안녕하세요, 오늘은 어떤 이야기를 나눠볼까요?', sequence_num: 1, created_at: '2026-02-21T14:30:01Z' },
     ],
     has_summary: false,
   };
