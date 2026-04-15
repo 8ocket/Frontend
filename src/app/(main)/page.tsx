@@ -484,6 +484,7 @@ export default function Home() {
   const userName = user?.name ?? 'USER NAME';
 
   const getCardDimensions = (cw: number) => {
+    if (cw <= 0) return { cardWidth: 175, cardHeight: 300, visibleCount: 7 };
     const gap = 24;
     const calcWidth = (n: number) => Math.floor((cw - gap * (n - 1)) / n);
     if (cw < 500) {
@@ -569,7 +570,7 @@ export default function Home() {
                 <Layers className="text-cta-300 h-4 w-4" aria-hidden="true" />
                 <h2 className="text-[14px] font-semibold text-[#1a222e]">감정카드</h2>
               </div>
-              <span className="text-prime-400 text-[11px]">최근 7건의 상담 결과</span>
+              <span className="text-prime-400 text-[11px]">최근 상담 결과</span>
             </div>
 
             <div className="relative">
@@ -579,32 +580,38 @@ export default function Home() {
               />
               <div
                 ref={setCardContainer}
-                className="no-scrollbar scroll-snap-type-x-mandatory flex items-end gap-4 overflow-x-auto pr-8 pb-1"
+                className="no-scrollbar snap-x snap-mandatory flex items-end gap-4 overflow-x-auto pr-8 pb-1"
               >
-                {collectionCards.slice(0, visibleCount).map((card, index) => {
-                  const emotionLabel = getPrimaryEmotionLabel(card);
-                  return (
-                    <button
-                      key={card.cardId}
-                      type="button"
-                      onClick={() => router.push('/collection')}
-                      style={{
-                        transitionDelay: `${index * 80}ms`,
-                        opacity: cardsVisible ? 1 : 0,
-                        transform: cardsVisible ? 'translateY(0)' : 'translateY(14px)',
-                      }}
-                      className="scroll-snap-align-start shrink-0 cursor-pointer transition-all duration-500 hover:scale-105 active:scale-95"
-                      aria-label={`${emotionLabel} 감정카드 — 마음기록 모음 보기`}
-                    >
-                      <EmotionCardFront
-                        layers={card.layers}
-                        emotionLabel={emotionLabel}
-                        width={cardWidth || 175}
-                        height={cardHeight || 300}
-                      />
-                    </button>
-                  );
-                })}
+                {collectionCards.length === 0 ? (
+                  <p className="text-prime-400 py-8 text-center text-sm w-full">
+                    아직 생성된 감정카드가 없어요
+                  </p>
+                ) : (
+                  collectionCards.slice(0, visibleCount).map((card, index) => {
+                    const emotionLabel = getPrimaryEmotionLabel(card);
+                    return (
+                      <button
+                        key={card.cardId}
+                        type="button"
+                        onClick={() => router.push('/collection')}
+                        style={{
+                          transitionDelay: `${index * 80}ms`,
+                          opacity: cardsVisible ? 1 : 0,
+                          transform: cardsVisible ? 'translateY(0)' : 'translateY(14px)',
+                        }}
+                        className="snap-start shrink-0 cursor-pointer transition-all duration-500 hover:scale-105 active:scale-95"
+                        aria-label={`${emotionLabel} 감정카드 — 마음기록 모음 보기`}
+                      >
+                        <EmotionCardFront
+                          layers={card.layers}
+                          emotionLabel={emotionLabel}
+                          width={cardWidth || 175}
+                          height={cardHeight || 300}
+                        />
+                      </button>
+                    );
+                  })
+                )}
               </div>
             </div>
           </div>

@@ -86,12 +86,6 @@ export function EmotionCardFront({
         );
       })}
 
-      {/* 스크린 블렌드 필터 (Figma: Filter frame, blend=SCREEN, blur 100px) */}
-      <div
-        className="absolute inset-0 rounded-2xl mix-blend-screen pointer-events-none"
-        style={{ filter: 'blur(100px)' }}
-        aria-hidden="true"
-      />
 
       {/* 감정명 라벨 */}
       <EmotionCardLabel label={emotionLabel} position="top-left" className={labelClass} />
