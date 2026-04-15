@@ -27,7 +27,11 @@ export default function NicknamePage() {
     }
   }, [router]);
 
-  const [nickname, setNickname] = useState(generatePositiveNickname);
+  useEffect(() => {
+    setNickname(generatePositiveNickname());
+  }, []);
+
+  const [nickname, setNickname] = useState('');
   const [userType, setUserType] = useState<keyof typeof OCCUPATION_MAP>('대학생 / 대학원생');
   const [ageGroup, setAgeGroup] = useState<keyof typeof AGE_MAP>('20대');
   const [gender, setGender] = useState<keyof typeof GENDER_MAP>('남성');
