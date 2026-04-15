@@ -36,3 +36,11 @@ jobs:
             --build-arg NEXT_PUBLIC_TOSS_CLIENT_KEY="${{ secrets.NEXT_PUBLIC_TOSS_CLIENT_KEY }}" \
             -t $ECR_REGISTRY/mindlog-fe:latest .
           docker push $ECR_REGISTRY/mindlog-fe:latest
+      #cd 트리거 추가  
+      - name: Trigger Deploy
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.CICD_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/8ocket/CICD/dispatches \
+            -d '{"event_type":"deploy"}'
