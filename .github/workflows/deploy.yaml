@@ -33,5 +33,6 @@ jobs:
             --build-arg NEXT_PUBLIC_KAKAO_REDIRECT_URI="${{ secrets.NEXT_PUBLIC_KAKAO_REDIRECT_URI }}" \
             --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID="${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}" \
             --build-arg NEXT_PUBLIC_GOOGLE_REDIRECT_URI="${{ secrets.NEXT_PUBLIC_GOOGLE_REDIRECT_URI }}" \
+            --build-arg NEXT_PUBLIC_TOSS_CLIENT_KEY="${{ secrets.NEXT_PUBLIC_TOSS_CLIENT_KEY }}" \
             -t $ECR_REGISTRY/mindlog-fe:latest .
           docker push $ECR_REGISTRY/mindlog-fe:latest
