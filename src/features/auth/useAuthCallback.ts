@@ -47,15 +47,13 @@ export function useOAuthCallback({ loginApi, errorMessage }: UseOAuthCallbackOpt
         setTokens(result.accessToken, result.refreshToken);
 
         const [profileResult, creditResult] = await Promise.allSettled([
-          getMyProfileApi(),
+          result.isNewUser ? Promise.resolve(null) : getMyProfileApi(),
           getMyCreditApi(),
         ]);
 
         if (profileResult.status === 'rejected') {
-          // 기존 유저는 프로필 조회 실패 시 에러 처리
-          if (!result.isNewUser) throw profileResult.reason;
-          // 신규 유저는 온보딩 전이라 프로필이 없을 수 있으므로 그대로 진행
-        } else {
+          throw profileResult.reason;
+        } else if (profileResult.value) {
           const profile = profileResult.value;
           setUser({
             id: profile.user_id,
