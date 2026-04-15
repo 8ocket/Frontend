@@ -1,6 +1,6 @@
-import { api } from '@/shared/api/axios';
 import { ApiResponse } from '@/entities/user/model';
-import type { SummaryResponse, SummaryUpdateRequest, SummaryListResponse } from './model';
+import { api } from '@/shared/api/axios';
+import type { SummaryListResponse, SummaryResponse, SummaryUpdateRequest } from './model';
 
 /**
  * 마음 기록 카드 조회
@@ -54,7 +54,7 @@ export const getSummaryListApi = async (page = 0, size = 20): Promise<SummaryLis
     `/summaries?page=${page}&size=${size}`
   );
 
-  if (response.data.success && response.data.data) {
+  if (response.data.data) {
     return response.data.data;
   }
 

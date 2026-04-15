@@ -30,12 +30,21 @@ interface CustomTooltipInternalProps {
   label?: string;
 }
 
+function formatYAxisTick(v: number): string {
+  if (v === 65) return '긍정';
+  if (v === 0) return '중립';
+  return '부정';
+}
+
 function CustomTooltip({ active, payload, label }: CustomTooltipInternalProps) {
   if (!active || !payload?.length) return null;
   const score = payload[0].value;
 
   // 감정 구간 판별
-  const zone = score >= 30 ? '긍정' : score <= -30 ? '부정' : '중립';
+  let zone: string;
+  if (score >= 30) zone = '긍정';
+  else if (score <= -30) zone = '부정';
+  else zone = '중립';
   return (
     <div
       className="border-prime-100 rounded-2xl border bg-white px-4 py-3 shadow-lg"
@@ -95,7 +104,7 @@ export function EmotionAreaChart({ data, type }: EmotionAreaChartProps) {
               <YAxis
                 domain={[-100, 100]}
                 ticks={[-65, 0, 65]}
-                tickFormatter={(v) => (v === 65 ? '긍정' : v === 0 ? '중립' : '부정')}
+                tickFormatter={formatYAxisTick}
               />
               <ReferenceLine
                 y={0}
@@ -148,7 +157,7 @@ export function EmotionAreaChart({ data, type }: EmotionAreaChartProps) {
               <YAxis
                 domain={[-100, 100]}
                 ticks={[-65, 0, 65]}
-                tickFormatter={(v) => (v === 65 ? '긍정' : v === 0 ? '중립' : '부정')}
+                tickFormatter={formatYAxisTick}
               />
               <ReferenceLine
                 y={0}

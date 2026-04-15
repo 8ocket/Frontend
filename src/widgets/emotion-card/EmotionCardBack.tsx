@@ -56,7 +56,10 @@ export function EmotionCardBack({
   };
 
   // CARD TEXT 크기 — Figma 기준: 175px→12px(card-03), 350px→24px(card-02), 400px→26px(card-01)
-  const labelClass = width < 200 ? 'card-03' : width < 380 ? 'card-02' : 'card-01';
+  let labelClass: string;
+  if (width < 200) labelClass = 'card-03';
+  else if (width < 380) labelClass = 'card-02';
+  else labelClass = 'card-01';
 
   // 글래스 패널 내부 패딩
   const panelPadding = 14;

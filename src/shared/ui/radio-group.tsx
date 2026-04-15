@@ -74,13 +74,17 @@ export function RadioGroup<T = string>({
           const isDisabled = disabled || option.disabled === true;
 
           // Figma: outer circle border 색상
+          let outerBorderColor: string;
+          if (error) outerBorderColor = 'border-error-700';
+          else if (isSelected && !isDisabled) outerBorderColor = 'border-cta-300';
+          else outerBorderColor = 'border-neutral-300';
+          let labelColor: string;
+          if (error) labelColor = 'text-error-700';
+          else if (isDisabled) labelColor = 'text-neutral-400';
+          else labelColor = 'text-prime-600';
           const outerClass = cn(
             'flex h-5 w-5 shrink-0 items-center justify-center rounded-full border',
-            error
-              ? 'border-error-700'
-              : isSelected && !isDisabled
-                ? 'border-cta-300'
-                : 'border-neutral-300',
+            outerBorderColor,
             'bg-secondary-100'
           );
 
@@ -114,11 +118,7 @@ export function RadioGroup<T = string>({
               <span
                 className={cn(
                   'text-base leading-none font-medium',
-                  error
-                    ? 'text-error-700'
-                    : isDisabled
-                      ? 'text-neutral-400'
-                      : 'text-prime-600'
+                  labelColor
                 )}
               >
                 {option.label}

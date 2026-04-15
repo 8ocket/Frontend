@@ -142,6 +142,19 @@ export function ReportSidebar({
           <div className="space-y-2">
             {filteredReports.map((report) => {
               const isSelected = selectedId === report.id && !isCreating;
+              let cardClass: string;
+              if (report.isFailed) cardClass = 'border-prime-100 opacity-60 grayscale hover:opacity-80';
+              else if (report.isGenerating) cardClass = 'border-prime-100 bg-prime-50 opacity-70 hover:opacity-80';
+              else if (isSelected) cardClass = 'border-main-blue bg-main-blue/8 ring-main-blue/20 shadow-sm ring-1';
+              else cardClass = 'border-prime-100 hover:border-prime-200 hover:bg-prime-50';
+              let badgeClass: string;
+              if (report.isFailed) badgeClass = 'bg-prime-100 text-prime-400';
+              else if (report.reportType === 'weekly') badgeClass = 'text-main-blue bg-(--main-blue)/10';
+              else badgeClass = 'bg-success-700/10 text-success-700';
+              let titleClass: string;
+              if (report.isFailed) titleClass = 'text-prime-400';
+              else if (isSelected) titleClass = 'text-prime-900';
+              else titleClass = 'text-prime-700';
               return (
                 <div
                   key={report.id}
@@ -151,13 +164,7 @@ export function ReportSidebar({
                   onKeyDown={(e) => e.key === 'Enter' && onSelect(report.id)}
                   className={cn(
                     'group relative w-full cursor-pointer rounded-xl border px-4 py-3.5 text-left transition-all',
-                    report.isFailed
-                      ? 'border-prime-100 opacity-60 grayscale hover:opacity-80'
-                      : report.isGenerating
-                        ? 'border-prime-100 bg-prime-50 opacity-70 hover:opacity-80'
-                        : isSelected
-                          ? 'border-main-blue bg-main-blue/8 ring-main-blue/20 shadow-sm ring-1'
-                          : 'border-prime-100 hover:border-prime-200 hover:bg-prime-50'
+                    cardClass
                   )}
                 >
                   {/* 첫 줄: 배지 + 제목 */}
@@ -165,11 +172,7 @@ export function ReportSidebar({
                     <span
                       className={cn(
                         'shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide',
-                        report.isFailed
-                          ? 'bg-prime-100 text-prime-400'
-                          : report.reportType === 'weekly'
-                            ? 'text-main-blue bg-(--main-blue)/10'
-                            : 'bg-success-700/10 text-success-700'
+                        badgeClass
                       )}
                     >
                       {report.reportType === 'weekly' ? '주간 리포트' : '월간 리포트'}
@@ -187,14 +190,7 @@ export function ReportSidebar({
 
                   {/* 제목 */}
                   <p
-                    className={cn(
-                      'mt-1.5 text-sm leading-snug font-semibold',
-                      report.isFailed
-                        ? 'text-prime-400'
-                        : isSelected
-                          ? 'text-prime-900'
-                          : 'text-prime-700'
-                    )}
+                    className={cn('mt-1.5 text-sm leading-snug font-semibold', titleClass)}
                   >
                     {report.title}
                   </p>

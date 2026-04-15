@@ -33,6 +33,11 @@ export function CheckboxItem({
   onLabelClick,
   showTag = true,
 }: CheckboxItemProps) {
+  let tagColor: string;
+  if (error) tagColor = 'text-error-700';
+  else if (required) tagColor = 'text-[rgba(130,201,255,0.8)]';
+  else tagColor = 'text-warning-500';
+
   // 체크박스 박스 스타일 결정
   const boxClass = cn(
     'flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border transition-colors',
@@ -79,17 +84,13 @@ export function CheckboxItem({
         >
           <span>{label}</span>
           {showTag && (
-            <span
-              className={
-                error
-                  ? 'text-error-700'
-                  : required
-                    ? 'text-error-500'
-                    : 'text-warning-500'
-              }
-            >
-              {required ? ' *' : ' (선택)'}
-            </span>
+            <>
+              <span> (</span>
+              <span className={tagColor}>
+                {required ? '필수' : '선택'}
+              </span>
+              <span>)</span>
+            </>
           )}
         </p>
       </button>

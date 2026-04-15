@@ -19,8 +19,12 @@ interface ReportPollingProps {
 export function ReportPolling({ onComplete, sseStep }: ReportPollingProps) {
   const [progress, setProgress] = useState(0);
 
-  const currentStep = sseStep === 'generating' ? 3 : sseStep === 'analyzing' ? 1 : 0;
-  const progressTarget = sseStep === 'generating' ? 90 : sseStep === 'analyzing' ? 55 : 15;
+  const STEP_MAP: Record<string, { step: number; target: number }> = {
+    generating: { step: 3, target: 90 },
+    analyzing: { step: 1, target: 55 },
+  };
+  const { step: currentStep, target: progressTarget } =
+    STEP_MAP[sseStep ?? ''] ?? { step: 0, target: 15 };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -76,22 +80,30 @@ export function ReportPolling({ onComplete, sseStep }: ReportPollingProps) {
             const Icon = step.icon;
             const isDone = i < currentStep;
             const isActive = i === currentStep;
+            let rowClass: string;
+            if (isDone) rowClass = 'bg-bg-light';
+            else if (isActive) rowClass = 'ring-main-blue/30 bg-(--main-blue)/10 ring-1';
+            else rowClass = 'opacity-40';
+            let dotClass: string;
+            if (isDone) dotClass = 'bg-success-700';
+            else if (isActive) dotClass = 'bg-main-blue';
+            else dotClass = 'bg-prime-200';
+            let labelClass: string;
+            if (isDone) labelClass = 'text-prime-400 line-through';
+            else if (isActive) labelClass = 'text-prime-900';
+            else labelClass = 'text-prime-400';
             return (
               <div
                 key={step.label}
                 className={cn(
                   'flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-300',
-                  isDone
-                    ? 'bg-bg-light'
-                    : isActive
-                      ? 'ring-main-blue/30 bg-(--main-blue)/10 ring-1'
-                      : 'opacity-40'
+                  rowClass
                 )}
               >
                 <div
                   className={cn(
                     'flex size-8 shrink-0 items-center justify-center rounded-full',
-                    isDone ? 'bg-success-700' : isActive ? 'bg-main-blue' : 'bg-prime-200'
+                    dotClass
                   )}
                 >
                   {isDone ? (
@@ -103,14 +115,7 @@ export function ReportPolling({ onComplete, sseStep }: ReportPollingProps) {
                   )}
                 </div>
                 <span
-                  className={cn(
-                    'text-sm font-medium',
-                    isDone
-                      ? 'text-prime-400 line-through'
-                      : isActive
-                        ? 'text-prime-900'
-                        : 'text-prime-400'
-                  )}
+                  className={cn('text-sm font-medium', labelClass)}
                 >
                   {step.label}
                 </span>

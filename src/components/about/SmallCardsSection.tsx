@@ -94,7 +94,7 @@ function FlipCard({
     : 'EMOTION';
 
   // 진입 전: 180deg 대기 / 진입 후: flipped 상태에 따라 0 ↔ 180
-  const rotateY = !inView ? 180 : flipped ? 180 : 0;
+  const rotateY = !inView || flipped ? 180 : 0;
 
   return (
     // 외부 래퍼: hover 시 "hovered" variant를 하위로 전파
@@ -120,7 +120,7 @@ function FlipCard({
           }}
           initial={{ rotateY: 180 }}
           animate={{ rotateY }}
-          transition={{ type: 'spring', damping: 16, stiffness: 40, delay: !inView ? 0 : flipped ? 0 : delay }}
+          transition={{ type: 'spring', damping: 16, stiffness: 40, delay: !inView || flipped ? 0 : delay }}
         >
           {/* 앞면 — EmotionCardBack(상담 데이터) + 광택 shimmer */}
           <div

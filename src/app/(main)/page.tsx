@@ -207,6 +207,7 @@ function MonthlyReportWidget({
 
 // ── 서브 위젯: 출석 현황 ─────────────────────────────────────────────────────
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
+const DAY_COLORS = ['text-red-400', 'text-prime-300', 'text-prime-300', 'text-prime-300', 'text-prime-300', 'text-prime-300', 'text-blue-400'];
 const FIRST_DAY_OFFSET = getDay(startOfMonth(_today));
 
 function AttendanceWidget() {
@@ -255,7 +256,7 @@ function AttendanceWidget() {
                 key={d}
                 className={cn(
                   'py-1 text-center text-xs font-medium',
-                  i === 0 ? 'text-red-400' : i === 6 ? 'text-blue-400' : 'text-prime-300'
+                  DAY_COLORS[i]
                 )}
               >
                 {d}
