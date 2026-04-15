@@ -115,7 +115,6 @@ export const updateMyProfileApi = async (
 
   const formData = new FormData();
 
-  // 백엔드 @RequestPart("profile_image")가 required이므로 파일 없을 땐 빈 Blob 전송
   formData.append('profile_image', profileImage ?? new Blob(), profileImage?.name ?? '');
 
   const contents: Record<string, unknown> = {};
@@ -228,9 +227,8 @@ export const signupApi = async (
 
   const formData = new FormData();
 
-  if (profileImage) {
-    formData.append('profile_image', profileImage, profileImage.name);
-  }
+  // 백엔드 @RequestPart("profile_image")가 required이므로 파일 없을 땐 빈 Blob 전송
+  formData.append('profile_image', profileImage ?? new Blob(), profileImage?.name ?? '');
 
   const contentsBlob = new Blob([JSON.stringify({ nickname, occupation, age, gender })], {
     type: 'application/json',

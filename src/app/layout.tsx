@@ -1,19 +1,11 @@
 import type { Metadata } from 'next';
 import { Cormorant_Garamond } from 'next/font/google';
-import localFont from 'next/font/local';
 import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { AuthInitializer } from '@/shared/ui/AuthInitializer';
 import { ToastProvider } from '@/shared/ui/toast';
 import { FooterWrapper } from '@/widgets/gnb';
 import './globals.css';
-
-const pretendard = localFont({
-  src: './fonts/PretendardVariable.woff2',
-  variable: '--font-pretendard',
-  display: 'swap',
-  weight: '45 920',
-});
 
 const cormorantGaramond = Cormorant_Garamond({
   variable: '--font-cormorant',
@@ -33,7 +25,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
-      <body className={`${pretendard.variable} ${cormorantGaramond.variable} antialiased`}>
+      <head>
+        <link rel="stylesheet" href="/fonts/pretendard/pretendardvariable-dynamic-subset.css" />
+      </head>
+      <body className={`${cormorantGaramond.variable} antialiased`}>
         <ThemeProvider>
           <QueryProvider>
             <ToastProvider>
