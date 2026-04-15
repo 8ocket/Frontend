@@ -129,7 +129,7 @@ export interface FinalizeCompleteEvent {
 
 export interface SessionDetailMessage {
   message_id: string;
-  role: 'assistant' | 'user';
+  role: 'ASSISTANT' | 'USER';
   content: string;
   sequence_num: number;
   created_at: string;

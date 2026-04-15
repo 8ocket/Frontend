@@ -95,7 +95,9 @@ export const createSessionStream = async (
     let code = '';
     try {
       const body = await response.json();
-      code = body.code || body.error?.code || '';
+      const msg: string = body.message || '';
+      if (msg.includes('크레딧')) code = 'INSUFFICIENT_CREDIT';
+      else code = body.code || body.error?.code || '';
     } catch {}
     throw new Error(code || String(response.status));
   }

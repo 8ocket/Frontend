@@ -17,7 +17,7 @@ import {
   // ChatSatisfactionModal,  // TODO: 만족도 조사 — 우선순위 보류
 } from '@/components/chat';
 import { finalizeToEmotionCardData } from '@/entities/session/utils';
-import { EmotionCardFront } from '@/widgets/emotion-card';
+import { EmotionCardBack, EmotionCardFront } from '@/widgets/emotion-card';
 import { Menu } from 'lucide-react';
 import {
   getActiveSessionApi,
@@ -26,7 +26,7 @@ import {
   finalizeSessionStream,
   deleteSessionApi,
 } from '@/entities/session/api';
-import { uploadSummaryCardImageApi } from '@/entities/summary';
+import { uploadSummaryCardImageApi, getSummaryListApi } from '@/entities/summary';
 import { useToast } from '@/shared/ui/toast';
 import { getCookie } from '@/shared/lib/utils/cookie';
 import type {
@@ -694,12 +694,16 @@ function ChatPageContent() {
   /** 채팅창에 외부에서 append할 메시지 */
   const [appendMessage, setAppendMessage] = useState<ChatBubbleProps | null>(null);
   const [sessionDetail, setSessionDetail] = useState<SessionDetailResponse | null>(null);
+  /** 완료된 세션의 마음기록카드 이미지 URL (summary 목록에서 조회) */
+  const [sessionCardImageUrl, setSessionCardImageUrl] = useState<string | null>(null);
   /** finalize 완료 데이터 */
   const [finalizeResult, setFinalizeResult] = useState<FinalizeCompleteEvent | null>(null);
   /** finalize 스트림 취소용 — 언마운트 시 abort */
   const finalizeAbortRef = useRef<AbortController | null>(null);
-  /** 감정 카드 앞면 이미지 캡처용 */
+  /** 감정 카드 이미지 캡처용 (오로라: card_back_image) */
   const captureCardRef = useRef<HTMLDivElement>(null);
+  /** 감정 카드 텍스트+오로라 캡처용 (card_front_image) */
+  const captureBackCardRef = useRef<HTMLDivElement>(null);
   const [capturePayload, setCapturePayload] = useState<{
     data: EmotionCardData;
     summaryId: string;
@@ -713,19 +717,27 @@ function ChatPageContent() {
     };
   }, []);
 
-  // finalize 완료 후 감정 카드 앞면 캡처 → PATCH /image 업로드
+  // finalize 완료 후 감정 카드 앞/뒷면 캡처 → PATCH /image 업로드
   useEffect(() => {
     if (!capturePayload) return;
     const { summaryId } = capturePayload;
 
     const timer = setTimeout(async () => {
-      if (!captureCardRef.current) return;
+      if (!captureBackCardRef.current) return;
       try {
         const { toBlob } = await import('html-to-image');
-        const blob = await toBlob(captureCardRef.current, { pixelRatio: 2 });
-        if (!blob) return;
-        const file = new File([blob], 'emotion-card.png', { type: 'image/png' });
-        await uploadSummaryCardImageApi(summaryId, file);
+        // SVG 브러시 이미지가 완전히 로드될 때까지 대기
+        const imgs = [
+          ...captureBackCardRef.current.querySelectorAll('img'),
+        ];
+        await Promise.all(
+          imgs.map((img) => img.complete ? Promise.resolve() : new Promise((r) => { img.onload = r; img.onerror = r; }))
+        );
+        // 텍스트+오로라 면(EmotionCardBack)만 업로드 — 백엔드 @RequestPart("summary_card")
+        const frontBlob = await toBlob(captureBackCardRef.current, { pixelRatio: 2 });
+        if (!frontBlob) return;
+        const frontFile = new File([frontBlob], 'card-front.png', { type: 'image/png' });
+        await uploadSummaryCardImageApi(summaryId, frontFile);
       } catch {
         // 업로드 실패는 UX에 영향 없음 — 조용히 무시
       } finally {
@@ -781,28 +793,38 @@ function ChatPageContent() {
       .catch(() => setSessionDetail(null));
   }, [activeSessionId]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // 세션 전환 시 카드 URL 초기화 (사이드바 선택은 handleSelectSession에서 prefetch)
+  useEffect(() => {
+    if (!sessionDetail?.has_summary) {
+      setSessionCardImageUrl(null);
+    } else if (sessionDetail.card_image_url) {
+      setSessionCardImageUrl(sessionDetail.card_image_url);
+    }
+    // has_summary이지만 card_image_url이 없는 경우는 handleSelectSession에서 이미 fetch함
+  }, [sessionDetail]);
+
   // 세션 상세 → ChatBubbleProps[] 변환 (API는 최신→과거 순, 표시는 과거→최신)
   const activeMessages = useMemo((): ChatBubbleProps[] => {
     if (!sessionDetail) return [];
     const messages: ChatBubbleProps[] = [...sessionDetail.messages].reverse().map((m) => ({
-      variant: m.role === 'assistant' ? 'ai' : 'user',
-      senderName: m.role === 'assistant' ? '나봄이' : (user?.name ?? '나'),
+      variant: m.role === 'ASSISTANT' ? 'ai' : 'user',
+      senderName: m.role === 'ASSISTANT' ? '나봄이' : (user?.name ?? '나'),
       content: m.content,
-      avatarSrc: m.role === 'assistant' ? '/images/personas/nabomi-44.png' : undefined,
-      userAvatarSrc: m.role === 'user' ? (user?.profileImage ?? undefined) : undefined,
+      avatarSrc: m.role === 'ASSISTANT' ? '/images/personas/nabomi-44.png' : undefined,
+      userAvatarSrc: m.role === 'USER' ? (user?.profileImage ?? undefined) : undefined,
     }));
 
-    if (sessionDetail.status === 'SAVED' && sessionDetail.card_image_url) {
+    if (sessionDetail.has_summary && sessionCardImageUrl) {
       messages.push({
         variant: 'ai',
         senderName: '나봄이',
         avatarSrc: '/images/personas/nabomi-44.png',
-        cardImageUrl: sessionDetail.card_image_url,
+        cardImageUrl: sessionCardImageUrl,
       });
     }
 
     return messages;
-  }, [sessionDetail, user]);
+  }, [sessionDetail, user, sessionCardImageUrl]);
 
   const activeAiName = '나봄이';
   const activeAiAvatarSrc = '/images/personas/nabomi-44.png';
@@ -906,9 +928,28 @@ function ChatPageContent() {
     }
   };
 
-  /** 사이드바 세션 선택: detail 먼저 fetch 후 세션 전환 */
+  /** 사이드바 세션 선택: detail + 카드 URL 먼저 fetch 후 세션 전환 */
   const handleSelectSession = async (id: string) => {
     const detail = await getSessionDetailApi(id).catch(() => null);
+
+    // 카드 URL 미리 fetch — ChatMainArea의 sessionId 변경 감지 시점에 activeMessages에 카드가 포함되도록
+    let cardUrl: string | null = null;
+    if (detail?.has_summary) {
+      if (detail.card_image_url) {
+        cardUrl = detail.card_image_url;
+      } else {
+        cardUrl = await getSummaryListApi(0, 50)
+          .then(({ content }) => {
+            const match = content.find((s) => s.sessionId === id);
+            // frontImageUrl 우선, 없으면 backImageUrl(AI 파이널라이즈 때 항상 저장됨)로 폴백
+            return match?.frontImageUrl || match?.backImageUrl || null;
+          })
+          .catch(() => null);
+      }
+    }
+
+    // React 18 자동 배칭 — 세 setter가 단일 렌더로 묶임
+    setSessionCardImageUrl(cardUrl);
     setSessionDetail(detail);
     setActiveSessionId(id);
     setSidebarOpen(false);
@@ -1123,28 +1164,40 @@ function ChatPageContent() {
         onNo={closeModal}
       /> */}
 
-      {/* 감정 카드 앞면 이미지 캡처용 — 화면 밖에 숨겨서 렌더링 */}
+      {/* 감정 카드 이미지 캡처용 — 화면 밖에 숨겨서 렌더링 */}
       {capturePayload && (
-        <div
-          ref={captureCardRef}
-          style={{
-            position: 'fixed',
-            left: '-9999px',
-            top: 0,
-            width: 400,
-            height: 686,
-            pointerEvents: 'none',
-          }}
-        >
-          <EmotionCardFront
-            layers={capturePayload.data.layers}
-            emotionLabel={(
-              capturePayload.data.layers.find((l) => l.role === 'primary')?.type ?? 'emotion'
-            ).toUpperCase()}
-            width={400}
-            height={686}
-          />
-        </div>
+        <>
+          {/* card_back_image — 오로라 전면 */}
+          <div
+            ref={captureCardRef}
+            style={{ position: 'fixed', left: '-9999px', top: 0, width: 400, height: 686, pointerEvents: 'none' }}
+          >
+            <EmotionCardFront
+              layers={capturePayload.data.layers}
+              emotionLabel={(
+                capturePayload.data.layers.find((l) => l.role === 'primary')?.type ?? 'emotion'
+              ).toUpperCase()}
+              width={400}
+              height={686}
+            />
+          </div>
+          {/* card_front_image — 텍스트+오로라 후면 */}
+          <div
+            ref={captureBackCardRef}
+            style={{ position: 'fixed', left: '-9999px', top: 0, width: 422, height: 723, pointerEvents: 'none' }}
+          >
+            <EmotionCardBack
+              data={capturePayload.data}
+              layers={capturePayload.data.layers}
+              emotionLabel={(
+                capturePayload.data.layers.find((l) => l.role === 'primary')?.type ?? 'emotion'
+              ).toUpperCase()}
+              width={422}
+              height={723}
+              animated={false}
+            />
+          </div>
+        </>
       )}
     </div>
   );
