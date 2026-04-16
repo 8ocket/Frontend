@@ -583,18 +583,25 @@ function ChatPageContent() {
       /> */}
 
       {/* 감정 카드 이미지 캡처용 — 화면 밖에 숨겨서 렌더링 */}
+      {/* 주의: 캡처 대상 div 자체에 position:fixed + left:-9999px 쓰면 html-to-image의
+           SVG foreignObject 렌더링 시 fixed 기준점이 foreignObject가 되어 내용이 캡처 영역 밖으로 나가 빈 이미지가 됨.
+           → 부모 div로 화면 밖에 숨기고, 캡처 div는 position 없는 plain 블록으로 유지 */}
       {capturePayload && (
-        <>
+        <div
+          style={{
+            position: 'fixed',
+            left: '-9999px',
+            top: 0,
+            pointerEvents: 'none',
+            zIndex: -1,
+          }}
+        >
           {/* card_back_image — 오로라 전면 */}
           <div
             ref={captureCardRef}
             style={{
-              position: 'fixed',
-              left: '-9999px',
-              top: 0,
               width: 400,
               height: 686,
-              pointerEvents: 'none',
             }}
           >
             <EmotionCardFront
@@ -610,12 +617,8 @@ function ChatPageContent() {
           <div
             ref={captureBackCardRef}
             style={{
-              position: 'fixed',
-              left: '-9999px',
-              top: 0,
               width: 422,
               height: 723,
-              pointerEvents: 'none',
             }}
           >
             <EmotionCardBack
@@ -629,7 +632,7 @@ function ChatPageContent() {
               animated={false}
             />
           </div>
-        </>
+        </div>
       )}
     </div>
   );

@@ -30,7 +30,7 @@ export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatar
     if (!cardImageUrl) return;
     const link = document.createElement('a');
     link.href = cardImageUrl;
-    link.download = `마음기록-${new Date().toISOString().slice(0, 10)}.jpg`;
+    link.download = `마음기록-${new Date().toISOString().slice(0, 10)}.png`;
     link.click();
   };
 
@@ -79,7 +79,7 @@ export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatar
         </div>
       ) : cardImageUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={cardImageUrl} alt="마음 기록 카드" className="rounded-2xl object-cover shadow-sm" style={{ width: 200 }} />
+        <img src={cardImageUrl} alt="마음 기록 카드" className="rounded-2xl shadow-sm" style={{ width: 350 }} />
       ) : (
         <div
           className={[
