@@ -42,6 +42,15 @@ export function EmotionCardBack({
   const primaryMeta = primaryLayer ? EMOTION_META[primaryLayer.type] : null;
   const bgColor = primaryMeta?.hex ?? '#f8fafc';
 
+  // 배경색을 10% 투명도로 변환 (글래스모피즘 효과)
+  const bgRgba = () => {
+    const hex = bgColor.replace('#', '');
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, 0.1)`;
+  };
+
   const brushSize = width;
 
   const sortedLayers = [...layers].sort((a, b) => {
@@ -72,7 +81,7 @@ export function EmotionCardBack({
       style={{
         width,
         height,
-        backgroundColor: `color-mix(in srgb, ${bgColor} 10%, transparent)`,
+        backgroundColor: bgRgba(),
       }}
     >
       {/* 브러시 레이어 (앞면과 동일) */}
@@ -93,18 +102,17 @@ export function EmotionCardBack({
           />
         );
       })}
-
       {/* 감정명 라벨 */}
       <EmotionCardLabel label={emotionLabel} position="top-left" className={labelClass} />
       <EmotionCardLabel label={emotionLabel} position="bottom-right" className={labelClass} />
-
       {/* ─── 글래스모피즘 정보 패널 ─── */}
+      {/* After — backdrop-blur-md 제거, 배경 opacity 높여서 블러 없이도 패널 구분되도록 */}
       <div
-        className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col justify-between rounded-2xl px-5 py-6 backdrop-blur-md"
+        className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col justify-between rounded-2xl px-5 py-6"
         style={{
           width: panelWidth,
           height: panelHeight,
-          backgroundColor: 'rgba(252, 251, 249, 0.95)',
+          backgroundColor: 'rgba(252, 251, 249, 0.97)',
         }}
       >
         <div className="flex w-full flex-col gap-4 overflow-hidden">
@@ -192,7 +200,7 @@ function SummaryHeader({
       {/* Figma 1905:7296 — "상담 요약" 섹션 라벨 */}
       <h4 className="subtitle-1 text-prime-900 font-semibold">상담 요약</h4>
       {/* Figma 1905:7297 — 요약 내용 (Input 오버라이드) */}
-      <p className="body-2 text-prime-500 whitespace-pre-line leading-relaxed">{title}</p>
+      <p className="body-2 text-prime-500 leading-relaxed whitespace-pre-line">{title}</p>
       {description && (
         <p className="caption-1 text-prime-500 leading-[1.2]">
           {parts.length > 1 ? (
