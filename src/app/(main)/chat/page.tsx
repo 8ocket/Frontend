@@ -723,13 +723,17 @@ function ChatPageContent() {
     const { summaryId } = capturePayload;
 
     const timer = setTimeout(async () => {
-      if (!captureBackCardRef.current) return;
+      if (!captureBackCardRef.current || !captureCardRef.current) return;
       try {
         const { toBlob } = await import('html-to-image');
-        // SVG 브러시 이미지가 완전히 로드될 때까지 대기
-        const imgs = [...captureBackCardRef.current.querySelectorAll('img')];
+
+        // 두 카드 면의 img 태그가 완전히 로드될 때까지 대기
+        const allImgs = [
+          ...captureBackCardRef.current.querySelectorAll('img'),
+          ...captureCardRef.current.querySelectorAll('img'),
+        ];
         await Promise.all(
-          imgs.map((img) =>
+          allImgs.map((img) =>
             img.complete
               ? Promise.resolve()
               : new Promise((r) => {
@@ -738,13 +742,40 @@ function ChatPageContent() {
                 })
           )
         );
-        // 텍스트+오로라 면(EmotionCardBack)만 업로드 — 백엔드 @RequestPart("summary_card")
+
+        // html-to-image는 <img>로 로드된 외부 SVG를 캔버스에 그리지 못함
+        // → 캡처 전 SVG img를 Canvas로 PNG 데이터 URL로 변환 후 src를 임시 교체
+        const svgImgs = allImgs.filter((img) => img.src.endsWith('.svg'));
+        const originalSrcs = svgImgs.map((img) => img.src);
+        await Promise.all(
+          svgImgs.map(async (img) => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.naturalWidth || img.width;
+            canvas.height = img.naturalHeight || img.height;
+            const ctx = canvas.getContext('2d');
+            if (ctx) ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            img.src = canvas.toDataURL('image/png');
+            // 새 src(data URL) 로드 완료 대기
+            await new Promise((r) => { img.onload = r; img.onerror = r; });
+          })
+        );
+
+        // card_front_image: 텍스트+오로라 후면 (EmotionCardBack) — captureBackCardRef
         const frontBlob = await toBlob(captureBackCardRef.current, { pixelRatio: 2 });
-        if (!frontBlob) return;
+
+        // card_back_image: 오로라 전면 (EmotionCardFront) — captureCardRef
+        const backBlob = await toBlob(captureCardRef.current, { pixelRatio: 2 });
+
+        // 캡처 완료 후 SVG img src 원복
+        svgImgs.forEach((img, i) => { img.src = originalSrcs[i]; });
+
+        if (!frontBlob || !backBlob) return;
         const frontFile = new File([frontBlob], 'card-front.png', { type: 'image/png' });
-        await uploadSummaryCardImageApi(summaryId, frontFile);
+        const backFile = new File([backBlob], 'card-back.png', { type: 'image/png' });
+
+        await uploadSummaryCardImageApi(summaryId, frontFile, backFile);
       } catch {
-        console.error(' 감정 카드 이미지 캡처 및 업로드 실패');
+        console.error('감정 카드 이미지 캡처 및 업로드 실패');
       } finally {
         setCapturePayload(null);
       }

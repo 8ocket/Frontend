@@ -9,11 +9,12 @@ import type { SummaryListResponse, SummaryResponse, SummaryUpdateRequest } from 
 export const getSummaryApi = async (summaryId: string): Promise<SummaryResponse> => {
   const response = await api.get<ApiResponse<SummaryResponse>>(`/summaries/${summaryId}`);
 
-  if (response.data.success && response.data.data) {
+  // 백엔드 ApiResult는 { code, message, data } 구조 — success 필드 없음
+  if (response.data.data) {
     return response.data.data;
   }
 
-  throw new Error(response.data.error?.message || '마음 기록 조회 실패');
+  throw new Error('마음 기록 조회 실패');
 };
 
 /**
@@ -26,24 +27,32 @@ export const updateSummaryApi = async (
 ): Promise<SummaryResponse> => {
   const response = await api.put<ApiResponse<SummaryResponse>>(`/summaries/${summaryId}`, body);
 
-  if (response.data.success && response.data.data) {
+  // 백엔드 ApiResult는 { code, message, data } 구조 — success 필드 없음
+  if (response.data.data) {
     return response.data.data;
   }
 
-  throw new Error(response.data.error?.message || '마음 기록 수정 실패');
+  throw new Error('마음 기록 수정 실패');
 };
 
 /**
- * 마음 기록 카드 앞면 이미지 업로드
+ * 마음 기록 카드 앞/뒷면 이미지 업로드
  * PATCH /v1/summaries/{summary_id}/image
- * 백엔드 @RequestPart("summary_card") — 필드명 "summary_card"
+ *
+ * 백엔드 @RequestPart 필드명:
+ *   - card_front_image: 텍스트+오로라 후면 (EmotionCardBack)
+ *   - card_back_image:  오로라 전면 (EmotionCardFront)
+ *
+ * 변경 이력: 기존 단일 필드 "summary_card" → 앞/뒷면 분리 업로드로 백엔드 수정됨
  */
 export const uploadSummaryCardImageApi = async (
   summaryId: string,
-  frontFile: File,
+  frontFile: File, // card_front_image — 텍스트+오로라 후면 (EmotionCardBack)
+  backFile: File,  // card_back_image  — 오로라 전면 (EmotionCardFront)
 ): Promise<void> => {
   const formData = new FormData();
-  formData.append('summary_card', frontFile);
+  formData.append('card_front_image', frontFile);
+  formData.append('card_back_image', backFile);
   await api.patch(`/summaries/${summaryId}/image`, formData);
 };
 

@@ -218,6 +218,7 @@ export const finalizeSessionStream = async (
   while (true) {
     const { done, value } = await reader.read();
     if (done) {
+      // 스트림 종료 시 decoder flush — 남은 buffer도 함께 처리
       buffer += decoder.decode();
       break;
     }
@@ -241,9 +242,12 @@ export const finalizeSessionStream = async (
             const data = JSON.parse(raw);
             if (currentEvent === 'status') onStatus(data.step, data.message);
             if (currentEvent === 'ai_complete') onComplete(data);
-            if (currentEvent === 'server_error' || currentEvent === 'error') onError?.(data.content ?? data.message);
-          } catch {
-            // malformed JSON 무시
+            if (currentEvent === 'server_error' || currentEvent === 'error') {
+              console.error('[finalize SSE] 서버 에러:', data.content ?? data.message);
+              onError?.(data.content ?? data.message);
+            }
+          } catch (e) {
+            console.error('[finalize SSE] JSON 파싱 실패 | event:', currentEvent, '| raw:', raw, e);
           }
         }
       }
@@ -254,6 +258,37 @@ export const finalizeSessionStream = async (
         onDone();
         reader.cancel();
         return;
+      }
+    }
+  }
+
+  // 스트림 종료 후 buffer에 남은 이벤트 처리
+  // 백엔드가 ai_complete 직후 스트림을 닫는 경우, 마지막 청크가
+  // buffer에 남아 처리되지 않아 capturedResult가 null이 되는 버그 수정
+  if (buffer.trim()) {
+    const eventBlocks = buffer.split('\n\n').filter(Boolean);
+    for (const eventBlock of eventBlocks) {
+      const lines = eventBlock.split('\n');
+      currentEvent = '';
+      for (const line of lines) {
+        if (line.startsWith('event:')) {
+          currentEvent = line.replace('event:', '').trim();
+        }
+        if (line.startsWith('data:')) {
+          const raw = line.replace('data:', '').trim();
+          if (!raw) continue;
+          try {
+            const data = JSON.parse(raw);
+            if (currentEvent === 'status') onStatus(data.step, data.message);
+            if (currentEvent === 'ai_complete') onComplete(data);
+            if (currentEvent === 'server_error' || currentEvent === 'error') {
+              console.error('[finalize SSE] 서버 에러 (buffer):', data.content ?? data.message);
+              onError?.(data.content ?? data.message);
+            }
+          } catch (e) {
+            console.error('[finalize SSE] JSON 파싱 실패 (buffer) | event:', currentEvent, '| raw:', raw, e);
+          }
+        }
       }
     }
   }
@@ -269,12 +304,6 @@ export const finalizeSessionStream = async (
 export const getSessionProgressApi = async (): Promise<SessionProgressResponse[]> => {
   if (USE_MOCK) return mockGetSessionProgress();
 
-  const response =
-    await api.get<ApiResponse<SessionProgressResponse[]>>('/sessions/me/progress');
-
-  if (response.data.success && response.data.data) {
-    return response.data.data;
-  }
-
-  throw new Error(response.data.error?.message || '리포트 달성률 조회 실패');
+  const response = await api.get<SessionProgressResponse[]>('/sessions/me/progress');
+  return response.data;
 };
