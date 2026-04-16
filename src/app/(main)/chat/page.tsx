@@ -727,11 +727,16 @@ function ChatPageContent() {
       try {
         const { toBlob } = await import('html-to-image');
         // SVG 브러시 이미지가 완전히 로드될 때까지 대기
-        const imgs = [
-          ...captureBackCardRef.current.querySelectorAll('img'),
-        ];
+        const imgs = [...captureBackCardRef.current.querySelectorAll('img')];
         await Promise.all(
-          imgs.map((img) => img.complete ? Promise.resolve() : new Promise((r) => { img.onload = r; img.onerror = r; }))
+          imgs.map((img) =>
+            img.complete
+              ? Promise.resolve()
+              : new Promise((r) => {
+                  img.onload = r;
+                  img.onerror = r;
+                })
+          )
         );
         // 텍스트+오로라 면(EmotionCardBack)만 업로드 — 백엔드 @RequestPart("summary_card")
         const frontBlob = await toBlob(captureBackCardRef.current, { pixelRatio: 2 });
@@ -739,7 +744,7 @@ function ChatPageContent() {
         const frontFile = new File([frontBlob], 'card-front.png', { type: 'image/png' });
         await uploadSummaryCardImageApi(summaryId, frontFile);
       } catch {
-        // 업로드 실패는 UX에 영향 없음 — 조용히 무시
+        console.error(' 감정 카드 이미지 캡처 및 업로드 실패');
       } finally {
         setCapturePayload(null);
       }
@@ -854,25 +859,24 @@ function ChatPageContent() {
     if (sessionId) {
       handleSelectSession(sessionId);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ── 진입 시 미완료 세션 확인 + 세션 목록 조회 ──────────────────
   useEffect(() => {
-    Promise.all([
-      getActiveSessionApi().catch(() => null),
-      getSessionsApi().catch(() => null),
-    ]).then(([activeSession, sessionData]) => {
-      const sessions = sessionData?.sessions ?? [];
-      setSessionList(sessions);
+    Promise.all([getActiveSessionApi().catch(() => null), getSessionsApi().catch(() => null)]).then(
+      ([activeSession, sessionData]) => {
+        const sessions = sessionData?.sessions ?? [];
+        setSessionList(sessions);
 
-      if (activeSession) {
-        setUnfinishedSession(activeSession);
-        openModal('unfinished-session');
-      } else if (sessions.length === 0) {
-        openModal('new-session');
+        if (activeSession) {
+          setUnfinishedSession(activeSession);
+          openModal('unfinished-session');
+        } else if (sessions.length === 0) {
+          openModal('new-session');
+        }
       }
-    });
+    );
   }, [openModal]);
 
   // ── 핸들러 ───────────────────────────────────────────────────────
@@ -899,9 +903,7 @@ function ChatPageContent() {
 
     // 오늘 이미 세션이 있으면 추가 상담(70 크레딧 차감) → 크레딧 사전 체크
     const today = new Date().toDateString();
-    const hasTodaySession = sessionList.some(
-      (s) => new Date(s.startedAt).toDateString() === today
-    );
+    const hasTodaySession = sessionList.some((s) => new Date(s.startedAt).toDateString() === today);
     if (hasTodaySession && totalCredit < 70) {
       openModal('credit-shortage');
       return;
@@ -1014,7 +1016,6 @@ function ChatPageContent() {
               senderName: '나봄이',
               avatarSrc: activeAiAvatarSrc,
               emotionCardData: cardData,
-              cardImageUrl: capturedResult.card_image_url,
             });
             setCapturePayload({ data: cardData, summaryId: capturedResult.summary_id });
           }
@@ -1023,7 +1024,12 @@ function ChatPageContent() {
         (errorMessage) => {
           closeModal();
           console.error('Finalize SSE error:', errorMessage);
-          setAppendMessage({ variant: 'ai', senderName: '나봄이', avatarSrc: activeAiAvatarSrc, content: '마음 기록 생성 중 오류가 발생했습니다.' });
+          setAppendMessage({
+            variant: 'ai',
+            senderName: '나봄이',
+            avatarSrc: activeAiAvatarSrc,
+            content: '마음 기록 생성 중 오류가 발생했습니다.',
+          });
         }
       );
     } catch (err) {
@@ -1170,7 +1176,14 @@ function ChatPageContent() {
           {/* card_back_image — 오로라 전면 */}
           <div
             ref={captureCardRef}
-            style={{ position: 'fixed', left: '-9999px', top: 0, width: 400, height: 686, pointerEvents: 'none' }}
+            style={{
+              position: 'fixed',
+              left: '-9999px',
+              top: 0,
+              width: 400,
+              height: 686,
+              pointerEvents: 'none',
+            }}
           >
             <EmotionCardFront
               layers={capturePayload.data.layers}
@@ -1184,7 +1197,14 @@ function ChatPageContent() {
           {/* card_front_image — 텍스트+오로라 후면 */}
           <div
             ref={captureBackCardRef}
-            style={{ position: 'fixed', left: '-9999px', top: 0, width: 422, height: 723, pointerEvents: 'none' }}
+            style={{
+              position: 'fixed',
+              left: '-9999px',
+              top: 0,
+              width: 422,
+              height: 723,
+              pointerEvents: 'none',
+            }}
           >
             <EmotionCardBack
               data={capturePayload.data}
