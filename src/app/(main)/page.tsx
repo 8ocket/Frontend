@@ -12,8 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/shared/lib/utils';
 import { getSummaryListApi } from '@/entities/summary';
 import { useAuthStore } from '@/entities/user/store';
-import { getReportListApi } from '@/entities/reports/api';
-import type { CanGenerate } from '@/entities/reports/model';
+import { getSessionProgressApi } from '@/entities/session';
 import { getAttendanceApi } from '@/entities/attendance/api';
 
 // ── 날짜 상수 ────────────────────────────────────────────────────────────────
@@ -65,14 +64,14 @@ function WeeklyReportWidget({
     <div className="flex flex-1 flex-col gap-4 rounded-2xl bg-white/70 p-5 shadow-sm backdrop-blur-sm">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <FileText className="text-cta-300 h-4 w-4" aria-hidden="true" />
+          <FileText className="text-main-blue h-4 w-4" aria-hidden="true" />
           <h3 className="text-[14px] font-semibold text-[#1a222e]">주간 리포트 달성률</h3>
         </div>
         <span className="text-prime-400 text-[11px]">{TODAY_LABEL}</span>
       </div>
 
       <div className="flex items-end gap-2">
-        <span className="text-cta-300 text-[44px] leading-none font-bold tracking-tight tabular-nums">
+        <span className="text-main-blue text-[44px] leading-none font-bold tracking-tight tabular-nums">
           {displayed}
           <span className="text-[22px] font-semibold">%</span>
         </span>
@@ -84,7 +83,7 @@ function WeeklyReportWidget({
       <div className="flex flex-col gap-1.5">
         <div className="relative h-3 w-full overflow-hidden rounded-full bg-neutral-200">
           <div
-            className="bg-cta-400 h-full rounded-full transition-[width] duration-16 ease-linear"
+            className="bg-main-blue h-full rounded-full transition-[width] duration-16 ease-linear"
             style={{ width: `${displayed}%` }}
             role="progressbar"
             aria-valuenow={progress}
@@ -101,8 +100,8 @@ function WeeklyReportWidget({
         className={cn(
           'mt-auto flex w-full items-center justify-center gap-2 rounded-xl py-3 text-[13px] font-semibold transition-all',
           eligible
-            ? 'bg-cta-300 text-prime-900 cursor-pointer hover:opacity-90'
-            : 'border-cta-200 bg-cta-100 text-cta-500 cursor-not-allowed border-2 border-dashed font-medium'
+            ? 'bg-main-blue cursor-pointer text-white hover:opacity-90'
+            : 'border-main-blue/30 bg-main-blue/10 text-main-blue cursor-not-allowed border-2 border-dashed font-medium'
         )}
       >
         {!eligible && <Lock className="h-3.5 w-3.5" aria-hidden="true" />}
@@ -143,19 +142,14 @@ function MonthlyReportWidget({
     <div className="flex flex-1 flex-col gap-4 rounded-2xl bg-white/70 p-5 shadow-sm backdrop-blur-sm">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <FileText className="text-cta-300 h-4 w-4" aria-hidden="true" />
+          <FileText className="text-success-700 h-4 w-4" aria-hidden="true" />
           <h3 className="text-[14px] font-semibold text-[#1a222e]">월간 리포트 달성률</h3>
         </div>
         <span className="text-prime-400 text-[11px]">{TODAY_LABEL}</span>
       </div>
 
       <div className="flex items-end gap-2">
-        <span
-          className={cn(
-            'text-[44px] leading-none font-bold tracking-tight tabular-nums',
-            'text-cta-300'
-          )}
-        >
+        <span className="text-success-700 text-[44px] leading-none font-bold tracking-tight tabular-nums">
           {displayed}
           <span className="text-[22px] font-semibold">%</span>
         </span>
@@ -167,7 +161,7 @@ function MonthlyReportWidget({
       <div className="flex flex-col gap-1.5">
         <div className="relative h-3 w-full overflow-hidden rounded-full bg-neutral-200">
           <div
-            className="bg-cta-400 h-full rounded-full transition-[width] duration-16 ease-linear"
+            className="bg-success-700 h-full rounded-full transition-[width] duration-16 ease-linear"
             style={{ width: `${displayed}%` }}
             role="progressbar"
             aria-valuenow={progress}
@@ -175,9 +169,6 @@ function MonthlyReportWidget({
             aria-valuemax={100}
           />
         </div>
-        <p className="text-prime-400 text-[11px]">
-          {eligible ? '리포트 열람 가능' : `목표까지 ${goal - sessions}회 남음`}
-        </p>
       </div>
 
       <button
@@ -187,12 +178,12 @@ function MonthlyReportWidget({
         className={cn(
           'mt-auto flex w-full items-center justify-center gap-2 rounded-xl py-3 text-[13px] font-semibold transition-all',
           eligible
-            ? 'bg-cta-300 cursor-pointer text-[#1a222e] hover:opacity-90'
-            : 'border-cta-200 bg-cta-100/60 text-cta-300 cursor-not-allowed border-2 border-dashed'
+            ? 'bg-success-700 cursor-pointer text-white hover:opacity-90'
+            : 'border-success-700/30 bg-success-700/10 text-success-700 cursor-not-allowed border-2 border-dashed font-medium'
         )}
       >
         {!eligible && <Lock className="h-3.5 w-3.5" aria-hidden="true" />}
-        {eligible ? '리포트 확인하기' : '리포트 열람 불가'}
+        {eligible ? '리포트 확인하기' : `리포트 생성까지 ${goal - sessions}회 남았어요!`}
       </button>
     </div>
   );
@@ -439,16 +430,16 @@ export default function Home() {
     }
   };
 
-  const { data: reportData, isError: reportLoadError } = useQuery({
-    queryKey: ['homeReports'],
-    queryFn: () => Promise.all([getReportListApi(), getReportListApi('weekly')]),
-    select: ([monthlyRes, weeklyRes]) => ({
-      canGenerate: monthlyRes.can_generate,
-      weeklyCanGenerate: weeklyRes.can_generate,
+  const { data: progressData, isError: reportLoadError } = useQuery({
+    queryKey: ['sessionProgress'],
+    queryFn: getSessionProgressApi,
+    select: (res) => ({
+      weekly: res.find((p) => p.report_type === 'WEEKLY'),
+      monthly: res.find((p) => p.report_type === 'MONTHLY'),
     }),
   });
-  const canGenerate = reportData?.canGenerate ?? null;
-  const weeklyCanGenerate = reportData?.weeklyCanGenerate ?? null;
+  const weeklyProgress = progressData?.weekly ?? null;
+  const monthlyProgress = progressData?.monthly ?? null;
 
   const { data: collectionCards = [] } = useQuery({
     queryKey: ['summaryList'],
@@ -545,22 +536,16 @@ export default function Home() {
           )}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch">
             <WeeklyReportWidget
-              sessions={weeklyCanGenerate?.saved_session_count ?? 0}
-              goal={weeklyCanGenerate?.required_session_count ?? 1}
-              eligible={weeklyCanGenerate?.eligible ?? false}
+              sessions={weeklyProgress?.current_count ?? 0}
+              goal={weeklyProgress?.required_count ?? 1}
+              eligible={(weeklyProgress?.current_count ?? 0) >= (weeklyProgress?.required_count ?? 1)}
               onViewReport={() => router.push('/report')}
             />
             <MonthlyReportWidget
-              sessions={canGenerate?.saved_session_count ?? 0}
-              goal={canGenerate?.required_session_count ?? 1}
-              progress={
-                canGenerate && canGenerate.required_session_count > 0
-                  ? Math.round(
-                      (canGenerate.saved_session_count / canGenerate.required_session_count) * 100
-                    )
-                  : 0
-              }
-              eligible={canGenerate?.eligible ?? false}
+              sessions={monthlyProgress?.current_count ?? 0}
+              goal={monthlyProgress?.required_count ?? 1}
+              progress={monthlyProgress?.progress_percentage ?? 0}
+              eligible={(monthlyProgress?.current_count ?? 0) >= (monthlyProgress?.required_count ?? 1)}
               onViewReport={() => router.push('/report')}
             />
           </div>
