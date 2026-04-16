@@ -73,6 +73,7 @@ export function ChatMainArea({
   // 항상 최신 initialMessages를 참조하기 위한 ref
   const initialMessagesRef = useRef(initialMessages);
   initialMessagesRef.current = initialMessages;
+  const prevAppendMessageRef = useRef<ChatBubbleProps | null | undefined>(null);
 
   // 세션 전환 시 메시지 교체 (sessionId 기준으로 판단)
   useEffect(() => {
@@ -100,10 +101,17 @@ export function ChatMainArea({
   }, [sessionId]);
 
   // 외부에서 메시지 추가 (예: 종료 시 "마음 기록 제작 중")
+  // emotionCardData 참조가 같으면 같은 카드의 업데이트(예: cardImageUrl 추가)로 간주해 마지막 메시지를 교체
   useEffect(() => {
-    if (appendMessage) {
-      setMessages((prev) => [...prev, appendMessage]);
-    }
+    if (!appendMessage) return;
+    const prev = prevAppendMessageRef.current;
+    const isSameCard =
+      prev?.emotionCardData != null &&
+      prev.emotionCardData === appendMessage.emotionCardData;
+    setMessages((msgs) =>
+      isSameCard ? [...msgs.slice(0, -1), appendMessage] : [...msgs, appendMessage]
+    );
+    prevAppendMessageRef.current = appendMessage;
   }, [appendMessage]);
 
   // 스크롤 위치 추적 → scrollRatio 업데이트

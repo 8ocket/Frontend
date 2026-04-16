@@ -3,9 +3,9 @@
 // Figma 1457:2703 (AI Bubble), 1457:2710 (User Bubble)
 // Root: VERTICAL, gap=4, max-w=450px, vSizing=HUG
 
-import { EmotionCard } from '@/widgets/emotion-card';
 import type { EmotionCardData } from '@/entities/emotion';
 import { ProfileAvatar } from '@/shared/ui/profile-avatar';
+import { EmotionCard } from '@/widgets/emotion-card';
 
 export type BubbleVariant = 'ai' | 'user';
 
