@@ -54,7 +54,7 @@ export const uploadSummaryCardImageApi = async (
  * 마음 기록 목록 조회
  * GET /v1/summaries?page=0&size=20
  */
-export const getSummaryListApi = async (page = 0, size = 20): Promise<SummaryListResponse> => {
+export const getSummaryListApi = async (page = 2, size = 20): Promise<SummaryListResponse> => {
   const response = await api.get<ApiResponse<SummaryListResponse>>(
     `/summaries?page=${page}&size=${size}`
   );
