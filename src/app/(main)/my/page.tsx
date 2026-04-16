@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { Popover, PopoverTrigger, PopoverContent } from '@/shared/ui/popover';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -19,6 +20,23 @@ import { getPaymentHistoryApi, cancelPaymentApi, getMyCreditApi } from '@/entiti
 import { PaymentHistoryItem } from '@/entities/credits/model';
 import { useToast } from '@/shared/ui/toast';
 import { OCCUPATION_LABEL, AGE_LABEL, GENDER_LABEL } from '@/entities/user/model';
+
+function toKSTString(dateStr: string, includeTime = true) {
+  // timezone 정보가 없는 LocalDateTime은 UTC로 처리 (배포 서버 기준)
+  const normalized = /[Z+\-]\d{2}:\d{2}$|Z$/.test(dateStr) ? dateStr : `${dateStr}Z`;
+  const date = new Date(normalized);
+  const fmt = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Seoul',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    ...(includeTime && { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }),
+  });
+  const parts = Object.fromEntries(fmt.formatToParts(date).map((p) => [p.type, p.value]));
+  return includeTime
+    ? `${parts.year}.${parts.month}.${parts.day} ${parts.hour}:${parts.minute}:${parts.second}`
+    : `${parts.year}.${parts.month}.${parts.day}`;
+}
 
 const TRANSACTION_LABEL: Record<string, string> = {
   SIGNUP_BONUS: '회원가입 보너스',
@@ -39,12 +57,10 @@ export default function MyPage() {
   const { user, logout } = useAuthStore();
   const { totalCredit, setTotalCredit } = useCreditStore();
   const { toast } = useToast();
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
   const [refundModalOpen, setRefundModalOpen] = useState(false);
   const [deleteAccountModalOpen, setDeleteAccountModalOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<PaymentHistoryItem | null>(null);
-  const dropdownRef = useRef<HTMLUListElement>(null);
 
   const {
     data: paymentHistory = [],
@@ -98,16 +114,6 @@ export default function MyPage() {
     // 3. 브랜드 소개 화면으로 이동
     router.replace('/about');
   };
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setOpenDropdownId(null);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   return (
     <div className="min-h-main-safe bg-secondary-100">
@@ -209,7 +215,7 @@ export default function MyPage() {
                   ) : paymentHistory.length === 0 ? (
                     <EmptyHistory message="결제 내역이 없습니다." />
                   ) : (
-                    <ul className="divide-prime-100 divide-y px-4 pb-2" ref={dropdownRef}>
+                    <ul className="divide-prime-100 divide-y px-4 pb-2">
                       {paymentHistory.map((item, idx) => {
                         const itemKey =
                           item.paymentId ??
@@ -229,9 +235,7 @@ export default function MyPage() {
                                 {item.orderName}
                               </span>
                               <span className="text-prime-400 text-xs tracking-[-0.18px]">
-                                {item.approvedAt
-                                  ? `${item.approvedAt.slice(0, 10).replace(/-/g, '.')} ${item.approvedAt.slice(11, 19)}`
-                                  : '-'}
+                                {item.approvedAt ? toKSTString(item.approvedAt) : '-'}
                               </span>
                               {item.status === 'CANCELED' && (
                                 <span className="text-prime-300 text-xs">
@@ -260,36 +264,30 @@ export default function MyPage() {
                               </div>
 
                               {/* 더보기 버튼 자리 — 항상 동일 너비 확보 */}
-                              <div className="relative size-7 shrink-0">
+                              <div className="size-7 shrink-0">
                                 {canRefund && (
-                                  <>
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        setOpenDropdownId(
-                                          openDropdownId === itemKey ? null : itemKey
-                                        )
-                                      }
-                                      className="text-prime-400 hover:bg-secondary-100 flex size-7 items-center justify-center rounded-lg transition-colors"
-                                    >
-                                      <MoreVertical size={15} />
-                                    </button>
-                                    {openDropdownId === itemKey && (
-                                      <div className="border-prime-100 absolute top-full right-0 z-20 mt-1 w-36 overflow-hidden rounded-xl border bg-white shadow-sm">
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            setSelectedPayment(item);
-                                            setOpenDropdownId(null);
-                                            setRefundModalOpen(true);
-                                          }}
-                                          className="text-error-500 hover:bg-error-100/50 flex w-full items-center px-4 py-3 text-sm font-medium transition-colors"
-                                        >
-                                          환불 요청하기
-                                        </button>
-                                      </div>
-                                    )}
-                                  </>
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <button
+                                        type="button"
+                                        className="text-prime-400 hover:bg-secondary-100 flex size-7 items-center justify-center rounded-lg transition-colors"
+                                      >
+                                        <MoreVertical size={15} />
+                                      </button>
+                                    </PopoverTrigger>
+                                    <PopoverContent align="end" sideOffset={6} className="w-36 overflow-hidden p-0">
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedPayment(item);
+                                          setRefundModalOpen(true);
+                                        }}
+                                        className="text-error-500 hover:bg-error-100/50 flex w-full items-center px-4 py-3 text-sm font-medium transition-colors"
+                                      >
+                                        환불 요청하기
+                                      </button>
+                                    </PopoverContent>
+                                  </Popover>
                                 )}
                               </div>
                             </div>
@@ -412,11 +410,7 @@ function PaymentStatusBadge({ status }: { status: string }) {
       </span>
     );
   }
-  return (
-    <span className="text-success-800 text-xs font-medium">
-      결제완료
-    </span>
-  );
+  return <span className="text-success-800 text-xs font-medium">결제완료</span>;
 }
 
 function RefundModal({
@@ -425,10 +419,10 @@ function RefundModal({
   item,
   onSuccess,
 }: {
-  isOpen: boolean;
-  onClose: () => void;
-  item: PaymentHistoryItem | null;
-  onSuccess: () => void;
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
+  readonly item: PaymentHistoryItem | null;
+  readonly onSuccess: () => void;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -476,7 +470,7 @@ function RefundModal({
                   <div className="flex flex-col gap-0.5">
                     <span className="text-prime-900 text-sm font-medium">{item.orderName}</span>
                     <span className="text-prime-400 text-xs">
-                      {item.approvedAt?.slice(0, 10).replace(/-/g, '.') ?? '-'}
+                      {item.approvedAt ? toKSTString(item.approvedAt, false) : '-'}
                     </span>
                   </div>
                   <span className="text-prime-900 text-sm font-bold">
@@ -561,7 +555,7 @@ function RefundModal({
   );
 }
 
-function PolicyItem({ title, desc }: { title: string; desc: string }) {
+function PolicyItem({ title, desc }: { readonly title: string; readonly desc: string }) {
   return (
     <div className="flex flex-col gap-0.5">
       <span className="text-prime-900 text-xs font-semibold tracking-[-0.18px]">{title}</span>
@@ -570,7 +564,7 @@ function PolicyItem({ title, desc }: { title: string; desc: string }) {
   );
 }
 
-function EmptyHistory({ message }: { message: string }) {
+function EmptyHistory({ message }: { readonly message: string }) {
   return (
     <div className="text-prime-400 flex flex-col items-center gap-2 py-12">
       <span className="text-sm">{message}</span>
@@ -585,11 +579,11 @@ function MenuRow({
   iconBg = 'bg-interactive-glass-blue-50',
   onClick,
 }: {
-  icon: React.ReactNode;
-  label: string;
-  labelClassName?: string;
-  iconBg?: string;
-  onClick: () => void;
+  readonly icon: React.ReactNode;
+  readonly label: string;
+  readonly labelClassName?: string;
+  readonly iconBg?: string;
+  readonly onClick: () => void;
 }) {
   return (
     <button
@@ -611,7 +605,13 @@ function MenuRow({
 }
 
 // ── 회원탈퇴 확인 모달 ─────────────────────────────────────────────
-function DeleteAccountModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+function DeleteAccountModal({
+  isOpen,
+  onClose,
+}: {
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
+}) {
   const [confirmText, setConfirmText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { logout } = useAuthStore();
