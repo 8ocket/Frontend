@@ -6,7 +6,7 @@ import { Check, FileText, Lock, Layers } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { cn } from '@/shared/lib/utils';
@@ -360,6 +360,25 @@ function AttendanceWidget() {
   );
 }
 
+// ── 감정카드 스켈레톤 ─────────────────────────────────────────────────────────
+function CardSkeleton({ width, height }: { width: number; height: number }) {
+  return (
+    <div
+      className="relative shrink-0 overflow-hidden rounded-3xl bg-neutral-200"
+      style={{ width, height }}
+    >
+      <div
+        className="absolute inset-0"
+        style={{
+          background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%)',
+          backgroundSize: '200% 100%',
+          animation: 'shimmer 1.4s infinite',
+        }}
+      />
+    </div>
+  );
+}
+
 // ── 광고 띠 배너 ─────────────────────────────────────────────────────────────
 function AdBanner() {
   const [current, setCurrent] = useState(0);
@@ -416,18 +435,19 @@ function AdBanner() {
 export default function Home() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading, user } = useAuthStore();
-  const cardSectionRef = useRef<HTMLElement>(null);
+  const [cardSectionEl, setCardSectionEl] = useState<HTMLElement | null>(null);
   const [cardContainerWidth, setCardContainerWidth] = useState(0);
   const [cardContainer, setCardContainer] = useState<HTMLDivElement | null>(null);
   const [cardsVisible, setCardsVisible] = useState(false);
-  const [flippedCardId, setFlippedCardId] = useState<string | null>(null);
+  const [flippedCardIds, setFlippedCardIds] = useState<Set<string>>(new Set());
 
   const handleCardClick = (summaryId: string) => {
-    if (flippedCardId === summaryId) {
-      router.push('/collection');
-    } else {
-      setFlippedCardId(summaryId);
-    }
+    setFlippedCardIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(summaryId)) next.delete(summaryId);
+      else next.add(summaryId);
+      return next;
+    });
   };
 
   const { data: progressData, isError: reportLoadError } = useQuery({
@@ -441,10 +461,14 @@ export default function Home() {
   const weeklyProgress = progressData?.weekly ?? null;
   const monthlyProgress = progressData?.monthly ?? null;
 
-  const { data: collectionCards = [] } = useQuery({
-    queryKey: ['summaryList'],
-    queryFn: () => getSummaryListApi().then((res) => res.content),
+  const { data: cardData, isLoading: cardsLoading } = useQuery({
+    queryKey: ['summaryList', 'home'],
+    queryFn: () => getSummaryListApi(),
   });
+  const collectionCards = (cardData?.content ?? []).sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+  const totalCardCount = cardData?.totalElements ?? 0;
 
   useEffect(() => {
     if (!cardContainer) return;
@@ -456,17 +480,21 @@ export default function Home() {
   }, [cardContainer]);
 
   useEffect(() => {
-    const el = cardSectionRef.current;
-    if (!el) return;
+    if (!cardSectionEl) return;
+    // 이미 뷰포트 안에 있으면 즉시 표시
+    const rect = cardSectionEl.getBoundingClientRect();
+    if (rect.top < window.innerHeight) {
+      setCardsVisible(true);
+      return;
+    }
+    // 뷰포트 밖이면 스크롤 시 페이드인
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setCardsVisible(true);
-      },
+      ([entry]) => { if (entry.isIntersecting) setCardsVisible(true); },
       { threshold: 0.1 }
     );
-    observer.observe(el);
+    observer.observe(cardSectionEl);
     return () => observer.disconnect();
-  }, []);
+  }, [cardSectionEl]);
 
   if (authLoading || !isAuthenticated) {
     return (
@@ -552,15 +580,30 @@ export default function Home() {
         </section>
 
         {/* ── 감정카드 섹션 ─────────────────────────────────────────────────── */}
-        <section ref={cardSectionRef} className="mb-4">
+        <section ref={setCardSectionEl} className="mb-4">
           <div className="flex flex-col gap-4 rounded-2xl bg-white/70 p-5 shadow-sm backdrop-blur-sm">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Layers className="text-cta-300 h-4 w-4" aria-hidden="true" />
                 <h2 className="text-[14px] font-semibold text-[#1a222e]">감정카드</h2>
               </div>
-              <span className="text-prime-400 text-[11px]">최근 상담 결과</span>
+              <Link href="/collection" className="bg-cta-50 text-cta-300 hover:bg-cta-100 border-cta-200 rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition-colors">
+                카드 전체 보기
+              </Link>
             </div>
+
+            {!cardsLoading && totalCardCount > 0 && (() => {
+              const latest = collectionCards[0] ? new Date(collectionCards[0].createdAt) : null;
+              const latestLabel = latest
+                ? `${latest.getMonth() + 1}월 ${latest.getDate()}일`
+                : null;
+              return (
+                <p className="text-prime-400 -mt-2 text-[11px]">
+                  총 {totalCardCount}개
+                  {latestLabel && <> · 가장 최근: {latestLabel}</>}
+                </p>
+              );
+            })()}
 
             <div className="relative">
               <div
@@ -569,66 +612,86 @@ export default function Home() {
               />
               <div
                 ref={setCardContainer}
-                className="no-scrollbar flex snap-x snap-mandatory items-end gap-4 overflow-x-auto pr-8 pb-1"
+                className="no-scrollbar flex snap-x snap-mandatory items-start gap-4 overflow-x-auto pr-8 pb-1"
+                onClick={() => setFlippedCardIds(new Set())}
               >
-                {collectionCards.length === 0 ? (
+                {cardsLoading ? (
+                  Array.from({ length: Math.max(visibleCount, 3) }).map((_, i) => (
+                    <CardSkeleton key={i} width={cardWidth || 175} height={cardHeight || 300} />
+                  ))
+                ) : collectionCards.length === 0 ? (
                   <p className="text-prime-400 w-full py-8 text-center text-sm">
                     아직 생성된 감정카드가 없어요
                   </p>
                 ) : (
-                  collectionCards.slice(0, visibleCount).map((card, index) => (
-                    <button
-                      key={card.summaryId}
-                      type="button"
-                      onClick={() => handleCardClick(card.summaryId)}
-                      style={{
-                        transitionDelay: `${index * 80}ms`,
-                        opacity: cardsVisible ? 1 : 0,
-                        transform: cardsVisible ? 'translateY(0)' : 'translateY(14px)',
-                        perspective: '1200px',
-                      }}
-                      className="shrink-0 cursor-pointer snap-start transition-[opacity,transform] duration-500"
-                      aria-label="감정카드 — 마음기록 모음 보기"
-                    >
-                      <div
-                        style={{
-                          width: cardWidth || 175,
-                          height: cardHeight || 300,
-                          position: 'relative',
-                          transformStyle: 'preserve-3d',
-                          transition: 'transform 0.7s ease-in-out',
-                          transform: flippedCardId === card.summaryId ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                        }}
-                      >
-                        {/* 앞면 */}
+                  collectionCards
+                    .slice(0, visibleCount)
+                    .map((card, index) => {
+                      const isFlipped = flippedCardIds.has(card.summaryId);
+                      const w = cardWidth || 175;
+                      const h = cardHeight || 300;
+                      return (
                         <div
-                          className="absolute inset-0 overflow-hidden rounded-3xl shadow-md ring-1 ring-black/5"
-                          style={{ backfaceVisibility: 'hidden' }}
+                          key={card.summaryId}
+                          className="shrink-0 snap-start transition-[opacity,transform] duration-500"
+                          style={{
+                            transitionDelay: `${index * 80}ms`,
+                            opacity: cardsVisible ? 1 : 0,
+                            transform: cardsVisible ? 'translateY(0)' : 'translateY(14px)',
+                            width: w,
+                          }}
                         >
-                          <Image
-                            src={card.frontImageUrl}
-                            alt="마음 기록 카드 앞면"
-                            width={cardWidth || 175}
-                            height={cardHeight || 300}
-                            className="h-full w-full object-cover"
-                          />
+                          {/* 카드 */}
+                          <div
+                            role="button"
+                            tabIndex={0}
+                            aria-label="감정카드 — 마음기록 모음 보기"
+                            onClick={(e) => { e.stopPropagation(); handleCardClick(card.summaryId); }}
+                            onKeyDown={(e) => e.key === 'Enter' && handleCardClick(card.summaryId)}
+                            style={{ perspective: '1200px', cursor: 'pointer' }}
+                          >
+                            <div
+                              style={{
+                                width: w,
+                                height: h,
+                                position: 'relative',
+                                transformStyle: 'preserve-3d',
+                                transition: 'transform 0.7s ease-in-out',
+                                transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                              }}
+                            >
+                              {/* 앞면 — 오로라 */}
+                              <div
+                                className="absolute inset-0 overflow-hidden rounded-3xl shadow-md ring-1 ring-black/5"
+                                style={{ backfaceVisibility: 'hidden' }}
+                              >
+                                <Image
+                                  src={card.backImageUrl}
+                                  alt="마음 기록 카드 오로라 면"
+                                  width={w}
+                                  height={h}
+                                  className="h-full w-full object-cover"
+                                />
+                              </div>
+                              {/* 뒷면 — 텍스트 */}
+                              <div
+                                className="absolute inset-0 overflow-hidden rounded-3xl shadow-md ring-1 ring-black/5"
+                                style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+                              >
+                                <Image
+                                  src={card.frontImageUrl}
+                                  alt="마음 기록 카드 텍스트 면"
+                                  width={w}
+                                  height={h}
+                                  className="h-full w-full object-cover"
+                                />
+                              </div>
+                            </div>
+                          </div>
+
                         </div>
-                        {/* 뒷면 */}
-                        <div
-                          className="absolute inset-0 overflow-hidden rounded-3xl shadow-md ring-1 ring-black/5"
-                          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
-                        >
-                          <Image
-                            src={card.backImageUrl}
-                            alt="마음 기록 카드 뒷면"
-                            width={cardWidth || 175}
-                            height={cardHeight || 300}
-                            className="h-full w-full object-cover"
-                          />
-                        </div>
-                      </div>
-                    </button>
-                  ))
+                      );
+                    })
                 )}
               </div>
             </div>
