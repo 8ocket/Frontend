@@ -25,9 +25,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
-      <head>
-        <link rel="stylesheet" href="/fonts/pretendard/pretendardvariable-dynamic-subset.css" />
-      </head>
       <body className={`${cormorantGaramond.variable} antialiased`}>
         <ThemeProvider>
           <QueryProvider>
