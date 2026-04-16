@@ -1,6 +1,6 @@
 import { ApiResponse } from '@/entities/user/model';
 import { api } from '@/shared/api/axios';
-import type { SummaryListResponse, SummaryResponse, SummaryUpdateRequest } from './model';
+import type { SummaryCardResponse, SummaryListResponse, SummaryResponse, SummaryUpdateRequest } from './model';
 
 /**
  * 마음 기록 카드 조회
@@ -51,10 +51,24 @@ export const uploadSummaryCardImageApi = async (
 }; 
 
 /**
+ * 마음 기록 카드 이미지 URL 조회
+ * GET /v1/summaries/card/{card_id}
+ */
+export const getSummaryCardApi = async (cardId: string): Promise<SummaryCardResponse> => {
+  const response = await api.get<ApiResponse<SummaryCardResponse>>(`/summaries/card/${cardId}`);
+
+  if (response.data.success && response.data.data) {
+    return response.data.data;
+  }
+
+  throw new Error(response.data.error?.message || '카드 이미지 조회 실패');
+};
+
+/**
  * 마음 기록 목록 조회
  * GET /v1/summaries?page=0&size=20
  */
-export const getSummaryListApi = async (page = 2, size = 20): Promise<SummaryListResponse> => {
+export const getSummaryListApi = async (page = 0, size = 20): Promise<SummaryListResponse> => {
   const response = await api.get<ApiResponse<SummaryListResponse>>(
     `/summaries?page=${page}&size=${size}`
   );
