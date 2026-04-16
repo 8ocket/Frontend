@@ -148,13 +148,15 @@ function ChatPageContent() {
           console.error('[capture] blob 생성 실패 | front:', !!frontBlob, 'back:', !!backBlob);
           return;
         }
+
+        // 캡처 완료 즉시 다운로드 버튼 표시 — 업로드 완료 기다리지 않음
+        const localImageUrl = URL.createObjectURL(frontBlob);
+        setAppendMessage((prev) => (prev ? { ...prev, cardImageUrl: localImageUrl } : prev));
+
+        // 서버 업로드는 백그라운드에서 진행
         const frontFile = new File([frontBlob], 'card-front.png', { type: 'image/png' });
         const backFile = new File([backBlob], 'card-back.png', { type: 'image/png' });
         await uploadSummaryCardImageApi(summaryId, frontFile, backFile);
-
-        // 업로드 성공 후 다운로드 버튼 표시 — frontBlob(카드 앞면 텍스트+오로라)으로 로컬 URL 생성
-        const localImageUrl = URL.createObjectURL(frontBlob);
-        setAppendMessage((prev) => (prev ? { ...prev, cardImageUrl: localImageUrl } : prev));
       } catch (e) {
         console.error('[capture] 감정 카드 이미지 캡처 및 업로드 실패', e);
       } finally {

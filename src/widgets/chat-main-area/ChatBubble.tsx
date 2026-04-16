@@ -78,8 +78,18 @@ export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatar
           )}
         </div>
       ) : cardImageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={cardImageUrl} alt="마음 기록 카드" className="rounded-2xl shadow-sm" style={{ width: 350 }} />
+        <div className="flex flex-row items-end gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={cardImageUrl} alt="마음 기록 카드" className="rounded-2xl shadow-sm" style={{ width: 350 }} />
+          <button
+            onClick={(e) => { e.stopPropagation(); handleDownload(); }}
+            className="bg-main-blue flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-white shadow-md transition-opacity hover:opacity-90 active:opacity-80"
+            aria-label="마음 기록 카드 다운로드"
+            style={{ fontFamily: 'Pretendard', fontSize: '16px', fontWeight: 500, lineHeight: '100%', textAlign: 'center' }}
+          >
+            다운로드
+          </button>
+        </div>
       ) : (
         <div
           className={[

@@ -35,3 +35,9 @@ export interface SummaryResponse {
   created_at: string;
   updated_at: string;
 }
+
+export interface SummaryCardResponse {
+  card_id: string;
+  front_image_url: string;
+  back_image_url: string;
+}

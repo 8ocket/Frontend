@@ -1,7 +1,7 @@
 'use client';
 
-import type { SummaryListItem, SummaryResponse } from '@/entities/summary';
-import { getSummaryApi, getSummaryListApi } from '@/entities/summary';
+import type { SummaryCardResponse, SummaryListItem } from '@/entities/summary';
+import { getSummaryCardApi, getSummaryListApi } from '@/entities/summary';
 import { cn } from '@/shared/lib/utils';
 import { EmotionColorLegend } from '@/widgets/emotion-color-legend';
 import { useQuery } from '@tanstack/react-query';
@@ -67,7 +67,7 @@ function GridCard({
         transition={{ duration: 0.2, layout: { duration: 0 } }}
       >
         <Image
-          src={data.frontImageUrl}
+          src={data.backImageUrl}
           alt="마음 기록 카드"
           width={cardWidth}
           height={cardHeight}
@@ -83,15 +83,13 @@ function GridCard({
 function CardOverlay({ data, onClose }: { data: SummaryListItem; onClose: () => void }) {
   const W = 400;
   const H = 686;
-  const [detail, setDetail] = useState<SummaryResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [cardImages, setCardImages] = useState<SummaryCardResponse | null>(null);
 
   useEffect(() => {
-    getSummaryApi(data.summaryId)
-      .then(setDetail)
-      .catch(() => {})
-      .finally(() => setIsLoading(false));
-  }, [data.summaryId]);
+    getSummaryCardApi(data.cardId)
+      .then(setCardImages)
+      .catch(() => {});
+  }, [data.cardId]);
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 px-4">
@@ -116,56 +114,26 @@ function CardOverlay({ data, onClose }: { data: SummaryListItem; onClose: () => 
               position: 'relative',
               transformStyle: 'preserve-3d',
             }}
-            initial={{ rotateY: -180 }}
-            animate={{ rotateY: 0 }}
-            exit={{ rotateY: -180 }}
+            initial={{ rotateY: 0 }}
+            animate={{ rotateY: 180 }}
+            exit={{ rotateY: 0 }}
             transition={{ duration: 0.7, ease: 'easeInOut' }}
           >
-            {/* 뒷면 */}
+            {/* 오로라 면 — 처음에 보이는 면 (rotateY:0) */}
             <div
               style={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden' }}
               className="overflow-hidden rounded-3xl"
             >
-              <div className="relative h-full w-full">
-                <Image
-                  src={data.backImageUrl}
-                  alt="마음 기록 카드 뒷면"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 400px"
-                  className="object-cover"
-                />
-                <div className="absolute inset-x-4 top-12 bottom-12 overflow-y-auto rounded-2xl bg-white/80 p-5 backdrop-blur-md">
-                  {isLoading ? (
-                    <p className="text-prime-500 text-sm">불러오는 중...</p>
-                  ) : detail ? (
-                    <div className="flex flex-col gap-4 text-sm">
-                      {detail.fact && (
-                        <div>
-                          <p className="text-prime-900 mb-1 font-semibold">사건</p>
-                          <p className="text-prime-700">{detail.fact}</p>
-                        </div>
-                      )}
-                      {detail.emotion && (
-                        <div>
-                          <p className="text-prime-900 mb-1 font-semibold">느꼈던 감정</p>
-                          <p className="text-prime-700">{detail.emotion}</p>
-                        </div>
-                      )}
-                      {detail.insight && (
-                        <div>
-                          <p className="text-prime-900 mb-1 font-semibold">AI 인사이트</p>
-                          <p className="text-prime-700">{detail.insight}</p>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <p className="text-prime-500 text-sm">내용을 불러올 수 없어요.</p>
-                  )}
-                </div>
-              </div>
+              <Image
+                src={cardImages?.back_image_url ?? data.backImageUrl}
+                alt="마음 기록 카드 오로라 면"
+                fill
+                sizes="(max-width: 768px) 100vw, 400px"
+                className="object-cover"
+              />
             </div>
 
-            {/* 앞면 */}
+            {/* 텍스트 면 — 플립 후 보이는 면 (rotateY:180) */}
             <div
               style={{
                 position: 'absolute',
@@ -176,11 +144,11 @@ function CardOverlay({ data, onClose }: { data: SummaryListItem; onClose: () => 
               className="overflow-hidden rounded-3xl"
             >
               <Image
-                src={data.frontImageUrl}
-                alt="마음 기록 카드 앞면"
-                width={W}
-                height={H}
-                className="h-full w-full object-cover"
+                src={cardImages?.front_image_url ?? data.frontImageUrl}
+                alt="마음 기록 카드 텍스트 면"
+                fill
+                sizes="(max-width: 768px) 100vw, 400px"
+                className="object-cover"
               />
             </div>
           </motion.div>
