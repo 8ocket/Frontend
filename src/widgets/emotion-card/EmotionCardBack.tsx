@@ -116,18 +116,9 @@ export function EmotionCardBack({
         }}
       >
         <div className="flex w-full flex-col gap-4 overflow-hidden">
-          {/* 상담 요약 헤더 */}
-          <motion.div {...sectionMotion(0, animated)}>
-            <SummaryHeader
-              title={data.summary.title}
-              description={data.summary.description}
-              userName={data.userName}
-            />
-          </motion.div>
-
           {/* 마음 키워드 */}
           {data.keywords.length > 0 && (
-            <motion.div {...sectionMotion(1, animated)}>
+            <motion.div {...sectionMotion(0, animated)}>
               <Section title="마음 키워드">
                 <div className="flex flex-wrap gap-1">
                   {data.keywords.map((kw, i) => (
@@ -143,7 +134,7 @@ export function EmotionCardBack({
 
           {/* 사건 */}
           {data.fact && (
-            <motion.div {...sectionMotion(2, animated)}>
+            <motion.div {...sectionMotion(1, animated)}>
               <Section title="사건">
                 <p className="body-2 text-prime-500 leading-relaxed">{data.fact}</p>
               </Section>
@@ -152,7 +143,7 @@ export function EmotionCardBack({
 
           {/* 느꼈던 감정 */}
           {data.emotion && (
-            <motion.div {...sectionMotion(3, animated)}>
+            <motion.div {...sectionMotion(2, animated)}>
               <Section title="느꼈던 감정">
                 <p className="body-2 text-prime-500 leading-relaxed">{data.emotion}</p>
               </Section>
@@ -161,62 +152,19 @@ export function EmotionCardBack({
 
           {/* AI 인사이트 */}
           {data.insight && (
-            <motion.div {...sectionMotion(4, animated)}>
+            <motion.div {...sectionMotion(3, animated)}>
               <Section title="AI 인사이트">
                 <p className="body-2 text-prime-500 leading-relaxed">{data.insight}</p>
               </Section>
             </motion.div>
           )}
         </div>
-
-        {/* 보안 고지문 */}
-        <p className="caption-1 text-warning-500 leading-[1.2]">
-          본 기록은 비공개 보안 저장소에 암호화되어 저장되었으며 본인 외에는 관리자도 열람하지
-          못합니다.
-        </p>
       </div>
     </div>
   );
 }
 
 // ─── 내부 하위 컴포넌트 ───
-
-/** 상담 요약 헤더 */
-function SummaryHeader({
-  title,
-  description,
-  userName,
-}: {
-  title: string;
-  description: string;
-  userName?: string;
-}) {
-  // description 내 "User Name" 또는 실제 userName 을 하이라이트
-  const highlightName = userName ?? 'User Name';
-  const parts = description.split(highlightName);
-
-  return (
-    <div className="flex flex-col gap-2">
-      {/* Figma 1905:7296 — "상담 요약" 섹션 라벨 */}
-      <h4 className="subtitle-1 text-prime-900 font-semibold">상담 요약</h4>
-      {/* Figma 1905:7297 — 요약 내용 (Input 오버라이드) */}
-      <p className="body-2 text-prime-500 leading-relaxed whitespace-pre-line">{title}</p>
-      {description && (
-        <p className="caption-1 text-prime-500 leading-[1.2]">
-          {parts.length > 1 ? (
-            <>
-              {parts[0]}
-              <span className="text-cta-300">{highlightName}</span>
-              {parts[1]}
-            </>
-          ) : (
-            description
-          )}
-        </p>
-      )}
-    </div>
-  );
-}
 
 /** 정보 섹션 (제목 + 내용) */
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
