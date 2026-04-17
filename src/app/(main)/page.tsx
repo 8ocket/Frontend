@@ -36,17 +36,18 @@ const BANNER_IMAGES = [
 
 // ── 주간 리포트 달성률 위젯 ──────────────────────────────────────────────────
 function WeeklyReportWidget({
+  progress,
   sessions,
   goal,
   eligible,
   onViewReport,
 }: {
+  progress: number;
   sessions: number;
   goal: number;
   eligible: boolean;
   onViewReport: () => void;
 }) {
-  const progress = goal > 0 ? Math.round((sessions / goal) * 100) : 0;
   const [displayed, setDisplayed] = useState(0);
 
   useEffect(() => {
@@ -536,6 +537,7 @@ export default function Home() {
           )}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch">
             <WeeklyReportWidget
+              progress={weeklyProgress?.progress_percentage ?? 0}
               sessions={weeklyProgress?.current_count ?? 0}
               goal={weeklyProgress?.required_count ?? 1}
               eligible={(weeklyProgress?.current_count ?? 0) >= (weeklyProgress?.required_count ?? 1)}
