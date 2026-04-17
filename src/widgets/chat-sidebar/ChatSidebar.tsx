@@ -79,7 +79,7 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, on
       setThumbRatio(el.clientHeight / el.scrollHeight);
     });
     return () => cancelAnimationFrame(raf);
-  }, [visibleCount]);
+  }, [visibleCount, sessionGroups.length]);
 
   return (
     <aside className="lg:border-prime-100 relative flex h-full w-full shrink-0 flex-col bg-white lg:w-80.75 lg:border-r lg:border-l">
