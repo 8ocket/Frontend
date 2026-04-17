@@ -2,7 +2,6 @@ import { api } from '@/shared/api/axios';
 import {
   AuthResponse,
   ApiResponse,
-  RefreshTokenResponse,
   KakaoLoginResponse,
   GoogleLoginResponse,
   UserProfileResponse,
@@ -13,7 +12,6 @@ import {
 } from '@/entities/user/model';
 import {
   mockLogin,
-  mockRefreshToken,
   mockKakaoLogin,
   mockGoogleLogin,
   mockGetMyProfile,
@@ -23,33 +21,10 @@ import {
 import { USE_MOCK } from '@/shared/lib/env';
 import { safeParse } from '@/shared/lib/utils/parse';
 import {
-  RefreshTokenResponseSchema,
   SocialLoginResponseSchema,
   UserProfileResponseSchema,
   UpdateMyProfileResponseSchema,
 } from './schema';
-
-/**
- * 토큰 갱신 API
- * GET /v1/auth/refresh
- */
-export const refreshTokenApi = async (refreshToken: string): Promise<RefreshTokenResponse> => {
-  if (USE_MOCK) {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve(mockRefreshToken()), 500);
-    });
-  }
-
-  const response = await api.get<ApiResponse<RefreshTokenResponse>>('/auth/refresh', {
-    params: { refreshToken },
-  });
-
-  if (response.data.success && response.data.data) {
-    return safeParse(RefreshTokenResponseSchema, response.data.data);
-  }
-
-  throw new Error(response.data.error?.message || '토큰 갱신 실패');
-};
 
 /**
  * 카카오 소셜 로그인 API
