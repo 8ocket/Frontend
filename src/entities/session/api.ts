@@ -57,13 +57,8 @@ export const getSessionsApi = async (
 export const getActiveSessionApi = async (): Promise<ActiveSessionResponse | null> => {
   if (USE_MOCK) return mockGetActiveSession();
 
-  const response = await api.get<ApiResponse<ActiveSessionResponse | null>>('/sessions/active');
-
-  if (response.data.success) {
-    return response.data.data ?? null;
-  }
-
-  throw new Error(response.data.error?.message || '미완료 세션 조회 실패');
+  const response = await api.get<ActiveSessionResponse | null>('/sessions/active');
+  return response.data ?? null;
 };
 
 /**

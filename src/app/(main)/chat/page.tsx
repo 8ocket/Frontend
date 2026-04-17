@@ -5,6 +5,7 @@ import { useAuthStore } from '@/entities/user/store';
 import type { ChatBubbleProps } from '@/widgets/chat-main-area';
 import type { ChatSessionGroup } from '@/widgets/chat-sidebar';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useChatNavigationStore } from '@/shared/lib/chatNavigationStore';
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
@@ -278,8 +279,10 @@ function ChatPageContent() {
 
   // ── 진입 시 미완료 세션 확인 + 세션 목록 조회 ──────────────────
   useEffect(() => {
+    let isMounted = true;
     Promise.all([getActiveSessionApi().catch(() => null), getSessionsApi().catch(() => null)]).then(
       ([activeSession, sessionData]) => {
+        if (!isMounted) return;
         const sessions = sessionData?.sessions ?? [];
         setSessionList(sessions);
 
@@ -291,6 +294,9 @@ function ChatPageContent() {
         }
       }
     );
+    return () => {
+      isMounted = false;
+    };
   }, [openModal]);
 
   // ── 핸들러 ───────────────────────────────────────────────────────
@@ -641,9 +647,10 @@ function ChatPageContent() {
 }
 
 export default function ChatPage() {
+  const visitKey = useChatNavigationStore((s) => s.visitKey);
   return (
     <Suspense>
-      <ChatPageContent />
+      <ChatPageContent key={visitKey} />
     </Suspense>
   );
 }
