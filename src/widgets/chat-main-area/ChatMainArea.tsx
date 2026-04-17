@@ -127,11 +127,16 @@ export function ChatMainArea({
   }, []);
 
   // 메시지/스트리밍 변경 시 thumbRatio 재계산 + 스크롤 하단으로
+  // 스크롤은 즉시 처리(scroll event → scrollRatio 동기 업데이트),
+  // thumbRatio는 rAF로 지연해 EmotionCard 등 레이아웃 완료 후 측정
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
     el.scrollTop = el.scrollHeight;
-    setThumbRatio(el.clientHeight / el.scrollHeight);
+    const raf = requestAnimationFrame(() => {
+      setThumbRatio(el.clientHeight / el.scrollHeight);
+    });
+    return () => cancelAnimationFrame(raf);
   }, [messages, streamingText]);
 
   const handleScrollTo = useCallback((ratio: number) => {
@@ -256,7 +261,7 @@ export function ChatMainArea({
       <div className="relative flex min-h-0 flex-1">
         <div
           ref={scrollRef}
-          className="relative flex flex-1 flex-col gap-4 overflow-y-auto p-6 pb-28"
+          className="relative flex flex-1 flex-col gap-4 overflow-y-auto p-6 pb-2"
           style={{ scrollbarWidth: 'none' }}
         >
           {messages.map((msg, i) => (
@@ -273,16 +278,18 @@ export function ChatMainArea({
           )}
         </div>
         {thumbRatio < 1 && (
-          <ChatScrollbar
-            scrollRatio={scrollRatio}
-            thumbRatio={thumbRatio}
-            onScrollTo={handleScrollTo}
-          />
+          <div className="flex pt-6">
+            <ChatScrollbar
+              scrollRatio={scrollRatio}
+              thumbRatio={thumbRatio}
+              onScrollTo={handleScrollTo}
+            />
+          </div>
         )}
       </div>
 
       {/* Input bar — Figma 1512:3708 */}
-      <div className="sticky right-0 bottom-0 left-0 z-10 shrink-0 bg-linear-to-t from-[#F8FAFF] via-[#F8FAFF]/95 to-transparent px-3 pt-4 pb-3">
+      <div className="sticky right-0 bottom-0 left-0 z-10 shrink-0 bg-linear-to-t from-[#F8FAFF] via-[#F8FAFF]/95 to-transparent px-3 pt-2 pb-3">
         <p className="mb-2 text-center text-[10px] leading-snug text-prime-400/50">
           본 기록은 비공개 보안 저장소에 암호화되어 저장되었으며 본인 외에는 관리자도 열람하지 못합니다.
         </p>

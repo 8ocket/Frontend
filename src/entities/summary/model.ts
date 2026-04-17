@@ -17,27 +17,3 @@ export interface SummaryListResponse {
   last: boolean;
   empty: boolean;
 }
-
-export interface SummaryUpdateRequest {
-  fact: string;
-  emotion: string;
-  insight: string;
-}
-
-export interface SummaryResponse {
-  summary_id: string;
-  session_id: string;
-  fact: string | null;
-  emotion: string | null;
-  insight: string | null;
-  is_edited: boolean;
-  visibility: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface SummaryCardResponse {
-  card_id: string;
-  front_image_url: string;
-  back_image_url: string;
-}

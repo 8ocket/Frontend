@@ -1,7 +1,7 @@
 'use client';
 
-import type { SummaryCardResponse, SummaryListItem } from '@/entities/summary';
-import { getSummaryCardApi, getSummaryListApi } from '@/entities/summary';
+import type { SummaryListItem } from '@/entities/summary';
+import { getSummaryListApi } from '@/entities/summary';
 import { cn } from '@/shared/lib/utils';
 import { EmotionColorLegend } from '@/widgets/emotion-color-legend';
 import { useQuery } from '@tanstack/react-query';
@@ -58,7 +58,7 @@ function GridCard({
         layoutId={`card-${data.summaryId}`}
         onClick={onClick}
         className={cn(
-          'cursor-pointer overflow-hidden rounded-3xl select-none',
+          'relative cursor-pointer overflow-hidden rounded-3xl select-none',
           'shadow-md ring-1 ring-black/5',
           isActive && 'invisible'
         )}
@@ -69,9 +69,9 @@ function GridCard({
         <Image
           src={data.backImageUrl}
           alt="마음 기록 카드"
-          width={cardWidth}
-          height={cardHeight}
-          className="h-full w-full object-cover"
+          fill
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+          className="object-cover"
         />
       </motion.div>
     </div>
@@ -83,13 +83,6 @@ function GridCard({
 function CardOverlay({ data, onClose }: { data: SummaryListItem; onClose: () => void }) {
   const W = 400;
   const H = 686;
-  const [cardImages, setCardImages] = useState<SummaryCardResponse | null>(null);
-
-  useEffect(() => {
-    getSummaryCardApi(data.cardId)
-      .then(setCardImages)
-      .catch(() => {});
-  }, [data.cardId]);
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 px-4">
@@ -125,7 +118,7 @@ function CardOverlay({ data, onClose }: { data: SummaryListItem; onClose: () => 
               className="overflow-hidden rounded-3xl"
             >
               <Image
-                src={cardImages?.back_image_url ?? data.backImageUrl}
+                src={data.backImageUrl}
                 alt="마음 기록 카드 오로라 면"
                 fill
                 sizes="(max-width: 768px) 100vw, 400px"
@@ -144,7 +137,7 @@ function CardOverlay({ data, onClose }: { data: SummaryListItem; onClose: () => 
               className="overflow-hidden rounded-3xl"
             >
               <Image
-                src={cardImages?.front_image_url ?? data.frontImageUrl}
+                src={data.frontImageUrl}
                 alt="마음 기록 카드 텍스트 면"
                 fill
                 sizes="(max-width: 768px) 100vw, 400px"

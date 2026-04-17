@@ -1,37 +1,6 @@
 import { ApiResponse } from '@/entities/user/model';
 import { api } from '@/shared/api/axios';
-import type { SummaryCardResponse, SummaryListResponse, SummaryResponse, SummaryUpdateRequest } from './model';
-
-/**
- * 마음 기록 카드 조회
- * GET /v1/summaries/{summary_id}
- */
-export const getSummaryApi = async (summaryId: string): Promise<SummaryResponse> => {
-  const response = await api.get<ApiResponse<SummaryResponse>>(`/summaries/${summaryId}`);
-
-  if (response.data.success && response.data.data) {
-    return response.data.data;
-  }
-
-  throw new Error(response.data.error?.message || '마음 기록 조회 실패');
-};
-
-/**
- * 마음 기록 카드 텍스트 수정
- * PUT /v1/summaries/{summary_id}
- */
-export const updateSummaryApi = async (
-  summaryId: string,
-  body: SummaryUpdateRequest
-): Promise<SummaryResponse> => {
-  const response = await api.put<ApiResponse<SummaryResponse>>(`/summaries/${summaryId}`, body);
-
-  if (response.data.success && response.data.data) {
-    return response.data.data;
-  }
-
-  throw new Error(response.data.error?.message || '마음 기록 수정 실패');
-};
+import type { SummaryListResponse } from './model';
 
 /**
  * 마음 기록 카드 이미지 업로드
@@ -49,20 +18,6 @@ export const uploadSummaryCardImageApi = async (
   formData.append('card_back_image', backFile);
   await api.patch(`/summaries/${summaryId}/image`, formData);
 }; 
-
-/**
- * 마음 기록 카드 이미지 URL 조회
- * GET /v1/summaries/card/{card_id}
- */
-export const getSummaryCardApi = async (cardId: string): Promise<SummaryCardResponse> => {
-  const response = await api.get<ApiResponse<SummaryCardResponse>>(`/summaries/card/${cardId}`);
-
-  if (response.data.success && response.data.data) {
-    return response.data.data;
-  }
-
-  throw new Error(response.data.error?.message || '카드 이미지 조회 실패');
-};
 
 /**
  * 마음 기록 목록 조회

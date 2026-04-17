@@ -5,7 +5,6 @@ import {
   ReportStatusEvent,
   ReportCompleteEvent,
   GetReportListResponse,
-  ReportDetailResponse,
   ReportType,
   SuggestionItem,
   ReportListItem,
@@ -23,7 +22,6 @@ import {
 } from './schema';
 import {
   mockCreateReport,
-  mockGetReportDetail,
   mockGetReportList,
   mockGetReportSuggestions,
 } from '@/mocks';
@@ -124,17 +122,6 @@ export const getReportListApi = async (reportType?: ReportType): Promise<GetRepo
     can_generate: { eligible: false, saved_session_count: 0, required_session_count: 1 },
   };
   return safeParse(GetReportListResponseSchema, result);
-};
-
-/**
- * 리포트 상세 조회
- * GET /v1/reports/{report_id}
- */
-export const getReportDetailApi = async (reportId: string): Promise<ReportDetailResponse> => {
-  if (USE_MOCK) return mockGetReportDetail(reportId);
-
-  const response = await api.get<ReportDetailResponse>(`/reports/${reportId}`);
-  return response.data;
 };
 
 /**
