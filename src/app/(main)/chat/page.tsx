@@ -30,6 +30,7 @@ import {
   getSessionDetailApi,
   getSessionsApi,
 } from '@/entities/session/api';
+import { getMyCreditApi } from '@/entities/credits/api';
 import { finalizeToEmotionCardData } from '@/entities/session/utils';
 import { uploadSummaryCardImageApi, getSummaryListApi } from '@/entities/summary';
 import { getCookie } from '@/shared/lib/utils/cookie';
@@ -510,6 +511,14 @@ function ChatPageContent() {
               { sessionId: id, title: '', status: 'ACTIVE', startedAt: new Date().toISOString() },
               ...prev,
             ]);
+            getMyCreditApi()
+              .then((credit) => useCreditStore.getState().setTotalCredit(credit.totalCredit))
+              .catch(() => {});
+          }}
+          onSessionTitleUpdate={(id, title) => {
+            setSessionList((prev) =>
+              prev.map((s) => (s.sessionId === id ? { ...s, title } : s))
+            );
           }}
           aiName={activeAiName}
           aiAvatarSrc={activeAiAvatarSrc}

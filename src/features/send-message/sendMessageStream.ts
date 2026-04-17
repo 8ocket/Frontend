@@ -12,7 +12,8 @@ export const sendMessageStream = async (
   onChunk: (chunk: string) => void,
   onCrisis: (msg: string) => void,
   onDone: () => void,
-  onError?: (message: string) => void
+  onError?: (message: string) => void,
+  onSessionTitle?: (title: string) => void
 ) => {
   if (USE_MOCK) {
     return mockSendMessageStream(onChunk, onCrisis, onDone);
@@ -79,6 +80,7 @@ export const sendMessageStream = async (
             const data = JSON.parse(raw);
             if (currentEvent === 'ai_chunk') onChunk(data.content);
             if (currentEvent === 'crisis_check') onCrisis(data.content);
+            if (currentEvent === 'session_title') onSessionTitle?.(data.title);
             if (currentEvent === 'error') onError?.(data.message);
           } catch (e) {
             console.warn('[SSE] JSON 파싱 실패 — raw:', raw, e);

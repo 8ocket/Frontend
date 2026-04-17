@@ -32,6 +32,8 @@ export interface ChatMainAreaProps {
   sessionId?: string;
   /** 세션 생성 완료 시 호출 — 페이지에서 activeSessionId 업데이트 용도 */
   onSessionCreated?: (sessionId: string) => void;
+  /** AI가 session_title 이벤트로 제목을 전송할 때 호출 (두 번째 메시지부터) */
+  onSessionTitleUpdate?: (sessionId: string, title: string) => void;
   /** AI 상담사 표시 이름 */
   aiName?: string;
   /** AI 상담사 아바타 이미지 URL */
@@ -54,6 +56,7 @@ export function ChatMainArea({
   appendMessage,
   sessionId,
   onSessionCreated,
+  onSessionTitleUpdate,
   aiName = '나봄이',
   aiAvatarSrc = '/images/personas/nabomi-44.png',
   onUserMessage,
@@ -174,9 +177,7 @@ export function ChatMainArea({
           (data) => {
             createdSessionId = data.session_id;
           },
-          (_title) => {
-            // session_title 이벤트 — 필요 시 사이드바 갱신에 활용
-          },
+          () => {},
           () => {
             setMessages((prev) => [
               ...prev,
@@ -237,7 +238,8 @@ export function ChatMainArea({
           console.error('SSE error:', errorMessage);
           setStreamingText('');
           setIsStreaming(false);
-        }
+        },
+        (title) => onSessionTitleUpdate?.(sessionId, title)
       );
     } catch (err) {
       console.error('Stream error:', err);
