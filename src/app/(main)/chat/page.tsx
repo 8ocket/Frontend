@@ -71,6 +71,12 @@ function ChatPageContent() {
   const [sessionCardImageUrl, setSessionCardImageUrl] = useState<string | null>(null);
   /** finalize 완료 데이터 */
   const [finalizeResult, setFinalizeResult] = useState<FinalizeCompleteEvent | null>(null);
+  /** finalize 진행/에러 UI 상태 */
+  const [isFinalizing, setIsFinalizing] = useState(false);
+  const [finalizeErrorMessage, setFinalizeErrorMessage] = useState<string | null>(null);
+  const finalizeStatusRef = useRef<string | null>(null);
+  const [_finalizeStatusTick, setFinalizeStatusTick] = useState(0);
+  const finalizeStatusMessage = finalizeStatusRef.current;
   /** finalize 스트림 취소용 — 언마운트 시 abort */
   const finalizeAbortRef = useRef<AbortController | null>(null);
   /** 감정 카드 이미지 캡처용 (오로라: card_back_image) */
@@ -177,7 +183,7 @@ function ChatPageContent() {
     };
   }, []);
 
-  // 60분 미입력 자동 종료 타이머 — 세션 활성 상태에서만 동작
+  // 3초 미입력 자동 종료 타이머 — 테스트용 임시 설정
   const resetInactivityTimer = useCallback(() => {
     if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
     inactivityTimerRef.current = setTimeout(
@@ -185,7 +191,7 @@ function ChatPageContent() {
         setIsSessionActive(false);
         finalizeAbortRef.current?.abort();
       },
-      60 * 60 * 1000
+      3 * 1000
     );
   }, []);
 
@@ -264,6 +270,7 @@ function ChatPageContent() {
         id: s.sessionId,
         title: s.title || '제목 없음',
         avatarSrc: '/images/personas/nabomi-21.png',
+        status: s.status,
       });
     }
     return Array.from(groupMap.values());
@@ -369,32 +376,31 @@ function ChatPageContent() {
     setSidebarOpen(false);
   };
 
-
   const handleEndChat = () => openModal('end-confirm');
 
   /** 종료 확인 → finalize SSE 호출 → 감정 카드 버블 */
   const handleEndConfirmed = async () => {
     closeModal();
-    setIsSessionActive(false);
-    setAppendMessage({
-      variant: 'ai',
-      senderName: '나봄이',
-      avatarSrc: activeAiAvatarSrc,
-      content: '마음 기록을 생성 중입니다.',
-    });
 
-    if (!activeSessionId) return;
-
-    // TODO: 만족도 조사 — 우선순위 보류
-    // if ((sessionList.length + 1) % 5 === 0) {
-    //   openModal('satisfaction');
-    // }
+    if (!activeSessionId) {
+      toast('종료할 상담 세션이 없습니다.', 'error');
+      return;
+    }
 
     const token = getCookie('accessToken') ?? '';
     if (!token) {
       router.push('/login');
       return;
     }
+
+    setIsFinalizing(true);
+    setFinalizeErrorMessage(null);
+    setIsSessionActive(false);
+
+    // TODO: 만족도 조사 — 우선순위 보류
+    // if ((sessionList.length + 1) % 5 === 0) {
+    //   openModal('satisfaction');
+    // }
 
     const controller = new AbortController();
     finalizeAbortRef.current = controller;
@@ -407,7 +413,10 @@ function ChatPageContent() {
       await finalizeSessionStream(
         capturedSessionId,
         token,
-        () => {}, // status 이벤트 — 고정 메시지 유지
+        (_step, message) => {
+          finalizeStatusRef.current = message;
+          setFinalizeStatusTick((t) => t + 1);
+        }, // status 이벤트 — 단계 메시지 업데이트
         (data) => {
           setFinalizeResult(data);
           capturedResult = data;
@@ -415,6 +424,14 @@ function ChatPageContent() {
         () => {
           // 만족도 팝업이 열려 있으면 닫기
           closeModal();
+          setIsFinalizing(false);
+          finalizeStatusRef.current = null;
+          setFinalizeStatusTick(0);
+          setFinalizeErrorMessage(null);
+          setSessionList((prev) =>
+            prev.map((s) => (s.sessionId === capturedSessionId ? { ...s, status: 'COMPLETED' } : s))
+          );
+          setUnfinishedSession((prev) => (prev?.session_id === capturedSessionId ? null : prev));
           // 텍스트 버블 대신 감정 카드 버블 표시
           if (capturedResult) {
             const cardData = finalizeToEmotionCardData(capturedResult, capturedSessionId);
@@ -430,19 +447,27 @@ function ChatPageContent() {
         controller.signal,
         (errorMessage) => {
           closeModal();
+          setIsFinalizing(false);
+          finalizeStatusRef.current = null;
+          setFinalizeStatusTick(0);
+          setIsSessionActive(true);
+          setFinalizeErrorMessage(errorMessage || '마음 기록 생성 중 오류가 발생했습니다.');
           console.error('Finalize SSE error:', errorMessage);
-          setAppendMessage({
-            variant: 'ai',
-            senderName: '나봄이',
-            avatarSrc: activeAiAvatarSrc,
-            content: '마음 기록 생성 중 오류가 발생했습니다.',
-          });
         }
       );
     } catch (err) {
-      if (err instanceof Error && err.name === 'AbortError') return;
+      if (err instanceof Error && err.name === 'AbortError') {
+        setIsFinalizing(false);
+        finalizeStatusRef.current = null;
+        setFinalizeStatusTick(0);
+        return;
+      }
       closeModal();
+      setIsFinalizing(false);
+      finalizeStatusRef.current = null;
+      setFinalizeStatusTick(0);
       const code = err instanceof Error ? err.message : '';
+      setIsSessionActive(code === 'SESSION_ALREADY_SAVED' ? false : true);
       const message =
         code === 'SESSION_ALREADY_SAVED'
           ? '이미 저장된 상담입니다.'
@@ -451,12 +476,7 @@ function ChatPageContent() {
             : code === 'SESSION_NOT_FOUND'
               ? '세션을 찾을 수 없습니다.'
               : '마음 기록 생성에 실패했습니다.';
-      setAppendMessage({
-        variant: 'ai',
-        senderName: '나봄이',
-        avatarSrc: activeAiAvatarSrc,
-        content: message,
-      });
+      setFinalizeErrorMessage(code === 'SESSION_ALREADY_SAVED' ? null : message);
     }
   };
 
@@ -465,14 +485,14 @@ function ChatPageContent() {
       {/* 모바일 사이드바 오버레이 */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-[55] bg-black/40 lg:hidden"
+          className="fixed inset-0 z-55 bg-black/40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* 사이드바 — 모바일: 슬라이드 오버레이, 데스크톱: 고정 */}
       <div
-        className={`fixed inset-y-0 left-0 z-[60] w-[min(320px,85vw)] transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:z-auto lg:w-80.75 lg:translate-x-0 lg:transition-none`}
+        className={`fixed inset-y-0 left-0 z-60 w-[min(320px,85vw)] transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:z-auto lg:w-80.75 lg:translate-x-0 lg:transition-none`}
       >
         <ChatSidebar
           onNewCounsel={handleNewCounsel}
@@ -516,15 +536,17 @@ function ChatPageContent() {
               .catch(() => {});
           }}
           onSessionTitleUpdate={(id, title) => {
-            setSessionList((prev) =>
-              prev.map((s) => (s.sessionId === id ? { ...s, title } : s))
-            );
+            setSessionList((prev) => prev.map((s) => (s.sessionId === id ? { ...s, title } : s)));
           }}
           aiName={activeAiName}
           aiAvatarSrc={activeAiAvatarSrc}
           onUserMessage={resetInactivityTimer}
           userName={user?.name}
           userAvatarSrc={user?.profileImage}
+          isFinalizing={isFinalizing}
+          finalizeStatusMessage={finalizeStatusMessage}
+          finalizeErrorMessage={finalizeErrorMessage}
+          onRetryFinalize={handleEndConfirmed}
         />
       </div>
 

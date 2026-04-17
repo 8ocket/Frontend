@@ -44,6 +44,14 @@ export interface ChatMainAreaProps {
   userName?: string;
   /** 사용자 프로필 이미지 URL */
   userAvatarSrc?: string;
+  /** 마음 기록 생성 중 여부 */
+  isFinalizing?: boolean;
+  /** finalize SSE 단계 진행 메시지 */
+  finalizeStatusMessage?: string | null;
+  /** 마음 기록 생성 실패 메시지 */
+  finalizeErrorMessage?: string | null;
+  /** 마음 기록 생성 재시도 */
+  onRetryFinalize?: () => void;
 }
 
 export function ChatMainArea({
@@ -62,6 +70,10 @@ export function ChatMainArea({
   onUserMessage,
   userName = '나',
   userAvatarSrc,
+  isFinalizing = false,
+  finalizeStatusMessage,
+  finalizeErrorMessage,
+  onRetryFinalize,
 }: ChatMainAreaProps = {}) {
   const [messages, setMessages] = useState<ChatBubbleProps[]>(initialMessages);
   const [inputValue, setInputValue] = useState('');
@@ -75,8 +87,12 @@ export function ChatMainArea({
   const justCreatedSessionRef = useRef(false);
   // 항상 최신 initialMessages를 참조하기 위한 ref
   const initialMessagesRef = useRef(initialMessages);
-  initialMessagesRef.current = initialMessages;
   const prevAppendMessageRef = useRef<ChatBubbleProps | null | undefined>(null);
+
+  // 렌더 중 ref 갱신을 피하고, 커밋 후 최신 initialMessages를 보관
+  useEffect(() => {
+    initialMessagesRef.current = initialMessages;
+  }, [initialMessages]);
 
   // 세션 전환 시 메시지 교체 (sessionId 기준으로 판단)
   useEffect(() => {
@@ -87,8 +103,11 @@ export function ChatMainArea({
 
     if (sessionId === undefined) {
       // 새 세션 시작 준비 → 메시지 및 스트리밍 상태 초기화
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMessages([]);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsStreaming(false);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStreamingText('');
       return;
     }
@@ -100,6 +119,7 @@ export function ChatMainArea({
     }
 
     // 이어가기 / 사이드바 세션 선택 → initialMessages 로드
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMessages(initialMessagesRef.current);
   }, [sessionId]);
 
@@ -109,8 +129,8 @@ export function ChatMainArea({
     if (!appendMessage) return;
     const prev = prevAppendMessageRef.current;
     const isSameCard =
-      prev?.emotionCardData != null &&
-      prev.emotionCardData === appendMessage.emotionCardData;
+      prev?.emotionCardData != null && prev.emotionCardData === appendMessage.emotionCardData;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMessages((msgs) =>
       isSameCard ? [...msgs.slice(0, -1), appendMessage] : [...msgs, appendMessage]
     );
@@ -155,7 +175,10 @@ export function ChatMainArea({
     setInputValue('');
     onUserMessage?.();
 
-    setMessages((prev) => [...prev, { variant: 'user', senderName: userName, userAvatarSrc, content }]);
+    setMessages((prev) => [
+      ...prev,
+      { variant: 'user', senderName: userName, userAvatarSrc, content },
+    ]);
 
     const token = getCookie('accessToken') ?? '';
 
@@ -278,6 +301,69 @@ export function ChatMainArea({
               isLoading={!streamingText}
             />
           )}
+          {isFinalizing && (
+            <div className="flex max-w-[85%] flex-col gap-1 self-start sm:max-w-[70%] md:max-w-[60%]">
+              <div className="flex flex-row items-center gap-2">
+                <div className="h-5.25 w-5.25 shrink-0 overflow-hidden rounded-full">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={aiAvatarSrc} alt={aiName} className="h-full w-full object-cover" />
+                </div>
+                <span className="text-prime-500 subtitle-1">{aiName}</span>
+              </div>
+              <div className="w-fit rounded-2xl bg-white px-5 py-3 shadow-sm">
+                <div className="flex items-center gap-2.5">
+                  <svg
+                    className="h-4 w-4 shrink-0 animate-spin text-blue-400"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    />
+                  </svg>
+                  <p className="text-prime-900 text-[15px] leading-[185%] whitespace-pre-wrap">
+                    {finalizeStatusMessage ?? '마음 기록을 생성 중입니다.'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          {!!finalizeErrorMessage && (
+            <div className="flex max-w-[85%] flex-col gap-1 self-start sm:max-w-[70%] md:max-w-[60%]">
+              <div className="flex flex-row items-center gap-2">
+                <div className="h-5.25 w-5.25 shrink-0 overflow-hidden rounded-full">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={aiAvatarSrc} alt={aiName} className="h-full w-full object-cover" />
+                </div>
+                <span className="text-prime-500 subtitle-1">{aiName}</span>
+              </div>
+              <div className="w-fit rounded-2xl bg-white px-5 py-2.5 shadow-sm">
+                <p className="text-prime-900 text-[15px] leading-[185%] whitespace-pre-wrap">
+                  {finalizeErrorMessage}
+                </p>
+                {onRetryFinalize && (
+                  <button
+                    type="button"
+                    onClick={onRetryFinalize}
+                    className="mt-2 rounded-md bg-red-500 px-3 py-1 text-[12px] font-semibold text-white transition-colors hover:bg-red-600"
+                  >
+                    다시 시도
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
         {thumbRatio < 1 && (
           <div className="flex pt-6">
@@ -292,8 +378,9 @@ export function ChatMainArea({
 
       {/* Input bar — Figma 1512:3708 */}
       <div className="sticky right-0 bottom-0 left-0 z-10 shrink-0 bg-linear-to-t from-[#F8FAFF] via-[#F8FAFF]/95 to-transparent px-3 pt-2 pb-3">
-        <p className="mb-2 text-center text-[10px] leading-snug text-prime-400/50">
-          본 기록은 비공개 보안 저장소에 암호화되어 저장되었으며 본인 외에는 관리자도 열람하지 못합니다.
+        <p className="text-prime-400/50 mb-2 text-center text-[10px] leading-snug">
+          본 기록은 비공개 보안 저장소에 암호화되어 저장되었으며 본인 외에는 관리자도 열람하지
+          못합니다.
         </p>
         <ChatInputBar
           value={inputValue}

@@ -14,15 +14,13 @@ type DateSelector = {
 
 type ChatFilterPanelProps = {
   onClose: () => void;
-  onApply: (filters: {
-    startDate: DateSelector;
-    endDate: DateSelector;
-  }) => void;
+  onApply: (filters: { startDate: DateSelector; endDate: DateSelector }) => void;
   startDate?: DateSelector;
   endDate?: DateSelector;
 };
 
-const YEAR_OPTIONS = Array.from({ length: 16 }, (_, i) => String(2035 - i));
+const CURRENT_YEAR = new Date().getFullYear();
+const YEAR_OPTIONS = Array.from({ length: 16 }, (_, i) => String(CURRENT_YEAR - i));
 const MONTH_OPTIONS = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'));
 const DAY_OPTIONS = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'));
 
@@ -57,7 +55,7 @@ function CustomSelect({
       <button
         type="button"
         onClick={() => setIsOpen((o) => !o)}
-        className="border-neutral-300 hover:border-cta-300 flex h-7 items-center gap-1 rounded-md border bg-white px-2 transition-colors"
+        className="hover:border-cta-300 flex h-7 items-center gap-1 rounded-md border border-neutral-300 bg-white px-2 transition-colors"
         aria-label={placeholder + ' 선택'}
       >
         <span
@@ -76,7 +74,7 @@ function CustomSelect({
 
       {isOpen && (
         <div
-          className="border-neutral-300 absolute top-8 left-0 z-50 overflow-y-auto rounded-md border bg-white shadow-md"
+          className="absolute top-8 left-0 z-50 overflow-y-auto rounded-md border border-neutral-300 bg-white shadow-md"
           style={{ width: dropdownWidth, maxHeight: '160px' }}
         >
           {options.map((opt) => {
@@ -85,7 +83,10 @@ function CustomSelect({
               <button
                 key={opt}
                 type="button"
-                onClick={() => { onChange(opt); setIsOpen(false); }}
+                onClick={() => {
+                  onChange(opt);
+                  setIsOpen(false);
+                }}
                 className="w-full px-2 py-1.5 text-left transition-colors"
                 style={{
                   fontFamily: 'var(--font-pretendard)',
@@ -143,9 +144,27 @@ function DateBlock({
         {label}
       </span>
       <div className="flex flex-row items-center gap-2">
-        <CustomSelect value={date.year} placeholder="연도" options={YEAR_OPTIONS} onChange={onYearChange} dropdownWidth="72px" />
-        <CustomSelect value={date.month} placeholder="월" options={MONTH_OPTIONS} onChange={onMonthChange} dropdownWidth="52px" />
-        <CustomSelect value={date.day} placeholder="일" options={DAY_OPTIONS} onChange={onDayChange} dropdownWidth="52px" />
+        <CustomSelect
+          value={date.year}
+          placeholder="연도"
+          options={YEAR_OPTIONS}
+          onChange={onYearChange}
+          dropdownWidth="72px"
+        />
+        <CustomSelect
+          value={date.month}
+          placeholder="월"
+          options={MONTH_OPTIONS}
+          onChange={onMonthChange}
+          dropdownWidth="52px"
+        />
+        <CustomSelect
+          value={date.day}
+          placeholder="일"
+          options={DAY_OPTIONS}
+          onChange={onDayChange}
+          dropdownWidth="52px"
+        />
       </div>
     </div>
   );
@@ -154,16 +173,15 @@ function DateBlock({
 export function ChatFilterPanel({
   onClose,
   onApply,
-  startDate: initialStartDate = { year: '', month: '', day: '' },
-  endDate: initialEndDate = { year: '', month: '', day: '' },
+  startDate: initialStartDate = { year: String(CURRENT_YEAR), month: '', day: '' },
+  endDate: initialEndDate = { year: String(CURRENT_YEAR), month: '', day: '' },
 }: ChatFilterPanelProps) {
   const [startDate, setStartDate] = useState<DateSelector>(initialStartDate);
   const [endDate, setEndDate] = useState<DateSelector>(initialEndDate);
 
   return (
-    <div className="w-full border-b border-prime-100 bg-[#F4F8FF] px-5 py-4">
+    <div className="border-prime-100 w-full border-b bg-[#F4F8FF] px-5 py-4">
       <div className="flex flex-col gap-4">
-
         {/* 헤더 */}
         <div className="flex items-center justify-between">
           <span
@@ -181,7 +199,7 @@ export function ChatFilterPanel({
           <button
             type="button"
             onClick={onClose}
-            className="flex h-5 w-5 items-center justify-center rounded text-prime-400 transition-colors hover:text-prime-700"
+            className="text-prime-400 hover:text-prime-700 flex h-5 w-5 items-center justify-center rounded transition-colors"
             aria-label="필터 닫기"
           >
             <X size={13} strokeWidth={2} />
