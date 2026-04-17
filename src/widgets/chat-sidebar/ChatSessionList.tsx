@@ -10,6 +10,7 @@ export type ChatSession = {
   title: string;
   avatarSrc?: string;
   isActive?: boolean;
+  status?: 'ACTIVE' | 'COMPLETED' | 'EXPIRED' | 'SAVED';
 };
 
 export type ChatSessionGroup = {

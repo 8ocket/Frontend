@@ -21,7 +21,14 @@ export interface ChatSidebarProps {
 
 const PAGE_SIZE = 5;
 
-export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, onDeleteSession, sessionGroups = [] }: ChatSidebarProps = {}) {
+export function ChatSidebar({
+  onNewCounsel,
+  activeSessionId,
+  onSelectSession,
+  onDeleteSession,
+  sessionGroups = [],
+}: ChatSidebarProps = {}) {
+  const currentYear = new Date().getFullYear();
   const [filterOpen, setFilterOpen] = useState(false);
   const [newCounselHovered, setNewCounselHovered] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
@@ -97,9 +104,7 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, on
             className="absolute right-0 transition-opacity duration-200"
             style={{ opacity: newCounselHovered ? 1 : 0 }}
           >
-            <div
-              className="inline-flex items-center justify-center gap-2.5 rounded-lg bg-main-blue/20 p-2.5 text-center text-xs font-medium leading-[120%] tracking-tight text-prime-900 opacity-50"
-            >
+            <div className="bg-main-blue/20 text-prime-900 inline-flex items-center justify-center gap-2.5 rounded-lg p-2.5 text-center text-xs leading-[120%] font-medium tracking-tight opacity-50">
               기본 무료 1회 · 추가 상담은 70 크레딧 차감
             </div>
           </div>
@@ -115,7 +120,7 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, on
           onBlur={() => setNewCounselHovered(false)}
           onTouchStart={() => setNewCounselHovered(true)}
           onTouchEnd={() => setNewCounselHovered(false)}
-          className="bg-main-blue text-white flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all hover:bg-main-blue/90"
+          className="bg-main-blue hover:bg-main-blue/90 flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold text-white transition-all"
         >
           <PlusCircle size={16} strokeWidth={2} />
           새로운 상담
@@ -173,7 +178,7 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, on
         )}
       </div>
       {/* 푸터 */}
-      <div className="shrink-0 px-5 pb-5 pt-4">
+      <div className="shrink-0 px-5 pt-4 pb-5">
         {/* 구분선 */}
         <div className="border-prime-100 mb-4 border-t" />
 
@@ -196,7 +201,9 @@ export function ChatSidebar({ onNewCounsel, activeSessionId, onSelectSession, on
 
         {/* 저작권 */}
         <p className="text-prime-700/40 text-[10px] leading-relaxed">
-          © 2026 마인드 로그 (MindLog).<br />All rights reserved.
+          © {currentYear} 마인드 로그 (MindLog).
+          <br />
+          All rights reserved.
         </p>
       </div>
 
