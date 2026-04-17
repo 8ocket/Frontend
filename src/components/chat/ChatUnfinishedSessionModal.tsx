@@ -19,9 +19,7 @@ export interface ChatUnfinishedSessionModalProps {
   sessionTitle: string;
   /** 미완결 상담 일자 (포맷된 문자열) */
   sessionDate: string;
-  /** 무시하기 버튼 클릭 */
-  onIgnore: () => void;
-  /** 진행한다 버튼 클릭 */
+  /** 확인 버튼 클릭 — 세션 재개 */
   onResume: () => void;
   /** 오버레이 블러 여부 (기본 true — 진입 시 강제 노출 모달이므로 블러) */
   overlayBlur?: boolean;
@@ -52,7 +50,6 @@ export function ChatUnfinishedSessionModal({
   onClose,
   sessionTitle,
   sessionDate,
-  onIgnore,
   onResume,
   overlayBlur = true,
 }: ChatUnfinishedSessionModalProps) {
@@ -104,17 +101,12 @@ export function ChatUnfinishedSessionModal({
             </div>
           </div>
 
-          {/* Frame 1597882319 — HORIZONTAL, SPACE_BETWEEN, gap 24, cross CENTER, 302×44(HUG) */}
-          <div className="flex w-full flex-row items-center justify-between gap-6">
-            {/* 무시하기 — Type=Secondary, Symentic=Blue, 140×44, padding H24/V14 */}
-            {/* VariableID:1168:2204 = secondary-100, stroke cta-300, text prime-600 */}
-            <Button variant="secondary" onClick={onIgnore} className="flex-1 px-6">
-              무시하기
-            </Button>
-            {/* 진행한다 — Type=Primary, Symentic=Blue, 140×44, padding H24/V14 */}
+          {/* Frame 1597882319 — HORIZONTAL, CENTER, gap 24, cross CENTER, 302×44(HUG) */}
+          <div className="flex w-full flex-row items-center justify-center">
+            {/* 확인 — Type=Primary, Symentic=Blue, 140×44, padding H24/V14 */}
             {/* VariableID:1168:2213 = cta-300 (#82C9FF), text prime-900 */}
-            <Button variant="primary" onClick={onResume} className="flex-1 px-6">
-              진행한다
+            <Button variant="primary" onClick={onResume} className="w-35 px-6">
+              확인
             </Button>
           </div>
         </div>

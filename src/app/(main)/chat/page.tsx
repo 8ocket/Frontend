@@ -320,15 +320,6 @@ function ChatPageContent() {
   const handleNewCounsel = () => {
     setSidebarOpen(false);
     closeModal();
-
-    // 오늘 이미 세션이 있으면 추가 상담(70 크레딧 차감) → 크레딧 사전 체크
-    const today = new Date().toDateString();
-    const hasTodaySession = sessionList.some((s) => new Date(s.startedAt).toDateString() === today);
-    if (hasTodaySession && totalCredit < 70) {
-      openModal('credit-shortage');
-      return;
-    }
-
     setActiveSessionId(undefined); // 새 세션 준비 (첫 메시지 전송 시 생성)
     setIsSessionActive(true);
   };
@@ -377,11 +368,6 @@ function ChatPageContent() {
     setSidebarOpen(false);
   };
 
-  /** [마무리 안된 상담] → 무시하기: 모달 닫고 입력창 비활성 유지 */
-  const handleUnfinishedIgnore = () => {
-    closeModal();
-    // 입력창은 비활성 유지 → 사이드바 [새로운 상담] 버튼으로 세션 시작 유도
-  };
 
   const handleEndChat = () => openModal('end-confirm');
 
@@ -569,7 +555,6 @@ function ChatPageContent() {
                 .replace(/\. /g, '. ')
             : ''
         }
-        onIgnore={handleUnfinishedIgnore}
         onResume={handleUnfinishedResume}
         overlayBlur
       />
