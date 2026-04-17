@@ -11,7 +11,6 @@ interface ProfileAvatarProps {
   defaultPadding?: string;
 }
 
-const DEFAULT_PROFILE = '/images/icons/profile-default.png';
 
 function DefaultProfileIcon({ padding }: { padding: string }) {
   return (
@@ -39,7 +38,7 @@ export function ProfileAvatar({
   const [imgError, setImgError] = useState(false);
 
   const isDefault = !src || imgError;
-  const isExternal = !isDefault && src!.startsWith('http');
+  const isExternal = !isDefault && (src!.startsWith('http') || src!.startsWith('blob:'));
 
   if (isDefault) {
     return <DefaultProfileIcon padding={defaultPadding} />;
