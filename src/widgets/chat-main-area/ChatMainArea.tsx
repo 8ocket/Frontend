@@ -283,7 +283,9 @@ export function ChatMainArea({
 
       {/* Input bar — Figma 1512:3708 */}
       <div className="sticky right-0 bottom-0 left-0 z-10 shrink-0 bg-linear-to-t from-[#F8FAFF] via-[#F8FAFF]/95 to-transparent px-3 pt-4 pb-3">
-        {/* Select Options popover — AI 교체 버튼 클릭 시 표시, 입력바 좌측 상단에 위치 */}
+        <p className="mb-2 text-center text-[10px] leading-snug text-prime-400/50">
+          본 기록은 비공개 보안 저장소에 암호화되어 저장되었으며 본인 외에는 관리자도 열람하지 못합니다.
+        </p>
         <ChatInputBar
           value={inputValue}
           onChange={setInputValue}
