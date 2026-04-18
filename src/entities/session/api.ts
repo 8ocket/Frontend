@@ -39,8 +39,8 @@ export const getSessionsApi = async (
   const params = new URLSearchParams();
   if (query.page) params.set('page', String(query.page));
   if (query.size) params.set('size', String(query.size));
-  if (query.start_date) params.set('start_date', query.start_date);
-  if (query.end_date) params.set('end_date', query.end_date);
+  if (query.start_date) params.set('startDate', query.start_date);
+  if (query.end_date) params.set('endDate', query.end_date);
 
   const response = await api.get<ApiResponse<SessionListResponse>>(
     `/sessions?${params.toString()}`
