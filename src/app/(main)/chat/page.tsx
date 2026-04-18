@@ -62,6 +62,10 @@ function ChatPageContent() {
   const [activeSessionId, setActiveSessionId] = useState<string | undefined>(undefined);
   const [unfinishedSession, setUnfinishedSession] = useState<ActiveSessionResponse | null>(null);
   const [sessionList, setSessionList] = useState<SessionListItem[]>([]);
+  const [appliedFilters, setAppliedFilters] = useState<{
+    startDate: { year: string; month: string; day: string };
+    endDate: { year: string; month: string; day: string };
+  } | null>(null);
   /** 현재 채팅 세션 활성 여부 — false면 입력창 비활성화 */
   const [isSessionActive, setIsSessionActive] = useState(false);
   /** 채팅창에 외부에서 append할 메시지 */
@@ -87,8 +91,6 @@ function ChatPageContent() {
     data: EmotionCardData;
     summaryId: string;
   } | null>(null);
-  /** 60분 미입력 자동 종료 타이머 */
-  const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return () => {
@@ -183,28 +185,6 @@ function ChatPageContent() {
     };
   }, []);
 
-  // 3초 미입력 자동 종료 타이머 — 테스트용 임시 설정
-  const resetInactivityTimer = useCallback(() => {
-    if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
-    inactivityTimerRef.current = setTimeout(
-      () => {
-        setIsSessionActive(false);
-        finalizeAbortRef.current?.abort();
-      },
-      3 * 1000
-    );
-  }, []);
-
-  useEffect(() => {
-    if (isSessionActive) {
-      resetInactivityTimer();
-    } else {
-      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
-    }
-    return () => {
-      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
-    };
-  }, [isSessionActive, resetInactivityTimer]);
 
   // activeSessionId 변경 시 세션 상세 조회 (새 세션 생성 시에만 — 이어가기/사이드바는 핸들러에서 pre-fetch)
   useEffect(() => {
@@ -306,6 +286,19 @@ function ChatPageContent() {
       isMounted = false;
     };
   }, [openModal]);
+
+  // ── 필터 적용 시 세션 재조회 ─────────────────────────────────────
+  useEffect(() => {
+    if (!appliedFilters) return;
+    function toDateString(d: { year: string; month: string; day: string }) {
+      if (!d.year || !d.month || !d.day) return undefined;
+      return `${d.year}-${d.month}-${d.day}`;
+    }
+    getSessionsApi({
+      start_date: toDateString(appliedFilters.startDate),
+      end_date: toDateString(appliedFilters.endDate),
+    }).then((data) => setSessionList(data?.sessions ?? []));
+  }, [appliedFilters]);
 
   // ── 핸들러 ───────────────────────────────────────────────────────
 
@@ -500,6 +493,7 @@ function ChatPageContent() {
           onSelectSession={handleSelectSession}
           onDeleteSession={handleDeleteSession}
           sessionGroups={sessionGroups}
+          onApplyFilters={setAppliedFilters}
         />
       </div>
 
@@ -540,7 +534,6 @@ function ChatPageContent() {
           }}
           aiName={activeAiName}
           aiAvatarSrc={activeAiAvatarSrc}
-          onUserMessage={resetInactivityTimer}
           userName={user?.name}
           userAvatarSrc={user?.profileImage}
           isFinalizing={isFinalizing}

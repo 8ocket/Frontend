@@ -10,6 +10,8 @@ import { ChatFilterPanel } from './ChatFilterPanel';
 import { ChatScrollbar } from './ChatScrollbar';
 import { type ChatSessionGroup, ChatSessionList } from './ChatSessionList';
 
+type DateSelector = { year: string; month: string; day: string };
+
 export interface ChatSidebarProps {
   /** 새 상담 시작 버튼 클릭 시 호출 (페르소나 선택 모달 열기) */
   onNewCounsel?: () => void;
@@ -17,6 +19,7 @@ export interface ChatSidebarProps {
   onSelectSession?: (id: string) => void;
   onDeleteSession?: (id: string) => void;
   sessionGroups?: ChatSessionGroup[];
+  onApplyFilters?: (filters: { startDate: DateSelector; endDate: DateSelector }) => void;
 }
 
 const PAGE_SIZE = 5;
@@ -27,9 +30,11 @@ export function ChatSidebar({
   onSelectSession,
   onDeleteSession,
   sessionGroups = [],
+  onApplyFilters,
 }: ChatSidebarProps = {}) {
   const currentYear = new Date().getFullYear();
   const [filterOpen, setFilterOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [newCounselHovered, setNewCounselHovered] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
   const filterRef = useRef<HTMLDivElement>(null);
@@ -55,8 +60,18 @@ export function ChatSidebar({
   const [thumbRatio, setThumbRatio] = useState(0.2);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-  const visibleGroups = sessionGroups.slice(0, Math.min(visibleCount, sessionGroups.length));
-  const hasMore = visibleCount < sessionGroups.length;
+  const filteredGroups = searchQuery.trim()
+    ? sessionGroups
+        .map((g) => ({
+          ...g,
+          sessions: g.sessions.filter((s) =>
+            s.title.toLowerCase().includes(searchQuery.toLowerCase()),
+          ),
+        }))
+        .filter((g) => g.sessions.length > 0)
+    : sessionGroups;
+  const visibleGroups = filteredGroups.slice(0, Math.min(visibleCount, filteredGroups.length));
+  const hasMore = visibleCount < filteredGroups.length;
 
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
@@ -67,9 +82,9 @@ export function ChatSidebar({
 
     // 스크롤이 하단에 가까워지면 추가 로드
     if (hasMore && el.scrollTop + el.clientHeight >= el.scrollHeight - 40) {
-      setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, sessionGroups.length));
+      setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, filteredGroups.length));
     }
-  }, [hasMore, sessionGroups.length]);
+  }, [hasMore, filteredGroups.length]);
 
   const handleScrollTo = useCallback((ratio: number) => {
     const el = scrollRef.current;
@@ -86,7 +101,7 @@ export function ChatSidebar({
       setThumbRatio(el.clientHeight / el.scrollHeight);
     });
     return () => cancelAnimationFrame(raf);
-  }, [visibleCount, sessionGroups.length]);
+  }, [visibleCount, filteredGroups.length]);
 
   return (
     <aside className="lg:border-prime-100 relative flex h-full w-full shrink-0 flex-col bg-white lg:w-80.75 lg:border-r lg:border-l">
@@ -134,6 +149,8 @@ export function ChatSidebar({
           <input
             type="text"
             placeholder="검색"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="text-prime-900 placeholder:text-prime-400 w-full bg-transparent text-[13px] outline-none"
           />
         </div>
@@ -155,7 +172,10 @@ export function ChatSidebar({
       >
         <ChatFilterPanel
           onClose={() => setFilterOpen(false)}
-          onApply={() => setFilterOpen(false)}
+          onApply={(filters) => {
+            onApplyFilters?.(filters);
+            setFilterOpen(false);
+          }}
         />
       </div>
 

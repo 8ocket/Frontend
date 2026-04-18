@@ -208,17 +208,30 @@ export function ChatFilterPanel({
 
         {/* 일자 설정 */}
         <div className="flex flex-col gap-2">
-          <span
-            style={{
-              fontFamily: 'var(--font-pretendard)',
-              fontSize: '12px',
-              fontWeight: 600,
-              color: 'var(--color-prime-700)',
-              lineHeight: '130%',
-            }}
-          >
-            일자 설정
-          </span>
+          <div className="flex items-center justify-between">
+            <span
+              style={{
+                fontFamily: 'var(--font-pretendard)',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: 'var(--color-prime-700)',
+                lineHeight: '130%',
+              }}
+            >
+              일자 설정
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                setStartDate({ year: String(CURRENT_YEAR), month: '', day: '' });
+                setEndDate({ year: String(CURRENT_YEAR), month: '', day: '' });
+              }}
+              className="text-prime-400 hover:text-prime-700 rounded px-1.5 py-0.5 text-[11px] font-medium transition-colors"
+              style={{ border: '1px solid var(--color-prime-100)' }}
+            >
+              초기화
+            </button>
+          </div>
           <div className="flex flex-col gap-2">
             <DateBlock
               label="시작일"
