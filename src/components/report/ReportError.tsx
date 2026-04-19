@@ -5,9 +5,10 @@ import { Button } from '@/shared/ui/button';
 
 interface ReportErrorProps {
   onDismiss: () => void;
+  errorMessage?: string;
 }
 
-export function ReportError({ onDismiss }: ReportErrorProps) {
+export function ReportError({ onDismiss, errorMessage }: ReportErrorProps) {
   return (
     <div className="flex min-h-150 items-center justify-center px-4">
       <div className="w-full max-w-130 text-center">
@@ -29,18 +30,18 @@ export function ReportError({ onDismiss }: ReportErrorProps) {
             {[
               {
                 color: 'bg-error-400',
-                title: '서버 연결 오류',
-                desc: 'AI 분석 서버와의 연결이 일시적으로 불안정합니다',
+                title: '오류 원인',
+                desc: errorMessage || 'AI 분석 서버와의 연결이 일시적으로 불안정합니다',
               },
               {
                 color: 'bg-success-700',
                 title: '크레딧 복구 완료',
-                desc: '사용하신 크레딧 1개가 자동으로 환불되었습니다',
+                desc: '사용된 크레딧이 자동으로 환불되었습니다',
               },
               {
                 color: 'bg-cta-300',
                 title: '재시도 가능',
-                desc: '잠시 후 다시 시도해주시면 정상적으로 생성됩니다',
+                desc: '잠시 후 다시 시도해 주세요.',
               },
             ].map((item) => (
               <div key={item.title} className="flex items-start gap-3">

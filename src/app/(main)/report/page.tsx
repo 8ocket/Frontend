@@ -68,6 +68,7 @@ export default function ReportPage() {
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
   const [sseStep, setSseStep] = useState<'analyzing' | 'generating' | undefined>();
 
+  const [reportErrorMessage, setReportErrorMessage] = useState<string | undefined>();
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [mobileListOpen, setMobileListOpen] = useState(false);
@@ -126,7 +127,9 @@ export default function ReportPage() {
           setTimeout(() => setIsLoadingDetail(false), SKELETON_MS);
         },
         (message: string) => {
-          toast(message || 'AI 분석 중 오류가 발생했어요.', 'error');
+          const errorMsg = message || 'AI 분석 중 오류가 발생했어요.';
+          toast(errorMsg, 'error');
+          setReportErrorMessage(errorMsg);
           setViewState('failed');
         }
       );
@@ -251,7 +254,7 @@ export default function ReportPage() {
         {viewState === 'creating' && <ReportPolling onComplete={() => {}} sseStep={sseStep} />}
 
         {/* failed: 에러 */}
-        {viewState === 'failed' && <ReportError onDismiss={handleCreateNew} />}
+        {viewState === 'failed' && <ReportError onDismiss={handleCreateNew} errorMessage={reportErrorMessage} />}
 
         {/* success: 스켈레톤 → 리포트 상세 */}
         {viewState === 'success' && (
