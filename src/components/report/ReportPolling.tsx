@@ -16,15 +16,17 @@ interface ReportPollingProps {
   sseStep?: 'analyzing' | 'generating';
 }
 
-export function ReportPolling({ onComplete, sseStep }: ReportPollingProps) {
+export function ReportPolling({ onComplete: _onComplete, sseStep }: ReportPollingProps) {
   const [progress, setProgress] = useState(0);
 
   const STEP_MAP: Record<string, { step: number; target: number }> = {
     generating: { step: 3, target: 90 },
     analyzing: { step: 1, target: 55 },
   };
-  const { step: currentStep, target: progressTarget } =
-    STEP_MAP[sseStep ?? ''] ?? { step: 0, target: 15 };
+  const { step: currentStep, target: progressTarget } = STEP_MAP[sseStep ?? ''] ?? {
+    step: 0,
+    target: 15,
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -114,11 +116,7 @@ export function ReportPolling({ onComplete, sseStep }: ReportPollingProps) {
                     />
                   )}
                 </div>
-                <span
-                  className={cn('text-sm font-medium', labelClass)}
-                >
-                  {step.label}
-                </span>
+                <span className={cn('text-sm font-medium', labelClass)}>{step.label}</span>
                 {isActive && (
                   <span className="ml-auto flex gap-0.5">
                     {[0, 1, 2].map((j) => (

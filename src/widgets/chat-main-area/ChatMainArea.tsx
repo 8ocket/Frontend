@@ -75,8 +75,12 @@ export function ChatMainArea({
   const justCreatedSessionRef = useRef(false);
   // 항상 최신 initialMessages를 참조하기 위한 ref
   const initialMessagesRef = useRef(initialMessages);
-  initialMessagesRef.current = initialMessages;
   const prevAppendMessageRef = useRef<ChatBubbleProps | null | undefined>(null);
+
+  // 최신 initialMessages 동기화
+  useEffect(() => {
+    initialMessagesRef.current = initialMessages;
+  }, [initialMessages]);
 
   // 세션 전환 시 메시지 교체 (sessionId 기준으로 판단)
   useEffect(() => {
@@ -85,36 +89,64 @@ export function ChatMainArea({
 
     if (prevId === sessionId) return;
 
+    let cancelled = false;
+    const runStateUpdate = (update: () => void) => {
+      queueMicrotask(() => {
+        if (!cancelled) update();
+      });
+    };
+
     if (sessionId === undefined) {
       // 새 세션 시작 준비 → 메시지 및 스트리밍 상태 초기화
-      setMessages([]);
-      setIsStreaming(false);
-      setStreamingText('');
-      return;
+      runStateUpdate(() => {
+        setMessages([]);
+        setIsStreaming(false);
+        setStreamingText('');
+      });
+      return () => {
+        cancelled = true;
+      };
     }
 
     if (justCreatedSessionRef.current) {
       // 방금 이 컴포넌트에서 세션을 생성한 경우 → 기존 메시지 유지
       justCreatedSessionRef.current = false;
-      return;
+      return () => {
+        cancelled = true;
+      };
     }
 
     // 이어가기 / 사이드바 세션 선택 → initialMessages 로드
-    setMessages(initialMessagesRef.current);
+    runStateUpdate(() => {
+      setMessages(initialMessagesRef.current);
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [sessionId]);
 
   // 외부에서 메시지 추가 (예: 종료 시 "마음 기록 제작 중")
   // emotionCardData 참조가 같으면 같은 카드의 업데이트(예: cardImageUrl 추가)로 간주해 마지막 메시지를 교체
   useEffect(() => {
     if (!appendMessage) return;
+
+    let cancelled = false;
     const prev = prevAppendMessageRef.current;
     const isSameCard =
-      prev?.emotionCardData != null &&
-      prev.emotionCardData === appendMessage.emotionCardData;
-    setMessages((msgs) =>
-      isSameCard ? [...msgs.slice(0, -1), appendMessage] : [...msgs, appendMessage]
-    );
-    prevAppendMessageRef.current = appendMessage;
+      prev?.emotionCardData != null && prev.emotionCardData === appendMessage.emotionCardData;
+
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setMessages((msgs) =>
+        isSameCard ? [...msgs.slice(0, -1), appendMessage] : [...msgs, appendMessage]
+      );
+      prevAppendMessageRef.current = appendMessage;
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [appendMessage]);
 
   // 스크롤 위치 추적 → scrollRatio 업데이트
@@ -155,7 +187,10 @@ export function ChatMainArea({
     setInputValue('');
     onUserMessage?.();
 
-    setMessages((prev) => [...prev, { variant: 'user', senderName: userName, userAvatarSrc, content }]);
+    setMessages((prev) => [
+      ...prev,
+      { variant: 'user', senderName: userName, userAvatarSrc, content },
+    ]);
 
     const token = getCookie('accessToken') ?? '';
 
@@ -292,8 +327,9 @@ export function ChatMainArea({
 
       {/* Input bar — Figma 1512:3708 */}
       <div className="sticky right-0 bottom-0 left-0 z-10 shrink-0 bg-linear-to-t from-[#F8FAFF] via-[#F8FAFF]/95 to-transparent px-3 pt-2 pb-3">
-        <p className="mb-2 text-center text-[10px] leading-snug text-prime-400/50">
-          본 기록은 비공개 보안 저장소에 암호화되어 저장되었으며 본인 외에는 관리자도 열람하지 못합니다.
+        <p className="text-prime-400/50 mb-2 text-center text-[10px] leading-snug">
+          본 기록은 비공개 보안 저장소에 암호화되어 저장되었으며 본인 외에는 관리자도 열람하지
+          못합니다.
         </p>
         <ChatInputBar
           value={inputValue}

@@ -70,7 +70,7 @@ function ChatPageContent() {
   /** 완료된 세션의 마음기록카드 이미지 URL (summary 목록에서 조회) */
   const [sessionCardImageUrl, setSessionCardImageUrl] = useState<string | null>(null);
   /** finalize 완료 데이터 */
-  const [finalizeResult, setFinalizeResult] = useState<FinalizeCompleteEvent | null>(null);
+  const [_finalizeResult, setFinalizeResult] = useState<FinalizeCompleteEvent | null>(null);
   /** finalize 스트림 취소용 — 언마운트 시 abort */
   const finalizeAbortRef = useRef<AbortController | null>(null);
   /** 감정 카드 이미지 캡처용 (오로라: card_back_image) */
@@ -203,7 +203,6 @@ function ChatPageContent() {
   // activeSessionId 변경 시 세션 상세 조회 (새 세션 생성 시에만 — 이어가기/사이드바는 핸들러에서 pre-fetch)
   useEffect(() => {
     if (!activeSessionId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSessionDetail(null);
       return;
     }
@@ -369,7 +368,6 @@ function ChatPageContent() {
     setSidebarOpen(false);
   };
 
-
   const handleEndChat = () => openModal('end-confirm');
 
   /** 종료 확인 → finalize SSE 호출 → 감정 카드 버블 */
@@ -400,7 +398,7 @@ function ChatPageContent() {
     finalizeAbortRef.current = controller;
 
     // onDone 클로저에서 state 참조가 stale해질 수 있으므로 로컬 변수로 캡처
-    let capturedResult: typeof finalizeResult = null;
+    let capturedResult: typeof _finalizeResult = null;
     const capturedSessionId = activeSessionId;
 
     try {
@@ -516,9 +514,7 @@ function ChatPageContent() {
               .catch(() => {});
           }}
           onSessionTitleUpdate={(id, title) => {
-            setSessionList((prev) =>
-              prev.map((s) => (s.sessionId === id ? { ...s, title } : s))
-            );
+            setSessionList((prev) => prev.map((s) => (s.sessionId === id ? { ...s, title } : s)));
           }}
           aiName={activeAiName}
           aiAvatarSrc={activeAiAvatarSrc}

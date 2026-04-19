@@ -371,7 +371,8 @@ function CardSkeleton({ width, height }: { width: number; height: number }) {
       <div
         className="absolute inset-0"
         style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%)',
+          background:
+            'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%)',
           backgroundSize: '200% 100%',
           animation: 'shimmer 1.4s infinite',
         }}
@@ -482,15 +483,11 @@ export default function Home() {
 
   useEffect(() => {
     if (!cardSectionEl) return;
-    // 이미 뷰포트 안에 있으면 즉시 표시
-    const rect = cardSectionEl.getBoundingClientRect();
-    if (rect.top < window.innerHeight) {
-      setCardsVisible(true);
-      return;
-    }
-    // 뷰포트 밖이면 스크롤 시 페이드인
+    // IntersectionObserver로 뷰포트 진입 감지
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setCardsVisible(true); },
+      ([entry]) => {
+        if (entry.isIntersecting) setCardsVisible(true);
+      },
       { threshold: 0.1 }
     );
     observer.observe(cardSectionEl);
@@ -568,14 +565,18 @@ export default function Home() {
               progress={weeklyProgress?.progress_percentage ?? 0}
               sessions={weeklyProgress?.current_count ?? 0}
               goal={weeklyProgress?.required_count ?? 1}
-              eligible={(weeklyProgress?.current_count ?? 0) >= (weeklyProgress?.required_count ?? 1)}
+              eligible={
+                (weeklyProgress?.current_count ?? 0) >= (weeklyProgress?.required_count ?? 1)
+              }
               onViewReport={() => router.push('/report')}
             />
             <MonthlyReportWidget
               sessions={monthlyProgress?.current_count ?? 0}
               goal={monthlyProgress?.required_count ?? 1}
               progress={monthlyProgress?.progress_percentage ?? 0}
-              eligible={(monthlyProgress?.current_count ?? 0) >= (monthlyProgress?.required_count ?? 1)}
+              eligible={
+                (monthlyProgress?.current_count ?? 0) >= (monthlyProgress?.required_count ?? 1)
+              }
               onViewReport={() => router.push('/report')}
             />
           </div>
@@ -589,23 +590,27 @@ export default function Home() {
                 <Layers className="text-cta-300 h-4 w-4" aria-hidden="true" />
                 <h2 className="text-[14px] font-semibold text-[#1a222e]">감정카드</h2>
               </div>
-              <Link href="/collection" className="bg-cta-50 text-cta-300 hover:bg-cta-100 border-cta-200 rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition-colors">
+              <Link
+                href="/collection"
+                className="bg-cta-50 text-cta-300 hover:bg-cta-100 border-cta-200 rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition-colors"
+              >
                 카드 전체 보기
               </Link>
             </div>
 
-            {!cardsLoading && totalCardCount > 0 && (() => {
-              const latest = collectionCards[0] ? new Date(collectionCards[0].createdAt) : null;
-              const latestLabel = latest
-                ? `${latest.getMonth() + 1}월 ${latest.getDate()}일`
-                : null;
-              return (
-                <p className="text-prime-400 -mt-2 text-[11px]">
-                  총 {totalCardCount}개
-                  {latestLabel && <> · 가장 최근: {latestLabel}</>}
-                </p>
-              );
-            })()}
+            {!cardsLoading &&
+              totalCardCount > 0 &&
+              (() => {
+                const latest = collectionCards[0] ? new Date(collectionCards[0].createdAt) : null;
+                const latestLabel = latest
+                  ? `${latest.getMonth() + 1}월 ${latest.getDate()}일`
+                  : null;
+                return (
+                  <p className="text-prime-400 -mt-2 text-[11px]">
+                    총 {totalCardCount}개{latestLabel && <> · 가장 최근: {latestLabel}</>}
+                  </p>
+                );
+              })()}
 
             <div className="relative">
               <div
@@ -626,74 +631,74 @@ export default function Home() {
                     아직 생성된 감정카드가 없어요
                   </p>
                 ) : (
-                  collectionCards
-                    .slice(0, visibleCount)
-                    .map((card, index) => {
-                      const isFlipped = flippedCardIds.has(card.summaryId);
-                      const w = cardWidth || 175;
-                      const h = cardHeight || 300;
-                      return (
+                  collectionCards.slice(0, visibleCount).map((card, index) => {
+                    const isFlipped = flippedCardIds.has(card.summaryId);
+                    const w = cardWidth || 175;
+                    const h = cardHeight || 300;
+                    return (
+                      <div
+                        key={card.summaryId}
+                        className="shrink-0 snap-start transition-[opacity,transform] duration-500"
+                        style={{
+                          transitionDelay: `${index * 80}ms`,
+                          opacity: cardsVisible ? 1 : 0,
+                          transform: cardsVisible ? 'translateY(0)' : 'translateY(14px)',
+                          width: w,
+                        }}
+                      >
+                        {/* 카드 */}
                         <div
-                          key={card.summaryId}
-                          className="shrink-0 snap-start transition-[opacity,transform] duration-500"
-                          style={{
-                            transitionDelay: `${index * 80}ms`,
-                            opacity: cardsVisible ? 1 : 0,
-                            transform: cardsVisible ? 'translateY(0)' : 'translateY(14px)',
-                            width: w,
+                          role="button"
+                          tabIndex={0}
+                          aria-label="감정카드 — 마음기록 모음 보기"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCardClick(card.summaryId);
                           }}
+                          onKeyDown={(e) => e.key === 'Enter' && handleCardClick(card.summaryId)}
+                          style={{ perspective: '1200px', cursor: 'pointer' }}
                         >
-                          {/* 카드 */}
                           <div
-                            role="button"
-                            tabIndex={0}
-                            aria-label="감정카드 — 마음기록 모음 보기"
-                            onClick={(e) => { e.stopPropagation(); handleCardClick(card.summaryId); }}
-                            onKeyDown={(e) => e.key === 'Enter' && handleCardClick(card.summaryId)}
-                            style={{ perspective: '1200px', cursor: 'pointer' }}
+                            style={{
+                              width: w,
+                              height: h,
+                              position: 'relative',
+                              transformStyle: 'preserve-3d',
+                              transition: 'transform 0.7s ease-in-out',
+                              transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                            }}
                           >
+                            {/* 앞면 — 오로라 */}
                             <div
-                              style={{
-                                width: w,
-                                height: h,
-                                position: 'relative',
-                                transformStyle: 'preserve-3d',
-                                transition: 'transform 0.7s ease-in-out',
-                                transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                              }}
+                              className="absolute inset-0 overflow-hidden rounded-3xl shadow-md ring-1 ring-black/5"
+                              style={{ backfaceVisibility: 'hidden' }}
                             >
-                              {/* 앞면 — 오로라 */}
-                              <div
-                                className="absolute inset-0 overflow-hidden rounded-3xl shadow-md ring-1 ring-black/5"
-                                style={{ backfaceVisibility: 'hidden' }}
-                              >
-                                <Image
-                                  src={card.backImageUrl}
-                                  alt="마음 기록 카드 오로라 면"
-                                  width={w}
-                                  height={h}
-                                  className="h-full w-full object-cover"
-                                />
-                              </div>
-                              {/* 뒷면 — 텍스트 */}
-                              <div
-                                className="absolute inset-0 overflow-hidden rounded-3xl shadow-md ring-1 ring-black/5"
-                                style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
-                              >
-                                <Image
-                                  src={card.frontImageUrl}
-                                  alt="마음 기록 카드 텍스트 면"
-                                  width={w}
-                                  height={h}
-                                  className="h-full w-full object-cover"
-                                />
-                              </div>
+                              <Image
+                                src={card.backImageUrl}
+                                alt="마음 기록 카드 오로라 면"
+                                width={w}
+                                height={h}
+                                className="h-full w-full object-cover"
+                              />
+                            </div>
+                            {/* 뒷면 — 텍스트 */}
+                            <div
+                              className="absolute inset-0 overflow-hidden rounded-3xl shadow-md ring-1 ring-black/5"
+                              style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+                            >
+                              <Image
+                                src={card.frontImageUrl}
+                                alt="마음 기록 카드 텍스트 면"
+                                width={w}
+                                height={h}
+                                className="h-full w-full object-cover"
+                              />
                             </div>
                           </div>
-
                         </div>
-                      );
-                    })
+                      </div>
+                    );
+                  })
                 )}
               </div>
             </div>
