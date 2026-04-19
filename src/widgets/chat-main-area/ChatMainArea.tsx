@@ -352,15 +352,6 @@ export function ChatMainArea({
                 <p className="text-prime-900 text-[15px] leading-[185%] whitespace-pre-wrap">
                   {finalizeErrorMessage}
                 </p>
-                {onRetryFinalize && (
-                  <button
-                    type="button"
-                    onClick={onRetryFinalize}
-                    className="mt-2 rounded-md bg-red-500 px-3 py-1 text-[12px] font-semibold text-white transition-colors hover:bg-red-600"
-                  >
-                    다시 시도
-                  </button>
-                )}
               </div>
             </div>
           )}
