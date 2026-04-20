@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import { cn } from '@/shared/lib/utils';
 import { EMOTION_META } from './constants';
 import { EmotionBrush } from './EmotionBrush';
@@ -38,6 +39,18 @@ export function EmotionCardBack({
   className,
   animated = false,
 }: EmotionCardBackProps) {
+  const [fontsReady, setFontsReady] = useState(false);
+
+  useEffect(() => {
+    const text = [data.fact, data.emotion, data.insight, ...data.keywords.map((k) => k.keyword)]
+      .filter(Boolean)
+      .join('');
+    document.fonts
+      .load('400 1rem "Pretendard Variable"', text || '가')
+      .then(() => setFontsReady(true))
+      .catch(() => setFontsReady(true));
+  }, []);
+
   const primaryLayer = layers.find((l) => l.role === 'primary');
   const primaryMeta = primaryLayer ? EMOTION_META[primaryLayer.type] : null;
   const bgColor = primaryMeta?.hex ?? '#f8fafc';
@@ -67,7 +80,7 @@ export function EmotionCardBack({
   // CARD TEXT 크기 — Figma 기준: 175px→12px(card-03), 350px→24px(card-02), 400px→26px(card-01)
   let labelClass: string;
   if (width < 200) labelClass = 'card-03';
-  else if (width < 380) labelClass = 'card-02';
+  else if (width < 350) labelClass = 'card-02';
   else labelClass = 'card-01';
 
   // 글래스 패널 내부 패딩
@@ -115,14 +128,14 @@ export function EmotionCardBack({
           backgroundColor: 'rgba(252, 251, 249, 0.97)',
         }}
       >
-        <div className="flex w-full flex-col gap-4 overflow-hidden">
+        <div className={cn('flex w-full flex-col gap-4 overflow-hidden transition-opacity duration-300', !fontsReady && 'opacity-0')}>
           {/* 마음 키워드 */}
           {data.keywords.length > 0 && (
             <motion.div {...sectionMotion(0, animated)}>
               <Section title="마음 키워드">
                 <div className="flex flex-wrap gap-1">
                   {data.keywords.map((kw, i) => (
-                    <span key={i} className="caption-1 text-prime-700">
+                    <span key={i} className="caption-1 text-prime-700" style={{ fontSize: '11px' }}>
                       #{kw.keyword}
                       {kw.percentage != null && `[${kw.percentage}%]`}
                     </span>
@@ -136,7 +149,7 @@ export function EmotionCardBack({
           {data.fact && (
             <motion.div {...sectionMotion(1, animated)}>
               <Section title="사건">
-                <p className="body-2 text-prime-500 leading-relaxed">{data.fact}</p>
+                <p className="body-2 text-prime-500 leading-relaxed" style={{ fontSize: '13px' }}>{data.fact}</p>
               </Section>
             </motion.div>
           )}
@@ -145,7 +158,7 @@ export function EmotionCardBack({
           {data.emotion && (
             <motion.div {...sectionMotion(2, animated)}>
               <Section title="느꼈던 감정">
-                <p className="body-2 text-prime-500 leading-relaxed">{data.emotion}</p>
+                <p className="body-2 text-prime-500 leading-relaxed" style={{ fontSize: '13px' }}>{data.emotion}</p>
               </Section>
             </motion.div>
           )}
@@ -154,7 +167,7 @@ export function EmotionCardBack({
           {data.insight && (
             <motion.div {...sectionMotion(3, animated)}>
               <Section title="AI 인사이트">
-                <p className="body-2 text-prime-500 leading-relaxed">{data.insight}</p>
+                <p className="body-2 text-prime-500 leading-relaxed" style={{ fontSize: '13px' }}>{data.insight}</p>
               </Section>
             </motion.div>
           )}
@@ -170,7 +183,7 @@ export function EmotionCardBack({
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-2">
-      <h4 className="subtitle-1 text-prime-900 font-semibold">{title}</h4>
+      <h4 className="subtitle-1 text-prime-900 font-semibold" style={{ fontSize: '13px' }}>{title}</h4>
       {children}
     </div>
   );

@@ -536,7 +536,7 @@ export default function Home() {
   const { cardWidth, cardHeight, visibleCount } = getCardDimensions(cardContainerWidth);
 
   return (
-    <div className="bg-secondary-100 min-h-screen w-full overflow-x-hidden">
+    <div className="bg-secondary-100 min-h-screen w-full overflow-x-clip">
       <div className="mx-auto max-w-360 px-4 sm:px-8 lg:px-10">
         {/* ── 헤더: 인사말 ─────────────────────────────────────────────────── */}
         <section className="pt-6 pb-5">
