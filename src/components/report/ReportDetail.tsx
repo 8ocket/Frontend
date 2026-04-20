@@ -250,7 +250,7 @@ export function ReportDetail({ report }: ReportDetailProps) {
             <h3 className="text-prime-900 text-2xl font-semibold tracking-tight">
               맞춤 행동 제언
             </h3>
-            <p className="text-prime-900 text-sm font-semibold">
+            <p className="text-prime-900 text-[15px] font-semibold">
               AI가 분석한 상태에 맞는 실천 가능한 액션 플랜
             </p>
           </div>
@@ -294,7 +294,7 @@ export function ReportDetail({ report }: ReportDetailProps) {
                   <h4 className="text-prime-900 text-xl font-semibold leading-snug">
                     {suggestion.title}
                   </h4>
-                  <p className="text-prime-900 text-base leading-relaxed">{suggestion.content}</p>
+                  <p className="text-prime-900 text-sm leading-relaxed">{suggestion.content}</p>
                 </div>
               </div>
             ))
@@ -308,11 +308,12 @@ export function ReportDetail({ report }: ReportDetailProps) {
         style={{ animationDuration: '400ms', animationDelay: '400ms', animationFillMode: 'both' }}
       >
         <div className="bg-prime-100/40 rounded-[24px] p-7">
-          <p className="text-prime-500 text-[13px] leading-relaxed">
-            💡 이 리포트는 AI 분석을 기반으로 자동 생성되었습니다. 심리적 어려움이 지속되거나 심화될
-            경우 전문가의 상담을 받으시길 권장합니다. 마인드 로그는 전문 의료 서비스를 대체하지
-            않습니다.
-          </p>
+          <div className="flex items-start gap-2">
+            <span className="text-[13px] shrink-0">💡</span>
+            <p className="text-prime-500 text-[13px] leading-relaxed break-keep">
+              이 리포트는 AI 분석을 기반으로 자동 생성되었습니다. 심리적 어려움이 지속되거나 심화될 경우 전문가의 상담을 받으시길 권장합니다. 마인드 로그는 전문 의료 서비스를 대체하지 않습니다.
+            </p>
+          </div>
         </div>
       </div>
     </div>
