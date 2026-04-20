@@ -69,7 +69,15 @@ export default function MyPage() {
   } = useQuery({
     queryKey: ['paymentHistory'],
     queryFn: () => getPaymentHistoryApi(),
-    select: (res) => res.content.filter((i) => i.status !== 'READY'),
+    select: (res) =>
+      res.content
+        .filter((i) => i.status !== 'READY')
+        .sort((a, b) => {
+          if (!a.approvedAt && !b.approvedAt) return 0;
+          if (!a.approvedAt) return 1;
+          if (!b.approvedAt) return -1;
+          return new Date(b.approvedAt).getTime() - new Date(a.approvedAt).getTime();
+        }),
   });
 
   const {
