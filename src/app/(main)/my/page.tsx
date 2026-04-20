@@ -80,7 +80,9 @@ export default function MyPage() {
     queryKey: ['myCredit'],
     queryFn: getMyCreditApi,
   });
-  const creditTransactions = creditData?.transactions ?? [];
+  const creditTransactions = (creditData?.transactions ?? [])
+    .slice()
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
   const { data: profileData } = useQuery({
     queryKey: ['myProfile'],
@@ -215,7 +217,7 @@ export default function MyPage() {
                   ) : paymentHistory.length === 0 ? (
                     <EmptyHistory message="결제 내역이 없습니다." />
                   ) : (
-                    <ul className="divide-prime-100 divide-y px-4 pb-2">
+                    <ul className="divide-prime-100 max-h-80 divide-y overflow-y-auto px-4 pb-2">
                       {paymentHistory.map((item, idx) => {
                         const itemKey =
                           item.paymentId ??
@@ -309,29 +311,38 @@ export default function MyPage() {
                   ) : creditTransactions.length === 0 ? (
                     <EmptyHistory message="크레딧 사용 내역이 없습니다." />
                   ) : (
-                    <ul className="divide-prime-100 divide-y px-4 pb-2">
-                      {creditTransactions.map((item, idx) => (
-                        <li
-                          key={idx}
-                          className="hover:bg-secondary-50 flex items-center justify-between rounded-xl px-3 py-4 transition-colors"
-                        >
-                          <div className="flex flex-col gap-1">
-                            <span className="text-prime-900 text-sm font-medium tracking-[-0.21px]">
-                              {TRANSACTION_LABEL[item.transactionType] ?? item.transactionType}
-                            </span>
-                            <span className="text-prime-400 text-xs tracking-[-0.18px]">
-                              {item.createdAt.slice(0, 10).replace(/-/g, '.')}{' '}
-                              {item.createdAt.slice(11, 16)}
-                            </span>
-                          </div>
-                          <span
-                            className={`text-sm font-bold tracking-[-0.21px] ${item.amount > 0 ? 'text-cta-300' : 'text-prime-900'}`}
+                    <ul className="divide-prime-100 max-h-80 divide-y overflow-y-auto px-4 pb-2">
+                      {creditTransactions.map((item, idx) => {
+                        const balance = creditTransactions
+                          .slice(0, idx)
+                          .reduce((acc, t) => acc - t.amount, creditData?.totalCredit ?? 0);
+                        return (
+                          <li
+                            key={idx}
+                            className="hover:bg-secondary-50 flex items-center justify-between rounded-xl px-3 py-4 transition-colors"
                           >
-                            {item.amount > 0 ? '+' : ''}
-                            {item.amount.toLocaleString()} 크레딧
-                          </span>
-                        </li>
-                      ))}
+                            <div className="flex flex-col gap-1">
+                              <span className="text-prime-900 text-sm font-medium tracking-[-0.21px]">
+                                {TRANSACTION_LABEL[item.transactionType] ?? item.transactionType}
+                              </span>
+                              <span className="text-prime-400 text-xs tracking-[-0.18px]">
+                                {toKSTString(item.createdAt)}
+                              </span>
+                            </div>
+                            <div className="flex flex-col items-end gap-1">
+                              <span
+                                className={`text-sm font-bold tracking-[-0.21px] ${item.amount > 0 ? 'text-cta-600' : 'text-error-500'}`}
+                              >
+                                {item.amount > 0 ? '+' : ''}
+                                {item.amount.toLocaleString()} 크레딧
+                              </span>
+                              <span className="text-prime-300 text-xs tracking-[-0.18px]">
+                                잔액 {balance.toLocaleString()} 크레딧
+                              </span>
+                            </div>
+                          </li>
+                        );
+                      })}
                     </ul>
                   )}
                 </TabsContent>
