@@ -35,7 +35,7 @@ import { finalizeToEmotionCardData } from '@/entities/session/utils';
 import { uploadSummaryCardImageApi, getSummaryListApi } from '@/entities/summary';
 import { getCookie } from '@/shared/lib/utils/cookie';
 import { useToast } from '@/shared/ui/toast';
-import { EmotionCardBack, EmotionCardFront } from '@/widgets/emotion-card';
+import { EmotionCardBack, EmotionCardFront, getEmotionDisplayName } from '@/widgets/emotion-card';
 import { Menu } from 'lucide-react';
 
 // ── 모달 상태 타입 ──────────────────────────────────────────────
@@ -623,8 +623,9 @@ function ChatPageContent() {
           >
             <EmotionCardFront
               layers={capturePayload.data.layers}
-              emotionLabel={(
-                capturePayload.data.layers.find((l) => l.role === 'primary')?.type ?? 'emotion'
+              emotionLabel={getEmotionDisplayName(
+                capturePayload.data.layers.find((l) => l.role === 'primary')?.type ?? 'joy',
+                null
               ).toUpperCase()}
               width={400}
               height={686}
@@ -634,18 +635,19 @@ function ChatPageContent() {
           <div
             ref={captureBackCardRef}
             style={{
-              width: 422,
-              height: 723,
+              width: 350,
+              height: 600,
             }}
           >
             <EmotionCardBack
               data={capturePayload.data}
               layers={capturePayload.data.layers}
-              emotionLabel={(
-                capturePayload.data.layers.find((l) => l.role === 'primary')?.type ?? 'emotion'
+              emotionLabel={getEmotionDisplayName(
+                capturePayload.data.layers.find((l) => l.role === 'primary')?.type ?? 'joy',
+                null
               ).toUpperCase()}
-              width={422}
-              height={723}
+              width={350}
+              height={600}
               animated={false}
             />
           </div>

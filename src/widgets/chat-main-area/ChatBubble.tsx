@@ -3,6 +3,7 @@
 // Figma 1457:2703 (AI Bubble), 1457:2710 (User Bubble)
 // Root: VERTICAL, gap=4, max-w=450px, vSizing=HUG
 
+import { useEffect, useState } from 'react';
 import type { EmotionCardData } from '@/entities/emotion';
 import { ProfileAvatar } from '@/shared/ui/profile-avatar';
 import { EmotionCard } from '@/widgets/emotion-card';
@@ -25,6 +26,19 @@ export type ChatBubbleProps = {
 export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatarSrc, isLoading, emotionCardData, cardImageUrl }: ChatBubbleProps) {
   const isAi = variant === 'ai';
   const resolvedAvatarSrc = avatarSrc ?? '/images/personas/nabomi-44.png';
+
+  const [cardWidth, setCardWidth] = useState(350);
+  useEffect(() => {
+    const update = () => {
+      const vw = window.innerWidth;
+      const bubbleRatio = vw < 640 ? 0.85 : vw < 768 ? 0.70 : 0.60;
+      const buttonRoom = cardImageUrl ? 72 : 0; // 다운로드 버튼 64px + gap 8px
+      setCardWidth(Math.min(350, Math.floor(vw * bubbleRatio) - buttonRoom));
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, [cardImageUrl]);
 
   const handleDownload = () => {
     if (!cardImageUrl) return;
@@ -65,7 +79,7 @@ export function ChatBubble({ variant, senderName, content, avatarSrc, userAvatar
       {/* Bubble body */}
       {emotionCardData ? (
         <div className="flex flex-row items-end gap-2">
-          <EmotionCard data={emotionCardData} size="sample" initialFace="front" />
+          <EmotionCard data={emotionCardData} size="sample" width={cardWidth} initialFace="front" />
           {cardImageUrl && (
             <button
               onClick={(e) => { e.stopPropagation(); handleDownload(); }}
