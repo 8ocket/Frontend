@@ -5,11 +5,16 @@
 
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { useAuthStore } from '@/entities/user/store';
 
 export function FooterCTASection() {
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
+
+  useEffect(() => {
+    if (!isAuthenticated) router.prefetch('/login');
+  }, [isAuthenticated, router]);
 
   const handleCTA = () => {
     router.push(isAuthenticated ? '/chat' : '/login');

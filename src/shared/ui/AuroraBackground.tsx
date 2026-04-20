@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 interface AuroraBackgroundProps {
   children: React.ReactNode;
