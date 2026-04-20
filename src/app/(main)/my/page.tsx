@@ -121,8 +121,8 @@ export default function MyPage() {
     // 2. Store 상태 초기화 (쿠키 포함)
     logout();
 
-    // 3. 브랜드 소개 화면으로 이동
-    router.replace('/about');
+    // 3. 로그인 화면으로 이동
+    router.replace('/login');
   };
 
   return (
@@ -639,100 +639,134 @@ function DeleteAccountModal({
 }) {
   const [confirmText, setConfirmText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isDone, setIsDone] = useState(false);
   const { logout } = useAuthStore();
   const router = useRouter();
   const { toast } = useToast();
   const isConfirmed = confirmText === '회원탈퇴';
 
+  const handleLeave = () => {
+    logout();
+    router.replace('/login');
+  };
+
   return (
-    <DialogRoot open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <DialogRoot open={isOpen} onOpenChange={(open) => { if (!open && !isDone) onClose(); }}>
       <DialogPortal>
         <DialogOverlay />
         <DialogPrimitive.Content className="fixed top-1/2 left-1/2 z-50 w-full max-w-105 -translate-x-1/2 -translate-y-1/2 focus:outline-none">
           <DialogTitle className="sr-only">회원탈퇴</DialogTitle>
           <div className="border-prime-100 overflow-hidden rounded-2xl border bg-white shadow-sm">
-            {/* 헤더 */}
-            <div className="border-prime-100 flex items-center justify-between border-b px-7 py-5">
-              <span className="text-prime-900 text-base font-semibold tracking-[-0.24px]">
-                정말 탈퇴하시겠어요?
-              </span>
-              <button
-                type="button"
-                onClick={onClose}
-                className="hover:bg-secondary-100 flex size-7 items-center justify-center rounded-full transition-colors"
-              >
-                <X size={16} className="text-prime-400" />
-              </button>
-            </div>
 
-            {/* 바디 */}
-            <div className="flex flex-col gap-5 px-7 py-6">
-              <div className="bg-error-100/60 rounded-xl px-4 py-3.5">
-                <p className="text-error-500 text-xs font-semibold">탈퇴 시 주의사항</p>
-                <ul className="mt-2 flex flex-col gap-1.5">
-                  {[
-                    '모든 상담 기록과 리포트가 영구적으로 삭제됩니다.',
-                    '보유 중인 크레딧은 모두 소멸되며 복구할 수 없습니다.',
-                    '동일 계정으로 재가입하더라도 이전 데이터는 복원되지 않습니다.',
-                  ].map((text) => (
-                    <li
-                      key={text}
-                      className="text-error-500/80 flex items-start gap-1.5 text-xs leading-relaxed"
-                    >
-                      <span className="bg-error-400 mt-1 size-1 shrink-0 rounded-full" />
-                      {text}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label className="text-prime-700 text-sm font-medium">
-                  확인을 위해 <span className="text-error-500 font-bold">&quot;회원탈퇴&quot;</span>
-                  를 입력해 주세요
-                </label>
-                <input
-                  type="text"
-                  value={confirmText}
-                  onChange={(e) => setConfirmText(e.target.value)}
-                  placeholder="회원탈퇴"
-                  className="border-prime-200 bg-secondary-50 text-prime-900 placeholder:text-prime-300 focus:border-error-500 h-11 w-full rounded-xl border px-4 text-sm transition-colors focus:bg-white focus:ring-2 focus:ring-red-500/20 focus:outline-none"
-                />
-              </div>
-
-              <div className="flex gap-2.5">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={onClose}
-                  className="flex-1 rounded-xl"
-                >
-                  취소
-                </Button>
+            {isDone ? (
+              /* 완료 화면 */
+              <div className="flex flex-col items-center gap-6 px-7 py-10">
+                <div className="flex flex-col items-center gap-3 text-center">
+                  <div className="bg-secondary-100 flex size-14 items-center justify-center rounded-full">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                      <path d="M20 6L9 17L4 12" stroke="#8A9BA8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <p className="text-prime-900 text-base font-semibold">탈퇴가 완료되었습니다</p>
+                  <p className="text-prime-400 text-sm leading-relaxed">
+                    그동안 MindLog를 이용해 주셔서 감사합니다.<br />
+                    언제든지 다시 찾아오세요.
+                  </p>
+                </div>
                 <Button
                   type="button"
                   variant="primary"
-                  semantic="red"
-                  disabled={!isConfirmed || isLoading}
-                  onClick={async () => {
-                    setIsLoading(true);
-                    try {
-                      await withdrawUserApi();
-                      logout();
-                      router.replace('/about');
-                      toast('회원탈퇴가 완료되었습니다.', 'success');
-                    } catch {
-                      toast('회원탈퇴에 실패했습니다. 다시 시도해주세요.', 'error');
-                    } finally {
-                      setIsLoading(false);
-                    }
-                  }}
-                  className="flex-1 rounded-xl"
+                  onClick={handleLeave}
+                  className="w-full rounded-xl"
                 >
-                  {isLoading ? '처리 중...' : '탈퇴하기'}
+                  확인
                 </Button>
               </div>
-            </div>
+            ) : (
+              <>
+                {/* 헤더 */}
+                <div className="border-prime-100 flex items-center justify-between border-b px-7 py-5">
+                  <span className="text-prime-900 text-base font-semibold tracking-[-0.24px]">
+                    정말 탈퇴하시겠어요?
+                  </span>
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="hover:bg-secondary-100 flex size-7 items-center justify-center rounded-full transition-colors"
+                  >
+                    <X size={16} className="text-prime-400" />
+                  </button>
+                </div>
+
+                {/* 바디 */}
+                <div className="flex flex-col gap-5 px-7 py-6">
+                  <div className="bg-error-100/60 rounded-xl px-4 py-3.5">
+                    <p className="text-error-500 text-xs font-semibold">탈퇴 시 주의사항</p>
+                    <ul className="mt-2 flex flex-col gap-1.5">
+                      {[
+                        '모든 상담 기록과 리포트가 영구적으로 삭제됩니다.',
+                        '보유 중인 크레딧은 모두 소멸되며 복구할 수 없습니다.',
+                        '동일 계정으로 재가입하더라도 이전 데이터는 복원되지 않습니다.',
+                      ].map((text) => (
+                        <li
+                          key={text}
+                          className="text-error-500/80 flex items-start gap-1.5 text-xs leading-relaxed"
+                        >
+                          <span className="bg-error-400 mt-1 size-1 shrink-0 rounded-full" />
+                          {text}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-prime-700 text-sm font-medium">
+                      확인을 위해 <span className="text-error-500 font-bold">&quot;회원탈퇴&quot;</span>
+                      를 입력해 주세요
+                    </label>
+                    <input
+                      type="text"
+                      value={confirmText}
+                      onChange={(e) => setConfirmText(e.target.value)}
+                      placeholder="회원탈퇴"
+                      className="border-prime-200 bg-secondary-50 text-prime-900 placeholder:text-prime-300 focus:border-error-500 h-11 w-full rounded-xl border px-4 text-sm transition-colors focus:bg-white focus:ring-2 focus:ring-red-500/20 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="flex gap-2.5">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={onClose}
+                      className="flex-1 rounded-xl"
+                    >
+                      취소
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="primary"
+                      semantic="red"
+                      disabled={!isConfirmed || isLoading}
+                      onClick={async () => {
+                        setIsLoading(true);
+                        try {
+                          await withdrawUserApi();
+                          setIsDone(true);
+                        } catch {
+                          toast('회원탈퇴에 실패했습니다. 다시 시도해주세요.', 'error');
+                        } finally {
+                          setIsLoading(false);
+                        }
+                      }}
+                      className="flex-1 rounded-xl"
+                    >
+                      {isLoading ? '처리 중...' : '탈퇴하기'}
+                    </Button>
+                  </div>
+                </div>
+              </>
+            )}
+
           </div>
         </DialogPrimitive.Content>
       </DialogPortal>
