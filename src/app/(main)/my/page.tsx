@@ -217,7 +217,8 @@ export default function MyPage() {
                   ) : paymentHistory.length === 0 ? (
                     <EmptyHistory message="결제 내역이 없습니다." />
                   ) : (
-                    <ul className="divide-prime-100 max-h-80 divide-y overflow-y-auto px-4 pb-2">
+                    <div className="group relative">
+                      <ul className="divide-prime-100 max-h-80 divide-y overflow-y-auto px-4 pb-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent group-hover:[&::-webkit-scrollbar-thumb]:bg-prime-200">
                       {paymentHistory.map((item, idx) => {
                         const itemKey =
                           item.paymentId ??
@@ -296,7 +297,9 @@ export default function MyPage() {
                           </li>
                         );
                       })}
-                    </ul>
+                      </ul>
+                      <div className="pointer-events-none absolute right-0 bottom-0 left-0 h-10 rounded-b-xl bg-linear-to-t from-white to-transparent" />
+                    </div>
                   )}
                 </TabsContent>
 
@@ -311,39 +314,42 @@ export default function MyPage() {
                   ) : creditTransactions.length === 0 ? (
                     <EmptyHistory message="크레딧 사용 내역이 없습니다." />
                   ) : (
-                    <ul className="divide-prime-100 max-h-80 divide-y overflow-y-auto px-4 pb-2">
-                      {creditTransactions.map((item, idx) => {
-                        const balance = creditTransactions
-                          .slice(0, idx)
-                          .reduce((acc, t) => acc - t.amount, creditData?.totalCredit ?? 0);
-                        return (
-                          <li
-                            key={idx}
-                            className="hover:bg-secondary-50 flex items-center justify-between rounded-xl px-3 py-4 transition-colors"
-                          >
-                            <div className="flex flex-col gap-1">
-                              <span className="text-prime-900 text-sm font-medium tracking-[-0.21px]">
-                                {TRANSACTION_LABEL[item.transactionType] ?? item.transactionType}
-                              </span>
-                              <span className="text-prime-400 text-xs tracking-[-0.18px]">
-                                {toKSTString(item.createdAt)}
-                              </span>
-                            </div>
-                            <div className="flex flex-col items-end gap-1">
-                              <span
-                                className={`text-sm font-bold tracking-[-0.21px] ${item.amount > 0 ? 'text-cta-600' : 'text-error-500'}`}
-                              >
-                                {item.amount > 0 ? '+' : ''}
-                                {item.amount.toLocaleString()} 크레딧
-                              </span>
-                              <span className="text-prime-300 text-xs tracking-[-0.18px]">
-                                잔액 {balance.toLocaleString()} 크레딧
-                              </span>
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
+                    <div className="group relative">
+                      <ul className="divide-prime-100 max-h-80 divide-y overflow-y-auto px-4 pb-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent group-hover:[&::-webkit-scrollbar-thumb]:bg-prime-200">
+                        {creditTransactions.map((item, idx) => {
+                          const balance = creditTransactions
+                            .slice(0, idx)
+                            .reduce((acc, t) => acc - t.amount, creditData?.totalCredit ?? 0);
+                          return (
+                            <li
+                              key={idx}
+                              className="hover:bg-secondary-50 flex items-center justify-between rounded-xl px-3 py-4 transition-colors"
+                            >
+                              <div className="flex flex-col gap-1">
+                                <span className="text-prime-900 text-sm font-medium tracking-[-0.21px]">
+                                  {TRANSACTION_LABEL[item.transactionType] ?? item.transactionType}
+                                </span>
+                                <span className="text-prime-400 text-xs tracking-[-0.18px]">
+                                  {toKSTString(item.createdAt)}
+                                </span>
+                              </div>
+                              <div className="flex flex-col items-end gap-1">
+                                <span
+                                  className={`text-sm font-bold tracking-[-0.21px] ${item.amount > 0 ? 'text-cta-500' : 'text-rose-400'}`}
+                                >
+                                  {item.amount > 0 ? '+' : ''}
+                                  {item.amount.toLocaleString()} 크레딧
+                                </span>
+                                <span className="text-prime-300 text-xs tracking-[-0.18px]">
+                                  잔액 {balance.toLocaleString()} 크레딧
+                                </span>
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                      <div className="pointer-events-none absolute right-0 bottom-0 left-0 h-10 rounded-b-xl bg-linear-to-t from-white to-transparent" />
+                    </div>
                   )}
                 </TabsContent>
               </Tabs>
