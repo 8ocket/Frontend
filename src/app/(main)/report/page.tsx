@@ -11,6 +11,7 @@ import {
   ReportDetail,
   ReportDetailSkeleton,
   DeleteReportModal,
+  ReportCreditModal,
   type Report,
   type ReportStatus,
   type ReportType,
@@ -19,8 +20,8 @@ import { LayoutList } from 'lucide-react';
 import { useToast } from '@/shared/ui/toast';
 import { ReportCompleteEvent, ReportListItem, ReportStatusEvent } from '@/entities/reports/model';
 import { createReportApi, deleteReportApi, getReportListApi } from '@/entities/reports/api';
-import { ChatCreditModal } from '@/components/chat';
 import { useCreditStore } from '@/entities/credits/store';
+import { REPORT_CREDIT_COST } from '@/constants/credit';
 
 function mapToReport(item: ReportListItem): Report {
   const reportType = item.report_type.toLowerCase() as ReportType;
@@ -54,6 +55,7 @@ export default function ReportPage() {
   const queryClient = useQueryClient();
   const { totalCredit } = useCreditStore();
   const [creditModalOpen, setCreditModalOpen] = useState(false);
+  const [creditModalType, setCreditModalType] = useState<ReportType>('weekly');
 
   const { data: reportData } = useQuery({
     queryKey: ['reports'],
@@ -113,6 +115,12 @@ export default function ReportPage() {
   };
 
   const handleCreateReport = async (type: ReportType, start: string, end: string) => {
+    if (totalCredit < REPORT_CREDIT_COST[type]) {
+      setCreditModalType(type);
+      setCreditModalOpen(true);
+      return;
+    }
+
     setViewState('creating');
     setSseStep(undefined);
 
@@ -136,6 +144,7 @@ export default function ReportPage() {
     } catch (err) {
       const code = err instanceof Error ? err.message : '';
       if (code === 'INSUFFICIENT_CREDIT') {
+        setCreditModalType(type);
         setCreditModalOpen(true);
       } else if (code === 'INSUFFICIENT_SESSIONS') {
         toast('기간 내 상담 기록이 3개 이상이어야 해요.', 'error');
@@ -184,11 +193,11 @@ export default function ReportPage() {
       />
 
       {/* 크레딧 부족 모달 */}
-      <ChatCreditModal
+      <ReportCreditModal
         isOpen={creditModalOpen}
         onClose={() => setCreditModalOpen(false)}
         remainingCredits={totalCredit}
-        onEnd={() => setCreditModalOpen(false)}
+        reportType={creditModalType}
         onPurchase={() => {
           setCreditModalOpen(false);
           router.push('/shop');
