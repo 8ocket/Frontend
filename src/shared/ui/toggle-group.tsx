@@ -30,7 +30,7 @@ export function ToggleGroup<T extends string>({
               key={option}
               htmlFor={id}
               className={cn(
-                'flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2.5 text-sm font-medium transition-all',
+                'flex items-center gap-2.5 rounded-lg border px-3 py-2.5 text-sm font-medium transition-all',
                 checked
                   ? 'border-cta-300 bg-cta-50 text-cta-400'
                   : 'border-slate-200 bg-white text-slate-500 hover:border-cta-200 hover:bg-cta-50/30'

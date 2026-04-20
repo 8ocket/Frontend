@@ -99,7 +99,7 @@ export function RadioGroup<T = string>({
               key={String(option.value)}
               className={cn(
                 'flex items-center gap-2',
-                isDisabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer',
+                isDisabled ? 'cursor-not-allowed opacity-60' : '',
                 itemClassName
               )}
             >

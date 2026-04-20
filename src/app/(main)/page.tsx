@@ -101,8 +101,8 @@ function WeeklyReportWidget({
         className={cn(
           'mt-auto flex w-full items-center justify-center gap-2 rounded-xl py-3 text-[13px] font-semibold transition-all',
           eligible
-            ? 'bg-main-blue cursor-pointer text-white hover:opacity-90'
-            : 'border-main-blue/30 bg-main-blue/10 text-main-blue cursor-not-allowed border-2 border-dashed font-medium'
+            ? 'bg-main-blue text-white hover:opacity-90'
+            : 'border-main-blue/30 bg-main-blue/10 text-main-blue border-2 border-dashed font-medium'
         )}
       >
         {!eligible && <Lock className="h-3.5 w-3.5" aria-hidden="true" />}
@@ -179,8 +179,8 @@ function MonthlyReportWidget({
         className={cn(
           'mt-auto flex w-full items-center justify-center gap-2 rounded-xl py-3 text-[13px] font-semibold transition-all',
           eligible
-            ? 'bg-success-700 cursor-pointer text-white hover:opacity-90'
-            : 'border-success-700/30 bg-success-700/10 text-success-700 cursor-not-allowed border-2 border-dashed font-medium'
+            ? 'bg-success-700 text-white hover:opacity-90'
+            : 'border-success-700/30 bg-success-700/10 text-success-700 border-2 border-dashed font-medium'
         )}
       >
         {!eligible && <Lock className="h-3.5 w-3.5" aria-hidden="true" />}

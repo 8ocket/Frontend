@@ -61,7 +61,7 @@ export function CheckboxItem({
         type="button"
         onClick={onChange}
         disabled={disabled}
-        className="flex shrink-0 cursor-pointer disabled:cursor-not-allowed"
+        className="flex shrink-0"
       >
         <div className={boxClass}>
           {checked && (
@@ -74,7 +74,7 @@ export function CheckboxItem({
         type="button"
         onClick={onLabelClick ?? onChange}
         disabled={disabled}
-        className="min-w-0 flex-1 cursor-pointer text-left disabled:cursor-not-allowed"
+        className="min-w-0 flex-1 text-left"
       >
         <p
           className={cn(

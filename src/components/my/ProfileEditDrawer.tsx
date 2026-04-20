@@ -234,7 +234,7 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="border-cta-300/40 bg-secondary-100 group hover:border-cta-300 relative flex size-20 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 transition-all"
+                      className="border-cta-300/40 bg-secondary-100 group hover:border-cta-300 relative flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 transition-all"
                       aria-label="프로필 사진 변경"
                     >
                       <ProfileAvatar src={profileImage} defaultPadding="p-2.5" />
@@ -281,7 +281,7 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
                       nicknameValidation
                         ? 'border-error-400 bg-error-50 focus:border-error-400'
                         : 'border-prime-200 bg-secondary-50 focus:border-cta-300'
-                    } text-prime-900 placeholder:text-prime-300 disabled:cursor-not-allowed disabled:opacity-60`}
+                    } text-prime-900 placeholder:text-prime-300 disabled:opacity-60`}
                   />
                   {(() => {
                     if (nicknameChangeCount >= 3) {
@@ -342,7 +342,7 @@ export function ProfileEditDrawer({ isOpen, onClose, onSaved }: ProfileEditDrawe
               type="button"
               onClick={handleSave}
               disabled={!nickname.trim() || saving || !hasChanges || !!nicknameValidation}
-              className="bg-cta-300 hover:bg-cta-400 w-full rounded-xl py-3.5 text-sm font-semibold text-white shadow-sm transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+              className="bg-cta-300 hover:bg-cta-400 w-full rounded-xl py-3.5 text-sm font-semibold text-white shadow-sm transition-all active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-400"
             >
               {saving ? '저장 중...' : '저장하기'}
             </button>

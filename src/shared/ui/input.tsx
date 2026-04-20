@@ -28,7 +28,7 @@ function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
         // Error
         'aria-invalid:border-error-700 aria-invalid:ring-2 aria-invalid:ring-error-700/20',
         // Disabled
-        'disabled:bg-neutral-300 disabled:border-neutral-200 disabled:cursor-not-allowed disabled:placeholder:text-neutral-400',
+        'disabled:bg-neutral-300 disabled:border-neutral-200 disabled:placeholder:text-neutral-400',
         className
       )}
       {...props}

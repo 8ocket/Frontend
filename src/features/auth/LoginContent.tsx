@@ -105,7 +105,7 @@ export function LoginContent({
             disabled={isLoading}
           />
 
-          {/* 임시 로그인 버튼 — 개발 환경에서만 노출 */}
+          {/* 임시 로그인 버튼 — 비활성화
           {USE_MOCK && (
             <button
               onClick={async () => {
@@ -123,7 +123,7 @@ export function LoginContent({
             >
               {loadingProvider === 'temp' ? '로그인 중...' : '임시 로그인 (개발용)'}
             </button>
-          )}
+          )} */}
 
           {/* 디스클레이머 텍스트 */}
           <p className="text-center text-[12px] leading-[1.2] tracking-[-0.18px] text-[#6a7282]">

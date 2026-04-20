@@ -50,7 +50,7 @@ export function SignupCreditModal({ isOpen, onConfirm }: SignupCreditModalProps)
         <button
           type="button"
           onClick={onConfirm}
-          className="bg-cta-300 h-14 w-full cursor-pointer rounded-xl text-base font-medium text-prime-900 shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1),0px_2px_4px_0px_rgba(0,0,0,0.1)] transition-opacity hover:opacity-90 active:opacity-80"
+          className="bg-cta-300 h-14 w-full rounded-xl text-base font-medium text-prime-900 shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1),0px_2px_4px_0px_rgba(0,0,0,0.1)] transition-opacity hover:opacity-90 active:opacity-80"
         >
           마인드 로그 시작하기
         </button>

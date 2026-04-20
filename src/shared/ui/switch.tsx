@@ -21,9 +21,9 @@ function Switch({
       data-slot="switch"
       checked={checked}
       className={cn(
-        "relative h-5 w-10.25 shrink-0 cursor-pointer rounded-full outline-none transition-colors duration-200",
+        "relative h-5 w-10.25 shrink-0 rounded-full outline-none transition-colors duration-200",
         checked ? "bg-cta-300" : "bg-neutral-200",
-        "disabled:cursor-not-allowed disabled:opacity-50",
+        "disabled:opacity-50",
         className
       )}
       {...props}

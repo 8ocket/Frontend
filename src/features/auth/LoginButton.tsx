@@ -59,7 +59,7 @@ export function LoginButton({
     <button
       onClick={onClick}
       disabled={disabled || isLoading}
-      className={`flex h-14 w-full items-center justify-center gap-2 rounded-xl px-6 py-2 font-medium transition-opacity duration-200 ${borderClass} ${bgClass} disabled:opacity-50 ${!borderClass ? 'text-white' : ''} ${config.textColor}`}
+      className={`flex h-14 w-full items-center justify-center gap-2 rounded-xl px-6 py-2 font-medium transition-opacity duration-200 hover:opacity-90 active:opacity-80 ${borderClass} ${bgClass} disabled:opacity-50 ${!borderClass ? 'text-white' : ''} ${config.textColor}`}
       style={{
         backgroundColor: provider !== 'google' ? config.bgColor : undefined,
         borderColor: provider === 'google' ? config.borderColor : 'transparent',

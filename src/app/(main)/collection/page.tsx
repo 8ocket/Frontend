@@ -239,7 +239,7 @@ export default function CollectionPage() {
             <button
               onClick={() => handleMonthChange(monthIndex + 1)}
               disabled={monthIndex >= totalMonths - 1}
-              className="text-prime-600 flex h-9 w-9 items-center justify-center rounded-full text-lg transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-30"
+              className="text-prime-600 flex h-9 w-9 items-center justify-center rounded-full text-lg transition-colors hover:bg-slate-100 disabled:opacity-30"
             >
               ‹
             </button>
@@ -247,7 +247,7 @@ export default function CollectionPage() {
             <button
               onClick={() => handleMonthChange(monthIndex - 1)}
               disabled={monthIndex <= 0}
-              className="text-prime-600 flex h-9 w-9 items-center justify-center rounded-full text-lg transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-30"
+              className="text-prime-600 flex h-9 w-9 items-center justify-center rounded-full text-lg transition-colors hover:bg-slate-100 disabled:opacity-30"
             >
               ›
             </button>

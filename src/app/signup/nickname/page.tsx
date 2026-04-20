@@ -194,7 +194,7 @@ export default function NicknamePage() {
               <button
                 type="button"
                 onClick={handleProfileClick}
-                className="border-cta-300 bg-secondary-100 relative flex size-15 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2"
+                className="border-cta-300 bg-secondary-100 relative flex size-15 shrink-0 items-center justify-center overflow-hidden rounded-full border-2"
               >
                 {profileImage ? (
                   <Image src={profileImage} alt="profile" fill sizes="60px" className="object-cover" />

@@ -89,7 +89,7 @@ export function DeleteReportModal({ isOpen, onClose, onConfirm, isDeleting }: De
               type="button"
               onClick={() => { setAgreed(false); onConfirm(); }}
               disabled={!agreed || isDeleting}
-              className="h-11 flex-1 rounded-lg bg-cta-300 text-base font-medium text-prime-900 transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
+              className="h-11 flex-1 rounded-lg bg-cta-300 text-base font-medium text-prime-900 transition-opacity hover:opacity-80 disabled:opacity-40"
             >
               {isDeleting ? '삭제 중...' : '삭제하기'}
             </button>

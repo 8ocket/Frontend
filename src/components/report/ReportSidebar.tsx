@@ -163,7 +163,7 @@ export function ReportSidebar({
                   onClick={() => onSelect(report.id)}
                   onKeyDown={(e) => e.key === 'Enter' && onSelect(report.id)}
                   className={cn(
-                    'group relative w-full cursor-pointer rounded-xl border px-4 py-3.5 text-left transition-all',
+                    'group relative w-full rounded-xl border px-4 py-3.5 text-left transition-all',
                     cardClass
                   )}
                 >
