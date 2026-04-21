@@ -35,7 +35,7 @@ export function CheckboxItem({
 }: CheckboxItemProps) {
   let tagColor: string;
   if (error) tagColor = 'text-error-700';
-  else if (required) tagColor = 'text-[rgba(130,201,255,0.8)]';
+  else if (required) tagColor = 'text-error-500';
   else tagColor = 'text-warning-500';
 
   // 체크박스 박스 스타일 결정
@@ -84,13 +84,9 @@ export function CheckboxItem({
         >
           <span>{label}</span>
           {showTag && (
-            <>
-              <span> (</span>
-              <span className={tagColor}>
-                {required ? '필수' : '선택'}
-              </span>
-              <span>)</span>
-            </>
+            <span className={cn('ml-1 font-medium', tagColor)}>
+              {required ? '*' : '(선택)'}
+            </span>
           )}
         </p>
       </button>
@@ -99,7 +95,7 @@ export function CheckboxItem({
         <button
           type="button"
           onClick={onLabelClick}
-          className="shrink-0 text-[14px] font-medium leading-5.25 text-prime-700 underline decoration-solid"
+          className="shrink-0 rounded-full border border-neutral-300 bg-neutral-100 px-2 py-0.5 text-[11px] font-medium text-prime-600"
         >
           보기
         </button>

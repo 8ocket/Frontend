@@ -18,7 +18,9 @@ import {
 
 export default function SignupPage() {
   const router = useRouter();
-  const [selectedTerm, setSelectedTerm] = useState<AgreementKey | null>(null);
+  const [selectedTerm, setSelectedTerm] = useState<AgreementKey | null>(
+    TERMS_GROUPS.find((g) => g.required)?.items[0]?.key ?? null
+  );
 
   useEffect(() => {
     if (!sessionStorage.getItem('pendingSignup')) {
@@ -111,6 +113,9 @@ export default function SignupPage() {
 
           {/* 약관 동의 목록 */}
           <div className="flex flex-col gap-8">
+            <p className="text-[11px] text-prime-500">
+              <span className="text-error-500">*</span> 표시 항목은 필수 동의 항목입니다.
+            </p>
             <div className="flex flex-col gap-6">
               {TERMS_GROUPS.map((group) => {
                 const isMulti = group.items.length > 1;
