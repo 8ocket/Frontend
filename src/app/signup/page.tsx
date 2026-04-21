@@ -18,9 +18,7 @@ import {
 
 export default function SignupPage() {
   const router = useRouter();
-  const [selectedTerm, setSelectedTerm] = useState<AgreementKey | null>(
-    TERMS_GROUPS.find((g) => g.required)?.items[0]?.key ?? null
-  );
+  const [selectedTerm, setSelectedTerm] = useState<AgreementKey | null>(null);
 
   useEffect(() => {
     if (!sessionStorage.getItem('pendingSignup')) {
