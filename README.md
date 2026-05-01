@@ -1,4 +1,4 @@
-직# 🧠 mindLog Frontend
+mindLog Frontend
 
 **AI 기반 감정 분석 및 정신 건강 관리 웹 서비스**
 
